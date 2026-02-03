@@ -5,8 +5,12 @@ import './index.css';
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch((error) => {
-      console.error('Service worker registration failed:', error);
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      registrations
+        .filter((registration) => registration.scope.includes('/hoshi-takarajima-pwa/'))
+        .forEach((registration) => {
+          registration.unregister();
+        });
     });
   });
 }
