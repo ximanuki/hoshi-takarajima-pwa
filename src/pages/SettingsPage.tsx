@@ -2,7 +2,9 @@ import { Link } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 
 export function SettingsPage() {
-  const settings = useAppStore((state) => state.settings);
+  const soundEnabled = useAppStore((state) => state.settings.soundEnabled);
+  const bgmVolume = useAppStore((state) => state.settings.bgmVolume);
+  const sfxVolume = useAppStore((state) => state.settings.sfxVolume);
   const updateSettings = useAppStore((state) => state.updateSettings);
   const clearProgress = useAppStore((state) => state.clearProgress);
 
@@ -19,32 +21,32 @@ export function SettingsPage() {
         <label className="field-row">
           <span>サウンド</span>
           <input
-            checked={settings.soundEnabled}
+            checked={soundEnabled}
             type="checkbox"
             onChange={(event) => updateSettings({ soundEnabled: event.target.checked })}
           />
         </label>
 
         <label className="field-stack">
-          <span>BGM おんりょう: {Math.round(settings.bgmVolume * 100)}%</span>
+          <span>BGM おんりょう: {Math.round(bgmVolume * 100)}%</span>
           <input
             max={1}
             min={0}
             step={0.1}
             type="range"
-            value={settings.bgmVolume}
+            value={bgmVolume}
             onChange={(event) => updateSettings({ bgmVolume: Number(event.target.value) })}
           />
         </label>
 
         <label className="field-stack">
-          <span>こうかおん: {Math.round(settings.sfxVolume * 100)}%</span>
+          <span>こうかおん: {Math.round(sfxVolume * 100)}%</span>
           <input
             max={1}
             min={0}
             step={0.1}
             type="range"
-            value={settings.sfxVolume}
+            value={sfxVolume}
             onChange={(event) => updateSettings({ sfxVolume: Number(event.target.value) })}
           />
         </label>

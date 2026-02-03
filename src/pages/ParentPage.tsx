@@ -8,13 +8,15 @@ import {
   PointElement,
   Tooltip,
 } from 'chart.js';
+import { useMemo } from 'react';
 import { Line } from 'react-chartjs-2';
 import { useAppStore } from '../store/useAppStore';
 
 ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Legend, Filler);
 
 export function ParentPage() {
-  const recent = useAppStore((state) => state.recentResults.slice(0, 7).reverse());
+  const recentResults = useAppStore((state) => state.recentResults);
+  const recent = useMemo(() => recentResults.slice(0, 7).reverse(), [recentResults]);
 
   const labels = recent.map((result) => result.date.slice(5, 10));
   const accuracy = recent.map((result) => Math.round((result.correct / result.total) * 100));
