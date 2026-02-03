@@ -1,0 +1,23 @@
+{
+  "name": "ほしのたからじま",
+  "short_name": "たからじま",
+  "description": "小学1〜2年生向け ゲーミフィケーション学習PWA",
+  "lang": "ja",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#d5f6ff",
+  "theme_color": "#56c7b4",
+  "icons": [
+    {
+      "src": "icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
