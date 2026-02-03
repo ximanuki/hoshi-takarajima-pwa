@@ -1,6 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 
+const modeLabel = {
+  learn: 'まなびミッション',
+  review: 'ふくしゅうミッション',
+  challenge: 'チャレンジミッション',
+} as const;
+
 export function ResultPage() {
   const result = useAppStore((state) => state.latestResult);
 
@@ -22,6 +28,11 @@ export function ResultPage() {
         <h1>
           {result.correct}/{result.total} せいかい
         </h1>
+        <p>{modeLabel[result.mode]}</p>
+        <p>せいとうりつ: {Math.round(result.accuracy * 100)}% / たいかんむずかしさ: {result.avgDifficulty}</p>
+        <p>
+          おすすめレベル: {result.beforeDifficulty} → {result.afterDifficulty}
+        </p>
         <p>⭐ +{result.earnedStars} / XP +{result.earnedXp}</p>
       </article>
 

@@ -2,6 +2,12 @@ import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 
+const modeLabel = {
+  learn: 'まなび',
+  review: 'ふくしゅう',
+  challenge: 'チャレンジ',
+} as const;
+
 export function PlayPage() {
   const navigate = useNavigate();
   const mission = useAppStore((state) => state.mission);
@@ -52,6 +58,9 @@ export function PlayPage() {
         <p>
           しんこう: {progress.now}/{progress.total}
         </p>
+        <p>
+          モード: {modeLabel[mission.plan.mode]} / ねらいレベル: {mission.plan.targetDifficulty}
+        </p>
         <div className="progress-track">
           <div className="progress-fill" style={{ width: `${(progress.now / progress.total) * 100}%` }} />
         </div>
@@ -59,6 +68,7 @@ export function PlayPage() {
 
       <article className="card">
         <h1>{question.prompt}</h1>
+        <p>むずかしさ: {question.difficulty}</p>
         <div className="choices">
           {question.choices.map((choice, index) => (
             <button

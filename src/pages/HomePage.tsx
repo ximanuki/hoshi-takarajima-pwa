@@ -1,9 +1,22 @@
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
+import { getDueReviewCount } from '../utils/mission';
 
 export function HomePage() {
   const streakDays = useAppStore((state) => state.streakDays);
   const recentResults = useAppStore((state) => state.recentResults);
+  const mathDifficulty = useAppStore((state) => state.adaptiveBySubject.math.targetDifficulty);
+  const japaneseDifficulty = useAppStore((state) => state.adaptiveBySubject.japanese.targetDifficulty);
+  const skillProgress = useAppStore((state) => state.skillProgress);
+
+  const dueReviews = useMemo(
+    () => ({
+      math: getDueReviewCount('math', skillProgress),
+      japanese: getDueReviewCount('japanese', skillProgress),
+    }),
+    [skillProgress],
+  );
 
   const last = recentResults[0];
 
@@ -19,6 +32,12 @@ export function HomePage() {
       </div>
 
       <div className="card">
+        <h2>おすすめレベル</h2>
+        <p>さんすう Lv.{mathDifficulty}（ふくしゅう {dueReviews.math}）</p>
+        <p>こくご Lv.{japaneseDifficulty}（ふくしゅう {dueReviews.japanese}）</p>
+      </div>
+
+      <div className="card">
         <h2>さいきんの きろく</h2>
         {last ? (
           <p>
@@ -30,7 +49,7 @@ export function HomePage() {
       </div>
 
       <div className="card mascot">
-        <p>あいぼう「ポコ」: まいにち 5ぷんで つよくなれるよ！</p>
+        <p>あいぼう「ポコ」: まちがいは たから！ つぎで もっと できるよ！</p>
       </div>
     </section>
   );

@@ -1,7 +1,20 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { buildMission, calcRewards } from '../utils/mission';
-import type { MissionResult, MissionSession, Settings, Subject } from '../types';
+import {
+  buildAdaptiveMission,
+  calcRewards,
+  createDefaultAdaptiveMap,
+  evaluateMission,
+  updateAdaptiveProgress,
+} from '../utils/mission';
+import type {
+  MissionResult,
+  MissionSession,
+  Settings,
+  SkillProgress,
+  Subject,
+  SubjectAdaptiveMap,
+} from '../types';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -17,6 +30,8 @@ type AppState = {
   subjectClears: SubjectCounts;
   recentResults: MissionResult[];
   settings: Settings;
+  adaptiveBySubject: SubjectAdaptiveMap;
+  skillProgress: Record<string, SkillProgress>;
   mission: MissionSession | null;
   latestResult: MissionResult | null;
   startMission: (subject: Subject) => void;
@@ -62,6 +77,8 @@ function grantBadge(state: AppState, result: MissionResult): string[] {
   if (state.streakDays >= 3) unlocked.add('three_day_streak');
   if (state.subjectClears.math >= 3) unlocked.add('math_explorer');
   if (state.subjectClears.japanese >= 3) unlocked.add('word_adventurer');
+  if (result.afterDifficulty > result.beforeDifficulty) unlocked.add('difficulty_climber');
+  if (result.mode === 'challenge' && result.correct === result.total) unlocked.add('challenge_clear');
 
   return Array.from(unlocked);
 }
@@ -78,14 +95,21 @@ export const useAppStore = create<AppState>()(
       subjectClears: defaultSubjectClears,
       recentResults: [],
       settings: defaultSettings,
+      adaptiveBySubject: createDefaultAdaptiveMap(),
+      skillProgress: {},
       mission: null,
       latestResult: null,
 
       startMission: (subject) => {
+        const state = get();
+        const subjectState = state.adaptiveBySubject[subject];
+        const { questions, plan } = buildAdaptiveMission(subject, subjectState, state.skillProgress);
+
         set({
           mission: {
             subject,
-            questions: buildMission(subject),
+            questions,
+            plan,
             currentIndex: 0,
             answers: [],
             startedAt: Date.now(),
@@ -114,17 +138,37 @@ export const useAppStore = create<AppState>()(
         const mission = state.mission;
         if (!mission) return null;
 
-        const total = mission.questions.length;
-        const correct = mission.questions.reduce((count, question, index) => {
-          return count + (mission.answers[index] === question.answerIndex ? 1 : 0);
-        }, 0);
+        const evaluation = evaluateMission(mission, mission.answers);
 
-        const { earnedXp, earnedStars } = calcRewards(correct, total);
+        const adaptiveUpdate = updateAdaptiveProgress({
+          subject: mission.subject,
+          subjectState: state.adaptiveBySubject[mission.subject],
+          skillProgress: state.skillProgress,
+          outcomes: evaluation.outcomes,
+          accuracy: evaluation.accuracy,
+          avgDifficulty: evaluation.avgDifficulty,
+          mode: mission.plan.mode,
+        });
+
+        const { earnedXp, earnedStars } = calcRewards({
+          correct: evaluation.correct,
+          total: evaluation.total,
+          mode: mission.plan.mode,
+          beforeDifficulty: adaptiveUpdate.beforeDifficulty,
+          afterDifficulty: adaptiveUpdate.afterDifficulty,
+          avgDifficulty: evaluation.avgDifficulty,
+        });
+
         const result: MissionResult = {
           date: new Date().toISOString(),
           subject: mission.subject,
-          total,
-          correct,
+          mode: mission.plan.mode,
+          total: evaluation.total,
+          correct: evaluation.correct,
+          accuracy: evaluation.accuracy,
+          avgDifficulty: Number(evaluation.avgDifficulty.toFixed(2)),
+          beforeDifficulty: adaptiveUpdate.beforeDifficulty,
+          afterDifficulty: adaptiveUpdate.afterDifficulty,
           durationSec: Math.max(10, Math.round((Date.now() - mission.startedAt) / 1000)),
           earnedXp,
           earnedStars,
@@ -142,6 +186,11 @@ export const useAppStore = create<AppState>()(
           [mission.subject]: state.subjectClears[mission.subject] + 1,
         };
 
+        const adaptiveBySubject: SubjectAdaptiveMap = {
+          ...state.adaptiveBySubject,
+          [mission.subject]: adaptiveUpdate.subjectState,
+        };
+
         const nextState: AppState = {
           ...state,
           xp: nextXp,
@@ -150,6 +199,8 @@ export const useAppStore = create<AppState>()(
           streakDays: newStreak,
           lastPlayedDate: today,
           subjectClears,
+          adaptiveBySubject,
+          skillProgress: adaptiveUpdate.skillProgress,
           recentResults: [result, ...state.recentResults].slice(0, 30),
           latestResult: result,
           mission: null,
@@ -175,6 +226,8 @@ export const useAppStore = create<AppState>()(
           badges: [],
           subjectClears: defaultSubjectClears,
           recentResults: [],
+          adaptiveBySubject: createDefaultAdaptiveMap(),
+          skillProgress: {},
           mission: null,
           latestResult: null,
         });
