@@ -3,11 +3,9 @@ import type { PropsWithChildren } from 'react';
 import { useAppStore } from '../store/useAppStore';
 
 export function AppShell({ children }: PropsWithChildren) {
-  const { level, stars, streakDays } = useAppStore((state) => ({
-    level: state.level,
-    stars: state.stars,
-    streakDays: state.streakDays,
-  }));
+  const level = useAppStore((state) => state.level);
+  const stars = useAppStore((state) => state.stars);
+  const streakDays = useAppStore((state) => state.streakDays);
 
   return (
     <div className="app-frame">

@@ -2,10 +2,8 @@ import { Link } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 
 export function HomePage() {
-  const { streakDays, recentResults } = useAppStore((state) => ({
-    streakDays: state.streakDays,
-    recentResults: state.recentResults,
-  }));
+  const streakDays = useAppStore((state) => state.streakDays);
+  const recentResults = useAppStore((state) => state.recentResults);
 
   const last = recentResults[0];
 
