@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { QuestionIllustration } from '../components/QuestionIllustration';
 import { questionMetaById } from '../data/question_meta';
 import { useAppStore } from '../store/useAppStore';
 import { getMisconceptionFeedback } from '../utils/misconceptions';
@@ -82,6 +83,7 @@ export function PlayPage() {
       <article className="card">
         <h1>{question.prompt}</h1>
         <p>むずかしさ: {question.difficulty}</p>
+        <QuestionIllustration question={question} />
         <div className="choices">
           {question.choices.map((choice, index) => (
             <button

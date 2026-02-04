@@ -157,6 +157,68 @@ p {
   gap: 8px;
 }
 
+.question-illustration {
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 2px dashed #a7d7cf;
+  background: linear-gradient(180deg, #f5fffd 0%, #ffffff 100%);
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+
+.question-illustration-title {
+  color: #0f6e6f;
+  font-size: 0.9rem;
+}
+
+.question-illustration-caption {
+  color: #1b5a5b;
+  font-size: 0.9rem;
+}
+
+.clock-svg {
+  width: min(240px, 100%);
+  height: auto;
+}
+
+.clock-face {
+  fill: #fffef8;
+  stroke: #2e8182;
+  stroke-width: 3;
+}
+
+.clock-tick {
+  stroke: #2f6f70;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.clock-number {
+  fill: #205f60;
+  font-size: 12px;
+  text-anchor: middle;
+}
+
+.clock-hand {
+  stroke-linecap: round;
+}
+
+.clock-hand.hour {
+  stroke: #2a4f63;
+  stroke-width: 5;
+}
+
+.clock-hand.minute {
+  stroke: #ff7f50;
+  stroke-width: 4;
+}
+
+.clock-center {
+  fill: #2a4f63;
+}
+
 .choice-btn {
   background: #f7f7ff;
   color: var(--ink);
