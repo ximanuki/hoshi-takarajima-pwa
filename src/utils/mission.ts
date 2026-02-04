@@ -1,5 +1,8 @@
 import { questionBank } from '../data/questions';
+import { questionMetaById } from '../data/question_meta';
 import type {
+  MisconceptionState,
+  MisconceptionTag,
   MissionMode,
   MissionPlan,
   MissionSession,
@@ -14,6 +17,19 @@ const MISSION_SIZE = 5;
 const MIN_DIFFICULTY = 1;
 const MAX_DIFFICULTY = 5;
 const BASE_MASTERY = 45;
+const MIN_PRIORITY = 0;
+const MAX_PRIORITY = 100;
+const MISCONCEPTION_ERROR_BASE_INTERVAL_MS = 3 * 60 * 1000;
+const MISCONCEPTION_ERROR_MAX_INTERVAL_MS = 24 * 60 * 60 * 1000;
+const MISCONCEPTION_RESOLVE_INTERVAL_MS = 8 * 60 * 60 * 1000;
+const MISCONCEPTION_PRIORITY_THRESHOLD = 25;
+const MISCONCEPTION_MAX_QUESTIONS = 2;
+const MISCONCEPTION_DIFFICULTY_TOLERANCE = 2;
+const PROMOTION_ACCURACY_MIN = 0.8;
+const PROMOTION_MASTERY_MIN = 55;
+const PROMOTION_UNRESOLVED_MAX = 0.35;
+const DEMOTION_ACCURACY_MAX = 0.4;
+const DEMOTION_UNRESOLVED_MIN = 0.65;
 
 const REVIEW_INTERVALS_MS = [
   5 * 60 * 1000,
@@ -54,13 +70,170 @@ function getSubjectSkillIds(subject: Subject): string[] {
 
 function getSkillProgress(skillProgress: Record<string, SkillProgress>, skillId: string, now: number): SkillProgress {
   const existing = skillProgress[skillId];
-  if (existing) return existing;
+  if (existing) {
+    return {
+      mastery: existing.mastery,
+      streak: existing.streak,
+      nextReviewAt: existing.nextReviewAt,
+      seenCount: existing.seenCount,
+      misconceptions: existing.misconceptions ?? {},
+      lastErrorTag: existing.lastErrorTag,
+    };
+  }
   return {
     mastery: BASE_MASTERY,
     streak: 0,
     nextReviewAt: now,
     seenCount: 0,
+    misconceptions: {},
   };
+}
+
+function createDefaultMisconceptionState(now: number): MisconceptionState {
+  return {
+    errorCount: 0,
+    recentErrorCount: 0,
+    resolvedStreak: 0,
+    priority: 0,
+    dueAt: now,
+    lastSeenAt: now,
+  };
+}
+
+function updateMisconceptionOnError(previous: MisconceptionState | undefined, difficulty: number, now: number): MisconceptionState {
+  const base = previous ?? createDefaultMisconceptionState(now);
+  const nextRecentErrorCount = base.recentErrorCount + 1;
+  const severity = 1 + difficulty * 0.2;
+  const interval = Math.min(
+    MISCONCEPTION_ERROR_BASE_INTERVAL_MS * 2 ** Math.max(nextRecentErrorCount - 1, 0),
+    MISCONCEPTION_ERROR_MAX_INTERVAL_MS,
+  );
+
+  return {
+    errorCount: base.errorCount + 1,
+    recentErrorCount: nextRecentErrorCount,
+    resolvedStreak: 0,
+    priority: clamp(base.priority + 12 * severity, MIN_PRIORITY, MAX_PRIORITY),
+    dueAt: now + interval,
+    lastSeenAt: now,
+  };
+}
+
+function decayTopMisconception(
+  misconceptions: Partial<Record<MisconceptionTag, MisconceptionState>>,
+  now: number,
+): Partial<Record<MisconceptionTag, MisconceptionState>> {
+  const entries = Object.entries(misconceptions) as Array<[MisconceptionTag, MisconceptionState]>;
+  if (entries.length === 0) return misconceptions;
+
+  const top = entries.sort((a, b) => b[1].priority - a[1].priority)[0];
+  if (!top) return misconceptions;
+
+  const [topTag, topState] = top;
+  const resolvedStreak = topState.resolvedStreak + 1;
+  const priorityDrop = 6 + resolvedStreak * 2;
+
+  return {
+    ...misconceptions,
+    [topTag]: {
+      ...topState,
+      resolvedStreak,
+      recentErrorCount: Math.max(0, topState.recentErrorCount - 1),
+      priority: clamp(topState.priority - priorityDrop, MIN_PRIORITY, MAX_PRIORITY),
+      dueAt: now + MISCONCEPTION_RESOLVE_INTERVAL_MS,
+      lastSeenAt: now,
+    },
+  };
+}
+
+function calcUnresolvedIndex(subjectSkills: string[], skillProgress: Record<string, SkillProgress>, now: number): number {
+  const priorities = subjectSkills.flatMap((skillId) =>
+    Object.values(getSkillProgress(skillProgress, skillId, now).misconceptions ?? {}).map((state) => state.priority),
+  );
+
+  if (priorities.length === 0) return 0;
+  const top2 = [...priorities].sort((a, b) => b - a).slice(0, 2);
+  const avgTopPriority = top2.reduce((sum, value) => sum + value, 0) / top2.length;
+  return Number((avgTopPriority / 100).toFixed(3));
+}
+
+type MisconceptionCandidate = {
+  skillId: string;
+  tag: MisconceptionTag;
+  priority: number;
+  dueAt: number;
+};
+
+function getDueMisconceptionCandidates(
+  skillIds: string[],
+  skillProgress: Record<string, SkillProgress>,
+  now: number,
+): MisconceptionCandidate[] {
+  const candidates: MisconceptionCandidate[] = [];
+
+  for (const skillId of skillIds) {
+    const progress = getSkillProgress(skillProgress, skillId, now);
+    const entries = Object.entries(progress.misconceptions ?? {}) as Array<[MisconceptionTag, MisconceptionState | undefined]>;
+
+    for (const [tag, state] of entries) {
+      if (!state) continue;
+      if (state.priority < MISCONCEPTION_PRIORITY_THRESHOLD) continue;
+      if (state.dueAt > now) continue;
+      candidates.push({
+        skillId,
+        tag,
+        priority: state.priority,
+        dueAt: state.dueAt,
+      });
+    }
+  }
+
+  return candidates.sort((a, b) => b.priority - a.priority || a.dueAt - b.dueAt);
+}
+
+function hasMisconceptionTag(question: Question, tag: MisconceptionTag): boolean {
+  return (questionMetaById[question.id]?.wrongChoiceTags ?? []).some((entry) => entry === tag);
+}
+
+function pickByMisconceptions(
+  candidates: MisconceptionCandidate[],
+  buckets: Map<string, Question[]>,
+  usedIds: Set<string>,
+  targetDifficulty: number,
+  count: number,
+  recentIds: Set<string>,
+): Question[] {
+  const selected: Question[] = [];
+  const usedTags = new Set<MisconceptionTag>();
+
+  const pickOne = (candidate: MisconceptionCandidate) => {
+    const skillQuestions = buckets.get(candidate.skillId) ?? [];
+    const tagged = skillQuestions.filter((question) => hasMisconceptionTag(question, candidate.tag));
+    if (tagged.length === 0) return;
+
+    const inRange = tagged.filter(
+      (question) => Math.abs(question.difficulty - targetDifficulty) <= MISCONCEPTION_DIFFICULTY_TOLERANCE,
+    );
+    const picked = pickQuestion(inRange.length > 0 ? inRange : tagged, usedIds, targetDifficulty, 'core', recentIds);
+    if (!picked) return;
+
+    usedIds.add(picked.id);
+    selected.push(picked);
+    usedTags.add(candidate.tag);
+  };
+
+  for (const candidate of candidates) {
+    if (selected.length >= count) break;
+    if (usedTags.has(candidate.tag)) continue;
+    pickOne(candidate);
+  }
+
+  for (const candidate of candidates) {
+    if (selected.length >= count) break;
+    pickOne(candidate);
+  }
+
+  return selected;
 }
 
 function pickQuestion(
@@ -129,6 +302,7 @@ export function buildAdaptiveMission(
   const questions = subjectQuestions(subject);
   const buckets = buildSkillBuckets(questions);
   const skills = getSubjectSkillIds(subject);
+  const misconceptionCandidates = getDueMisconceptionCandidates(skills, skillProgress, now);
 
   const dueSkills = skills
     .map((skillId) => ({
@@ -149,7 +323,17 @@ export function buildAdaptiveMission(
 
   const usedIds = new Set<string>();
   const recentIds = new Set(recentQuestionIds);
-  const reviewCountTarget = Math.min(2, dueSkills.length);
+  const misconceptionCountTarget = Math.min(MISCONCEPTION_MAX_QUESTIONS, misconceptionCandidates.length);
+  const misconceptionQuestions = pickByMisconceptions(
+    misconceptionCandidates,
+    buckets,
+    usedIds,
+    subjectState.targetDifficulty,
+    misconceptionCountTarget,
+    recentIds,
+  );
+
+  const reviewCountTarget = Math.min(2, dueSkills.length, MISSION_SIZE - misconceptionQuestions.length);
   const reviewQuestions = pickBySkills(
     dueSkills,
     buckets,
@@ -162,8 +346,9 @@ export function buildAdaptiveMission(
   const hasChallengeCandidate = questions.some(
     (question) => question.difficulty >= clamp(subjectState.targetDifficulty + 1, MIN_DIFFICULTY, MAX_DIFFICULTY),
   );
-  const challengeCountTarget = hasChallengeCandidate ? 1 : 0;
-  const coreCountTarget = MISSION_SIZE - reviewQuestions.length - challengeCountTarget;
+  const remainingAfterReview = MISSION_SIZE - misconceptionQuestions.length - reviewQuestions.length;
+  const challengeCountTarget = hasChallengeCandidate && remainingAfterReview > 0 ? 1 : 0;
+  const coreCountTarget = MISSION_SIZE - misconceptionQuestions.length - reviewQuestions.length - challengeCountTarget;
 
   const coreQuestions = pickBySkills(
     weaknessSkills,
@@ -183,14 +368,14 @@ export function buildAdaptiveMission(
     }
   }
 
-  const selected = [...reviewQuestions, ...coreQuestions, ...challengeQuestions];
+  const selected = [...misconceptionQuestions, ...reviewQuestions, ...coreQuestions, ...challengeQuestions];
 
   if (selected.length < MISSION_SIZE) {
     const fillers = shuffle(questions.filter((question) => !usedIds.has(question.id))).slice(0, MISSION_SIZE - selected.length);
     selected.push(...fillers);
   }
 
-  const reviewCount = reviewQuestions.length;
+  const reviewCount = reviewQuestions.length + misconceptionQuestions.length;
   const challengeCount = challengeQuestions.length;
   const coreCount = selected.length - reviewCount - challengeCount;
 
@@ -200,6 +385,7 @@ export function buildAdaptiveMission(
   const plan: MissionPlan = {
     mode,
     targetDifficulty: subjectState.targetDifficulty,
+    misconceptionCount: misconceptionQuestions.length,
     reviewCount,
     coreCount,
     challengeCount,
@@ -214,11 +400,13 @@ export function buildAdaptiveMission(
 export function evaluateMission(mission: MissionSession, answers: number[]) {
   const outcomes = mission.questions.map((question, index) => {
     const correct = answers[index] === question.answerIndex;
+    const trace = mission.answerTraces[index];
     return {
       questionId: question.id,
       skillId: question.skillId,
       difficulty: question.difficulty,
       correct,
+      errorTag: trace?.errorTag,
     };
   });
 
@@ -241,7 +429,7 @@ export function updateAdaptiveProgress(params: {
   subject: Subject;
   subjectState: SubjectAdaptiveState;
   skillProgress: Record<string, SkillProgress>;
-  outcomes: Array<{ skillId: string; difficulty: number; correct: boolean }>;
+  outcomes: Array<{ skillId: string; difficulty: number; correct: boolean; errorTag?: MisconceptionTag }>;
   accuracy: number;
   avgDifficulty: number;
   mode: MissionMode;
@@ -269,8 +457,21 @@ export function updateAdaptiveProgress(params: {
         streak,
         nextReviewAt: now + interval,
         seenCount: previous.seenCount + 1,
+        misconceptions: decayTopMisconception(previous.misconceptions ?? {}, now),
+        lastErrorTag: previous.lastErrorTag,
       };
       continue;
+    }
+
+    const misconceptions = { ...(previous.misconceptions ?? {}) };
+    let lastErrorTag = previous.lastErrorTag;
+    if (outcome.errorTag) {
+      misconceptions[outcome.errorTag] = updateMisconceptionOnError(
+        misconceptions[outcome.errorTag],
+        outcome.difficulty,
+        now,
+      );
+      lastErrorTag = outcome.errorTag;
     }
 
     nextSkillProgress[outcome.skillId] = {
@@ -278,6 +479,8 @@ export function updateAdaptiveProgress(params: {
       streak: 0,
       nextReviewAt: now + 3 * 60 * 1000,
       seenCount: previous.seenCount + 1,
+      misconceptions,
+      lastErrorTag,
     };
   }
 
@@ -289,20 +492,22 @@ export function updateAdaptiveProgress(params: {
   const avgMastery =
     subjectSkills.reduce((sum, skillId) => sum + getSkillProgress(nextSkillProgress, skillId, now).mastery, 0) /
     subjectSkills.length;
+  const unresolvedIndex = calcUnresolvedIndex(subjectSkills, nextSkillProgress, now);
 
   const beforeDifficulty = subjectState.targetDifficulty;
   let afterDifficulty = beforeDifficulty;
 
   if (
-    accuracy >= 0.8 &&
-    avgMastery >= 55 &&
+    accuracy >= PROMOTION_ACCURACY_MIN &&
+    avgMastery >= PROMOTION_MASTERY_MIN &&
+    unresolvedIndex <= PROMOTION_UNRESOLVED_MAX &&
     avgDifficulty >= beforeDifficulty - 0.25 &&
     mode !== 'review'
   ) {
     afterDifficulty += 1;
   }
 
-  if (accuracy <= 0.4) {
+  if (accuracy <= DEMOTION_ACCURACY_MAX || unresolvedIndex >= DEMOTION_UNRESOLVED_MIN) {
     afterDifficulty -= 1;
   }
 
@@ -318,6 +523,7 @@ export function updateAdaptiveProgress(params: {
     afterDifficulty,
     avgMastery,
     reviewedSkills,
+    unresolvedIndex,
   };
 }
 

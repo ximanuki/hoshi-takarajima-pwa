@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
+import { getMisconceptionFeedback, getMisconceptionLabel } from '../utils/misconceptions';
 
 const modeLabel = {
   learn: 'まなびミッション',
@@ -34,6 +35,13 @@ export function ResultPage() {
           おすすめレベル: {result.beforeDifficulty} → {result.afterDifficulty}
         </p>
         <p>⭐ +{result.earnedStars} / XP +{result.earnedXp}</p>
+        {result.topMisconceptions && result.topMisconceptions.length > 0 ? (
+          <div>
+            <p>こんかいの つまずき:</p>
+            <p>{result.topMisconceptions.map((item) => `${getMisconceptionLabel(item.tag)}(${item.count})`).join(' / ')}</p>
+            {result.recommendedFocusTag ? <p>つぎは: {getMisconceptionFeedback(result.recommendedFocusTag)}</p> : null}
+          </div>
+        ) : null}
       </article>
 
       <div className="card inline-actions">

@@ -9,6 +9,8 @@
     "prebuild": "npm run questions:build",
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "test": "vitest run",
+    "test:golden": "vitest run src/utils/mission.test.ts src/utils/diagnostics.test.ts",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -32,6 +34,7 @@
     "globals": "^16.5.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
-    "vite": "^7.2.4"
+    "vite": "^7.2.4",
+    "vitest": "^4.0.18"
   }
 }

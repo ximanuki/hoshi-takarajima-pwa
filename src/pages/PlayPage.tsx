@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { questionMetaById } from '../data/question_meta';
 import { useAppStore } from '../store/useAppStore';
+import { getMisconceptionFeedback } from '../utils/misconceptions';
 
 const modeLabel = {
   learn: 'まなび',
@@ -16,6 +18,7 @@ export function PlayPage() {
   const finishMission = useAppStore((state) => state.finishMission);
   const [selected, setSelected] = useState<number | null>(null);
   const [showHint, setShowHint] = useState(false);
+  const [feedback, setFeedback] = useState<{ correct: boolean; message: string } | null>(null);
 
   const progress = useMemo(() => {
     if (!mission) return { now: 0, total: 0 };
@@ -38,11 +41,21 @@ export function PlayPage() {
 
   const onNext = () => {
     if (selected === null) return;
-    submitAnswer(selected);
-    setShowHint(false);
-    setSelected(null);
+    if (!feedback) {
+      submitAnswer(selected);
+      const correct = selected === question.answerIndex;
+      const errorTag = questionMetaById[question.id]?.wrongChoiceTags?.[selected];
+      setFeedback({
+        correct,
+        message: correct ? 'せいかい！ そのちょうし！' : errorTag ? getMisconceptionFeedback(errorTag) : 'もういちど みてみよう',
+      });
+      return;
+    }
 
     const isLast = mission.currentIndex >= mission.questions.length - 1;
+    setShowHint(false);
+    setSelected(null);
+    setFeedback(null);
     if (isLast) {
       finishMission();
       navigate('/result');
@@ -74,6 +87,7 @@ export function PlayPage() {
             <button
               className={`choice-btn ${selected === index ? 'selected' : ''}`}
               key={choice}
+              disabled={Boolean(feedback)}
               onClick={() => setSelected(index)}
             >
               {choice}
@@ -86,10 +100,11 @@ export function PlayPage() {
             ヒント
           </button>
           <button className="primary-btn" onClick={onNext} disabled={selected === null}>
-            {progress.now === progress.total ? 'けっかへ' : 'つぎへ'}
+            {!feedback ? 'こたえる' : progress.now === progress.total ? 'けっかへ' : 'つぎへ'}
           </button>
         </div>
 
+        {feedback ? <p className="hint">{feedback.correct ? '🎉 ' : '📝 '}{feedback.message}</p> : null}
         {showHint ? <p className="hint">💡 {question.hint}</p> : null}
       </article>
     </section>

@@ -32,6 +32,12 @@ npm run build
 npm run preview
 ```
 
+## テスト
+```bash
+npm run test
+npm run test:golden
+```
+
 ## デプロイ（GitHub Pages）
 - `main` へ push すると `.github/workflows/deploy.yml` で自動デプロイされます。
 - GitHub の Settings > Pages で **Source = GitHub Actions** を選択してください。
