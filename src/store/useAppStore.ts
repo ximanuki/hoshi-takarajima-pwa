@@ -77,11 +77,15 @@ const defaultSettings: Settings = {
 const defaultSubjectClears: SubjectCounts = {
   math: 0,
   japanese: 0,
+  life: 0,
+  insight: 0,
 };
 
 const defaultRecentQuestionIdsBySubject: SubjectRecentQuestions = {
   math: [],
   japanese: [],
+  life: [],
+  insight: [],
 };
 
 function normalizeDate(date: Date): string {
@@ -93,7 +97,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function isSubject(value: unknown): value is Subject {
-  return value === 'math' || value === 'japanese';
+  return value === 'math' || value === 'japanese' || value === 'life' || value === 'insight';
 }
 
 function isMisconceptionTag(value: unknown): value is MisconceptionTag {
@@ -103,6 +107,37 @@ function isMisconceptionTag(value: unknown): value is MisconceptionTag {
 function toNumber(value: unknown, fallback: number): number {
   if (typeof value !== 'number' || Number.isNaN(value)) return fallback;
   return value;
+}
+
+function normalizeSubjectClears(value: unknown): SubjectCounts {
+  if (!isRecord(value)) return defaultSubjectClears;
+
+  return {
+    math: toNumber(value.math, 0),
+    japanese: toNumber(value.japanese, 0),
+    life: toNumber(value.life, 0),
+    insight: toNumber(value.insight, 0),
+  };
+}
+
+function normalizeAdaptiveBySubject(value: unknown): SubjectAdaptiveMap {
+  if (!isRecord(value)) return createDefaultAdaptiveMap();
+
+  const defaults = createDefaultAdaptiveMap();
+  const normalizeOne = (raw: unknown, fallback: { targetDifficulty: number; missionCount: number }) => {
+    if (!isRecord(raw)) return fallback;
+    return {
+      targetDifficulty: Math.max(1, Math.min(5, Math.round(toNumber(raw.targetDifficulty, fallback.targetDifficulty)))),
+      missionCount: Math.max(0, Math.round(toNumber(raw.missionCount, fallback.missionCount))),
+    };
+  };
+
+  return {
+    math: normalizeOne(value.math, defaults.math),
+    japanese: normalizeOne(value.japanese, defaults.japanese),
+    life: normalizeOne(value.life, defaults.life),
+    insight: normalizeOne(value.insight, defaults.insight),
+  };
 }
 
 function normalizeMisconceptions(value: unknown, now: number): Partial<Record<MisconceptionTag, MisconceptionState>> {
@@ -146,14 +181,18 @@ function normalizeSkillProgressMap(value: unknown): Record<string, SkillProgress
 }
 
 function normalizeRecentQuestionIdsBySubject(value: unknown): SubjectRecentQuestions {
-  if (!isRecord(value)) return { math: [], japanese: [] };
+  if (!isRecord(value)) return { math: [], japanese: [], life: [], insight: [] };
 
   const math = Array.isArray(value.math) ? value.math.filter((id): id is string => typeof id === 'string') : [];
   const japanese = Array.isArray(value.japanese)
     ? value.japanese.filter((id): id is string => typeof id === 'string')
     : [];
+  const life = Array.isArray(value.life) ? value.life.filter((id): id is string => typeof id === 'string') : [];
+  const insight = Array.isArray(value.insight)
+    ? value.insight.filter((id): id is string => typeof id === 'string')
+    : [];
 
-  return { math, japanese };
+  return { math, japanese, life, insight };
 }
 
 function normalizeDiagnosticLogs(value: unknown): AnswerTrace[] {
@@ -444,13 +483,15 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'hoshi-takarajima-pwa',
-      version: 2,
+      version: 3,
       migrate: (persistedState, version) => {
         void version;
         if (!isRecord(persistedState)) return persistedState;
 
         return {
           ...persistedState,
+          subjectClears: normalizeSubjectClears(persistedState.subjectClears),
+          adaptiveBySubject: normalizeAdaptiveBySubject(persistedState.adaptiveBySubject),
           skillProgress: normalizeSkillProgressMap(persistedState.skillProgress),
           recentQuestionIdsBySubject: normalizeRecentQuestionIdsBySubject(persistedState.recentQuestionIdsBySubject),
           diagnosticLogs: normalizeDiagnosticLogs(persistedState.diagnosticLogs),

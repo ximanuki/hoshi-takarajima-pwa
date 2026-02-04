@@ -44,6 +44,8 @@ export function createDefaultAdaptiveMap(): SubjectAdaptiveMap {
   return {
     math: { targetDifficulty: 1, missionCount: 0 },
     japanese: { targetDifficulty: 1, missionCount: 0 },
+    life: { targetDifficulty: 1, missionCount: 0 },
+    insight: { targetDifficulty: 1, missionCount: 0 },
   };
 }
 

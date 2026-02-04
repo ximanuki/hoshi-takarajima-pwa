@@ -43,8 +43,8 @@ function parseTable(markdown) {
     const answerIndex = Number(answerRaw);
 
     if (!id) throw new Error(`Row ${index + 1}: id is required.`);
-    if (!['math', 'japanese'].includes(subject)) {
-      throw new Error(`Row ${index + 1}: subject must be math|japanese.`);
+    if (!['math', 'japanese', 'life', 'insight'].includes(subject)) {
+      throw new Error(`Row ${index + 1}: subject must be math|japanese|life|insight.`);
     }
     if (!skillId) throw new Error(`Row ${index + 1}: skillId is required.`);
     if (!Number.isInteger(difficulty) || difficulty < 1 || difficulty > 5) {

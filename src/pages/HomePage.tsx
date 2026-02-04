@@ -1,20 +1,27 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
+import type { Subject } from '../types';
 import { getDueReviewCount } from '../utils/mission';
+
+const subjectLabels: Record<Subject, string> = {
+  math: 'さんすう',
+  japanese: 'こくご',
+  life: 'くらし',
+  insight: 'ひらめき',
+};
+
+const homeSubjects: Subject[] = ['math', 'japanese', 'life', 'insight'];
 
 export function HomePage() {
   const streakDays = useAppStore((state) => state.streakDays);
   const recentResults = useAppStore((state) => state.recentResults);
-  const mathDifficulty = useAppStore((state) => state.adaptiveBySubject.math.targetDifficulty);
-  const japaneseDifficulty = useAppStore((state) => state.adaptiveBySubject.japanese.targetDifficulty);
+  const adaptiveBySubject = useAppStore((state) => state.adaptiveBySubject);
   const skillProgress = useAppStore((state) => state.skillProgress);
 
   const dueReviews = useMemo(
-    () => ({
-      math: getDueReviewCount('math', skillProgress),
-      japanese: getDueReviewCount('japanese', skillProgress),
-    }),
+    () =>
+      Object.fromEntries(homeSubjects.map((subject) => [subject, getDueReviewCount(subject, skillProgress)])) as Record<Subject, number>,
     [skillProgress],
   );
 
@@ -33,15 +40,18 @@ export function HomePage() {
 
       <div className="card">
         <h2>おすすめレベル</h2>
-        <p>さんすう Lv.{mathDifficulty}（ふくしゅう {dueReviews.math}）</p>
-        <p>こくご Lv.{japaneseDifficulty}（ふくしゅう {dueReviews.japanese}）</p>
+        {homeSubjects.map((subject) => (
+          <p key={subject}>
+            {subjectLabels[subject]} Lv.{adaptiveBySubject[subject].targetDifficulty}（ふくしゅう {dueReviews[subject]}）
+          </p>
+        ))}
       </div>
 
       <div className="card">
         <h2>さいきんの きろく</h2>
         {last ? (
           <p>
-            {last.subject === 'math' ? 'さんすう' : 'こくご'}: {last.correct}/{last.total} せいかい
+            {subjectLabels[last.subject]}: {last.correct}/{last.total} せいかい
           </p>
         ) : (
           <p>まだ きろくが ありません。さいしょの ぼうけんへ！</p>

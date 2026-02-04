@@ -1,6 +1,14 @@
 import { Link } from 'react-router-dom';
 import { questionBank } from '../data/questions';
 import { useAppStore } from '../store/useAppStore';
+import type { Subject } from '../types';
+
+const subjectLabels: Record<Subject, string> = {
+  math: 'さんすう',
+  japanese: 'こくご',
+  life: 'くらし',
+  insight: 'ひらめき',
+};
 
 export function SettingsPage() {
   const soundEnabled = useAppStore((state) => state.settings.soundEnabled);
@@ -8,8 +16,13 @@ export function SettingsPage() {
   const sfxVolume = useAppStore((state) => state.settings.sfxVolume);
   const updateSettings = useAppStore((state) => state.updateSettings);
   const clearProgress = useAppStore((state) => state.clearProgress);
-  const mathCount = questionBank.filter((question) => question.subject === 'math').length;
-  const japaneseCount = questionBank.filter((question) => question.subject === 'japanese').length;
+  const subjectCounts = questionBank.reduce<Record<Subject, number>>(
+    (counts, question) => ({
+      ...counts,
+      [question.subject]: counts[question.subject] + 1,
+    }),
+    { math: 0, japanese: 0, life: 0, insight: 0 },
+  );
 
   const onReset = () => {
     if (!window.confirm('ほんとうに がくしゅうきろくを けしますか？')) return;
@@ -69,7 +82,13 @@ export function SettingsPage() {
         <p>編集元: docs/question_bank_master.md</p>
         <p>アプリ参照: src/data/questions.generated.ts （src/data/questions.ts けいゆ）</p>
         <p>
-          もんだい数: さんすう {mathCount} / こくご {japaneseCount} / ごうけい {questionBank.length}
+          もんだい数:
+          {' '}
+          {(Object.keys(subjectLabels) as Subject[])
+            .map((subject) => `${subjectLabels[subject]} ${subjectCounts[subject]}`)
+            .join(' / ')}
+          {' '}
+          / ごうけい {questionBank.length}
         </p>
       </article>
     </section>

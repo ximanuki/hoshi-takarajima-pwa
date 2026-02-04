@@ -1,4 +1,4 @@
-export type Subject = 'math' | 'japanese';
+export type Subject = 'math' | 'japanese' | 'life' | 'insight';
 export type MissionMode = 'learn' | 'review' | 'challenge';
 export type MisconceptionTag =
   | 'unknown_guess'

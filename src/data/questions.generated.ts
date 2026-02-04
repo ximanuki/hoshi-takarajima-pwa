@@ -11145,5 +11145,3365 @@ export const questionBank: Question[] = [
     ],
     "answerIndex": 2,
     "hint": "ばめんに あう ことばを えらぼう。"
+  },
+  {
+    "id": "l1",
+    "subject": "life",
+    "skillId": "clock_hour",
+    "difficulty": 1,
+    "prompt": "とけいの みじかい はりが 1、ながい はりが 12。なんじ？",
+    "choices": [
+      "12じ",
+      "1じ",
+      "2じ"
+    ],
+    "answerIndex": 1,
+    "hint": "みじかい はりの かずを よもう。"
+  },
+  {
+    "id": "l2",
+    "subject": "life",
+    "skillId": "clock_hour",
+    "difficulty": 1,
+    "prompt": "2じ ちょうどを あらわす こたえは？",
+    "choices": [
+      "1じ",
+      "3じ",
+      "2じ"
+    ],
+    "answerIndex": 2,
+    "hint": "みじかい はりの かずを よもう。"
+  },
+  {
+    "id": "l3",
+    "subject": "life",
+    "skillId": "clock_hour",
+    "difficulty": 1,
+    "prompt": "チャイムが 3じに なったよ。いま なんじ？",
+    "choices": [
+      "3じ",
+      "4じ",
+      "2じ"
+    ],
+    "answerIndex": 0,
+    "hint": "みじかい はりの かずを よもう。"
+  },
+  {
+    "id": "l4",
+    "subject": "life",
+    "skillId": "clock_hour",
+    "difficulty": 1,
+    "prompt": "とけいの みじかい はりが 4、ながい はりが 12。なんじ？",
+    "choices": [
+      "5じ",
+      "4じ",
+      "3じ"
+    ],
+    "answerIndex": 1,
+    "hint": "みじかい はりの かずを よもう。"
+  },
+  {
+    "id": "l5",
+    "subject": "life",
+    "skillId": "clock_hour",
+    "difficulty": 1,
+    "prompt": "5じ ちょうどを あらわす こたえは？",
+    "choices": [
+      "6じ",
+      "4じ",
+      "5じ"
+    ],
+    "answerIndex": 2,
+    "hint": "みじかい はりの かずを よもう。"
+  },
+  {
+    "id": "l6",
+    "subject": "life",
+    "skillId": "clock_hour",
+    "difficulty": 1,
+    "prompt": "チャイムが 6じに なったよ。いま なんじ？",
+    "choices": [
+      "6じ",
+      "5じ",
+      "7じ"
+    ],
+    "answerIndex": 0,
+    "hint": "みじかい はりの かずを よもう。"
+  },
+  {
+    "id": "l7",
+    "subject": "life",
+    "skillId": "clock_hour",
+    "difficulty": 2,
+    "prompt": "とけいの みじかい はりが 7、ながい はりが 12。なんじ？",
+    "choices": [
+      "6じ",
+      "7じ",
+      "8じ"
+    ],
+    "answerIndex": 1,
+    "hint": "みじかい はりの かずを よもう。"
+  },
+  {
+    "id": "l8",
+    "subject": "life",
+    "skillId": "clock_hour",
+    "difficulty": 2,
+    "prompt": "8じ ちょうどを あらわす こたえは？",
+    "choices": [
+      "7じ",
+      "9じ",
+      "8じ"
+    ],
+    "answerIndex": 2,
+    "hint": "みじかい はりの かずを よもう。"
+  },
+  {
+    "id": "l9",
+    "subject": "life",
+    "skillId": "clock_hour",
+    "difficulty": 2,
+    "prompt": "チャイムが 9じに なったよ。いま なんじ？",
+    "choices": [
+      "9じ",
+      "10じ",
+      "8じ"
+    ],
+    "answerIndex": 0,
+    "hint": "みじかい はりの かずを よもう。"
+  },
+  {
+    "id": "l10",
+    "subject": "life",
+    "skillId": "clock_hour",
+    "difficulty": 2,
+    "prompt": "とけいの みじかい はりが 10、ながい はりが 12。なんじ？",
+    "choices": [
+      "11じ",
+      "10じ",
+      "9じ"
+    ],
+    "answerIndex": 1,
+    "hint": "みじかい はりの かずを よもう。"
+  },
+  {
+    "id": "l11",
+    "subject": "life",
+    "skillId": "clock_hour",
+    "difficulty": 2,
+    "prompt": "11じ ちょうどを あらわす こたえは？",
+    "choices": [
+      "12じ",
+      "10じ",
+      "11じ"
+    ],
+    "answerIndex": 2,
+    "hint": "みじかい はりの かずを よもう。"
+  },
+  {
+    "id": "l12",
+    "subject": "life",
+    "skillId": "clock_hour",
+    "difficulty": 2,
+    "prompt": "チャイムが 12じに なったよ。いま なんじ？",
+    "choices": [
+      "12じ",
+      "11じ",
+      "1じ"
+    ],
+    "answerIndex": 0,
+    "hint": "みじかい はりの かずを よもう。"
+  },
+  {
+    "id": "l13",
+    "subject": "life",
+    "skillId": "clock_half",
+    "difficulty": 2,
+    "prompt": "ながい はりが 6、みじかい はりが 1と2の あいだ。なんじ はん？",
+    "choices": [
+      "1じ",
+      "1じはん",
+      "2じはん"
+    ],
+    "answerIndex": 1,
+    "hint": "ながい はりが 6なら 「はん」。"
+  },
+  {
+    "id": "l14",
+    "subject": "life",
+    "skillId": "clock_half",
+    "difficulty": 2,
+    "prompt": "2じの はんぶん すぎ。なんじ はん？",
+    "choices": [
+      "2じ",
+      "3じはん",
+      "2じはん"
+    ],
+    "answerIndex": 2,
+    "hint": "ながい はりが 6なら 「はん」。"
+  },
+  {
+    "id": "l15",
+    "subject": "life",
+    "skillId": "clock_half",
+    "difficulty": 2,
+    "prompt": "3じ30ぷんを こくごで いうと？",
+    "choices": [
+      "3じはん",
+      "4じはん",
+      "3じ"
+    ],
+    "answerIndex": 0,
+    "hint": "ながい はりが 6なら 「はん」。"
+  },
+  {
+    "id": "l16",
+    "subject": "life",
+    "skillId": "clock_half",
+    "difficulty": 2,
+    "prompt": "ながい はりが 6、みじかい はりが 4と5の あいだ。なんじ はん？",
+    "choices": [
+      "5じはん",
+      "4じはん",
+      "4じ"
+    ],
+    "answerIndex": 1,
+    "hint": "ながい はりが 6なら 「はん」。"
+  },
+  {
+    "id": "l17",
+    "subject": "life",
+    "skillId": "clock_half",
+    "difficulty": 2,
+    "prompt": "5じの はんぶん すぎ。なんじ はん？",
+    "choices": [
+      "6じはん",
+      "5じ",
+      "5じはん"
+    ],
+    "answerIndex": 2,
+    "hint": "ながい はりが 6なら 「はん」。"
+  },
+  {
+    "id": "l18",
+    "subject": "life",
+    "skillId": "clock_half",
+    "difficulty": 2,
+    "prompt": "6じ30ぷんを こくごで いうと？",
+    "choices": [
+      "6じはん",
+      "6じ",
+      "7じはん"
+    ],
+    "answerIndex": 0,
+    "hint": "ながい はりが 6なら 「はん」。"
+  },
+  {
+    "id": "l19",
+    "subject": "life",
+    "skillId": "clock_half",
+    "difficulty": 3,
+    "prompt": "ながい はりが 6、みじかい はりが 7と8の あいだ。なんじ はん？",
+    "choices": [
+      "7じ",
+      "7じはん",
+      "8じはん"
+    ],
+    "answerIndex": 1,
+    "hint": "ながい はりが 6なら 「はん」。"
+  },
+  {
+    "id": "l20",
+    "subject": "life",
+    "skillId": "clock_half",
+    "difficulty": 3,
+    "prompt": "8じの はんぶん すぎ。なんじ はん？",
+    "choices": [
+      "8じ",
+      "9じはん",
+      "8じはん"
+    ],
+    "answerIndex": 2,
+    "hint": "ながい はりが 6なら 「はん」。"
+  },
+  {
+    "id": "l21",
+    "subject": "life",
+    "skillId": "clock_half",
+    "difficulty": 3,
+    "prompt": "9じ30ぷんを こくごで いうと？",
+    "choices": [
+      "9じはん",
+      "10じはん",
+      "9じ"
+    ],
+    "answerIndex": 0,
+    "hint": "ながい はりが 6なら 「はん」。"
+  },
+  {
+    "id": "l22",
+    "subject": "life",
+    "skillId": "clock_half",
+    "difficulty": 3,
+    "prompt": "ながい はりが 6、みじかい はりが 10と11の あいだ。なんじ はん？",
+    "choices": [
+      "11じはん",
+      "10じはん",
+      "10じ"
+    ],
+    "answerIndex": 1,
+    "hint": "ながい はりが 6なら 「はん」。"
+  },
+  {
+    "id": "l23",
+    "subject": "life",
+    "skillId": "clock_half",
+    "difficulty": 3,
+    "prompt": "11じの はんぶん すぎ。なんじ はん？",
+    "choices": [
+      "12じはん",
+      "11じ",
+      "11じはん"
+    ],
+    "answerIndex": 2,
+    "hint": "ながい はりが 6なら 「はん」。"
+  },
+  {
+    "id": "l24",
+    "subject": "life",
+    "skillId": "clock_half",
+    "difficulty": 3,
+    "prompt": "12じ30ぷんを こくごで いうと？",
+    "choices": [
+      "12じはん",
+      "12じ",
+      "1じはん"
+    ],
+    "answerIndex": 0,
+    "hint": "ながい はりが 6なら 「はん」。"
+  },
+  {
+    "id": "l25",
+    "subject": "life",
+    "skillId": "clock_quarter",
+    "difficulty": 3,
+    "prompt": "ながい はりが 3、みじかい はりが 1を すぎたところ。なんじ なんぷん？",
+    "choices": [
+      "1じ45ふん",
+      "1じ15ふん",
+      "2じ15ふん"
+    ],
+    "answerIndex": 1,
+    "hint": "ながい はりが 3は 15ふん。"
+  },
+  {
+    "id": "l26",
+    "subject": "life",
+    "skillId": "clock_quarter",
+    "difficulty": 3,
+    "prompt": "ながい はりが 3、みじかい はりが 2を すぎたところ。なんじ なんぷん？",
+    "choices": [
+      "2じ45ふん",
+      "3じ15ふん",
+      "2じ15ふん"
+    ],
+    "answerIndex": 2,
+    "hint": "ながい はりが 3は 15ふん。"
+  },
+  {
+    "id": "l27",
+    "subject": "life",
+    "skillId": "clock_quarter",
+    "difficulty": 3,
+    "prompt": "ながい はりが 3、みじかい はりが 3を すぎたところ。なんじ なんぷん？",
+    "choices": [
+      "3じ15ふん",
+      "4じ15ふん",
+      "3じ45ふん"
+    ],
+    "answerIndex": 0,
+    "hint": "ながい はりが 3は 15ふん。"
+  },
+  {
+    "id": "l28",
+    "subject": "life",
+    "skillId": "clock_quarter",
+    "difficulty": 3,
+    "prompt": "ながい はりが 3、みじかい はりが 4を すぎたところ。なんじ なんぷん？",
+    "choices": [
+      "5じ15ふん",
+      "4じ15ふん",
+      "4じ45ふん"
+    ],
+    "answerIndex": 1,
+    "hint": "ながい はりが 3は 15ふん。"
+  },
+  {
+    "id": "l29",
+    "subject": "life",
+    "skillId": "clock_quarter",
+    "difficulty": 3,
+    "prompt": "ながい はりが 3、みじかい はりが 5を すぎたところ。なんじ なんぷん？",
+    "choices": [
+      "6じ15ふん",
+      "5じ45ふん",
+      "5じ15ふん"
+    ],
+    "answerIndex": 2,
+    "hint": "ながい はりが 3は 15ふん。"
+  },
+  {
+    "id": "l30",
+    "subject": "life",
+    "skillId": "clock_quarter",
+    "difficulty": 3,
+    "prompt": "ながい はりが 3、みじかい はりが 6を すぎたところ。なんじ なんぷん？",
+    "choices": [
+      "6じ15ふん",
+      "6じ45ふん",
+      "7じ15ふん"
+    ],
+    "answerIndex": 0,
+    "hint": "ながい はりが 3は 15ふん。"
+  },
+  {
+    "id": "l31",
+    "subject": "life",
+    "skillId": "clock_quarter",
+    "difficulty": 4,
+    "prompt": "ながい はりが 9、みじかい はりが 8に ちかい。なんじ なんぷん？",
+    "choices": [
+      "7じ15ふん",
+      "7じ45ふん",
+      "8じ45ふん"
+    ],
+    "answerIndex": 1,
+    "hint": "ながい はりが 9は 45ふん。"
+  },
+  {
+    "id": "l32",
+    "subject": "life",
+    "skillId": "clock_quarter",
+    "difficulty": 4,
+    "prompt": "ながい はりが 9、みじかい はりが 9に ちかい。なんじ なんぷん？",
+    "choices": [
+      "8じ15ふん",
+      "9じ45ふん",
+      "8じ45ふん"
+    ],
+    "answerIndex": 2,
+    "hint": "ながい はりが 9は 45ふん。"
+  },
+  {
+    "id": "l33",
+    "subject": "life",
+    "skillId": "clock_quarter",
+    "difficulty": 4,
+    "prompt": "ながい はりが 9、みじかい はりが 10に ちかい。なんじ なんぷん？",
+    "choices": [
+      "9じ45ふん",
+      "10じ45ふん",
+      "9じ15ふん"
+    ],
+    "answerIndex": 0,
+    "hint": "ながい はりが 9は 45ふん。"
+  },
+  {
+    "id": "l34",
+    "subject": "life",
+    "skillId": "clock_quarter",
+    "difficulty": 5,
+    "prompt": "ながい はりが 9、みじかい はりが 11に ちかい。なんじ なんぷん？",
+    "choices": [
+      "11じ45ふん",
+      "10じ45ふん",
+      "10じ15ふん"
+    ],
+    "answerIndex": 1,
+    "hint": "ながい はりが 9は 45ふん。"
+  },
+  {
+    "id": "l35",
+    "subject": "life",
+    "skillId": "clock_quarter",
+    "difficulty": 5,
+    "prompt": "ながい はりが 9、みじかい はりが 12に ちかい。なんじ なんぷん？",
+    "choices": [
+      "12じ45ふん",
+      "11じ15ふん",
+      "11じ45ふん"
+    ],
+    "answerIndex": 2,
+    "hint": "ながい はりが 9は 45ふん。"
+  },
+  {
+    "id": "l36",
+    "subject": "life",
+    "skillId": "clock_quarter",
+    "difficulty": 5,
+    "prompt": "ながい はりが 9、みじかい はりが 1に ちかい。なんじ なんぷん？",
+    "choices": [
+      "12じ45ふん",
+      "12じ15ふん",
+      "1じ45ふん"
+    ],
+    "answerIndex": 0,
+    "hint": "ながい はりが 9は 45ふん。"
+  },
+  {
+    "id": "l37",
+    "subject": "life",
+    "skillId": "money_value",
+    "difficulty": 1,
+    "prompt": "1えんだま 5まい。いくら？",
+    "choices": [
+      "1えん",
+      "5えん",
+      "10えん"
+    ],
+    "answerIndex": 1,
+    "hint": "だまの かちは そのまま たす。"
+  },
+  {
+    "id": "l38",
+    "subject": "life",
+    "skillId": "money_value",
+    "difficulty": 1,
+    "prompt": "5えんだま 1まい。いくら？",
+    "choices": [
+      "1えん",
+      "10えん",
+      "5えん"
+    ],
+    "answerIndex": 2,
+    "hint": "だまの かちは そのまま たす。"
+  },
+  {
+    "id": "l39",
+    "subject": "life",
+    "skillId": "money_value",
+    "difficulty": 1,
+    "prompt": "10えんだま 2まい。いくら？",
+    "choices": [
+      "20えん",
+      "25えん",
+      "15えん"
+    ],
+    "answerIndex": 0,
+    "hint": "だまの かちは そのまま たす。"
+  },
+  {
+    "id": "l40",
+    "subject": "life",
+    "skillId": "money_value",
+    "difficulty": 1,
+    "prompt": "50えんだま 1まい。いくら？",
+    "choices": [
+      "55えん",
+      "50えん",
+      "45えん"
+    ],
+    "answerIndex": 1,
+    "hint": "だまの かちは そのまま たす。"
+  },
+  {
+    "id": "l41",
+    "subject": "life",
+    "skillId": "money_value",
+    "difficulty": 1,
+    "prompt": "100えんだま 1まい。いくら？",
+    "choices": [
+      "150えん",
+      "50えん",
+      "100えん"
+    ],
+    "answerIndex": 2,
+    "hint": "だまの かちは そのまま たす。"
+  },
+  {
+    "id": "l42",
+    "subject": "life",
+    "skillId": "money_value",
+    "difficulty": 2,
+    "prompt": "10えんだま 5まい。いくら？",
+    "choices": [
+      "50えん",
+      "45えん",
+      "55えん"
+    ],
+    "answerIndex": 0,
+    "hint": "だまの かちは そのまま たす。"
+  },
+  {
+    "id": "l43",
+    "subject": "life",
+    "skillId": "money_value",
+    "difficulty": 2,
+    "prompt": "5えんだま 4まい。いくら？",
+    "choices": [
+      "15えん",
+      "20えん",
+      "25えん"
+    ],
+    "answerIndex": 1,
+    "hint": "だまの かちは そのまま たす。"
+  },
+  {
+    "id": "l44",
+    "subject": "life",
+    "skillId": "money_value",
+    "difficulty": 2,
+    "prompt": "50えんだま 2まい。いくら？",
+    "choices": [
+      "50えん",
+      "150えん",
+      "100えん"
+    ],
+    "answerIndex": 2,
+    "hint": "だまの かちは そのまま たす。"
+  },
+  {
+    "id": "l45",
+    "subject": "life",
+    "skillId": "money_value",
+    "difficulty": 2,
+    "prompt": "100えんだま 3まい。いくら？",
+    "choices": [
+      "300えん",
+      "350えん",
+      "250えん"
+    ],
+    "answerIndex": 0,
+    "hint": "だまの かちは そのまま たす。"
+  },
+  {
+    "id": "l46",
+    "subject": "life",
+    "skillId": "money_value",
+    "difficulty": 2,
+    "prompt": "500えんだま 1まい。いくら？",
+    "choices": [
+      "550えん",
+      "500えん",
+      "450えん"
+    ],
+    "answerIndex": 1,
+    "hint": "だまの かちは そのまま たす。"
+  },
+  {
+    "id": "l47",
+    "subject": "life",
+    "skillId": "money_value",
+    "difficulty": 2,
+    "prompt": "1000えんさつ 1まい。いくら？",
+    "choices": [
+      "1050えん",
+      "950えん",
+      "1000えん"
+    ],
+    "answerIndex": 2,
+    "hint": "だまの かちは そのまま たす。"
+  },
+  {
+    "id": "l48",
+    "subject": "life",
+    "skillId": "money_value",
+    "difficulty": 2,
+    "prompt": "100えんだま 5まい。いくら？",
+    "choices": [
+      "500えん",
+      "450えん",
+      "550えん"
+    ],
+    "answerIndex": 0,
+    "hint": "だまの かちは そのまま たす。"
+  },
+  {
+    "id": "l49",
+    "subject": "life",
+    "skillId": "money_sum",
+    "difficulty": 2,
+    "prompt": "10えんだま 3まいと 1えんだま 4まい。あわせて いくら？",
+    "choices": [
+      "24えん",
+      "34えん",
+      "44えん"
+    ],
+    "answerIndex": 1,
+    "hint": "おおきい かずから たすと はやい。"
+  },
+  {
+    "id": "l50",
+    "subject": "life",
+    "skillId": "money_sum",
+    "difficulty": 2,
+    "prompt": "50えんだま 1まいと 10えんだま 2まい。あわせて いくら？",
+    "choices": [
+      "60えん",
+      "80えん",
+      "70えん"
+    ],
+    "answerIndex": 2,
+    "hint": "おおきい かずから たすと はやい。"
+  },
+  {
+    "id": "l51",
+    "subject": "life",
+    "skillId": "money_sum",
+    "difficulty": 2,
+    "prompt": "100えんだま 2まいと 10えんだま 3まい。あわせて いくら？",
+    "choices": [
+      "230えん",
+      "240えん",
+      "220えん"
+    ],
+    "answerIndex": 0,
+    "hint": "おおきい かずから たすと はやい。"
+  },
+  {
+    "id": "l52",
+    "subject": "life",
+    "skillId": "money_sum",
+    "difficulty": 3,
+    "prompt": "100えんだま 1まいと 50えんだま 1まいと 10えんだま 4まい。あわせて いくら？",
+    "choices": [
+      "200えん",
+      "190えん",
+      "180えん"
+    ],
+    "answerIndex": 1,
+    "hint": "おおきい かずから たすと はやい。"
+  },
+  {
+    "id": "l53",
+    "subject": "life",
+    "skillId": "money_sum",
+    "difficulty": 3,
+    "prompt": "500えんだま 1まいと 100えんだま 2まい。あわせて いくら？",
+    "choices": [
+      "800えん",
+      "600えん",
+      "700えん"
+    ],
+    "answerIndex": 2,
+    "hint": "おおきい かずから たすと はやい。"
+  },
+  {
+    "id": "l54",
+    "subject": "life",
+    "skillId": "money_sum",
+    "difficulty": 3,
+    "prompt": "1000えんさつ 1まいと 100えんだま 5まい。あわせて いくら？",
+    "choices": [
+      "1500えん",
+      "1400えん",
+      "1600えん"
+    ],
+    "answerIndex": 0,
+    "hint": "おおきい かずから たすと はやい。"
+  },
+  {
+    "id": "l55",
+    "subject": "life",
+    "skillId": "money_sum",
+    "difficulty": 3,
+    "prompt": "50えんだま 3まいと 5えんだま 2まい。あわせて いくら？",
+    "choices": [
+      "150えん",
+      "160えん",
+      "170えん"
+    ],
+    "answerIndex": 1,
+    "hint": "おおきい かずから たすと はやい。"
+  },
+  {
+    "id": "l56",
+    "subject": "life",
+    "skillId": "money_sum",
+    "difficulty": 3,
+    "prompt": "100えんだま 4まいと 10えんだま 5まい。あわせて いくら？",
+    "choices": [
+      "440えん",
+      "460えん",
+      "450えん"
+    ],
+    "answerIndex": 2,
+    "hint": "おおきい かずから たすと はやい。"
+  },
+  {
+    "id": "l57",
+    "subject": "life",
+    "skillId": "money_sum",
+    "difficulty": 3,
+    "prompt": "500えんだま 2まいと 50えんだま 1まい。あわせて いくら？",
+    "choices": [
+      "1050えん",
+      "1150えん",
+      "950えん"
+    ],
+    "answerIndex": 0,
+    "hint": "おおきい かずから たすと はやい。"
+  },
+  {
+    "id": "l58",
+    "subject": "life",
+    "skillId": "money_sum",
+    "difficulty": 3,
+    "prompt": "1000えんさつ 2まいと 500えんだま 1まい。あわせて いくら？",
+    "choices": [
+      "2600えん",
+      "2500えん",
+      "2400えん"
+    ],
+    "answerIndex": 1,
+    "hint": "おおきい かずから たすと はやい。"
+  },
+  {
+    "id": "l59",
+    "subject": "life",
+    "skillId": "money_sum",
+    "difficulty": 2,
+    "prompt": "10えんだま 8まいと 5えんだま 3まい。あわせて いくら？",
+    "choices": [
+      "105えん",
+      "85えん",
+      "95えん"
+    ],
+    "answerIndex": 2,
+    "hint": "おおきい かずから たすと はやい。"
+  },
+  {
+    "id": "l60",
+    "subject": "life",
+    "skillId": "money_sum",
+    "difficulty": 3,
+    "prompt": "100えんだま 3まいと 50えんだま 4まい。あわせて いくら？",
+    "choices": [
+      "500えん",
+      "400えん",
+      "600えん"
+    ],
+    "answerIndex": 0,
+    "hint": "おおきい かずから たすと はやい。"
+  },
+  {
+    "id": "l61",
+    "subject": "life",
+    "skillId": "money_change",
+    "difficulty": 3,
+    "prompt": "120えんの ジュースを 200えんで かいました。おつりは？",
+    "choices": [
+      "70えん",
+      "80えん",
+      "90えん"
+    ],
+    "answerIndex": 1,
+    "hint": "しはらい ー ねだん で おつり。"
+  },
+  {
+    "id": "l62",
+    "subject": "life",
+    "skillId": "money_change",
+    "difficulty": 3,
+    "prompt": "350えんの パンを 500えんで かいました。おつりは？",
+    "choices": [
+      "140えん",
+      "160えん",
+      "150えん"
+    ],
+    "answerIndex": 2,
+    "hint": "しはらい ー ねだん で おつり。"
+  },
+  {
+    "id": "l63",
+    "subject": "life",
+    "skillId": "money_change",
+    "difficulty": 3,
+    "prompt": "480えんの ほんを 500えんで かいました。おつりは？",
+    "choices": [
+      "20えん",
+      "30えん",
+      "10えん"
+    ],
+    "answerIndex": 0,
+    "hint": "しはらい ー ねだん で おつり。"
+  },
+  {
+    "id": "l64",
+    "subject": "life",
+    "skillId": "money_change",
+    "difficulty": 4,
+    "prompt": "620えんを 1000えんで しはらいました。おつりは？",
+    "choices": [
+      "390えん",
+      "380えん",
+      "370えん"
+    ],
+    "answerIndex": 1,
+    "hint": "しはらい ー ねだん で おつり。"
+  },
+  {
+    "id": "l65",
+    "subject": "life",
+    "skillId": "money_change",
+    "difficulty": 4,
+    "prompt": "750えんを 1000えんで しはらいました。おつりは？",
+    "choices": [
+      "260えん",
+      "240えん",
+      "250えん"
+    ],
+    "answerIndex": 2,
+    "hint": "しはらい ー ねだん で おつり。"
+  },
+  {
+    "id": "l66",
+    "subject": "life",
+    "skillId": "money_change",
+    "difficulty": 4,
+    "prompt": "980えんを 1000えんで しはらいました。おつりは？",
+    "choices": [
+      "20えん",
+      "10えん",
+      "30えん"
+    ],
+    "answerIndex": 0,
+    "hint": "しはらい ー ねだん で おつり。"
+  },
+  {
+    "id": "l67",
+    "subject": "life",
+    "skillId": "money_change",
+    "difficulty": 4,
+    "prompt": "1300えんを 2000えんで しはらいました。おつりは？",
+    "choices": [
+      "690えん",
+      "700えん",
+      "710えん"
+    ],
+    "answerIndex": 1,
+    "hint": "しはらい ー ねだん で おつり。"
+  },
+  {
+    "id": "l68",
+    "subject": "life",
+    "skillId": "money_change",
+    "difficulty": 4,
+    "prompt": "1450えんを 2000えんで しはらいました。おつりは？",
+    "choices": [
+      "540えん",
+      "560えん",
+      "550えん"
+    ],
+    "answerIndex": 2,
+    "hint": "しはらい ー ねだん で おつり。"
+  },
+  {
+    "id": "l69",
+    "subject": "life",
+    "skillId": "money_change",
+    "difficulty": 5,
+    "prompt": "1780えんを 2000えんで しはらいました。おつりは？",
+    "choices": [
+      "220えん",
+      "230えん",
+      "210えん"
+    ],
+    "answerIndex": 0,
+    "hint": "しはらい ー ねだん で おつり。"
+  },
+  {
+    "id": "l70",
+    "subject": "life",
+    "skillId": "money_change",
+    "difficulty": 5,
+    "prompt": "2360えんを 3000えんで しはらいました。おつりは？",
+    "choices": [
+      "650えん",
+      "640えん",
+      "630えん"
+    ],
+    "answerIndex": 1,
+    "hint": "しはらい ー ねだん で おつり。"
+  },
+  {
+    "id": "l71",
+    "subject": "life",
+    "skillId": "money_change",
+    "difficulty": 5,
+    "prompt": "2990えんを 3000えんで しはらいました。おつりは？",
+    "choices": [
+      "20えん",
+      "0えん",
+      "10えん"
+    ],
+    "answerIndex": 2,
+    "hint": "しはらい ー ねだん で おつり。"
+  },
+  {
+    "id": "l72",
+    "subject": "life",
+    "skillId": "money_change",
+    "difficulty": 4,
+    "prompt": "840えんを 1000えんで しはらいました。おつりは？",
+    "choices": [
+      "160えん",
+      "150えん",
+      "170えん"
+    ],
+    "answerIndex": 0,
+    "hint": "しはらい ー ねだん で おつり。"
+  },
+  {
+    "id": "l73",
+    "subject": "life",
+    "skillId": "safety_road",
+    "difficulty": 1,
+    "prompt": "しんごうが あか。どうする？",
+    "choices": [
+      "いそいで わたる",
+      "わたらず まつ",
+      "めを つぶって わたる"
+    ],
+    "answerIndex": 1,
+    "hint": "じぶんと みんなを まもる こうどうを えらぼう。"
+  },
+  {
+    "id": "l74",
+    "subject": "life",
+    "skillId": "safety_road",
+    "difficulty": 1,
+    "prompt": "どうろを わたる まえに することは？",
+    "choices": [
+      "はしりだす",
+      "うしろだけ みる",
+      "みぎ ひだり みぎを みる"
+    ],
+    "answerIndex": 2,
+    "hint": "じぶんと みんなを まもる こうどうを えらぼう。"
+  },
+  {
+    "id": "l75",
+    "subject": "life",
+    "skillId": "safety_road",
+    "difficulty": 1,
+    "prompt": "ほどうの はしを あるくとき ただしいのは？",
+    "choices": [
+      "ひろがらずに あるく",
+      "くるまみちを あるく",
+      "おにごっこを する"
+    ],
+    "answerIndex": 0,
+    "hint": "じぶんと みんなを まもる こうどうを えらぼう。"
+  },
+  {
+    "id": "l76",
+    "subject": "life",
+    "skillId": "safety_road",
+    "difficulty": 2,
+    "prompt": "くるまから おりたら まず どうする？",
+    "choices": [
+      "めを つむる",
+      "とまって まわりを みる",
+      "すぐ はしる"
+    ],
+    "answerIndex": 1,
+    "hint": "じぶんと みんなを まもる こうどうを えらぼう。"
+  },
+  {
+    "id": "l77",
+    "subject": "life",
+    "skillId": "safety_road",
+    "difficulty": 2,
+    "prompt": "しらない ばしょで まよったときは？",
+    "choices": [
+      "ないしょで かくれる",
+      "どこでも はしる",
+      "おとなに たすけを もとめる"
+    ],
+    "answerIndex": 2,
+    "hint": "じぶんと みんなを まもる こうどうを えらぼう。"
+  },
+  {
+    "id": "l78",
+    "subject": "life",
+    "skillId": "safety_road",
+    "difficulty": 2,
+    "prompt": "じてんしゃで だいじなのは？",
+    "choices": [
+      "ヘルメットを かぶる",
+      "みみを ふさぐ",
+      "よそみを する"
+    ],
+    "answerIndex": 0,
+    "hint": "じぶんと みんなを まもる こうどうを えらぼう。"
+  },
+  {
+    "id": "l79",
+    "subject": "life",
+    "skillId": "safety_road",
+    "difficulty": 1,
+    "prompt": "くるまが ちかい ばしょで あそんで いい？",
+    "choices": [
+      "いい",
+      "だめ",
+      "どっちでも いい"
+    ],
+    "answerIndex": 1,
+    "hint": "じぶんと みんなを まもる こうどうを えらぼう。"
+  },
+  {
+    "id": "l80",
+    "subject": "life",
+    "skillId": "safety_road",
+    "difficulty": 2,
+    "prompt": "よるに あるくとき いい こうどうは？",
+    "choices": [
+      "くらい みちを えらぶ",
+      "かくれて あるく",
+      "あかるい みちを えらぶ"
+    ],
+    "answerIndex": 2,
+    "hint": "じぶんと みんなを まもる こうどうを えらぼう。"
+  },
+  {
+    "id": "l81",
+    "subject": "life",
+    "skillId": "safety_road",
+    "difficulty": 2,
+    "prompt": "ふみきりで することは？",
+    "choices": [
+      "とまって みて きく",
+      "うたを うたいながら わたる",
+      "めを つぶって はしる"
+    ],
+    "answerIndex": 0,
+    "hint": "じぶんと みんなを まもる こうどうを えらぼう。"
+  },
+  {
+    "id": "l82",
+    "subject": "life",
+    "skillId": "safety_road",
+    "difficulty": 2,
+    "prompt": "しんごうが みどりでも することは？",
+    "choices": [
+      "うしろに さがる",
+      "くるまが こないか かくにん",
+      "すぐ はしる"
+    ],
+    "answerIndex": 1,
+    "hint": "じぶんと みんなを まもる こうどうを えらぼう。"
+  },
+  {
+    "id": "l83",
+    "subject": "life",
+    "skillId": "safety_road",
+    "difficulty": 2,
+    "prompt": "あめのひに どうろを あるくときは？",
+    "choices": [
+      "かさを ふりまわす",
+      "みずたまりを ぜんりょくで はしる",
+      "すべらないよう ゆっくり"
+    ],
+    "answerIndex": 2,
+    "hint": "じぶんと みんなを まもる こうどうを えらぼう。"
+  },
+  {
+    "id": "l84",
+    "subject": "life",
+    "skillId": "safety_road",
+    "difficulty": 3,
+    "prompt": "バスを おりた すぐあとに どうろを わたるのは？",
+    "choices": [
+      "いったん とまって かくにん",
+      "すぐ わたる",
+      "うしろむきで わたる"
+    ],
+    "answerIndex": 0,
+    "hint": "じぶんと みんなを まもる こうどうを えらぼう。"
+  },
+  {
+    "id": "l85",
+    "subject": "life",
+    "skillId": "safety_disaster",
+    "difficulty": 2,
+    "prompt": "じしんが きたら まず どうする？",
+    "choices": [
+      "まどに ちかづく",
+      "あたまを まもる",
+      "とびはねる"
+    ],
+    "answerIndex": 1,
+    "hint": "あんぜんを いちばんに かんがえよう。"
+  },
+  {
+    "id": "l86",
+    "subject": "life",
+    "skillId": "safety_disaster",
+    "difficulty": 2,
+    "prompt": "かじを みつけたら どうする？",
+    "choices": [
+      "かくれて みる",
+      "さわって たしかめる",
+      "おとなに しらせる"
+    ],
+    "answerIndex": 2,
+    "hint": "あんぜんを いちばんに かんがえよう。"
+  },
+  {
+    "id": "l87",
+    "subject": "life",
+    "skillId": "safety_disaster",
+    "difficulty": 3,
+    "prompt": "けむりが でている ときの こうどうは？",
+    "choices": [
+      "ひくい しせいで にげる",
+      "たちどまる",
+      "けむりを すいこむ"
+    ],
+    "answerIndex": 0,
+    "hint": "あんぜんを いちばんに かんがえよう。"
+  },
+  {
+    "id": "l88",
+    "subject": "life",
+    "skillId": "safety_disaster",
+    "difficulty": 2,
+    "prompt": "たいふうの ひに そとで あそぶのは？",
+    "choices": [
+      "かぜに むかって はしる",
+      "しない",
+      "する"
+    ],
+    "answerIndex": 1,
+    "hint": "あんぜんを いちばんに かんがえよう。"
+  },
+  {
+    "id": "l89",
+    "subject": "life",
+    "skillId": "safety_disaster",
+    "difficulty": 3,
+    "prompt": "らいめいが きこえたら？",
+    "choices": [
+      "かわで あそぶ",
+      "たかい きの したに いく",
+      "たてものに はいる"
+    ],
+    "answerIndex": 2,
+    "hint": "あんぜんを いちばんに かんがえよう。"
+  },
+  {
+    "id": "l90",
+    "subject": "life",
+    "skillId": "safety_disaster",
+    "difficulty": 2,
+    "prompt": "ひなん するとき たいせつなのは？",
+    "choices": [
+      "おとなと いっしょに いく",
+      "ひとりで べつみちへ",
+      "にもつを さがしつづける"
+    ],
+    "answerIndex": 0,
+    "hint": "あんぜんを いちばんに かんがえよう。"
+  },
+  {
+    "id": "l91",
+    "subject": "life",
+    "skillId": "safety_disaster",
+    "difficulty": 4,
+    "prompt": "ガスの においが したら？",
+    "choices": [
+      "マッチを つける",
+      "まどを あけて おとなに しらせる",
+      "でんきを ぱちぱち する"
+    ],
+    "answerIndex": 1,
+    "hint": "あんぜんを いちばんに かんがえよう。"
+  },
+  {
+    "id": "l92",
+    "subject": "life",
+    "skillId": "safety_disaster",
+    "difficulty": 1,
+    "prompt": "ゆかが ぬれて いるばしょでは？",
+    "choices": [
+      "とびはねる",
+      "めを つぶって はしる",
+      "すべらないよう あるく"
+    ],
+    "answerIndex": 2,
+    "hint": "あんぜんを いちばんに かんがえよう。"
+  },
+  {
+    "id": "l93",
+    "subject": "life",
+    "skillId": "safety_disaster",
+    "difficulty": 2,
+    "prompt": "あつい なべを さわりそうな ときは？",
+    "choices": [
+      "ミトンを つかう",
+      "みずを かける",
+      "そのまま さわる"
+    ],
+    "answerIndex": 0,
+    "hint": "あんぜんを いちばんに かんがえよう。"
+  },
+  {
+    "id": "l94",
+    "subject": "life",
+    "skillId": "safety_disaster",
+    "difficulty": 2,
+    "prompt": "くすりを みつけたときは？",
+    "choices": [
+      "ともだちに わたす",
+      "おとなに きいてから",
+      "じぶんで のむ"
+    ],
+    "answerIndex": 1,
+    "hint": "あんぜんを いちばんに かんがえよう。"
+  },
+  {
+    "id": "l95",
+    "subject": "life",
+    "skillId": "safety_disaster",
+    "difficulty": 2,
+    "prompt": "しらない ひとに ついてこいと いわれたら？",
+    "choices": [
+      "ないしょで いく",
+      "ついていく",
+      "きっぱり ことわる"
+    ],
+    "answerIndex": 2,
+    "hint": "あんぜんを いちばんに かんがえよう。"
+  },
+  {
+    "id": "l96",
+    "subject": "life",
+    "skillId": "safety_disaster",
+    "difficulty": 5,
+    "prompt": "エレベーターで じしんが おきたら？",
+    "choices": [
+      "すべての かいの ボタンを おす",
+      "ジャンプする",
+      "ドアを むりに あける"
+    ],
+    "answerIndex": 0,
+    "hint": "あんぜんを いちばんに かんがえよう。"
+  },
+  {
+    "id": "l97",
+    "subject": "life",
+    "skillId": "life_routine",
+    "difficulty": 1,
+    "prompt": "あさ おきたら まず することは？",
+    "choices": [
+      "よるの おやつを たべる",
+      "かおを あらう",
+      "テレビを つけっぱなしに する"
+    ],
+    "answerIndex": 1,
+    "hint": "からだに やさしい えらびかたを しよう。"
+  },
+  {
+    "id": "l98",
+    "subject": "life",
+    "skillId": "life_routine",
+    "difficulty": 1,
+    "prompt": "しょくじの まえに たいせつなのは？",
+    "choices": [
+      "てを よごす",
+      "ねころぶ",
+      "てを あらう"
+    ],
+    "answerIndex": 2,
+    "hint": "からだに やさしい えらびかたを しよう。"
+  },
+  {
+    "id": "l99",
+    "subject": "life",
+    "skillId": "life_routine",
+    "difficulty": 2,
+    "prompt": "はを みがく タイミングとして いいのは？",
+    "choices": [
+      "しょくご",
+      "ねる ちょくぜんだけ",
+      "どろあそびの まえ"
+    ],
+    "answerIndex": 0,
+    "hint": "からだに やさしい えらびかたを しよう。"
+  },
+  {
+    "id": "l100",
+    "subject": "life",
+    "skillId": "life_routine",
+    "difficulty": 2,
+    "prompt": "すいぶん ほきゅうが ひつようなのは？",
+    "choices": [
+      "ほんを よんだ ときだけ",
+      "あそんだ あと",
+      "ねる まえに たべすぎた とき"
+    ],
+    "answerIndex": 1,
+    "hint": "からだに やさしい えらびかたを しよう。"
+  },
+  {
+    "id": "l101",
+    "subject": "life",
+    "skillId": "life_routine",
+    "difficulty": 2,
+    "prompt": "よる おそくまで ゲームすると どうなる？",
+    "choices": [
+      "せが のびる",
+      "いつも げんきに なる",
+      "つぎのひ ねむく なりやすい"
+    ],
+    "answerIndex": 2,
+    "hint": "からだに やさしい えらびかたを しよう。"
+  },
+  {
+    "id": "l102",
+    "subject": "life",
+    "skillId": "life_routine",
+    "difficulty": 2,
+    "prompt": "はやね はやおきで えられることは？",
+    "choices": [
+      "あさ すっきり おきやすい",
+      "ひるに ねむれない",
+      "しゅくだいが ふえる"
+    ],
+    "answerIndex": 0,
+    "hint": "からだに やさしい えらびかたを しよう。"
+  },
+  {
+    "id": "l103",
+    "subject": "life",
+    "skillId": "life_routine",
+    "difficulty": 2,
+    "prompt": "あせを かいたら どうする？",
+    "choices": [
+      "そのまま ほうっておく",
+      "きがえを する",
+      "れいぞうこに はいる"
+    ],
+    "answerIndex": 1,
+    "hint": "からだに やさしい えらびかたを しよう。"
+  },
+  {
+    "id": "l104",
+    "subject": "life",
+    "skillId": "life_routine",
+    "difficulty": 2,
+    "prompt": "つめが のびたら？",
+    "choices": [
+      "かむ",
+      "ひっぱる",
+      "おとなと いっしょに きる"
+    ],
+    "answerIndex": 2,
+    "hint": "からだに やさしい えらびかたを しよう。"
+  },
+  {
+    "id": "l105",
+    "subject": "life",
+    "skillId": "life_routine",
+    "difficulty": 3,
+    "prompt": "しんどい ときは？",
+    "choices": [
+      "むりせず 休んで つたえる",
+      "ずっと がまんする",
+      "かくして はしる"
+    ],
+    "answerIndex": 0,
+    "hint": "からだに やさしい えらびかたを しよう。"
+  },
+  {
+    "id": "l106",
+    "subject": "life",
+    "skillId": "life_routine",
+    "difficulty": 3,
+    "prompt": "めを まもるために たいせつなのは？",
+    "choices": [
+      "ながく ひとみを こする",
+      "ほんと かおの きょりを あける",
+      "まっくらで ちかくを みる"
+    ],
+    "answerIndex": 1,
+    "hint": "からだに やさしい えらびかたを しよう。"
+  },
+  {
+    "id": "l107",
+    "subject": "life",
+    "skillId": "life_routine",
+    "difficulty": 3,
+    "prompt": "しせいを よくすると どうなる？",
+    "choices": [
+      "おなかが へらない",
+      "えんぴつが ふえる",
+      "つかれにくく なる"
+    ],
+    "answerIndex": 2,
+    "hint": "からだに やさしい えらびかたを しよう。"
+  },
+  {
+    "id": "l108",
+    "subject": "life",
+    "skillId": "life_routine",
+    "difficulty": 3,
+    "prompt": "きそくただしい せいかつの コツは？",
+    "choices": [
+      "じかんを きめて すごす",
+      "まいにち ぜんぶ ばらばら",
+      "ねる じかんを なくす"
+    ],
+    "answerIndex": 0,
+    "hint": "からだに やさしい えらびかたを しよう。"
+  },
+  {
+    "id": "l109",
+    "subject": "life",
+    "skillId": "cooking_step",
+    "difficulty": 2,
+    "prompt": "サラダを つくる とき、さいしょに することは？",
+    "choices": [
+      "ドレッシングを こぼす",
+      "てを あらう",
+      "ほうちょうを ふりまわす"
+    ],
+    "answerIndex": 1,
+    "hint": "てじゅんと あんぜんを まもろう。"
+  },
+  {
+    "id": "l110",
+    "subject": "life",
+    "skillId": "cooking_step",
+    "difficulty": 2,
+    "prompt": "やさいを きるまえに することは？",
+    "choices": [
+      "そのまま かむ",
+      "ゆかに おく",
+      "よく あらう"
+    ],
+    "answerIndex": 2,
+    "hint": "てじゅんと あんぜんを まもろう。"
+  },
+  {
+    "id": "l111",
+    "subject": "life",
+    "skillId": "cooking_step",
+    "difficulty": 2,
+    "prompt": "あつい なべを もつとき つかうものは？",
+    "choices": [
+      "ミトン",
+      "はだかの て",
+      "ぬれた かみ"
+    ],
+    "answerIndex": 0,
+    "hint": "てじゅんと あんぜんを まもろう。"
+  },
+  {
+    "id": "l112",
+    "subject": "life",
+    "skillId": "cooking_step",
+    "difficulty": 2,
+    "prompt": "れいぞうこの ものを だしたら？",
+    "choices": [
+      "まどに おく",
+      "つかうぶんだけ だす",
+      "ぜんぶ だしっぱなし"
+    ],
+    "answerIndex": 1,
+    "hint": "てじゅんと あんぜんを まもろう。"
+  },
+  {
+    "id": "l113",
+    "subject": "life",
+    "skillId": "cooking_step",
+    "difficulty": 3,
+    "prompt": "たまごを わった あとは？",
+    "choices": [
+      "つくえを なめる",
+      "そのまま さわる",
+      "てを あらう"
+    ],
+    "answerIndex": 2,
+    "hint": "てじゅんと あんぜんを まもろう。"
+  },
+  {
+    "id": "l114",
+    "subject": "life",
+    "skillId": "cooking_step",
+    "difficulty": 3,
+    "prompt": "りょうりの じゅんばんで ただしいのは？",
+    "choices": [
+      "ざいりょうを そろえる→つくる",
+      "つくる→ざいりょうを さがす",
+      "たべる→つくる"
+    ],
+    "answerIndex": 0,
+    "hint": "てじゅんと あんぜんを まもろう。"
+  },
+  {
+    "id": "l115",
+    "subject": "life",
+    "skillId": "cooking_step",
+    "difficulty": 4,
+    "prompt": "あじみを するときの きまりは？",
+    "choices": [
+      "おなじ スプーンを つかいまわす",
+      "スプーンを かえる",
+      "なべに くちを つける"
+    ],
+    "answerIndex": 1,
+    "hint": "てじゅんと あんぜんを まもろう。"
+  },
+  {
+    "id": "l116",
+    "subject": "life",
+    "skillId": "cooking_step",
+    "difficulty": 3,
+    "prompt": "ほうちょうを つかいおわったら？",
+    "choices": [
+      "ゆかに おく",
+      "ベッドに おく",
+      "きめられた ばしょに もどす"
+    ],
+    "answerIndex": 2,
+    "hint": "てじゅんと あんぜんを まもろう。"
+  },
+  {
+    "id": "l117",
+    "subject": "life",
+    "skillId": "cooking_step",
+    "difficulty": 3,
+    "prompt": "おこめを たくまえに することは？",
+    "choices": [
+      "かるく といで みずを はかる",
+      "さとうを たくさん いれる",
+      "そのまま なべに いれる"
+    ],
+    "answerIndex": 0,
+    "hint": "てじゅんと あんぜんを まもろう。"
+  },
+  {
+    "id": "l118",
+    "subject": "life",
+    "skillId": "cooking_step",
+    "difficulty": 4,
+    "prompt": "ふっとうした なべの ふたを あけるときは？",
+    "choices": [
+      "いきおいよく ひらく",
+      "てまえに けむりを こないように あける",
+      "かおを ちかづける"
+    ],
+    "answerIndex": 1,
+    "hint": "てじゅんと あんぜんを まもろう。"
+  },
+  {
+    "id": "l119",
+    "subject": "life",
+    "skillId": "cooking_step",
+    "difficulty": 2,
+    "prompt": "りょうりごの だいどころで たいせつなのは？",
+    "choices": [
+      "みずを だしっぱなし",
+      "よごれを そのまま",
+      "つかった ところを かたづける"
+    ],
+    "answerIndex": 2,
+    "hint": "てじゅんと あんぜんを まもろう。"
+  },
+  {
+    "id": "l120",
+    "subject": "life",
+    "skillId": "cooking_step",
+    "difficulty": 3,
+    "prompt": "しょくひんの しょうみきげんを みるりゆうは？",
+    "choices": [
+      "あんぜんに たべるため",
+      "もじの れんしゅうのため",
+      "いろを くらべるため"
+    ],
+    "answerIndex": 0,
+    "hint": "てじゅんと あんぜんを まもろう。"
+  },
+  {
+    "id": "i1",
+    "subject": "insight",
+    "skillId": "pattern_number",
+    "difficulty": 1,
+    "prompt": "1, 2, 3, 4, つぎは？",
+    "choices": [
+      "4",
+      "5",
+      "7"
+    ],
+    "answerIndex": 1,
+    "hint": "まえと つぎの へんかを みよう。"
+  },
+  {
+    "id": "i2",
+    "subject": "insight",
+    "skillId": "pattern_number",
+    "difficulty": 1,
+    "prompt": "2, 4, 6, 8, つぎは？",
+    "choices": [
+      "9",
+      "12",
+      "10"
+    ],
+    "answerIndex": 2,
+    "hint": "まえと つぎの へんかを みよう。"
+  },
+  {
+    "id": "i3",
+    "subject": "insight",
+    "skillId": "pattern_number",
+    "difficulty": 1,
+    "prompt": "3, 5, 7, 9, つぎは？",
+    "choices": [
+      "11",
+      "13",
+      "10"
+    ],
+    "answerIndex": 0,
+    "hint": "まえと つぎの へんかを みよう。"
+  },
+  {
+    "id": "i4",
+    "subject": "insight",
+    "skillId": "pattern_number",
+    "difficulty": 2,
+    "prompt": "5, 8, 11, 14, つぎは？",
+    "choices": [
+      "19",
+      "17",
+      "16"
+    ],
+    "answerIndex": 1,
+    "hint": "まえと つぎの へんかを みよう。"
+  },
+  {
+    "id": "i5",
+    "subject": "insight",
+    "skillId": "pattern_number",
+    "difficulty": 2,
+    "prompt": "10, 20, 30, 40, つぎは？",
+    "choices": [
+      "52",
+      "49",
+      "50"
+    ],
+    "answerIndex": 2,
+    "hint": "まえと つぎの へんかを みよう。"
+  },
+  {
+    "id": "i6",
+    "subject": "insight",
+    "skillId": "pattern_number",
+    "difficulty": 2,
+    "prompt": "4, 7, 10, 13, つぎは？",
+    "choices": [
+      "16",
+      "15",
+      "18"
+    ],
+    "answerIndex": 0,
+    "hint": "まえと つぎの へんかを みよう。"
+  },
+  {
+    "id": "i7",
+    "subject": "insight",
+    "skillId": "pattern_number",
+    "difficulty": 2,
+    "prompt": "2, 5, 8, 11, つぎは？",
+    "choices": [
+      "13",
+      "14",
+      "16"
+    ],
+    "answerIndex": 1,
+    "hint": "まえと つぎの へんかを みよう。"
+  },
+  {
+    "id": "i8",
+    "subject": "insight",
+    "skillId": "pattern_number",
+    "difficulty": 2,
+    "prompt": "1, 4, 7, 10, つぎは？",
+    "choices": [
+      "12",
+      "15",
+      "13"
+    ],
+    "answerIndex": 2,
+    "hint": "まえと つぎの へんかを みよう。"
+  },
+  {
+    "id": "i9",
+    "subject": "insight",
+    "skillId": "pattern_number",
+    "difficulty": 3,
+    "prompt": "6, 9, 12, 15, つぎは？",
+    "choices": [
+      "18",
+      "20",
+      "17"
+    ],
+    "answerIndex": 0,
+    "hint": "まえと つぎの へんかを みよう。"
+  },
+  {
+    "id": "i10",
+    "subject": "insight",
+    "skillId": "pattern_number",
+    "difficulty": 3,
+    "prompt": "7, 11, 15, 19, つぎは？",
+    "choices": [
+      "25",
+      "23",
+      "22"
+    ],
+    "answerIndex": 1,
+    "hint": "まえと つぎの へんかを みよう。"
+  },
+  {
+    "id": "i11",
+    "subject": "insight",
+    "skillId": "pattern_number",
+    "difficulty": 3,
+    "prompt": "9, 14, 19, 24, つぎは？",
+    "choices": [
+      "31",
+      "28",
+      "29"
+    ],
+    "answerIndex": 2,
+    "hint": "まえと つぎの へんかを みよう。"
+  },
+  {
+    "id": "i12",
+    "subject": "insight",
+    "skillId": "pattern_number",
+    "difficulty": 3,
+    "prompt": "12, 18, 24, 30, つぎは？",
+    "choices": [
+      "36",
+      "35",
+      "38"
+    ],
+    "answerIndex": 0,
+    "hint": "まえと つぎの へんかを みよう。"
+  },
+  {
+    "id": "i13",
+    "subject": "insight",
+    "skillId": "pattern_symbol",
+    "difficulty": 1,
+    "prompt": "あか, あお, あか, あお, つぎは？",
+    "choices": [
+      "あお",
+      "あか",
+      "きいろ"
+    ],
+    "answerIndex": 1,
+    "hint": "くりかえしの かたちを みつけよう。"
+  },
+  {
+    "id": "i14",
+    "subject": "insight",
+    "skillId": "pattern_symbol",
+    "difficulty": 1,
+    "prompt": "まる, さんかく, まる, さんかく, つぎは？",
+    "choices": [
+      "しかく",
+      "さんかく",
+      "まる"
+    ],
+    "answerIndex": 2,
+    "hint": "くりかえしの かたちを みつけよう。"
+  },
+  {
+    "id": "i15",
+    "subject": "insight",
+    "skillId": "pattern_symbol",
+    "difficulty": 1,
+    "prompt": "いぬ, ねこ, いぬ, ねこ, つぎは？",
+    "choices": [
+      "いぬ",
+      "ねこ",
+      "うさぎ"
+    ],
+    "answerIndex": 0,
+    "hint": "くりかえしの かたちを みつけよう。"
+  },
+  {
+    "id": "i16",
+    "subject": "insight",
+    "skillId": "pattern_symbol",
+    "difficulty": 1,
+    "prompt": "1, 2, 1, 2, 1, つぎは？",
+    "choices": [
+      "1",
+      "2",
+      "3"
+    ],
+    "answerIndex": 1,
+    "hint": "くりかえしの かたちを みつけよう。"
+  },
+  {
+    "id": "i17",
+    "subject": "insight",
+    "skillId": "pattern_symbol",
+    "difficulty": 2,
+    "prompt": "みぎ, ひだり, みぎ, ひだり, つぎは？",
+    "choices": [
+      "ひだり",
+      "うえ",
+      "みぎ"
+    ],
+    "answerIndex": 2,
+    "hint": "くりかえしの かたちを みつけよう。"
+  },
+  {
+    "id": "i18",
+    "subject": "insight",
+    "skillId": "pattern_symbol",
+    "difficulty": 2,
+    "prompt": "ちいさい, おおきい, ちいさい, おおきい, つぎは？",
+    "choices": [
+      "ちいさい",
+      "おおきい",
+      "まんなか"
+    ],
+    "answerIndex": 0,
+    "hint": "くりかえしの かたちを みつけよう。"
+  },
+  {
+    "id": "i19",
+    "subject": "insight",
+    "skillId": "pattern_symbol",
+    "difficulty": 2,
+    "prompt": "○, △, □, ○, △, つぎは？",
+    "choices": [
+      "○",
+      "□",
+      "△"
+    ],
+    "answerIndex": 1,
+    "hint": "くりかえしの かたちを みつけよう。"
+  },
+  {
+    "id": "i20",
+    "subject": "insight",
+    "skillId": "pattern_symbol",
+    "difficulty": 2,
+    "prompt": "き, はな, み, き, はな, つぎは？",
+    "choices": [
+      "き",
+      "はな",
+      "み"
+    ],
+    "answerIndex": 2,
+    "hint": "くりかえしの かたちを みつけよう。"
+  },
+  {
+    "id": "i21",
+    "subject": "insight",
+    "skillId": "pattern_symbol",
+    "difficulty": 3,
+    "prompt": "A, B, A, C, A, B, A, つぎは？",
+    "choices": [
+      "C",
+      "A",
+      "B"
+    ],
+    "answerIndex": 0,
+    "hint": "くりかえしの かたちを みつけよう。"
+  },
+  {
+    "id": "i22",
+    "subject": "insight",
+    "skillId": "pattern_symbol",
+    "difficulty": 3,
+    "prompt": "1, 1, 2, 1, 1, 2, つぎは？",
+    "choices": [
+      "3",
+      "1",
+      "2"
+    ],
+    "answerIndex": 1,
+    "hint": "くりかえしの かたちを みつけよう。"
+  },
+  {
+    "id": "i23",
+    "subject": "insight",
+    "skillId": "pattern_symbol",
+    "difficulty": 3,
+    "prompt": "あお, あお, あか, あお, あお, あか, つぎは？",
+    "choices": [
+      "きいろ",
+      "あか",
+      "あお"
+    ],
+    "answerIndex": 2,
+    "hint": "くりかえしの かたちを みつけよう。"
+  },
+  {
+    "id": "i24",
+    "subject": "insight",
+    "skillId": "pattern_symbol",
+    "difficulty": 2,
+    "prompt": "ひ, つき, ほし, ひ, つき, ほし, つぎは？",
+    "choices": [
+      "ひ",
+      "ほし",
+      "つき"
+    ],
+    "answerIndex": 0,
+    "hint": "くりかえしの かたちを みつけよう。"
+  },
+  {
+    "id": "i25",
+    "subject": "insight",
+    "skillId": "odd_one_out",
+    "difficulty": 1,
+    "prompt": "なかまはずれは どれ？（でんしゃ / りんご / みかん）",
+    "choices": [
+      "りんご",
+      "でんしゃ",
+      "みかん"
+    ],
+    "answerIndex": 1,
+    "hint": "おなじ なかまを さがそう。"
+  },
+  {
+    "id": "i26",
+    "subject": "insight",
+    "skillId": "odd_one_out",
+    "difficulty": 1,
+    "prompt": "なかまはずれは どれ？（えんぴつ / いぬ / ねこ）",
+    "choices": [
+      "いぬ",
+      "ねこ",
+      "えんぴつ"
+    ],
+    "answerIndex": 2,
+    "hint": "おなじ なかまを さがそう。"
+  },
+  {
+    "id": "i27",
+    "subject": "insight",
+    "skillId": "odd_one_out",
+    "difficulty": 1,
+    "prompt": "なかまはずれは どれ？（あお / さくらんぼ / ぶどう）",
+    "choices": [
+      "あお",
+      "ぶどう",
+      "さくらんぼ"
+    ],
+    "answerIndex": 0,
+    "hint": "おなじ なかまを さがそう。"
+  },
+  {
+    "id": "i28",
+    "subject": "insight",
+    "skillId": "odd_one_out",
+    "difficulty": 1,
+    "prompt": "なかまはずれは どれ？（さかな / バス / でんしゃ）",
+    "choices": [
+      "でんしゃ",
+      "さかな",
+      "バス"
+    ],
+    "answerIndex": 1,
+    "hint": "おなじ なかまを さがそう。"
+  },
+  {
+    "id": "i29",
+    "subject": "insight",
+    "skillId": "odd_one_out",
+    "difficulty": 2,
+    "prompt": "なかまはずれは どれ？（うみ / がっこう / としょかん）",
+    "choices": [
+      "としょかん",
+      "がっこう",
+      "うみ"
+    ],
+    "answerIndex": 2,
+    "hint": "おなじ なかまを さがそう。"
+  },
+  {
+    "id": "i30",
+    "subject": "insight",
+    "skillId": "odd_one_out",
+    "difficulty": 2,
+    "prompt": "なかまはずれは どれ？（はしる / りんご / みかん）",
+    "choices": [
+      "はしる",
+      "りんご",
+      "みかん"
+    ],
+    "answerIndex": 0,
+    "hint": "おなじ なかまを さがそう。"
+  },
+  {
+    "id": "i31",
+    "subject": "insight",
+    "skillId": "odd_one_out",
+    "difficulty": 2,
+    "prompt": "なかまはずれは どれ？（まる / さんかく / いぬ）",
+    "choices": [
+      "さんかく",
+      "いぬ",
+      "まる"
+    ],
+    "answerIndex": 1,
+    "hint": "おなじ なかまを さがそう。"
+  },
+  {
+    "id": "i32",
+    "subject": "insight",
+    "skillId": "odd_one_out",
+    "difficulty": 2,
+    "prompt": "なかまはずれは どれ？（11 / 2 / 4）",
+    "choices": [
+      "2",
+      "4",
+      "11"
+    ],
+    "answerIndex": 2,
+    "hint": "おなじ なかまを さがそう。"
+  },
+  {
+    "id": "i33",
+    "subject": "insight",
+    "skillId": "odd_one_out",
+    "difficulty": 2,
+    "prompt": "なかまはずれは どれ？（アイス / ぼうし / てぶくろ）",
+    "choices": [
+      "アイス",
+      "てぶくろ",
+      "ぼうし"
+    ],
+    "answerIndex": 0,
+    "hint": "おなじ なかまを さがそう。"
+  },
+  {
+    "id": "i34",
+    "subject": "insight",
+    "skillId": "odd_one_out",
+    "difficulty": 3,
+    "prompt": "なかまはずれは どれ？（きゅうり / えんぴつ / けしごむ）",
+    "choices": [
+      "けしごむ",
+      "きゅうり",
+      "えんぴつ"
+    ],
+    "answerIndex": 1,
+    "hint": "おなじ なかまを さがそう。"
+  },
+  {
+    "id": "i35",
+    "subject": "insight",
+    "skillId": "odd_one_out",
+    "difficulty": 3,
+    "prompt": "なかまはずれは どれ？（にわとり / すずめ / ひこうき）",
+    "choices": [
+      "ひこうき",
+      "すずめ",
+      "にわとり"
+    ],
+    "answerIndex": 0,
+    "hint": "おなじ なかまを さがそう。"
+  },
+  {
+    "id": "i36",
+    "subject": "insight",
+    "skillId": "odd_one_out",
+    "difficulty": 3,
+    "prompt": "なかまはずれは どれ？（あさ / ひる / でんしゃ）",
+    "choices": [
+      "あさ",
+      "でんしゃ",
+      "ひる"
+    ],
+    "answerIndex": 1,
+    "hint": "おなじ なかまを さがそう。"
+  },
+  {
+    "id": "i37",
+    "subject": "insight",
+    "skillId": "rule_transform",
+    "difficulty": 2,
+    "prompt": "ルール: 2→4, 3→6。5→？",
+    "choices": [
+      "8",
+      "10",
+      "12"
+    ],
+    "answerIndex": 1,
+    "hint": "まず へんかの きまりを みつけよう。"
+  },
+  {
+    "id": "i38",
+    "subject": "insight",
+    "skillId": "rule_transform",
+    "difficulty": 2,
+    "prompt": "ルール: 1→3, 2→4。6→？",
+    "choices": [
+      "7",
+      "9",
+      "8"
+    ],
+    "answerIndex": 2,
+    "hint": "まず へんかの きまりを みつけよう。"
+  },
+  {
+    "id": "i39",
+    "subject": "insight",
+    "skillId": "rule_transform",
+    "difficulty": 2,
+    "prompt": "ルール: 4→3, 7→6。9→？",
+    "choices": [
+      "8",
+      "7",
+      "10"
+    ],
+    "answerIndex": 0,
+    "hint": "まず へんかの きまりを みつけよう。"
+  },
+  {
+    "id": "i40",
+    "subject": "insight",
+    "skillId": "rule_transform",
+    "difficulty": 2,
+    "prompt": "ルール: 10→5, 8→4。6→？",
+    "choices": [
+      "4",
+      "3",
+      "2"
+    ],
+    "answerIndex": 1,
+    "hint": "まず へんかの きまりを みつけよう。"
+  },
+  {
+    "id": "i41",
+    "subject": "insight",
+    "skillId": "rule_transform",
+    "difficulty": 3,
+    "prompt": "ルール: 3→9, 4→16。5→？",
+    "choices": [
+      "15",
+      "20",
+      "25"
+    ],
+    "answerIndex": 2,
+    "hint": "まず へんかの きまりを みつけよう。"
+  },
+  {
+    "id": "i42",
+    "subject": "insight",
+    "skillId": "rule_transform",
+    "difficulty": 3,
+    "prompt": "ルール: 12→6, 14→7。20→？",
+    "choices": [
+      "10",
+      "8",
+      "12"
+    ],
+    "answerIndex": 0,
+    "hint": "まず へんかの きまりを みつけよう。"
+  },
+  {
+    "id": "i43",
+    "subject": "insight",
+    "skillId": "rule_transform",
+    "difficulty": 3,
+    "prompt": "ルール: 5→7, 9→11。13→？",
+    "choices": [
+      "14",
+      "15",
+      "16"
+    ],
+    "answerIndex": 1,
+    "hint": "まず へんかの きまりを みつけよう。"
+  },
+  {
+    "id": "i44",
+    "subject": "insight",
+    "skillId": "rule_transform",
+    "difficulty": 3,
+    "prompt": "ルール: 8→5, 12→9。20→？",
+    "choices": [
+      "16",
+      "15",
+      "17"
+    ],
+    "answerIndex": 2,
+    "hint": "まず へんかの きまりを みつけよう。"
+  },
+  {
+    "id": "i45",
+    "subject": "insight",
+    "skillId": "rule_transform",
+    "difficulty": 4,
+    "prompt": "ルール: 2→5, 4→7。10→？",
+    "choices": [
+      "13",
+      "14",
+      "12"
+    ],
+    "answerIndex": 0,
+    "hint": "まず へんかの きまりを みつけよう。"
+  },
+  {
+    "id": "i46",
+    "subject": "insight",
+    "skillId": "rule_transform",
+    "difficulty": 4,
+    "prompt": "ルール: 30→10, 21→7。18→？",
+    "choices": [
+      "8",
+      "6",
+      "9"
+    ],
+    "answerIndex": 1,
+    "hint": "まず へんかの きまりを みつけよう。"
+  },
+  {
+    "id": "i47",
+    "subject": "insight",
+    "skillId": "rule_transform",
+    "difficulty": 4,
+    "prompt": "ルール: 6→12, 9→18。11→？",
+    "choices": [
+      "24",
+      "20",
+      "22"
+    ],
+    "answerIndex": 2,
+    "hint": "まず へんかの きまりを みつけよう。"
+  },
+  {
+    "id": "i48",
+    "subject": "insight",
+    "skillId": "rule_transform",
+    "difficulty": 4,
+    "prompt": "ルール: 100→1, 200→2。500→？",
+    "choices": [
+      "5",
+      "4",
+      "6"
+    ],
+    "answerIndex": 0,
+    "hint": "まず へんかの きまりを みつけよう。"
+  },
+  {
+    "id": "i49",
+    "subject": "insight",
+    "skillId": "logic_condition",
+    "difficulty": 2,
+    "prompt": "あかい かぎで あく はこ。いま あおい かぎだけ。はこは？",
+    "choices": [
+      "あく",
+      "あかない",
+      "こわれる"
+    ],
+    "answerIndex": 1,
+    "hint": "「もし〜なら」を そのまま つかおう。"
+  },
+  {
+    "id": "i50",
+    "subject": "insight",
+    "skillId": "logic_condition",
+    "difficulty": 2,
+    "prompt": "あめのひは かさを もつ。きょうは あめ。どうする？",
+    "choices": [
+      "ぼうしだけ",
+      "なにも もたない",
+      "かさを もつ"
+    ],
+    "answerIndex": 2,
+    "hint": "「もし〜なら」を そのまま つかおう。"
+  },
+  {
+    "id": "i51",
+    "subject": "insight",
+    "skillId": "logic_condition",
+    "difficulty": 2,
+    "prompt": "ベルが 2かい なったら ならぶ。いま 1かいだけ。どうする？",
+    "choices": [
+      "まつ",
+      "はしる",
+      "ならぶ"
+    ],
+    "answerIndex": 0,
+    "hint": "「もし〜なら」を そのまま つかおう。"
+  },
+  {
+    "id": "i52",
+    "subject": "insight",
+    "skillId": "logic_condition",
+    "difficulty": 2,
+    "prompt": "りんごを たべるには あらう。まだ あらってない。どうする？",
+    "choices": [
+      "すてる",
+      "あらってから たべる",
+      "すぐ たべる"
+    ],
+    "answerIndex": 1,
+    "hint": "「もし〜なら」を そのまま つかおう。"
+  },
+  {
+    "id": "i53",
+    "subject": "insight",
+    "skillId": "logic_condition",
+    "difficulty": 3,
+    "prompt": "「しゅくだいが おわったら あそぶ」。まだ おわってない。どうする？",
+    "choices": [
+      "ねる",
+      "すぐ あそぶ",
+      "しゅくだいを すすめる"
+    ],
+    "answerIndex": 2,
+    "hint": "「もし〜なら」を そのまま つかおう。"
+  },
+  {
+    "id": "i54",
+    "subject": "insight",
+    "skillId": "logic_condition",
+    "difficulty": 3,
+    "prompt": "「しんごうが あおなら わたる」。いま きいろ。どうする？",
+    "choices": [
+      "とまる",
+      "わたる",
+      "めを つぶる"
+    ],
+    "answerIndex": 0,
+    "hint": "「もし〜なら」を そのまま つかおう。"
+  },
+  {
+    "id": "i55",
+    "subject": "insight",
+    "skillId": "logic_condition",
+    "difficulty": 3,
+    "prompt": "「3にん そろったら しゅっぱつ」。いま 2にん。どうする？",
+    "choices": [
+      "しゅっぱつ",
+      "もう1にん まつ",
+      "かえる"
+    ],
+    "answerIndex": 1,
+    "hint": "「もし〜なら」を そのまま つかおう。"
+  },
+  {
+    "id": "i56",
+    "subject": "insight",
+    "skillId": "logic_condition",
+    "difficulty": 3,
+    "prompt": "「にがてなものを 1くち たべたら デザート」。まだ たべてない。どうする？",
+    "choices": [
+      "デザートだけ たべる",
+      "のこす",
+      "1くち たべる"
+    ],
+    "answerIndex": 2,
+    "hint": "「もし〜なら」を そのまま つかおう。"
+  },
+  {
+    "id": "i57",
+    "subject": "insight",
+    "skillId": "logic_condition",
+    "difficulty": 4,
+    "prompt": "「スイッチAとBが ONで ライトが つく」。AだけON。ライトは？",
+    "choices": [
+      "つかない",
+      "こわれる",
+      "つく"
+    ],
+    "answerIndex": 0,
+    "hint": "「もし〜なら」を そのまま つかおう。"
+  },
+  {
+    "id": "i58",
+    "subject": "insight",
+    "skillId": "logic_condition",
+    "difficulty": 4,
+    "prompt": "「カードが 2まいとも あかなら クリア」。1まいは あお。クリアは？",
+    "choices": [
+      "はんぶん できる",
+      "できない",
+      "できる"
+    ],
+    "answerIndex": 1,
+    "hint": "「もし〜なら」を そのまま つかおう。"
+  },
+  {
+    "id": "i59",
+    "subject": "insight",
+    "skillId": "logic_condition",
+    "difficulty": 4,
+    "prompt": "「ひだりに 2かい まがると ゴール」。1かいしか まがってない。どうする？",
+    "choices": [
+      "うしろに さがる",
+      "みぎに まがる",
+      "もう1かい ひだり"
+    ],
+    "answerIndex": 2,
+    "hint": "「もし〜なら」を そのまま つかおう。"
+  },
+  {
+    "id": "i60",
+    "subject": "insight",
+    "skillId": "logic_condition",
+    "difficulty": 4,
+    "prompt": "「じかんないに 3もん とけたら だいせいこう」。いま 2もん。つぎに ひつようなのは？",
+    "choices": [
+      "あと1もん とく",
+      "おわる",
+      "まちがえる"
+    ],
+    "answerIndex": 0,
+    "hint": "「もし〜なら」を そのまま つかおう。"
+  },
+  {
+    "id": "i61",
+    "subject": "insight",
+    "skillId": "route_optimization",
+    "difficulty": 3,
+    "prompt": "Aみち 2ほ+2ほ、Bみち 3ほ+2ほ、Cみち 1ほ+4ほ。いちばん みじかいのは？",
+    "choices": [
+      "Bみち",
+      "Aみち",
+      "Cみち"
+    ],
+    "answerIndex": 1,
+    "hint": "それぞれ ぜんぶ たして くらべよう。"
+  },
+  {
+    "id": "i62",
+    "subject": "insight",
+    "skillId": "route_optimization",
+    "difficulty": 3,
+    "prompt": "A 4ほ+1ほ、B 2ほ+2ほ、C 3ほ+2ほ。いちばん みじかいのは？",
+    "choices": [
+      "A",
+      "C",
+      "B"
+    ],
+    "answerIndex": 2,
+    "hint": "それぞれ ぜんぶ たして くらべよう。"
+  },
+  {
+    "id": "i63",
+    "subject": "insight",
+    "skillId": "route_optimization",
+    "difficulty": 3,
+    "prompt": "みちX 5ほ、みちY 2ほ+2ほ、みちZ 3ほ+3ほ。はやいのは？",
+    "choices": [
+      "みちY",
+      "みちZ",
+      "みちX"
+    ],
+    "answerIndex": 0,
+    "hint": "それぞれ ぜんぶ たして くらべよう。"
+  },
+  {
+    "id": "i64",
+    "subject": "insight",
+    "skillId": "route_optimization",
+    "difficulty": 3,
+    "prompt": "A 1ほ+1ほ+1ほ、B 2ほ+2ほ、C 5ほ。いちばん みじかいのは？",
+    "choices": [
+      "C",
+      "A",
+      "B"
+    ],
+    "answerIndex": 1,
+    "hint": "それぞれ ぜんぶ たして くらべよう。"
+  },
+  {
+    "id": "i65",
+    "subject": "insight",
+    "skillId": "route_optimization",
+    "difficulty": 3,
+    "prompt": "ルート1 6ほ、ルート2 4ほ+1ほ、ルート3 3ほ+3ほ。いちばん みじかいのは？",
+    "choices": [
+      "ルート3",
+      "ルート1",
+      "ルート2"
+    ],
+    "answerIndex": 2,
+    "hint": "それぞれ ぜんぶ たして くらべよう。"
+  },
+  {
+    "id": "i66",
+    "subject": "insight",
+    "skillId": "route_optimization",
+    "difficulty": 3,
+    "prompt": "A 7ほ、B 3ほ+3ほ、C 2ほ+5ほ。いちばん みじかいのは？",
+    "choices": [
+      "B",
+      "A",
+      "C"
+    ],
+    "answerIndex": 0,
+    "hint": "それぞれ ぜんぶ たして くらべよう。"
+  },
+  {
+    "id": "i67",
+    "subject": "insight",
+    "skillId": "route_optimization",
+    "difficulty": 4,
+    "prompt": "A 2+2+2ほ、B 5+1ほ、C 4+3ほ。いちばん みじかいのは？",
+    "choices": [
+      "B",
+      "A",
+      "C"
+    ],
+    "answerIndex": 1,
+    "hint": "それぞれ ぜんぶ たして くらべよう。"
+  },
+  {
+    "id": "i68",
+    "subject": "insight",
+    "skillId": "route_optimization",
+    "difficulty": 4,
+    "prompt": "みちP 8ほ、みちQ 3ほ+4ほ、みちR 2ほ+2ほ+2ほ。いちばん みじかいのは？",
+    "choices": [
+      "みちQ",
+      "みちP",
+      "みちR"
+    ],
+    "answerIndex": 2,
+    "hint": "それぞれ ぜんぶ たして くらべよう。"
+  },
+  {
+    "id": "i69",
+    "subject": "insight",
+    "skillId": "route_optimization",
+    "difficulty": 4,
+    "prompt": "A 9ほ、B 4ほ+4ほ、C 3ほ+3ほ+1ほ。いちばん みじかいのは？",
+    "choices": [
+      "C",
+      "A",
+      "B"
+    ],
+    "answerIndex": 0,
+    "hint": "それぞれ ぜんぶ たして くらべよう。"
+  },
+  {
+    "id": "i70",
+    "subject": "insight",
+    "skillId": "route_optimization",
+    "difficulty": 4,
+    "prompt": "コース赤 5+2ほ、青 4+4ほ、黄 3+3+2ほ。いちばん みじかいのは？",
+    "choices": [
+      "コース黄",
+      "コース赤",
+      "コース青"
+    ],
+    "answerIndex": 1,
+    "hint": "それぞれ ぜんぶ たして くらべよう。"
+  },
+  {
+    "id": "i71",
+    "subject": "insight",
+    "skillId": "route_optimization",
+    "difficulty": 4,
+    "prompt": "ルートA 10ほ、B 6ほ+2ほ、C 4ほ+3ほ。いちばん みじかいのは？",
+    "choices": [
+      "ルートA",
+      "ルートB",
+      "ルートC"
+    ],
+    "answerIndex": 2,
+    "hint": "それぞれ ぜんぶ たして くらべよう。"
+  },
+  {
+    "id": "i72",
+    "subject": "insight",
+    "skillId": "route_optimization",
+    "difficulty": 4,
+    "prompt": "A 2+3+3ほ、B 4+4ほ、C 1+1+1+5ほ。いちばん みじかいのは？",
+    "choices": [
+      "B",
+      "A",
+      "C"
+    ],
+    "answerIndex": 0,
+    "hint": "それぞれ ぜんぶ たして くらべよう。"
+  },
+  {
+    "id": "i73",
+    "subject": "insight",
+    "skillId": "strategy_choice",
+    "difficulty": 3,
+    "prompt": "キャンディを 2こ えらべる。A(1+1), B(2+0), C(0+3)。いちばん おおいのは？",
+    "choices": [
+      "A",
+      "C",
+      "B"
+    ],
+    "answerIndex": 1,
+    "hint": "ゴールに いちばん ちかい えらびかたを。"
+  },
+  {
+    "id": "i74",
+    "subject": "insight",
+    "skillId": "strategy_choice",
+    "difficulty": 3,
+    "prompt": "3ターンで すすむ。A:1+1+1、B:2+0+2、C:1+2+1。いちばん すすむのは？",
+    "choices": [
+      "A",
+      "C",
+      "B"
+    ],
+    "answerIndex": 2,
+    "hint": "ゴールに いちばん ちかい えらびかたを。"
+  },
+  {
+    "id": "i75",
+    "subject": "insight",
+    "skillId": "strategy_choice",
+    "difficulty": 4,
+    "prompt": "コイン 5まいで かえる。Aは2まいで1こ、Bは3まいで2こ。どちらが おとく？",
+    "choices": [
+      "B",
+      "おなじ",
+      "A"
+    ],
+    "answerIndex": 0,
+    "hint": "ゴールに いちばん ちかい えらびかたを。"
+  },
+  {
+    "id": "i76",
+    "subject": "insight",
+    "skillId": "strategy_choice",
+    "difficulty": 3,
+    "prompt": "のこり 1てで ゴール。Aは 1すすめる、Bは 2すすめる、Cは 0。えらぶのは？",
+    "choices": [
+      "C",
+      "A",
+      "B"
+    ],
+    "answerIndex": 1,
+    "hint": "ゴールに いちばん ちかい えらびかたを。"
+  },
+  {
+    "id": "i77",
+    "subject": "insight",
+    "skillId": "strategy_choice",
+    "difficulty": 4,
+    "prompt": "ポイントを 6に したい。A:+2,+2,+2 B:+3,+1,+1 C:+4,+1,+0。いちばん ぴったりは？",
+    "choices": [
+      "C",
+      "B",
+      "A"
+    ],
+    "answerIndex": 2,
+    "hint": "ゴールに いちばん ちかい えらびかたを。"
+  },
+  {
+    "id": "i78",
+    "subject": "insight",
+    "skillId": "strategy_choice",
+    "difficulty": 4,
+    "prompt": "3まいの カードから 2まい ひく。A(5),B(4),C(1)。ごうけい さいだいは？",
+    "choices": [
+      "AとB",
+      "AとC",
+      "BとC"
+    ],
+    "answerIndex": 0,
+    "hint": "ゴールに いちばん ちかい えらびかたを。"
+  },
+  {
+    "id": "i79",
+    "subject": "insight",
+    "skillId": "strategy_choice",
+    "difficulty": 4,
+    "prompt": "せいげんじかん 10びょう。Aみち 6びょう、Bみち 11びょう、Cみち 9びょう。もっとも あんぜんは？",
+    "choices": [
+      "Bみち",
+      "Aみち",
+      "Cみち"
+    ],
+    "answerIndex": 1,
+    "hint": "ゴールに いちばん ちかい えらびかたを。"
+  },
+  {
+    "id": "i80",
+    "subject": "insight",
+    "skillId": "strategy_choice",
+    "difficulty": 5,
+    "prompt": "くじを 1つ えらぶ。あたり: A=1/2, B=1/3, C=1/4。あたりやすいのは？",
+    "choices": [
+      "B",
+      "C",
+      "A"
+    ],
+    "answerIndex": 2,
+    "hint": "ゴールに いちばん ちかい えらびかたを。"
+  },
+  {
+    "id": "i81",
+    "subject": "insight",
+    "skillId": "strategy_choice",
+    "difficulty": 4,
+    "prompt": "バッテリー のこり 20%。Aアプリ 5%, Bアプリ 12%, Cアプリ 18%。ながく つかえるのは？",
+    "choices": [
+      "Aアプリ",
+      "Cアプリ",
+      "Bアプリ"
+    ],
+    "answerIndex": 0,
+    "hint": "ゴールに いちばん ちかい えらびかたを。"
+  },
+  {
+    "id": "i82",
+    "subject": "insight",
+    "skillId": "strategy_choice",
+    "difficulty": 5,
+    "prompt": "おこづかい 300えん。A200えん+B120えん, C150えん+D140えん, E100えん+F180えん。かえるのは？",
+    "choices": [
+      "EとF",
+      "CとD",
+      "AとB"
+    ],
+    "answerIndex": 1,
+    "hint": "ゴールに いちばん ちかい えらびかたを。"
+  },
+  {
+    "id": "i83",
+    "subject": "insight",
+    "skillId": "strategy_choice",
+    "difficulty": 4,
+    "prompt": "2かい こうげき。A:3+3, B:5+0, C:2+5。さいだいダメージは？",
+    "choices": [
+      "B",
+      "A",
+      "C"
+    ],
+    "answerIndex": 2,
+    "hint": "ゴールに いちばん ちかい えらびかたを。"
+  },
+  {
+    "id": "i84",
+    "subject": "insight",
+    "skillId": "strategy_choice",
+    "difficulty": 5,
+    "prompt": "のこり 2ターンで 7ポイント ひつよう。A:+3,+3 B:+4,+3 C:+5,+1。たっせい できるのは？",
+    "choices": [
+      "B",
+      "A",
+      "C"
+    ],
+    "answerIndex": 0,
+    "hint": "ゴールに いちばん ちかい えらびかたを。"
+  },
+  {
+    "id": "i85",
+    "subject": "insight",
+    "skillId": "observation_compare",
+    "difficulty": 2,
+    "prompt": "あかい ふうせん3こ、あおい ふうせん2こ。おおいのは？",
+    "choices": [
+      "あおい ふうせん",
+      "あかい ふうせん",
+      "おなじ"
+    ],
+    "answerIndex": 1,
+    "hint": "くらべる たいしょうを そろえよう。"
+  },
+  {
+    "id": "i86",
+    "subject": "insight",
+    "skillId": "observation_compare",
+    "difficulty": 2,
+    "prompt": "えんぴつ5ほん、けしごむ2こ。すうが おおいのは？",
+    "choices": [
+      "けしごむ",
+      "おなじ",
+      "えんぴつ"
+    ],
+    "answerIndex": 2,
+    "hint": "くらべる たいしょうを そろえよう。"
+  },
+  {
+    "id": "i87",
+    "subject": "insight",
+    "skillId": "observation_compare",
+    "difficulty": 2,
+    "prompt": "ねこ2ひき、いぬ2ひき。おおいのは？",
+    "choices": [
+      "おなじ",
+      "いぬ",
+      "ねこ"
+    ],
+    "answerIndex": 0,
+    "hint": "くらべる たいしょうを そろえよう。"
+  },
+  {
+    "id": "i88",
+    "subject": "insight",
+    "skillId": "observation_compare",
+    "difficulty": 3,
+    "prompt": "みず 200ml と ぎゅうにゅう 150ml。おおいのは？",
+    "choices": [
+      "おなじ",
+      "みず",
+      "ぎゅうにゅう"
+    ],
+    "answerIndex": 1,
+    "hint": "くらべる たいしょうを そろえよう。"
+  },
+  {
+    "id": "i89",
+    "subject": "insight",
+    "skillId": "observation_compare",
+    "difficulty": 3,
+    "prompt": "1ぷんで 20メートルと 15メートル。はやいのは？",
+    "choices": [
+      "おなじ",
+      "15メートルの ほう",
+      "20メートルの ほう"
+    ],
+    "answerIndex": 2,
+    "hint": "くらべる たいしょうを そろえよう。"
+  },
+  {
+    "id": "i90",
+    "subject": "insight",
+    "skillId": "observation_compare",
+    "difficulty": 3,
+    "prompt": "ほんA 30ページ、ほんB 24ページ。あついのは？",
+    "choices": [
+      "ほんA",
+      "ほんB",
+      "おなじ"
+    ],
+    "answerIndex": 0,
+    "hint": "くらべる たいしょうを そろえよう。"
+  },
+  {
+    "id": "i91",
+    "subject": "insight",
+    "skillId": "observation_compare",
+    "difficulty": 2,
+    "prompt": "チーム赤 8てん、青 11てん。かっているのは？",
+    "choices": [
+      "チーム赤",
+      "チーム青",
+      "おなじ"
+    ],
+    "answerIndex": 1,
+    "hint": "くらべる たいしょうを そろえよう。"
+  },
+  {
+    "id": "i92",
+    "subject": "insight",
+    "skillId": "observation_compare",
+    "difficulty": 4,
+    "prompt": "コップA 3/4、コップB 1/2。おおいのは？",
+    "choices": [
+      "コップB",
+      "おなじ",
+      "コップA"
+    ],
+    "answerIndex": 2,
+    "hint": "くらべる たいしょうを そろえよう。"
+  },
+  {
+    "id": "i93",
+    "subject": "insight",
+    "skillId": "observation_compare",
+    "difficulty": 3,
+    "prompt": "はこA 12こ、はこB 12こ、はこC 9こ。いちばん すくないのは？",
+    "choices": [
+      "はこC",
+      "はこB",
+      "はこA"
+    ],
+    "answerIndex": 0,
+    "hint": "くらべる たいしょうを そろえよう。"
+  },
+  {
+    "id": "i94",
+    "subject": "insight",
+    "skillId": "observation_compare",
+    "difficulty": 2,
+    "prompt": "バスは 5ふんご、でんしゃは 8ふんご。はやく くるのは？",
+    "choices": [
+      "おなじ",
+      "バス",
+      "でんしゃ"
+    ],
+    "answerIndex": 1,
+    "hint": "くらべる たいしょうを そろえよう。"
+  },
+  {
+    "id": "i95",
+    "subject": "insight",
+    "skillId": "observation_compare",
+    "difficulty": 2,
+    "prompt": "ノートA 60えん、B 80えん。やすいのは？",
+    "choices": [
+      "おなじ",
+      "ノートB",
+      "ノートA"
+    ],
+    "answerIndex": 2,
+    "hint": "くらべる たいしょうを そろえよう。"
+  },
+  {
+    "id": "i96",
+    "subject": "insight",
+    "skillId": "observation_compare",
+    "difficulty": 4,
+    "prompt": "みちA 900m、みちB 1km。みじかいのは？",
+    "choices": [
+      "みちA",
+      "みちB",
+      "おなじ"
+    ],
+    "answerIndex": 0,
+    "hint": "くらべる たいしょうを そろえよう。"
+  },
+  {
+    "id": "i97",
+    "subject": "insight",
+    "skillId": "riddle_wordplay",
+    "difficulty": 4,
+    "prompt": "あさは 4ほん、ひるは 2ほん、よるは 3ぼんで あるくものは？",
+    "choices": [
+      "いぬ",
+      "ひと",
+      "くるま"
+    ],
+    "answerIndex": 1,
+    "hint": "ことばの いみを べつの かどから みよう。"
+  },
+  {
+    "id": "i98",
+    "subject": "insight",
+    "skillId": "riddle_wordplay",
+    "difficulty": 4,
+    "prompt": "みずに いれると なくなるものは？",
+    "choices": [
+      "いし",
+      "かみ",
+      "かげ"
+    ],
+    "answerIndex": 2,
+    "hint": "ことばの いみを べつの かどから みよう。"
+  },
+  {
+    "id": "i99",
+    "subject": "insight",
+    "skillId": "riddle_wordplay",
+    "difficulty": 3,
+    "prompt": "たべられないのに まいにち きるものは？",
+    "choices": [
+      "ふく",
+      "くだもの",
+      "パン"
+    ],
+    "answerIndex": 0,
+    "hint": "ことばの いみを べつの かどから みよう。"
+  },
+  {
+    "id": "i100",
+    "subject": "insight",
+    "skillId": "riddle_wordplay",
+    "difficulty": 5,
+    "prompt": "かっても だれも たべない「けーき」は？",
+    "choices": [
+      "おたんじょうびケーキ",
+      "ホットケーキの もけい",
+      "けしゴム"
+    ],
+    "answerIndex": 1,
+    "hint": "ことばの いみを べつの かどから みよう。"
+  },
+  {
+    "id": "i101",
+    "subject": "insight",
+    "skillId": "riddle_wordplay",
+    "difficulty": 4,
+    "prompt": "とると ふえるものは？",
+    "choices": [
+      "つくえ",
+      "えんぴつ",
+      "しゃしん"
+    ],
+    "answerIndex": 2,
+    "hint": "ことばの いみを べつの かどから みよう。"
+  },
+  {
+    "id": "i102",
+    "subject": "insight",
+    "skillId": "riddle_wordplay",
+    "difficulty": 3,
+    "prompt": "いつも うごくけど あしが ないものは？",
+    "choices": [
+      "とけいの はり",
+      "くつ",
+      "かさ"
+    ],
+    "answerIndex": 0,
+    "hint": "ことばの いみを べつの かどから みよう。"
+  },
+  {
+    "id": "i103",
+    "subject": "insight",
+    "skillId": "riddle_wordplay",
+    "difficulty": 5,
+    "prompt": "「ん」ではじまり「ん」で おわることばは？",
+    "choices": [
+      "ぱん",
+      "んーん",
+      "みかん"
+    ],
+    "answerIndex": 1,
+    "hint": "ことばの いみを べつの かどから みよう。"
+  },
+  {
+    "id": "i104",
+    "subject": "insight",
+    "skillId": "riddle_wordplay",
+    "difficulty": 5,
+    "prompt": "まどは あるけど ドアが ないものは？",
+    "choices": [
+      "いえ",
+      "れいぞうこ",
+      "カレンダー"
+    ],
+    "answerIndex": 2,
+    "hint": "ことばの いみを べつの かどから みよう。"
+  },
+  {
+    "id": "i105",
+    "subject": "insight",
+    "skillId": "riddle_wordplay",
+    "difficulty": 5,
+    "prompt": "おすと へるけど つかうと ふえるものは？",
+    "choices": [
+      "スタンプの インク",
+      "つみき",
+      "かみ"
+    ],
+    "answerIndex": 0,
+    "hint": "ことばの いみを べつの かどから みよう。"
+  },
+  {
+    "id": "i106",
+    "subject": "insight",
+    "skillId": "riddle_wordplay",
+    "difficulty": 5,
+    "prompt": "あなの あいた ふくろでも みずを はこべるのは なぜ？",
+    "choices": [
+      "みずが すくないから",
+      "こおり だから",
+      "ふくろが つよいから"
+    ],
+    "answerIndex": 1,
+    "hint": "ことばの いみを べつの かどから みよう。"
+  },
+  {
+    "id": "i107",
+    "subject": "insight",
+    "skillId": "riddle_wordplay",
+    "difficulty": 4,
+    "prompt": "「かき」は かきでも えんぴつで かく「かき」は？",
+    "choices": [
+      "かきを つる",
+      "かきを たべる",
+      "えを かく"
+    ],
+    "answerIndex": 2,
+    "hint": "ことばの いみを べつの かどから みよう。"
+  },
+  {
+    "id": "i108",
+    "subject": "insight",
+    "skillId": "riddle_wordplay",
+    "difficulty": 3,
+    "prompt": "どんどん みじかくなるのに つかうと うれしいものは？",
+    "choices": [
+      "えんぴつ",
+      "つくえ",
+      "ぼうし"
+    ],
+    "answerIndex": 0,
+    "hint": "ことばの いみを べつの かどから みよう。"
+  },
+  {
+    "id": "i109",
+    "subject": "insight",
+    "skillId": "story_inference",
+    "difficulty": 3,
+    "prompt": "くつが ぬれている。そとは どうだった？",
+    "choices": [
+      "いつもより かわいていた",
+      "あめが ふっていた",
+      "ゆきだるまが とけた"
+    ],
+    "answerIndex": 1,
+    "hint": "じょうきょうから もっとも しぜんな こたえを。"
+  },
+  {
+    "id": "i110",
+    "subject": "insight",
+    "skillId": "story_inference",
+    "difficulty": 3,
+    "prompt": "ランドセルが かるい。いちばん ありそうなのは？",
+    "choices": [
+      "ほんが ふえた",
+      "いしを いれた",
+      "きょうは じゅぎょうが すくない"
+    ],
+    "answerIndex": 2,
+    "hint": "じょうきょうから もっとも しぜんな こたえを。"
+  },
+  {
+    "id": "i111",
+    "subject": "insight",
+    "skillId": "story_inference",
+    "difficulty": 3,
+    "prompt": "でんきが ついていない へや。どうするのが よい？",
+    "choices": [
+      "スイッチを たしかめる",
+      "めを つぶる",
+      "くらいまま はしる"
+    ],
+    "answerIndex": 0,
+    "hint": "じょうきょうから もっとも しぜんな こたえを。"
+  },
+  {
+    "id": "i112",
+    "subject": "insight",
+    "skillId": "story_inference",
+    "difficulty": 3,
+    "prompt": "こえが きこえない。つぎに ためすことは？",
+    "choices": [
+      "にげる",
+      "ちかくで はっきり きく",
+      "すぐ おこる"
+    ],
+    "answerIndex": 1,
+    "hint": "じょうきょうから もっとも しぜんな こたえを。"
+  },
+  {
+    "id": "i113",
+    "subject": "insight",
+    "skillId": "story_inference",
+    "difficulty": 3,
+    "prompt": "はなが しおれている。ひつようなのは？",
+    "choices": [
+      "はっぱを ちぎる",
+      "くらい はこに いれる",
+      "みずを あげる"
+    ],
+    "answerIndex": 2,
+    "hint": "じょうきょうから もっとも しぜんな こたえを。"
+  },
+  {
+    "id": "i114",
+    "subject": "insight",
+    "skillId": "story_inference",
+    "difficulty": 2,
+    "prompt": "えんぴつの しんが おれた。まず することは？",
+    "choices": [
+      "けずる",
+      "すてる",
+      "かむ"
+    ],
+    "answerIndex": 0,
+    "hint": "じょうきょうから もっとも しぜんな こたえを。"
+  },
+  {
+    "id": "i115",
+    "subject": "insight",
+    "skillId": "story_inference",
+    "difficulty": 3,
+    "prompt": "カレンダーに まるが ついている。なにを あらわすことが おおい？",
+    "choices": [
+      "わすれていい ひ",
+      "たいせつな ひ",
+      "よるだけの ひ"
+    ],
+    "answerIndex": 1,
+    "hint": "じょうきょうから もっとも しぜんな こたえを。"
+  },
+  {
+    "id": "i116",
+    "subject": "insight",
+    "skillId": "story_inference",
+    "difficulty": 4,
+    "prompt": "ドアの まえに くつが 2そく。なにが わかる？",
+    "choices": [
+      "だれも いない",
+      "くつやさん",
+      "だれか きている"
+    ],
+    "answerIndex": 2,
+    "hint": "じょうきょうから もっとも しぜんな こたえを。"
+  },
+  {
+    "id": "i117",
+    "subject": "insight",
+    "skillId": "story_inference",
+    "difficulty": 4,
+    "prompt": "こおりが とけて みずに なった。おんどは？",
+    "choices": [
+      "あたたかく なった",
+      "かわらない",
+      "さむく なった"
+    ],
+    "answerIndex": 0,
+    "hint": "じょうきょうから もっとも しぜんな こたえを。"
+  },
+  {
+    "id": "i118",
+    "subject": "insight",
+    "skillId": "story_inference",
+    "difficulty": 3,
+    "prompt": "ノートに しるしが 3つ。しゅくだいの すすみぐあいは？",
+    "choices": [
+      "ぜんぶ おわった",
+      "3かしょ おわった",
+      "なにも してない"
+    ],
+    "answerIndex": 1,
+    "hint": "じょうきょうから もっとも しぜんな こたえを。"
+  },
+  {
+    "id": "i119",
+    "subject": "insight",
+    "skillId": "story_inference",
+    "difficulty": 4,
+    "prompt": "しんごうが かわる まえに ピッピッとなる。どうする？",
+    "choices": [
+      "めを とじる",
+      "とつぜん はしる",
+      "おちついて わたりきるか まつ"
+    ],
+    "answerIndex": 2,
+    "hint": "じょうきょうから もっとも しぜんな こたえを。"
+  },
+  {
+    "id": "i120",
+    "subject": "insight",
+    "skillId": "story_inference",
+    "difficulty": 2,
+    "prompt": "あそんだ あとに のどが かわいた。からだが ほしいのは？",
+    "choices": [
+      "みず",
+      "けしごむ",
+      "ぼうし"
+    ],
+    "answerIndex": 0,
+    "hint": "じょうきょうから もっとも しぜんな こたえを。"
   }
 ];
