@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { questionBank } from '../data/questions';
 import { useAppStore } from '../store/useAppStore';
 
 export function SettingsPage() {
@@ -7,6 +8,8 @@ export function SettingsPage() {
   const sfxVolume = useAppStore((state) => state.settings.sfxVolume);
   const updateSettings = useAppStore((state) => state.updateSettings);
   const clearProgress = useAppStore((state) => state.clearProgress);
+  const mathCount = questionBank.filter((question) => question.subject === 'math').length;
+  const japaneseCount = questionBank.filter((question) => question.subject === 'japanese').length;
 
   const onReset = () => {
     if (!window.confirm('ほんとうに がくしゅうきろくを けしますか？')) return;
@@ -60,6 +63,14 @@ export function SettingsPage() {
           データをリセット
         </button>
       </div>
+
+      <article className="card">
+        <h2>もんだいデータの 参照元</h2>
+        <p>ファイル: src/data/questions.ts</p>
+        <p>
+          もんだい数: さんすう {mathCount} / こくご {japaneseCount} / ごうけい {questionBank.length}
+        </p>
+      </article>
     </section>
   );
 }
