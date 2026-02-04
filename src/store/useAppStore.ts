@@ -19,6 +19,7 @@ import type {
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 type SubjectCounts = Record<Subject, number>;
+type SubjectRecentQuestions = Record<Subject, string[]>;
 
 type AppState = {
   xp: number;
@@ -32,6 +33,7 @@ type AppState = {
   settings: Settings;
   adaptiveBySubject: SubjectAdaptiveMap;
   skillProgress: Record<string, SkillProgress>;
+  recentQuestionIdsBySubject: SubjectRecentQuestions;
   mission: MissionSession | null;
   latestResult: MissionResult | null;
   startMission: (subject: Subject) => void;
@@ -53,8 +55,18 @@ const defaultSubjectClears: SubjectCounts = {
   japanese: 0,
 };
 
+const defaultRecentQuestionIdsBySubject: SubjectRecentQuestions = {
+  math: [],
+  japanese: [],
+};
+
 function normalizeDate(date: Date): string {
   return date.toISOString().slice(0, 10);
+}
+
+function mergeRecentQuestionIds(current: string[], latest: string[], limit: number): string[] {
+  const merged = [...latest, ...current];
+  return Array.from(new Set(merged)).slice(0, limit);
 }
 
 function nextStreak(lastPlayedDate: string | null): number {
@@ -97,13 +109,19 @@ export const useAppStore = create<AppState>()(
       settings: defaultSettings,
       adaptiveBySubject: createDefaultAdaptiveMap(),
       skillProgress: {},
+      recentQuestionIdsBySubject: defaultRecentQuestionIdsBySubject,
       mission: null,
       latestResult: null,
 
       startMission: (subject) => {
         const state = get();
         const subjectState = state.adaptiveBySubject[subject];
-        const { questions, plan } = buildAdaptiveMission(subject, subjectState, state.skillProgress);
+        const { questions, plan } = buildAdaptiveMission(
+          subject,
+          subjectState,
+          state.skillProgress,
+          state.recentQuestionIdsBySubject[subject],
+        );
 
         set({
           mission: {
@@ -191,6 +209,15 @@ export const useAppStore = create<AppState>()(
           [mission.subject]: adaptiveUpdate.subjectState,
         };
 
+        const recentQuestionIdsBySubject: SubjectRecentQuestions = {
+          ...state.recentQuestionIdsBySubject,
+          [mission.subject]: mergeRecentQuestionIds(
+            state.recentQuestionIdsBySubject[mission.subject],
+            mission.questions.map((question) => question.id),
+            30,
+          ),
+        };
+
         const nextState: AppState = {
           ...state,
           xp: nextXp,
@@ -201,6 +228,7 @@ export const useAppStore = create<AppState>()(
           subjectClears,
           adaptiveBySubject,
           skillProgress: adaptiveUpdate.skillProgress,
+          recentQuestionIdsBySubject,
           recentResults: [result, ...state.recentResults].slice(0, 30),
           latestResult: result,
           mission: null,
@@ -228,6 +256,7 @@ export const useAppStore = create<AppState>()(
           recentResults: [],
           adaptiveBySubject: createDefaultAdaptiveMap(),
           skillProgress: {},
+          recentQuestionIdsBySubject: defaultRecentQuestionIdsBySubject,
           mission: null,
           latestResult: null,
         });

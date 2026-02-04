@@ -68,6 +68,7 @@ function pickQuestion(
   usedIds: Set<string>,
   targetDifficulty: number,
   mode: 'core' | 'challenge',
+  recentIds: Set<string>,
 ): Question | undefined {
   const available = candidates.filter((question) => !usedIds.has(question.id));
   if (available.length === 0) return undefined;
@@ -77,7 +78,8 @@ function pickQuestion(
   return shuffle(available)
     .map((question) => {
       const challengePenalty = mode === 'challenge' && question.difficulty < desired ? 3 : 0;
-      const score = Math.abs(question.difficulty - desired) + challengePenalty;
+      const recentPenalty = recentIds.has(question.id) ? 2 : 0;
+      const score = Math.abs(question.difficulty - desired) + challengePenalty + recentPenalty;
       return { question, score };
     })
     .sort((a, b) => a.score - b.score)[0]?.question;
@@ -89,6 +91,7 @@ function pickBySkills(
   usedIds: Set<string>,
   targetDifficulty: number,
   count: number,
+  recentIds: Set<string>,
 ): Question[] {
   const selected: Question[] = [];
 
@@ -96,7 +99,7 @@ function pickBySkills(
     if (selected.length >= count) break;
     const questions = buckets.get(skillId) ?? [];
     const near = questions.filter((question) => Math.abs(question.difficulty - targetDifficulty) <= 1);
-    const picked = pickQuestion(near.length > 0 ? near : questions, usedIds, targetDifficulty, 'core');
+    const picked = pickQuestion(near.length > 0 ? near : questions, usedIds, targetDifficulty, 'core', recentIds);
 
     if (!picked) continue;
     usedIds.add(picked.id);
@@ -120,6 +123,7 @@ export function buildAdaptiveMission(
   subject: Subject,
   subjectState: SubjectAdaptiveState,
   skillProgress: Record<string, SkillProgress>,
+  recentQuestionIds: string[] = [],
   now = Date.now(),
 ): { questions: Question[]; plan: MissionPlan } {
   const questions = subjectQuestions(subject);
@@ -144,8 +148,16 @@ export function buildAdaptiveMission(
     .map(({ skillId }) => skillId);
 
   const usedIds = new Set<string>();
+  const recentIds = new Set(recentQuestionIds);
   const reviewCountTarget = Math.min(2, dueSkills.length);
-  const reviewQuestions = pickBySkills(dueSkills, buckets, usedIds, subjectState.targetDifficulty, reviewCountTarget);
+  const reviewQuestions = pickBySkills(
+    dueSkills,
+    buckets,
+    usedIds,
+    subjectState.targetDifficulty,
+    reviewCountTarget,
+    recentIds,
+  );
 
   const hasChallengeCandidate = questions.some(
     (question) => question.difficulty >= clamp(subjectState.targetDifficulty + 1, MIN_DIFFICULTY, MAX_DIFFICULTY),
@@ -159,11 +171,12 @@ export function buildAdaptiveMission(
     usedIds,
     subjectState.targetDifficulty,
     Math.max(0, coreCountTarget),
+    recentIds,
   );
 
   const challengeQuestions: Question[] = [];
   if (challengeCountTarget > 0) {
-    const challenge = pickQuestion(questions, usedIds, subjectState.targetDifficulty, 'challenge');
+    const challenge = pickQuestion(questions, usedIds, subjectState.targetDifficulty, 'challenge', recentIds);
     if (challenge) {
       usedIds.add(challenge.id);
       challengeQuestions.push(challenge);

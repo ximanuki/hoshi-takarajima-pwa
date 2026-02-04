@@ -66,7 +66,8 @@ export function SettingsPage() {
 
       <article className="card">
         <h2>もんだいデータの 参照元</h2>
-        <p>ファイル: src/data/questions.ts</p>
+        <p>編集元: docs/question_bank_master.md</p>
+        <p>アプリ参照: src/data/questions.generated.ts （src/data/questions.ts けいゆ）</p>
         <p>
           もんだい数: さんすう {mathCount} / こくご {japaneseCount} / ごうけい {questionBank.length}
         </p>

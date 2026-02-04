@@ -4,6 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "questions:build": "node scripts/generate-question-bank.mjs",
+    "predev": "npm run questions:build",
+    "prebuild": "npm run questions:build",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",

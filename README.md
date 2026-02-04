@@ -17,6 +17,15 @@ npm install
 npm run dev
 ```
 
+## 問題集データの編集
+- 編集元: `docs/question_bank_master.md`
+- 生成先: `src/data/questions.generated.ts`
+- 手動生成:
+```bash
+npm run questions:build
+```
+- `npm run dev` / `npm run build` 実行時にも自動再生成されます。
+
 ## ビルド
 ```bash
 npm run build
