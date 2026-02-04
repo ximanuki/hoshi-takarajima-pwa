@@ -7785,5 +7785,3365 @@ export const questionBank: Question[] = [
     ],
     "answerIndex": 0,
     "hint": "はんたいの ことばを さがそう。"
+  },
+  {
+    "id": "m335",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 3,
+    "prompt": "2 × 2 は いくつ？",
+    "choices": [
+      "6",
+      "4",
+      "2"
+    ],
+    "answerIndex": 1,
+    "hint": "だんを おもいだそう。"
+  },
+  {
+    "id": "m336",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 3,
+    "prompt": "2こずつ はいった はこが 3こ。ぜんぶで いくつ？",
+    "choices": [
+      "6",
+      "4",
+      "8"
+    ],
+    "answerIndex": 0,
+    "hint": "おなじ かずの くりかえしは かけざん。"
+  },
+  {
+    "id": "m337",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 3,
+    "prompt": "2 × 4 は いくつ？",
+    "choices": [
+      "6",
+      "10",
+      "8"
+    ],
+    "answerIndex": 2,
+    "hint": "だんを おもいだそう。"
+  },
+  {
+    "id": "m338",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 3,
+    "prompt": "2こずつ はいった はこが 5こ。ぜんぶで いくつ？",
+    "choices": [
+      "12",
+      "10",
+      "8"
+    ],
+    "answerIndex": 1,
+    "hint": "おなじ かずの くりかえしは かけざん。"
+  },
+  {
+    "id": "m339",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 3,
+    "prompt": "2 × 6 は いくつ？",
+    "choices": [
+      "12",
+      "10",
+      "14"
+    ],
+    "answerIndex": 0,
+    "hint": "だんを おもいだそう。"
+  },
+  {
+    "id": "m340",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 3,
+    "prompt": "2こずつ はいった はこが 7こ。ぜんぶで いくつ？",
+    "choices": [
+      "12",
+      "16",
+      "14"
+    ],
+    "answerIndex": 2,
+    "hint": "おなじ かずの くりかえしは かけざん。"
+  },
+  {
+    "id": "m341",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 3,
+    "prompt": "2 × 8 は いくつ？",
+    "choices": [
+      "18",
+      "16",
+      "14"
+    ],
+    "answerIndex": 1,
+    "hint": "だんを おもいだそう。"
+  },
+  {
+    "id": "m342",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 3,
+    "prompt": "2こずつ はいった はこが 9こ。ぜんぶで いくつ？",
+    "choices": [
+      "18",
+      "16",
+      "20"
+    ],
+    "answerIndex": 0,
+    "hint": "おなじ かずの くりかえしは かけざん。"
+  },
+  {
+    "id": "m343",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 3,
+    "prompt": "3 × 2 は いくつ？",
+    "choices": [
+      "3",
+      "9",
+      "6"
+    ],
+    "answerIndex": 2,
+    "hint": "だんを おもいだそう。"
+  },
+  {
+    "id": "m344",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 3,
+    "prompt": "3こずつ はいった はこが 3こ。ぜんぶで いくつ？",
+    "choices": [
+      "12",
+      "9",
+      "6"
+    ],
+    "answerIndex": 1,
+    "hint": "おなじ かずの くりかえしは かけざん。"
+  },
+  {
+    "id": "m345",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 3,
+    "prompt": "3 × 4 は いくつ？",
+    "choices": [
+      "12",
+      "9",
+      "15"
+    ],
+    "answerIndex": 0,
+    "hint": "だんを おもいだそう。"
+  },
+  {
+    "id": "m346",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 3,
+    "prompt": "3こずつ はいった はこが 5こ。ぜんぶで いくつ？",
+    "choices": [
+      "12",
+      "18",
+      "15"
+    ],
+    "answerIndex": 2,
+    "hint": "おなじ かずの くりかえしは かけざん。"
+  },
+  {
+    "id": "m347",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 3,
+    "prompt": "3 × 6 は いくつ？",
+    "choices": [
+      "21",
+      "18",
+      "15"
+    ],
+    "answerIndex": 1,
+    "hint": "だんを おもいだそう。"
+  },
+  {
+    "id": "m348",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 4,
+    "prompt": "3こずつ はいった はこが 7こ。ぜんぶで いくつ？",
+    "choices": [
+      "21",
+      "18",
+      "24"
+    ],
+    "answerIndex": 0,
+    "hint": "おなじ かずの くりかえしは かけざん。"
+  },
+  {
+    "id": "m349",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 4,
+    "prompt": "3 × 8 は いくつ？",
+    "choices": [
+      "21",
+      "27",
+      "24"
+    ],
+    "answerIndex": 2,
+    "hint": "だんを おもいだそう。"
+  },
+  {
+    "id": "m350",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 4,
+    "prompt": "3こずつ はいった はこが 9こ。ぜんぶで いくつ？",
+    "choices": [
+      "30",
+      "27",
+      "24"
+    ],
+    "answerIndex": 1,
+    "hint": "おなじ かずの くりかえしは かけざん。"
+  },
+  {
+    "id": "m351",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 3,
+    "prompt": "4 × 2 は いくつ？",
+    "choices": [
+      "8",
+      "4",
+      "12"
+    ],
+    "answerIndex": 0,
+    "hint": "だんを おもいだそう。"
+  },
+  {
+    "id": "m352",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 3,
+    "prompt": "4こずつ はいった はこが 3こ。ぜんぶで いくつ？",
+    "choices": [
+      "8",
+      "16",
+      "12"
+    ],
+    "answerIndex": 2,
+    "hint": "おなじ かずの くりかえしは かけざん。"
+  },
+  {
+    "id": "m353",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 3,
+    "prompt": "4 × 4 は いくつ？",
+    "choices": [
+      "20",
+      "16",
+      "12"
+    ],
+    "answerIndex": 1,
+    "hint": "だんを おもいだそう。"
+  },
+  {
+    "id": "m354",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 3,
+    "prompt": "4こずつ はいった はこが 5こ。ぜんぶで いくつ？",
+    "choices": [
+      "20",
+      "16",
+      "24"
+    ],
+    "answerIndex": 0,
+    "hint": "おなじ かずの くりかえしは かけざん。"
+  },
+  {
+    "id": "m355",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 4,
+    "prompt": "4 × 6 は いくつ？",
+    "choices": [
+      "20",
+      "28",
+      "24"
+    ],
+    "answerIndex": 2,
+    "hint": "だんを おもいだそう。"
+  },
+  {
+    "id": "m356",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 4,
+    "prompt": "4こずつ はいった はこが 7こ。ぜんぶで いくつ？",
+    "choices": [
+      "32",
+      "28",
+      "24"
+    ],
+    "answerIndex": 1,
+    "hint": "おなじ かずの くりかえしは かけざん。"
+  },
+  {
+    "id": "m357",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 4,
+    "prompt": "4 × 8 は いくつ？",
+    "choices": [
+      "32",
+      "28",
+      "36"
+    ],
+    "answerIndex": 0,
+    "hint": "だんを おもいだそう。"
+  },
+  {
+    "id": "m358",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 4,
+    "prompt": "4こずつ はいった はこが 9こ。ぜんぶで いくつ？",
+    "choices": [
+      "32",
+      "40",
+      "36"
+    ],
+    "answerIndex": 2,
+    "hint": "おなじ かずの くりかえしは かけざん。"
+  },
+  {
+    "id": "m359",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 3,
+    "prompt": "5 × 2 は いくつ？",
+    "choices": [
+      "15",
+      "10",
+      "5"
+    ],
+    "answerIndex": 1,
+    "hint": "だんを おもいだそう。"
+  },
+  {
+    "id": "m360",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 3,
+    "prompt": "5こずつ はいった はこが 3こ。ぜんぶで いくつ？",
+    "choices": [
+      "15",
+      "10",
+      "20"
+    ],
+    "answerIndex": 0,
+    "hint": "おなじ かずの くりかえしは かけざん。"
+  },
+  {
+    "id": "m361",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 3,
+    "prompt": "5 × 4 は いくつ？",
+    "choices": [
+      "15",
+      "25",
+      "20"
+    ],
+    "answerIndex": 2,
+    "hint": "だんを おもいだそう。"
+  },
+  {
+    "id": "m362",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 4,
+    "prompt": "5こずつ はいった はこが 5こ。ぜんぶで いくつ？",
+    "choices": [
+      "30",
+      "25",
+      "20"
+    ],
+    "answerIndex": 1,
+    "hint": "おなじ かずの くりかえしは かけざん。"
+  },
+  {
+    "id": "m363",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 4,
+    "prompt": "5 × 6 は いくつ？",
+    "choices": [
+      "30",
+      "25",
+      "35"
+    ],
+    "answerIndex": 0,
+    "hint": "だんを おもいだそう。"
+  },
+  {
+    "id": "m364",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 4,
+    "prompt": "5こずつ はいった はこが 7こ。ぜんぶで いくつ？",
+    "choices": [
+      "30",
+      "40",
+      "35"
+    ],
+    "answerIndex": 2,
+    "hint": "おなじ かずの くりかえしは かけざん。"
+  },
+  {
+    "id": "m365",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 4,
+    "prompt": "5 × 8 は いくつ？",
+    "choices": [
+      "45",
+      "40",
+      "35"
+    ],
+    "answerIndex": 1,
+    "hint": "だんを おもいだそう。"
+  },
+  {
+    "id": "m366",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 5,
+    "prompt": "5こずつ はいった はこが 9こ。ぜんぶで いくつ？",
+    "choices": [
+      "45",
+      "40",
+      "50"
+    ],
+    "answerIndex": 0,
+    "hint": "おなじ かずの くりかえしは かけざん。"
+  },
+  {
+    "id": "m367",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 3,
+    "prompt": "6 × 2 は いくつ？",
+    "choices": [
+      "6",
+      "18",
+      "12"
+    ],
+    "answerIndex": 2,
+    "hint": "だんを おもいだそう。"
+  },
+  {
+    "id": "m368",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 3,
+    "prompt": "6こずつ はいった はこが 3こ。ぜんぶで いくつ？",
+    "choices": [
+      "24",
+      "18",
+      "12"
+    ],
+    "answerIndex": 1,
+    "hint": "おなじ かずの くりかえしは かけざん。"
+  },
+  {
+    "id": "m369",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 4,
+    "prompt": "6 × 4 は いくつ？",
+    "choices": [
+      "24",
+      "18",
+      "30"
+    ],
+    "answerIndex": 0,
+    "hint": "だんを おもいだそう。"
+  },
+  {
+    "id": "m370",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 4,
+    "prompt": "6こずつ はいった はこが 5こ。ぜんぶで いくつ？",
+    "choices": [
+      "24",
+      "36",
+      "30"
+    ],
+    "answerIndex": 2,
+    "hint": "おなじ かずの くりかえしは かけざん。"
+  },
+  {
+    "id": "m371",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 4,
+    "prompt": "6 × 6 は いくつ？",
+    "choices": [
+      "42",
+      "36",
+      "30"
+    ],
+    "answerIndex": 1,
+    "hint": "だんを おもいだそう。"
+  },
+  {
+    "id": "m372",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 5,
+    "prompt": "6こずつ はいった はこが 7こ。ぜんぶで いくつ？",
+    "choices": [
+      "42",
+      "36",
+      "48"
+    ],
+    "answerIndex": 0,
+    "hint": "おなじ かずの くりかえしは かけざん。"
+  },
+  {
+    "id": "m373",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 5,
+    "prompt": "6 × 8 は いくつ？",
+    "choices": [
+      "42",
+      "54",
+      "48"
+    ],
+    "answerIndex": 2,
+    "hint": "だんを おもいだそう。"
+  },
+  {
+    "id": "m374",
+    "subject": "math",
+    "skillId": "multiplication_intro",
+    "difficulty": 5,
+    "prompt": "6こずつ はいった はこが 9こ。ぜんぶで いくつ？",
+    "choices": [
+      "60",
+      "54",
+      "48"
+    ],
+    "answerIndex": 1,
+    "hint": "おなじ かずの くりかえしは かけざん。"
+  },
+  {
+    "id": "m375",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "4こ を 2にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "3",
+      "1",
+      "2"
+    ],
+    "answerIndex": 2,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m376",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "6こ を 2にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "2",
+      "3",
+      "4"
+    ],
+    "answerIndex": 1,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m377",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "8こ を 2にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "4",
+      "5",
+      "3"
+    ],
+    "answerIndex": 0,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m378",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "10こ を 2にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "6",
+      "4",
+      "5"
+    ],
+    "answerIndex": 2,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m379",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "12こ を 2にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "5",
+      "6",
+      "7"
+    ],
+    "answerIndex": 1,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m380",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "14こ を 2にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "7",
+      "8",
+      "6"
+    ],
+    "answerIndex": 0,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m381",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "16こ を 2にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "9",
+      "7",
+      "8"
+    ],
+    "answerIndex": 2,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m382",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "18こ を 2にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "8",
+      "9",
+      "10"
+    ],
+    "answerIndex": 1,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m383",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "6こ を 3にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "2",
+      "3",
+      "1"
+    ],
+    "answerIndex": 0,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m384",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "9こ を 3にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "4",
+      "2",
+      "3"
+    ],
+    "answerIndex": 2,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m385",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "12こ を 3にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "3",
+      "4",
+      "5"
+    ],
+    "answerIndex": 1,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m386",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "15こ を 3にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "5",
+      "6",
+      "4"
+    ],
+    "answerIndex": 0,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m387",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "18こ を 3にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "7",
+      "5",
+      "6"
+    ],
+    "answerIndex": 2,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m388",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "21こ を 3にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "6",
+      "7",
+      "8"
+    ],
+    "answerIndex": 1,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m389",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "24こ を 3にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "8",
+      "9",
+      "7"
+    ],
+    "answerIndex": 0,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m390",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "27こ を 3にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "10",
+      "8",
+      "9"
+    ],
+    "answerIndex": 2,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m391",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "8こ を 4にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "1",
+      "2",
+      "3"
+    ],
+    "answerIndex": 1,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m392",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "12こ を 4にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "3",
+      "4",
+      "2"
+    ],
+    "answerIndex": 0,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m393",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "16こ を 4にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "5",
+      "3",
+      "4"
+    ],
+    "answerIndex": 2,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m394",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "20こ を 4にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "4",
+      "5",
+      "6"
+    ],
+    "answerIndex": 1,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m395",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "24こ を 4にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "6",
+      "7",
+      "5"
+    ],
+    "answerIndex": 0,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m396",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "28こ を 4にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "8",
+      "6",
+      "7"
+    ],
+    "answerIndex": 2,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m397",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "32こ を 4にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "7",
+      "8",
+      "9"
+    ],
+    "answerIndex": 1,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m398",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "36こ を 4にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "9",
+      "10",
+      "8"
+    ],
+    "answerIndex": 0,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m399",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "10こ を 5にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "3",
+      "1",
+      "2"
+    ],
+    "answerIndex": 2,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m400",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "15こ を 5にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "2",
+      "3",
+      "4"
+    ],
+    "answerIndex": 1,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m401",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "20こ を 5にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "4",
+      "5",
+      "3"
+    ],
+    "answerIndex": 0,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m402",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "25こ を 5にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "6",
+      "4",
+      "5"
+    ],
+    "answerIndex": 2,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m403",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "30こ を 5にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "5",
+      "6",
+      "7"
+    ],
+    "answerIndex": 1,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m404",
+    "subject": "math",
+    "skillId": "division_intro",
+    "difficulty": 4,
+    "prompt": "35こ を 5にんで おなじ かずずつ わけると ひとり なんこ？",
+    "choices": [
+      "7",
+      "8",
+      "6"
+    ],
+    "answerIndex": 0,
+    "hint": "わりざんは 「いくつずつ」 を さがす。"
+  },
+  {
+    "id": "m405",
+    "subject": "math",
+    "skillId": "fractions_basic",
+    "difficulty": 4,
+    "prompt": "ケーキを 4とうぶん した 1きれは、ぜんたいの なんぶんの いくつ？",
+    "choices": [
+      "1/3",
+      "1/4",
+      "1/2"
+    ],
+    "answerIndex": 1,
+    "hint": "「ぜんぶを 1」と かんがえる。"
+  },
+  {
+    "id": "m406",
+    "subject": "math",
+    "skillId": "fractions_basic",
+    "difficulty": 4,
+    "prompt": "ケーキを 3とうぶん した 1きれは、ぜんたいの なんぶんの いくつ？",
+    "choices": [
+      "1/3",
+      "1/2",
+      "1/4"
+    ],
+    "answerIndex": 0,
+    "hint": "「ぜんぶを 1」と かんがえる。"
+  },
+  {
+    "id": "m407",
+    "subject": "math",
+    "skillId": "fractions_basic",
+    "difficulty": 4,
+    "prompt": "ケーキを 2とうぶん した 1きれは、ぜんたいの なんぶんの いくつ？",
+    "choices": [
+      "1/3",
+      "1/4",
+      "1/2"
+    ],
+    "answerIndex": 2,
+    "hint": "「ぜんぶを 1」と かんがえる。"
+  },
+  {
+    "id": "m408",
+    "subject": "math",
+    "skillId": "fractions_basic",
+    "difficulty": 4,
+    "prompt": "ケーキを 5とうぶん した 1きれは、ぜんたいの なんぶんの いくつ？",
+    "choices": [
+      "1/4",
+      "1/5",
+      "1/2"
+    ],
+    "answerIndex": 1,
+    "hint": "「ぜんぶを 1」と かんがえる。"
+  },
+  {
+    "id": "m409",
+    "subject": "math",
+    "skillId": "fractions_basic",
+    "difficulty": 4,
+    "prompt": "ケーキを 4とうぶん した 1きれは、ぜんたいの なんぶんの いくつ？",
+    "choices": [
+      "1/4",
+      "1/2",
+      "1/3"
+    ],
+    "answerIndex": 0,
+    "hint": "「ぜんぶを 1」と かんがえる。"
+  },
+  {
+    "id": "m410",
+    "subject": "math",
+    "skillId": "fractions_basic",
+    "difficulty": 4,
+    "prompt": "ケーキを 3とうぶん した 1きれは、ぜんたいの なんぶんの いくつ？",
+    "choices": [
+      "1/2",
+      "1/4",
+      "1/3"
+    ],
+    "answerIndex": 2,
+    "hint": "「ぜんぶを 1」と かんがえる。"
+  },
+  {
+    "id": "m411",
+    "subject": "math",
+    "skillId": "fractions_basic",
+    "difficulty": 4,
+    "prompt": "ケーキを 2とうぶん した 1きれは、ぜんたいの なんぶんの いくつ？",
+    "choices": [
+      "1/4",
+      "1/2",
+      "1/3"
+    ],
+    "answerIndex": 1,
+    "hint": "「ぜんぶを 1」と かんがえる。"
+  },
+  {
+    "id": "m412",
+    "subject": "math",
+    "skillId": "fractions_basic",
+    "difficulty": 4,
+    "prompt": "ケーキを 5とうぶん した 1きれは、ぜんたいの なんぶんの いくつ？",
+    "choices": [
+      "1/5",
+      "1/2",
+      "1/4"
+    ],
+    "answerIndex": 0,
+    "hint": "「ぜんぶを 1」と かんがえる。"
+  },
+  {
+    "id": "m413",
+    "subject": "math",
+    "skillId": "fractions_basic",
+    "difficulty": 4,
+    "prompt": "ケーキを 4とうぶん した 1きれは、ぜんたいの なんぶんの いくつ？",
+    "choices": [
+      "1/2",
+      "1/3",
+      "1/4"
+    ],
+    "answerIndex": 2,
+    "hint": "「ぜんぶを 1」と かんがえる。"
+  },
+  {
+    "id": "m414",
+    "subject": "math",
+    "skillId": "fractions_basic",
+    "difficulty": 4,
+    "prompt": "ケーキを 3とうぶん した 1きれは、ぜんたいの なんぶんの いくつ？",
+    "choices": [
+      "1/4",
+      "1/3",
+      "1/2"
+    ],
+    "answerIndex": 1,
+    "hint": "「ぜんぶを 1」と かんがえる。"
+  },
+  {
+    "id": "m415",
+    "subject": "math",
+    "skillId": "fractions_basic",
+    "difficulty": 4,
+    "prompt": "ケーキを 2とうぶん した 1きれは、ぜんたいの なんぶんの いくつ？",
+    "choices": [
+      "1/2",
+      "1/3",
+      "1/4"
+    ],
+    "answerIndex": 0,
+    "hint": "「ぜんぶを 1」と かんがえる。"
+  },
+  {
+    "id": "m416",
+    "subject": "math",
+    "skillId": "fractions_basic",
+    "difficulty": 4,
+    "prompt": "ケーキを 5とうぶん した 1きれは、ぜんたいの なんぶんの いくつ？",
+    "choices": [
+      "1/2",
+      "1/4",
+      "1/5"
+    ],
+    "answerIndex": 2,
+    "hint": "「ぜんぶを 1」と かんがえる。"
+  },
+  {
+    "id": "m417",
+    "subject": "math",
+    "skillId": "fractions_basic",
+    "difficulty": 4,
+    "prompt": "ケーキを 4とうぶん した 1きれは、ぜんたいの なんぶんの いくつ？",
+    "choices": [
+      "1/3",
+      "1/4",
+      "1/2"
+    ],
+    "answerIndex": 1,
+    "hint": "「ぜんぶを 1」と かんがえる。"
+  },
+  {
+    "id": "m418",
+    "subject": "math",
+    "skillId": "fractions_basic",
+    "difficulty": 4,
+    "prompt": "ケーキを 3とうぶん した 1きれは、ぜんたいの なんぶんの いくつ？",
+    "choices": [
+      "1/3",
+      "1/2",
+      "1/4"
+    ],
+    "answerIndex": 0,
+    "hint": "「ぜんぶを 1」と かんがえる。"
+  },
+  {
+    "id": "m419",
+    "subject": "math",
+    "skillId": "fractions_basic",
+    "difficulty": 4,
+    "prompt": "ケーキを 2とうぶん した 1きれは、ぜんたいの なんぶんの いくつ？",
+    "choices": [
+      "1/3",
+      "1/4",
+      "1/2"
+    ],
+    "answerIndex": 2,
+    "hint": "「ぜんぶを 1」と かんがえる。"
+  },
+  {
+    "id": "m420",
+    "subject": "math",
+    "skillId": "fractions_basic",
+    "difficulty": 4,
+    "prompt": "ケーキを 5とうぶん した 1きれは、ぜんたいの なんぶんの いくつ？",
+    "choices": [
+      "1/4",
+      "1/5",
+      "1/2"
+    ],
+    "answerIndex": 1,
+    "hint": "「ぜんぶを 1」と かんがえる。"
+  },
+  {
+    "id": "m421",
+    "subject": "math",
+    "skillId": "fractions_basic",
+    "difficulty": 4,
+    "prompt": "ケーキを 4とうぶん した 1きれは、ぜんたいの なんぶんの いくつ？",
+    "choices": [
+      "1/4",
+      "1/2",
+      "1/3"
+    ],
+    "answerIndex": 0,
+    "hint": "「ぜんぶを 1」と かんがえる。"
+  },
+  {
+    "id": "m422",
+    "subject": "math",
+    "skillId": "fractions_basic",
+    "difficulty": 4,
+    "prompt": "ケーキを 3とうぶん した 1きれは、ぜんたいの なんぶんの いくつ？",
+    "choices": [
+      "1/2",
+      "1/4",
+      "1/3"
+    ],
+    "answerIndex": 2,
+    "hint": "「ぜんぶを 1」と かんがえる。"
+  },
+  {
+    "id": "m423",
+    "subject": "math",
+    "skillId": "fractions_basic",
+    "difficulty": 4,
+    "prompt": "ケーキを 2とうぶん した 1きれは、ぜんたいの なんぶんの いくつ？",
+    "choices": [
+      "1/4",
+      "1/2",
+      "1/3"
+    ],
+    "answerIndex": 1,
+    "hint": "「ぜんぶを 1」と かんがえる。"
+  },
+  {
+    "id": "m424",
+    "subject": "math",
+    "skillId": "fractions_basic",
+    "difficulty": 4,
+    "prompt": "ケーキを 5とうぶん した 1きれは、ぜんたいの なんぶんの いくつ？",
+    "choices": [
+      "1/5",
+      "1/2",
+      "1/4"
+    ],
+    "answerIndex": 0,
+    "hint": "「ぜんぶを 1」と かんがえる。"
+  },
+  {
+    "id": "m425",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "1じ から 10ぷん たつと なんじ なんぷん？",
+    "choices": [
+      "2じ10ふん",
+      "1じ10ふん",
+      "1じ10ふん"
+    ],
+    "answerIndex": 1,
+    "hint": "とけいの はりを すすめて かんがえよう。"
+  },
+  {
+    "id": "m426",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "2じ から 20ぷん たつと なんじ なんぷん？",
+    "choices": [
+      "2じ20ふん",
+      "2じ20ふん",
+      "3じ20ふん"
+    ],
+    "answerIndex": 0,
+    "hint": "とけいの はりを すすめて かんがえよう。"
+  },
+  {
+    "id": "m427",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "3じ から 30ぷん たつと なんじ なんぷん？",
+    "choices": [
+      "3じ30ふん",
+      "4じ30ふん",
+      "3じ30ふん"
+    ],
+    "answerIndex": 2,
+    "hint": "とけいの はりを すすめて かんがえよう。"
+  },
+  {
+    "id": "m428",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "4じ から 10ぷん たつと なんじ なんぷん？",
+    "choices": [
+      "5じ10ふん",
+      "4じ10ふん",
+      "4じ10ふん"
+    ],
+    "answerIndex": 1,
+    "hint": "とけいの はりを すすめて かんがえよう。"
+  },
+  {
+    "id": "m429",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "5じ から 20ぷん たつと なんじ なんぷん？",
+    "choices": [
+      "5じ20ふん",
+      "5じ20ふん",
+      "6じ20ふん"
+    ],
+    "answerIndex": 0,
+    "hint": "とけいの はりを すすめて かんがえよう。"
+  },
+  {
+    "id": "m430",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "6じ から 30ぷん たつと なんじ なんぷん？",
+    "choices": [
+      "6じ30ふん",
+      "7じ30ふん",
+      "6じ30ふん"
+    ],
+    "answerIndex": 2,
+    "hint": "とけいの はりを すすめて かんがえよう。"
+  },
+  {
+    "id": "m431",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "7じ から 10ぷん たつと なんじ なんぷん？",
+    "choices": [
+      "8じ10ふん",
+      "7じ10ふん",
+      "7じ10ふん"
+    ],
+    "answerIndex": 1,
+    "hint": "とけいの はりを すすめて かんがえよう。"
+  },
+  {
+    "id": "m432",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "8じ から 20ぷん たつと なんじ なんぷん？",
+    "choices": [
+      "8じ20ふん",
+      "8じ20ふん",
+      "9じ20ふん"
+    ],
+    "answerIndex": 0,
+    "hint": "とけいの はりを すすめて かんがえよう。"
+  },
+  {
+    "id": "m433",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "9じ から 30ぷん たつと なんじ なんぷん？",
+    "choices": [
+      "9じ30ふん",
+      "10じ30ふん",
+      "9じ30ふん"
+    ],
+    "answerIndex": 2,
+    "hint": "とけいの はりを すすめて かんがえよう。"
+  },
+  {
+    "id": "m434",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "10じ から 10ぷん たつと なんじ なんぷん？",
+    "choices": [
+      "11じ10ふん",
+      "10じ10ふん",
+      "10じ10ふん"
+    ],
+    "answerIndex": 1,
+    "hint": "とけいの はりを すすめて かんがえよう。"
+  },
+  {
+    "id": "m435",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "1じ から 20ぷん たつと なんじ なんぷん？",
+    "choices": [
+      "1じ20ふん",
+      "1じ20ふん",
+      "2じ20ふん"
+    ],
+    "answerIndex": 0,
+    "hint": "とけいの はりを すすめて かんがえよう。"
+  },
+  {
+    "id": "m436",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "2じ から 30ぷん たつと なんじ なんぷん？",
+    "choices": [
+      "2じ30ふん",
+      "3じ30ふん",
+      "2じ30ふん"
+    ],
+    "answerIndex": 2,
+    "hint": "とけいの はりを すすめて かんがえよう。"
+  },
+  {
+    "id": "m437",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "3じ から 10ぷん たつと なんじ なんぷん？",
+    "choices": [
+      "4じ10ふん",
+      "3じ10ふん",
+      "3じ10ふん"
+    ],
+    "answerIndex": 1,
+    "hint": "とけいの はりを すすめて かんがえよう。"
+  },
+  {
+    "id": "m438",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "4じ から 20ぷん たつと なんじ なんぷん？",
+    "choices": [
+      "4じ20ふん",
+      "4じ20ふん",
+      "5じ20ふん"
+    ],
+    "answerIndex": 0,
+    "hint": "とけいの はりを すすめて かんがえよう。"
+  },
+  {
+    "id": "m439",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "5じ から 30ぷん たつと なんじ なんぷん？",
+    "choices": [
+      "5じ30ふん",
+      "6じ30ふん",
+      "5じ30ふん"
+    ],
+    "answerIndex": 2,
+    "hint": "とけいの はりを すすめて かんがえよう。"
+  },
+  {
+    "id": "m440",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "あおいさんは 80えん の ものを 300えんで かった。おつりは いくら？",
+    "choices": [
+      "220えん",
+      "230えん",
+      "210えん"
+    ],
+    "answerIndex": 0,
+    "hint": "おつり = はらった おかね - ねだん。"
+  },
+  {
+    "id": "m441",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "ゆうとさんは 90えん の ものを 300えんで かった。おつりは いくら？",
+    "choices": [
+      "220えん",
+      "200えん",
+      "210えん"
+    ],
+    "answerIndex": 2,
+    "hint": "おつり = はらった おかね - ねだん。"
+  },
+  {
+    "id": "m442",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "みおさんは 110えん の ものを 300えんで かった。おつりは いくら？",
+    "choices": [
+      "180えん",
+      "190えん",
+      "200えん"
+    ],
+    "answerIndex": 1,
+    "hint": "おつり = はらった おかね - ねだん。"
+  },
+  {
+    "id": "m443",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "そうたさんは 120えん の ものを 300えんで かった。おつりは いくら？",
+    "choices": [
+      "180えん",
+      "190えん",
+      "170えん"
+    ],
+    "answerIndex": 0,
+    "hint": "おつり = はらった おかね - ねだん。"
+  },
+  {
+    "id": "m444",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "りんさんは 130えん の ものを 300えんで かった。おつりは いくら？",
+    "choices": [
+      "180えん",
+      "160えん",
+      "170えん"
+    ],
+    "answerIndex": 2,
+    "hint": "おつり = はらった おかね - ねだん。"
+  },
+  {
+    "id": "m445",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "はるさんは 140えん の ものを 300えんで かった。おつりは いくら？",
+    "choices": [
+      "150えん",
+      "160えん",
+      "170えん"
+    ],
+    "answerIndex": 1,
+    "hint": "おつり = はらった おかね - ねだん。"
+  },
+  {
+    "id": "m446",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "あおいさんは 150えん の ものを 300えんで かった。おつりは いくら？",
+    "choices": [
+      "150えん",
+      "160えん",
+      "140えん"
+    ],
+    "answerIndex": 0,
+    "hint": "おつり = はらった おかね - ねだん。"
+  },
+  {
+    "id": "m447",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "ゆうとさんは 160えん の ものを 300えんで かった。おつりは いくら？",
+    "choices": [
+      "150えん",
+      "130えん",
+      "140えん"
+    ],
+    "answerIndex": 2,
+    "hint": "おつり = はらった おかね - ねだん。"
+  },
+  {
+    "id": "m448",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "みおさんは 170えん の ものを 300えんで かった。おつりは いくら？",
+    "choices": [
+      "120えん",
+      "130えん",
+      "140えん"
+    ],
+    "answerIndex": 1,
+    "hint": "おつり = はらった おかね - ねだん。"
+  },
+  {
+    "id": "m449",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "そうたさんは 180えん の ものを 300えんで かった。おつりは いくら？",
+    "choices": [
+      "120えん",
+      "130えん",
+      "110えん"
+    ],
+    "answerIndex": 0,
+    "hint": "おつり = はらった おかね - ねだん。"
+  },
+  {
+    "id": "m450",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 4,
+    "prompt": "りんさんは 190えん の ものを 300えんで かった。おつりは いくら？",
+    "choices": [
+      "120えん",
+      "100えん",
+      "110えん"
+    ],
+    "answerIndex": 2,
+    "hint": "おつり = はらった おかね - ねだん。"
+  },
+  {
+    "id": "m451",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 5,
+    "prompt": "はるさんは 210えん の ものを 300えんで かった。おつりは いくら？",
+    "choices": [
+      "80えん",
+      "90えん",
+      "100えん"
+    ],
+    "answerIndex": 1,
+    "hint": "おつり = はらった おかね - ねだん。"
+  },
+  {
+    "id": "m452",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 5,
+    "prompt": "あおいさんは 220えん の ものを 300えんで かった。おつりは いくら？",
+    "choices": [
+      "80えん",
+      "90えん",
+      "70えん"
+    ],
+    "answerIndex": 0,
+    "hint": "おつり = はらった おかね - ねだん。"
+  },
+  {
+    "id": "m453",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 5,
+    "prompt": "ゆうとさんは 230えん の ものを 300えんで かった。おつりは いくら？",
+    "choices": [
+      "80えん",
+      "60えん",
+      "70えん"
+    ],
+    "answerIndex": 2,
+    "hint": "おつり = はらった おかね - ねだん。"
+  },
+  {
+    "id": "m454",
+    "subject": "math",
+    "skillId": "measurement_time_money",
+    "difficulty": 5,
+    "prompt": "みおさんは 240えん の ものを 300えんで かった。おつりは いくら？",
+    "choices": [
+      "50えん",
+      "60えん",
+      "70えん"
+    ],
+    "answerIndex": 1,
+    "hint": "おつり = はらった おかね - ねだん。"
+  },
+  {
+    "id": "j223",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「テレビ」の よみかたは どれ？",
+    "choices": [
+      "れもん",
+      "ばす",
+      "てれび"
+    ],
+    "answerIndex": 2,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j224",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「バナナ」の よみかたは どれ？",
+    "choices": [
+      "こーと",
+      "ばなな",
+      "めろん"
+    ],
+    "answerIndex": 1,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j225",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「カメラ」の よみかたは どれ？",
+    "choices": [
+      "かめら",
+      "のーと",
+      "さらだ"
+    ],
+    "answerIndex": 0,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j226",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「レモン」の よみかたは どれ？",
+    "choices": [
+      "かーど",
+      "ぱん",
+      "れもん"
+    ],
+    "answerIndex": 2,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j227",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「メロン」の よみかたは どれ？",
+    "choices": [
+      "じゅーす",
+      "めろん",
+      "ばす"
+    ],
+    "answerIndex": 1,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j228",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「ノート」の よみかたは どれ？",
+    "choices": [
+      "のーと",
+      "こーと",
+      "ほてる"
+    ],
+    "answerIndex": 0,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j229",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「カード」の よみかたは どれ？",
+    "choices": [
+      "さらだ",
+      "ぼーる",
+      "かーど"
+    ],
+    "answerIndex": 2,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j230",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「バス」の よみかたは どれ？",
+    "choices": [
+      "げーむ",
+      "ばす",
+      "ぱん"
+    ],
+    "answerIndex": 1,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j231",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「コート」の よみかたは どれ？",
+    "choices": [
+      "こーと",
+      "じゅーす",
+      "ちーず"
+    ],
+    "answerIndex": 0,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j232",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「サラダ」の よみかたは どれ？",
+    "choices": [
+      "ほてる",
+      "たおる",
+      "さらだ"
+    ],
+    "answerIndex": 2,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j233",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「パン」の よみかたは どれ？",
+    "choices": [
+      "りぼん",
+      "ぱん",
+      "ぼーる"
+    ],
+    "answerIndex": 1,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j234",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 3,
+    "prompt": "「ジュース」の よみかたは どれ？",
+    "choices": [
+      "じゅーす",
+      "げーむ",
+      "けーき"
+    ],
+    "answerIndex": 0,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j235",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「ホテル」の よみかたは どれ？",
+    "choices": [
+      "ちーず",
+      "ぺん",
+      "ほてる"
+    ],
+    "answerIndex": 2,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j236",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「ボール」の よみかたは どれ？",
+    "choices": [
+      "てれび",
+      "ぼーる",
+      "たおる"
+    ],
+    "answerIndex": 1,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j237",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「ゲーム」の よみかたは どれ？",
+    "choices": [
+      "げーむ",
+      "りぼん",
+      "ばなな"
+    ],
+    "answerIndex": 0,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j238",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「チーズ」の よみかたは どれ？",
+    "choices": [
+      "けーき",
+      "かめら",
+      "ちーず"
+    ],
+    "answerIndex": 2,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j239",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「タオル」の よみかたは どれ？",
+    "choices": [
+      "れもん",
+      "たおる",
+      "ぺん"
+    ],
+    "answerIndex": 1,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j240",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「リボン」の よみかたは どれ？",
+    "choices": [
+      "りぼん",
+      "てれび",
+      "めろん"
+    ],
+    "answerIndex": 0,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j241",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「ケーキ」の よみかたは どれ？",
+    "choices": [
+      "ばなな",
+      "のーと",
+      "けーき"
+    ],
+    "answerIndex": 2,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j242",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「ペン」の よみかたは どれ？",
+    "choices": [
+      "かーど",
+      "ぺん",
+      "かめら"
+    ],
+    "answerIndex": 1,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j243",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「テレビ」の よみかたは どれ？",
+    "choices": [
+      "てれび",
+      "れもん",
+      "ばす"
+    ],
+    "answerIndex": 0,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j244",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「バナナ」の よみかたは どれ？",
+    "choices": [
+      "めろん",
+      "こーと",
+      "ばなな"
+    ],
+    "answerIndex": 2,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j245",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「カメラ」の よみかたは どれ？",
+    "choices": [
+      "さらだ",
+      "かめら",
+      "のーと"
+    ],
+    "answerIndex": 1,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j246",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「レモン」の よみかたは どれ？",
+    "choices": [
+      "れもん",
+      "かーど",
+      "ぱん"
+    ],
+    "answerIndex": 0,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j247",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「メロン」の よみかたは どれ？",
+    "choices": [
+      "ばす",
+      "じゅーす",
+      "めろん"
+    ],
+    "answerIndex": 2,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j248",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「ノート」の よみかたは どれ？",
+    "choices": [
+      "ほてる",
+      "のーと",
+      "こーと"
+    ],
+    "answerIndex": 1,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j249",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「カード」の よみかたは どれ？",
+    "choices": [
+      "かーど",
+      "さらだ",
+      "ぼーる"
+    ],
+    "answerIndex": 0,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j250",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「バス」の よみかたは どれ？",
+    "choices": [
+      "ぱん",
+      "げーむ",
+      "ばす"
+    ],
+    "answerIndex": 2,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j251",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「コート」の よみかたは どれ？",
+    "choices": [
+      "ちーず",
+      "こーと",
+      "じゅーす"
+    ],
+    "answerIndex": 1,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j252",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「サラダ」の よみかたは どれ？",
+    "choices": [
+      "さらだ",
+      "ほてる",
+      "たおる"
+    ],
+    "answerIndex": 0,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j253",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「パン」の よみかたは どれ？",
+    "choices": [
+      "ぼーる",
+      "りぼん",
+      "ぱん"
+    ],
+    "answerIndex": 2,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j254",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 3,
+    "prompt": "「ジュース」の よみかたは どれ？",
+    "choices": [
+      "けーき",
+      "じゅーす",
+      "げーむ"
+    ],
+    "answerIndex": 1,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j255",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「ホテル」の よみかたは どれ？",
+    "choices": [
+      "ほてる",
+      "ちーず",
+      "ぺん"
+    ],
+    "answerIndex": 0,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j256",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「ボール」の よみかたは どれ？",
+    "choices": [
+      "たおる",
+      "てれび",
+      "ぼーる"
+    ],
+    "answerIndex": 2,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j257",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「ゲーム」の よみかたは どれ？",
+    "choices": [
+      "ばなな",
+      "げーむ",
+      "りぼん"
+    ],
+    "answerIndex": 1,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j258",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「チーズ」の よみかたは どれ？",
+    "choices": [
+      "ちーず",
+      "けーき",
+      "かめら"
+    ],
+    "answerIndex": 0,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j259",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「タオル」の よみかたは どれ？",
+    "choices": [
+      "ぺん",
+      "れもん",
+      "たおる"
+    ],
+    "answerIndex": 2,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j260",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「リボン」の よみかたは どれ？",
+    "choices": [
+      "めろん",
+      "りぼん",
+      "てれび"
+    ],
+    "answerIndex": 1,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j261",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「ケーキ」の よみかたは どれ？",
+    "choices": [
+      "けーき",
+      "ばなな",
+      "のーと"
+    ],
+    "answerIndex": 0,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j262",
+    "subject": "japanese",
+    "skillId": "katakana_reading",
+    "difficulty": 2,
+    "prompt": "「ペン」の よみかたは どれ？",
+    "choices": [
+      "かめら",
+      "かーど",
+      "ぺん"
+    ],
+    "answerIndex": 2,
+    "hint": "カタカナを ひらがなに なおして よもう。"
+  },
+  {
+    "id": "j263",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 3,
+    "prompt": "かんじ「山」の よみは どれ？",
+    "choices": [
+      "はな",
+      "き",
+      "やま"
+    ],
+    "answerIndex": 2,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j264",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 3,
+    "prompt": "かんじ「川」の よみは どれ？",
+    "choices": [
+      "きん",
+      "かわ",
+      "いぬ"
+    ],
+    "answerIndex": 1,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j265",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 3,
+    "prompt": "かんじ「空」の よみは どれ？",
+    "choices": [
+      "そら",
+      "ねこ",
+      "つち"
+    ],
+    "answerIndex": 0,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j266",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 3,
+    "prompt": "かんじ「雨」の よみは どれ？",
+    "choices": [
+      "ひ",
+      "ひ",
+      "あめ"
+    ],
+    "answerIndex": 2,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j267",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 3,
+    "prompt": "かんじ「花」の よみは どれ？",
+    "choices": [
+      "つき",
+      "はな",
+      "みず"
+    ],
+    "answerIndex": 1,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j268",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 3,
+    "prompt": "かんじ「犬」の よみは どれ？",
+    "choices": [
+      "いぬ",
+      "き",
+      "みみ"
+    ],
+    "answerIndex": 0,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j269",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 3,
+    "prompt": "かんじ「猫」の よみは どれ？",
+    "choices": [
+      "きん",
+      "やま",
+      "ねこ"
+    ],
+    "answerIndex": 2,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j270",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 3,
+    "prompt": "かんじ「火」の よみは どれ？",
+    "choices": [
+      "かわ",
+      "ひ",
+      "つち"
+    ],
+    "answerIndex": 1,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j271",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 3,
+    "prompt": "かんじ「水」の よみは どれ？",
+    "choices": [
+      "みず",
+      "ひ",
+      "そら"
+    ],
+    "answerIndex": 0,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j272",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 3,
+    "prompt": "かんじ「木」の よみは どれ？",
+    "choices": [
+      "つき",
+      "あめ",
+      "き"
+    ],
+    "answerIndex": 2,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j273",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 3,
+    "prompt": "かんじ「金」の よみは どれ？",
+    "choices": [
+      "はな",
+      "きん",
+      "みみ"
+    ],
+    "answerIndex": 1,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j274",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 3,
+    "prompt": "かんじ「土」の よみは どれ？",
+    "choices": [
+      "つち",
+      "やま",
+      "いぬ"
+    ],
+    "answerIndex": 0,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j275",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 3,
+    "prompt": "かんじ「日」の よみは どれ？",
+    "choices": [
+      "かわ",
+      "ねこ",
+      "ひ"
+    ],
+    "answerIndex": 2,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j276",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 3,
+    "prompt": "かんじ「月」の よみは どれ？",
+    "choices": [
+      "ひ",
+      "つき",
+      "そら"
+    ],
+    "answerIndex": 1,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j277",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 3,
+    "prompt": "かんじ「耳」の よみは どれ？",
+    "choices": [
+      "みみ",
+      "あめ",
+      "みず"
+    ],
+    "answerIndex": 0,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j278",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 4,
+    "prompt": "かんじ「山」の よみは どれ？",
+    "choices": [
+      "はな",
+      "き",
+      "やま"
+    ],
+    "answerIndex": 2,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j279",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 4,
+    "prompt": "かんじ「川」の よみは どれ？",
+    "choices": [
+      "きん",
+      "かわ",
+      "いぬ"
+    ],
+    "answerIndex": 1,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j280",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 4,
+    "prompt": "かんじ「空」の よみは どれ？",
+    "choices": [
+      "そら",
+      "ねこ",
+      "つち"
+    ],
+    "answerIndex": 0,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j281",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 4,
+    "prompt": "かんじ「雨」の よみは どれ？",
+    "choices": [
+      "ひ",
+      "ひ",
+      "あめ"
+    ],
+    "answerIndex": 2,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j282",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 4,
+    "prompt": "かんじ「花」の よみは どれ？",
+    "choices": [
+      "つき",
+      "はな",
+      "みず"
+    ],
+    "answerIndex": 1,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j283",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 4,
+    "prompt": "かんじ「犬」の よみは どれ？",
+    "choices": [
+      "いぬ",
+      "き",
+      "みみ"
+    ],
+    "answerIndex": 0,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j284",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 4,
+    "prompt": "かんじ「猫」の よみは どれ？",
+    "choices": [
+      "きん",
+      "やま",
+      "ねこ"
+    ],
+    "answerIndex": 2,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j285",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 4,
+    "prompt": "かんじ「火」の よみは どれ？",
+    "choices": [
+      "かわ",
+      "ひ",
+      "つち"
+    ],
+    "answerIndex": 1,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j286",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 4,
+    "prompt": "かんじ「水」の よみは どれ？",
+    "choices": [
+      "みず",
+      "ひ",
+      "そら"
+    ],
+    "answerIndex": 0,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j287",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 4,
+    "prompt": "かんじ「木」の よみは どれ？",
+    "choices": [
+      "つき",
+      "あめ",
+      "き"
+    ],
+    "answerIndex": 2,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j288",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 4,
+    "prompt": "かんじ「金」の よみは どれ？",
+    "choices": [
+      "はな",
+      "きん",
+      "みみ"
+    ],
+    "answerIndex": 1,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j289",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 4,
+    "prompt": "かんじ「土」の よみは どれ？",
+    "choices": [
+      "つち",
+      "やま",
+      "いぬ"
+    ],
+    "answerIndex": 0,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j290",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 4,
+    "prompt": "かんじ「日」の よみは どれ？",
+    "choices": [
+      "かわ",
+      "ねこ",
+      "ひ"
+    ],
+    "answerIndex": 2,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j291",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 4,
+    "prompt": "かんじ「月」の よみは どれ？",
+    "choices": [
+      "ひ",
+      "つき",
+      "そら"
+    ],
+    "answerIndex": 1,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j292",
+    "subject": "japanese",
+    "skillId": "kanji_intro",
+    "difficulty": 4,
+    "prompt": "かんじ「耳」の よみは どれ？",
+    "choices": [
+      "みみ",
+      "あめ",
+      "みず"
+    ],
+    "answerIndex": 0,
+    "hint": "よく つかう かんじは くりかえし よもう。"
+  },
+  {
+    "id": "j293",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 3,
+    "prompt": "ゆうたは あさ 7じに おきました。 ゆうたが おきた じかんは？",
+    "choices": [
+      "8じ",
+      "7じ",
+      "6じ"
+    ],
+    "answerIndex": 1,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j294",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 3,
+    "prompt": "あめが ふったので、かさを もって いきます。 なにを もって いきますか？",
+    "choices": [
+      "かさ",
+      "ぼうし",
+      "くつ"
+    ],
+    "answerIndex": 0,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j295",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 3,
+    "prompt": "ねこは ひるねが すきです。 すきな ことは？",
+    "choices": [
+      "さんぽ",
+      "およぐ",
+      "ひるね"
+    ],
+    "answerIndex": 2,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j296",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 3,
+    "prompt": "きょうの きゅうしょくは カレーです。 きょうの きゅうしょくは？",
+    "choices": [
+      "うどん",
+      "カレー",
+      "パン"
+    ],
+    "answerIndex": 1,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j297",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 3,
+    "prompt": "こうえんで ボールあそびを しました。 どこで あそびましたか？",
+    "choices": [
+      "こうえん",
+      "がっこう",
+      "うみ"
+    ],
+    "answerIndex": 0,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j298",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 3,
+    "prompt": "ゆうたは あさ 7じに おきました。 ゆうたが おきた じかんは？",
+    "choices": [
+      "6じ",
+      "8じ",
+      "7じ"
+    ],
+    "answerIndex": 2,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j299",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 3,
+    "prompt": "あめが ふったので、かさを もって いきます。 なにを もって いきますか？",
+    "choices": [
+      "くつ",
+      "かさ",
+      "ぼうし"
+    ],
+    "answerIndex": 1,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j300",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 3,
+    "prompt": "ねこは ひるねが すきです。 すきな ことは？",
+    "choices": [
+      "ひるね",
+      "さんぽ",
+      "およぐ"
+    ],
+    "answerIndex": 0,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j301",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 3,
+    "prompt": "きょうの きゅうしょくは カレーです。 きょうの きゅうしょくは？",
+    "choices": [
+      "パン",
+      "うどん",
+      "カレー"
+    ],
+    "answerIndex": 2,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j302",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 3,
+    "prompt": "こうえんで ボールあそびを しました。 どこで あそびましたか？",
+    "choices": [
+      "うみ",
+      "こうえん",
+      "がっこう"
+    ],
+    "answerIndex": 1,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j303",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 3,
+    "prompt": "ゆうたは あさ 7じに おきました。 ゆうたが おきた じかんは？",
+    "choices": [
+      "7じ",
+      "6じ",
+      "8じ"
+    ],
+    "answerIndex": 0,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j304",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 3,
+    "prompt": "あめが ふったので、かさを もって いきます。 なにを もって いきますか？",
+    "choices": [
+      "ぼうし",
+      "くつ",
+      "かさ"
+    ],
+    "answerIndex": 2,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j305",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 3,
+    "prompt": "ねこは ひるねが すきです。 すきな ことは？",
+    "choices": [
+      "およぐ",
+      "ひるね",
+      "さんぽ"
+    ],
+    "answerIndex": 1,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j306",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 3,
+    "prompt": "きょうの きゅうしょくは カレーです。 きょうの きゅうしょくは？",
+    "choices": [
+      "カレー",
+      "パン",
+      "うどん"
+    ],
+    "answerIndex": 0,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j307",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 3,
+    "prompt": "こうえんで ボールあそびを しました。 どこで あそびましたか？",
+    "choices": [
+      "がっこう",
+      "うみ",
+      "こうえん"
+    ],
+    "answerIndex": 2,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j308",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 4,
+    "prompt": "ゆうたは あさ 7じに おきました。 ゆうたが おきた じかんは？",
+    "choices": [
+      "8じ",
+      "7じ",
+      "6じ"
+    ],
+    "answerIndex": 1,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j309",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 4,
+    "prompt": "あめが ふったので、かさを もって いきます。 なにを もって いきますか？",
+    "choices": [
+      "かさ",
+      "ぼうし",
+      "くつ"
+    ],
+    "answerIndex": 0,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j310",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 4,
+    "prompt": "ねこは ひるねが すきです。 すきな ことは？",
+    "choices": [
+      "さんぽ",
+      "およぐ",
+      "ひるね"
+    ],
+    "answerIndex": 2,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j311",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 4,
+    "prompt": "きょうの きゅうしょくは カレーです。 きょうの きゅうしょくは？",
+    "choices": [
+      "うどん",
+      "カレー",
+      "パン"
+    ],
+    "answerIndex": 1,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j312",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 4,
+    "prompt": "こうえんで ボールあそびを しました。 どこで あそびましたか？",
+    "choices": [
+      "こうえん",
+      "がっこう",
+      "うみ"
+    ],
+    "answerIndex": 0,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j313",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 4,
+    "prompt": "ゆうたは あさ 7じに おきました。 ゆうたが おきた じかんは？",
+    "choices": [
+      "6じ",
+      "8じ",
+      "7じ"
+    ],
+    "answerIndex": 2,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j314",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 4,
+    "prompt": "あめが ふったので、かさを もって いきます。 なにを もって いきますか？",
+    "choices": [
+      "くつ",
+      "かさ",
+      "ぼうし"
+    ],
+    "answerIndex": 1,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j315",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 4,
+    "prompt": "ねこは ひるねが すきです。 すきな ことは？",
+    "choices": [
+      "ひるね",
+      "さんぽ",
+      "およぐ"
+    ],
+    "answerIndex": 0,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j316",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 4,
+    "prompt": "きょうの きゅうしょくは カレーです。 きょうの きゅうしょくは？",
+    "choices": [
+      "パン",
+      "うどん",
+      "カレー"
+    ],
+    "answerIndex": 2,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j317",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 4,
+    "prompt": "こうえんで ボールあそびを しました。 どこで あそびましたか？",
+    "choices": [
+      "うみ",
+      "こうえん",
+      "がっこう"
+    ],
+    "answerIndex": 1,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j318",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 4,
+    "prompt": "ゆうたは あさ 7じに おきました。 ゆうたが おきた じかんは？",
+    "choices": [
+      "7じ",
+      "6じ",
+      "8じ"
+    ],
+    "answerIndex": 0,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j319",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 4,
+    "prompt": "あめが ふったので、かさを もって いきます。 なにを もって いきますか？",
+    "choices": [
+      "ぼうし",
+      "くつ",
+      "かさ"
+    ],
+    "answerIndex": 2,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j320",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 4,
+    "prompt": "ねこは ひるねが すきです。 すきな ことは？",
+    "choices": [
+      "およぐ",
+      "ひるね",
+      "さんぽ"
+    ],
+    "answerIndex": 1,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j321",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 4,
+    "prompt": "きょうの きゅうしょくは カレーです。 きょうの きゅうしょくは？",
+    "choices": [
+      "カレー",
+      "パン",
+      "うどん"
+    ],
+    "answerIndex": 0,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j322",
+    "subject": "japanese",
+    "skillId": "reading_short",
+    "difficulty": 4,
+    "prompt": "こうえんで ボールあそびを しました。 どこで あそびましたか？",
+    "choices": [
+      "がっこう",
+      "うみ",
+      "こうえん"
+    ],
+    "answerIndex": 2,
+    "hint": "ぶんの なかの ことばを さがそう。"
+  },
+  {
+    "id": "j323",
+    "subject": "japanese",
+    "skillId": "expression_choice",
+    "difficulty": 3,
+    "prompt": "せんせいに ものを かりる ときの ことばは？",
+    "choices": [
+      "かして ください",
+      "ちょうだい",
+      "もっていくね"
+    ],
+    "answerIndex": 0,
+    "hint": "ばめんに あう ことばを えらぼう。"
+  },
+  {
+    "id": "j324",
+    "subject": "japanese",
+    "skillId": "expression_choice",
+    "difficulty": 3,
+    "prompt": "ともだちに ありがとうを つたえる ことばは？",
+    "choices": [
+      "しらない",
+      "いやだ",
+      "ありがとう"
+    ],
+    "answerIndex": 2,
+    "hint": "ばめんに あう ことばを えらぼう。"
+  },
+  {
+    "id": "j325",
+    "subject": "japanese",
+    "skillId": "expression_choice",
+    "difficulty": 3,
+    "prompt": "あやまる ときの ことばは？",
+    "choices": [
+      "だいじょうぶ",
+      "ごめんなさい",
+      "やったー"
+    ],
+    "answerIndex": 1,
+    "hint": "ばめんに あう ことばを えらぼう。"
+  },
+  {
+    "id": "j326",
+    "subject": "japanese",
+    "skillId": "expression_choice",
+    "difficulty": 3,
+    "prompt": "あいさつを する ときの ことばは？",
+    "choices": [
+      "おはよう",
+      "またね",
+      "おやすみ"
+    ],
+    "answerIndex": 0,
+    "hint": "ばめんに あう ことばを えらぼう。"
+  },
+  {
+    "id": "j327",
+    "subject": "japanese",
+    "skillId": "expression_choice",
+    "difficulty": 3,
+    "prompt": "てつだって ほしい ときの ことばは？",
+    "choices": [
+      "どいて",
+      "しないで",
+      "てつだって ください"
+    ],
+    "answerIndex": 2,
+    "hint": "ばめんに あう ことばを えらぼう。"
+  },
+  {
+    "id": "j328",
+    "subject": "japanese",
+    "skillId": "expression_choice",
+    "difficulty": 3,
+    "prompt": "せんせいに ものを かりる ときの ことばは？",
+    "choices": [
+      "もっていくね",
+      "かして ください",
+      "ちょうだい"
+    ],
+    "answerIndex": 1,
+    "hint": "ばめんに あう ことばを えらぼう。"
+  },
+  {
+    "id": "j329",
+    "subject": "japanese",
+    "skillId": "expression_choice",
+    "difficulty": 3,
+    "prompt": "ともだちに ありがとうを つたえる ことばは？",
+    "choices": [
+      "ありがとう",
+      "しらない",
+      "いやだ"
+    ],
+    "answerIndex": 0,
+    "hint": "ばめんに あう ことばを えらぼう。"
+  },
+  {
+    "id": "j330",
+    "subject": "japanese",
+    "skillId": "expression_choice",
+    "difficulty": 3,
+    "prompt": "あやまる ときの ことばは？",
+    "choices": [
+      "やったー",
+      "だいじょうぶ",
+      "ごめんなさい"
+    ],
+    "answerIndex": 2,
+    "hint": "ばめんに あう ことばを えらぼう。"
+  },
+  {
+    "id": "j331",
+    "subject": "japanese",
+    "skillId": "expression_choice",
+    "difficulty": 3,
+    "prompt": "あいさつを する ときの ことばは？",
+    "choices": [
+      "おやすみ",
+      "おはよう",
+      "またね"
+    ],
+    "answerIndex": 1,
+    "hint": "ばめんに あう ことばを えらぼう。"
+  },
+  {
+    "id": "j332",
+    "subject": "japanese",
+    "skillId": "expression_choice",
+    "difficulty": 3,
+    "prompt": "てつだって ほしい ときの ことばは？",
+    "choices": [
+      "てつだって ください",
+      "どいて",
+      "しないで"
+    ],
+    "answerIndex": 0,
+    "hint": "ばめんに あう ことばを えらぼう。"
+  },
+  {
+    "id": "j333",
+    "subject": "japanese",
+    "skillId": "expression_choice",
+    "difficulty": 4,
+    "prompt": "せんせいに ものを かりる ときの ことばは？",
+    "choices": [
+      "ちょうだい",
+      "もっていくね",
+      "かして ください"
+    ],
+    "answerIndex": 2,
+    "hint": "ばめんに あう ことばを えらぼう。"
+  },
+  {
+    "id": "j334",
+    "subject": "japanese",
+    "skillId": "expression_choice",
+    "difficulty": 4,
+    "prompt": "ともだちに ありがとうを つたえる ことばは？",
+    "choices": [
+      "いやだ",
+      "ありがとう",
+      "しらない"
+    ],
+    "answerIndex": 1,
+    "hint": "ばめんに あう ことばを えらぼう。"
+  },
+  {
+    "id": "j335",
+    "subject": "japanese",
+    "skillId": "expression_choice",
+    "difficulty": 4,
+    "prompt": "あやまる ときの ことばは？",
+    "choices": [
+      "ごめんなさい",
+      "やったー",
+      "だいじょうぶ"
+    ],
+    "answerIndex": 0,
+    "hint": "ばめんに あう ことばを えらぼう。"
+  },
+  {
+    "id": "j336",
+    "subject": "japanese",
+    "skillId": "expression_choice",
+    "difficulty": 4,
+    "prompt": "あいさつを する ときの ことばは？",
+    "choices": [
+      "またね",
+      "おやすみ",
+      "おはよう"
+    ],
+    "answerIndex": 2,
+    "hint": "ばめんに あう ことばを えらぼう。"
+  },
+  {
+    "id": "j337",
+    "subject": "japanese",
+    "skillId": "expression_choice",
+    "difficulty": 4,
+    "prompt": "てつだって ほしい ときの ことばは？",
+    "choices": [
+      "しないで",
+      "てつだって ください",
+      "どいて"
+    ],
+    "answerIndex": 1,
+    "hint": "ばめんに あう ことばを えらぼう。"
+  },
+  {
+    "id": "j338",
+    "subject": "japanese",
+    "skillId": "expression_choice",
+    "difficulty": 4,
+    "prompt": "せんせいに ものを かりる ときの ことばは？",
+    "choices": [
+      "かして ください",
+      "ちょうだい",
+      "もっていくね"
+    ],
+    "answerIndex": 0,
+    "hint": "ばめんに あう ことばを えらぼう。"
+  },
+  {
+    "id": "j339",
+    "subject": "japanese",
+    "skillId": "expression_choice",
+    "difficulty": 4,
+    "prompt": "ともだちに ありがとうを つたえる ことばは？",
+    "choices": [
+      "しらない",
+      "いやだ",
+      "ありがとう"
+    ],
+    "answerIndex": 2,
+    "hint": "ばめんに あう ことばを えらぼう。"
+  },
+  {
+    "id": "j340",
+    "subject": "japanese",
+    "skillId": "expression_choice",
+    "difficulty": 4,
+    "prompt": "あやまる ときの ことばは？",
+    "choices": [
+      "だいじょうぶ",
+      "ごめんなさい",
+      "やったー"
+    ],
+    "answerIndex": 1,
+    "hint": "ばめんに あう ことばを えらぼう。"
+  },
+  {
+    "id": "j341",
+    "subject": "japanese",
+    "skillId": "expression_choice",
+    "difficulty": 4,
+    "prompt": "あいさつを する ときの ことばは？",
+    "choices": [
+      "おはよう",
+      "またね",
+      "おやすみ"
+    ],
+    "answerIndex": 0,
+    "hint": "ばめんに あう ことばを えらぼう。"
+  },
+  {
+    "id": "j342",
+    "subject": "japanese",
+    "skillId": "expression_choice",
+    "difficulty": 4,
+    "prompt": "てつだって ほしい ときの ことばは？",
+    "choices": [
+      "どいて",
+      "しないで",
+      "てつだって ください"
+    ],
+    "answerIndex": 2,
+    "hint": "ばめんに あう ことばを えらぼう。"
   }
 ];

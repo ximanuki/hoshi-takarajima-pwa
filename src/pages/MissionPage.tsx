@@ -48,7 +48,7 @@ export function MissionPage() {
           <h2>{mission.title}</h2>
           <p>{mission.desc}</p>
           <p>おすすめレベル: {difficultyBySubject[mission.subject]}</p>
-          <p>ふくしゅう: {stats[mission.subject].dueReview} / しゅくじゅくど: {stats[mission.subject].mastery}%</p>
+          <p>ふくしゅう: {stats[mission.subject].dueReview} / しゅうじゅくど: {stats[mission.subject].mastery}%</p>
           <button className="primary-btn" onClick={() => onStart(mission.subject)}>
             このミッションであそぶ
           </button>
