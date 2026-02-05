@@ -1,6 +1,7 @@
 import type { Gain, Sequence } from 'tone';
 
 export type AudioLabEngine = 'none' | 'asset' | 'tone';
+export type AssetBgmId = 'default' | 'home' | 'mission' | 'play' | 'result';
 export type TonePresetId =
   | 'lofi_cafe'
   | 'lofi_rain'
@@ -122,6 +123,13 @@ type ToneMasterStageConfig = {
 
 const STEPS_PER_BAR = 16;
 const LOOP_BARS = 32;
+const ASSET_BGM_LIBRARY: Record<AssetBgmId, string> = {
+  default: 'bgm_asset_loop.wav',
+  home: 'bgm_asset_loop.wav',
+  mission: 'bgm_asset_loop.wav',
+  play: 'bgm_asset_loop.wav',
+  result: 'bgm_asset_loop.wav',
+};
 
 function clamp01(value: number): number {
   if (Number.isNaN(value)) return 0;
@@ -1191,6 +1199,8 @@ const TONE_MASTER_STAGE_LIBRARY: Record<TonePresetId, ToneMasterStageConfig> = {
 
 export class AudioLabPlayer {
   private assetAudio: HTMLAudioElement | null = null;
+  private activeAssetId: AssetBgmId = 'default';
+  private activeAssetSrc = '';
   private tone: ToneModule | null = null;
   private toneLoadPromise: Promise<ToneModule> | null = null;
   private toneLoading = false;
@@ -1254,11 +1264,12 @@ export class AudioLabPlayer {
     }
   }
 
-  async playAsset() {
+  async playAsset(assetId: AssetBgmId = 'default') {
     this.stopTone();
-    this.ensureAssetAudio();
+    this.ensureAssetAudio(assetId);
     if (!this.assetAudio) return;
 
+    this.activeAssetId = assetId;
     this.assetAudio.currentTime = 0;
     this.assetAudio.volume = curvedVolume(this.bgmVolume);
     this.engine = 'asset';
@@ -1266,12 +1277,7 @@ export class AudioLabPlayer {
     try {
       await this.assetAudio.play();
     } catch {
-      await this.unlock();
-      try {
-        await this.assetAudio.play();
-      } catch {
-        this.engine = 'none';
-      }
+      this.engine = 'none';
     }
   }
 
@@ -1500,11 +1506,21 @@ export class AudioLabPlayer {
     return node;
   }
 
-  private ensureAssetAudio() {
-    if (this.assetAudio || typeof window === 'undefined') return;
-    this.assetAudio = new Audio(`${import.meta.env.BASE_URL}assets/audio/bgm_asset_loop.wav`);
-    this.assetAudio.loop = true;
-    this.assetAudio.preload = 'auto';
+  private ensureAssetAudio(assetId: AssetBgmId = this.activeAssetId) {
+    if (typeof window === 'undefined') return;
+    if (!this.assetAudio) {
+      this.assetAudio = new Audio();
+      this.assetAudio.loop = true;
+      this.assetAudio.preload = 'auto';
+    }
+
+    const fileName = ASSET_BGM_LIBRARY[assetId] ?? ASSET_BGM_LIBRARY.default;
+    const nextSrc = `${import.meta.env.BASE_URL}assets/audio/${fileName}`;
+    if (this.activeAssetSrc !== nextSrc) {
+      this.assetAudio.src = nextSrc;
+      this.activeAssetId = assetId;
+      this.activeAssetSrc = nextSrc;
+    }
   }
 
   private async loadTone(): Promise<ToneModule> {

@@ -1,5 +1,9 @@
 import type { Settings } from '../types';
-import { AudioLabPlayer, type TonePresetId, type ToneSfxId } from './audioLabPlayer';
+import type { AudioLabPlayer } from './audioLabPlayer';
+
+type AssetBgmId = import('./audioLabPlayer').AssetBgmId;
+type TonePresetId = import('./audioLabPlayer').TonePresetId;
+type ToneSfxId = import('./audioLabPlayer').ToneSfxId;
 
 export type AudioScene = 'home' | 'mission' | 'play' | 'result';
 export type SoundEffect = 'tap' | 'correct' | 'wrong' | 'combo' | 'clear';
@@ -15,6 +19,13 @@ const SCENE_PRESETS: Record<AudioScene, TonePresetId> = {
   mission: 'uk_garage_neon',
   play: 'future_garage_mist',
   result: 'lofi_jersey',
+};
+
+const SCENE_ASSETS: Record<AudioScene, AssetBgmId> = {
+  home: 'home',
+  mission: 'mission',
+  play: 'play',
+  result: 'result',
 };
 
 const EFFECT_TO_TONE: Record<SoundEffect, ToneSfxId> = {
@@ -37,7 +48,8 @@ function clamp01(value: number): number {
 }
 
 class AudioManager {
-  private player = new AudioLabPlayer();
+  private player: AudioLabPlayer | null = null;
+  private playerLoadPromise: Promise<AudioLabPlayer> | null = null;
   private unlocked = false;
   private bgmSuppressed = false;
   private settings: Settings = DEFAULT_SETTINGS;
@@ -55,7 +67,7 @@ class AudioManager {
     this.bgmSuppressed = suppressed;
     if (suppressed) {
       this.sceneGeneration += 1;
-      this.player.stop();
+      this.player?.stop();
       return;
     }
 
@@ -69,12 +81,12 @@ class AudioManager {
       sfxVolume: clamp01(next.sfxVolume),
     };
 
-    this.player.setBgmVolume(this.settings.bgmVolume);
-    this.player.setSfxVolume(this.settings.sfxVolume);
+    this.player?.setBgmVolume(this.settings.bgmVolume);
+    this.player?.setSfxVolume(this.settings.sfxVolume);
 
     if (!this.settings.soundEnabled) {
       this.sceneGeneration += 1;
-      this.player.stop();
+      this.player?.stop();
       return;
     }
 
@@ -82,12 +94,7 @@ class AudioManager {
   }
 
   async unlock() {
-    try {
-      await this.player.unlock();
-    } catch {
-      return;
-    }
-
+    if (!this.settings.soundEnabled) return;
     this.unlocked = true;
     if (this.settings.soundEnabled && !this.bgmSuppressed) {
       await this.startSceneIfReady();
@@ -105,17 +112,18 @@ class AudioManager {
 
     const presetId = SCENE_PRESETS[this.scene];
     const toneEffect = EFFECT_TO_TONE[effect];
-    void this.player.playToneSfx(toneEffect, presetId);
+    void this.playToneEffect(toneEffect, presetId);
   }
 
   private async startSceneIfReady() {
     if (!this.unlocked || this.bgmSuppressed || !this.settings.soundEnabled) return;
 
     const generation = ++this.sceneGeneration;
-    const presetId = SCENE_PRESETS[this.scene];
+    const assetId = SCENE_ASSETS[this.scene];
+    const player = await this.ensurePlayer();
 
     try {
-      await this.player.playTone(presetId);
+      await player.playAsset(assetId);
     } catch {
       return;
     }
@@ -124,6 +132,30 @@ class AudioManager {
       // Ignore stale starts caused by rapid scene changes.
       return;
     }
+  }
+
+  private async playToneEffect(effect: ToneSfxId, presetId: TonePresetId) {
+    const player = await this.ensurePlayer();
+    await player.playToneSfx(effect, presetId);
+  }
+
+  private async ensurePlayer(): Promise<AudioLabPlayer> {
+    if (this.player) return this.player;
+    if (this.playerLoadPromise) return this.playerLoadPromise;
+
+    this.playerLoadPromise = import('./audioLabPlayer')
+      .then((module) => {
+        const nextPlayer = new module.AudioLabPlayer();
+        nextPlayer.setBgmVolume(this.settings.bgmVolume);
+        nextPlayer.setSfxVolume(this.settings.sfxVolume);
+        this.player = nextPlayer;
+        return nextPlayer;
+      })
+      .finally(() => {
+        this.playerLoadPromise = null;
+      });
+
+    return this.playerLoadPromise;
   }
 }
 
