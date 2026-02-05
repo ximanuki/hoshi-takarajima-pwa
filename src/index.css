@@ -425,6 +425,32 @@ p {
   justify-items: center;
 }
 
+.hamchee-bubble {
+  position: relative;
+  max-width: min(420px, 100%);
+  background: #ffffff;
+  border: 2px solid #bfd9f4;
+  border-radius: 16px;
+  padding: 10px 12px;
+  font-size: 0.88rem;
+  color: #234d72;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.hamchee-bubble::after {
+  content: '';
+  position: absolute;
+  left: 24px;
+  bottom: -10px;
+  width: 16px;
+  height: 16px;
+  background: #ffffff;
+  border-right: 2px solid #bfd9f4;
+  border-bottom: 2px solid #bfd9f4;
+  transform: rotate(45deg);
+}
+
 .poko-stage {
   width: min(360px, 100%);
   border-radius: 16px;
@@ -452,6 +478,11 @@ p {
   font-size: 0.8rem;
   color: #4a6f95;
   text-align: center;
+}
+
+.mascot h2 {
+  color: #1f5f7e;
+  margin-bottom: 4px;
 }
 
 .preview-grid {

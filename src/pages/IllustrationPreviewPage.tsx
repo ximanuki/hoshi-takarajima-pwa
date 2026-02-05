@@ -83,7 +83,7 @@ export function IllustrationPreviewPage() {
       <article className="card preview-card">
         <p>この画面で、実装中のSVGイラストをGUIで確認できます。</p>
         <p>SVGの実装元: `src/components/QuestionIllustration.tsx`</p>
-        <p>ポコ実装元: `src/components/PokoIllustration.tsx` / 画像: `public/assets/hamchee/*.png`</p>
+        <p>はむちー実装元: `src/components/PokoIllustration.tsx` / 画像: `public/assets/hamchee/*.png`</p>
         <p>問題→可視化データ変換: `src/utils/questionVisuals.ts`</p>
         <p>
           イラスト対応:
@@ -148,7 +148,7 @@ export function IllustrationPreviewPage() {
       )}
 
       <article className="card preview-card">
-        <h2>あいぼう「ポコ（ハムチーモデル）」プレビュー</h2>
+        <h2>あいぼう「はむちー」プレビュー</h2>
         <p className="preview-meta">表情とポーズを切り替えて確認できます。</p>
         <div className="inline-actions">
           {pokoMoods.map((mood) => (

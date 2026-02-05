@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { PokoIllustration } from '../components/PokoIllustration';
 import { useAppStore } from '../store/useAppStore';
 import type { Subject } from '../types';
 import { getDueReviewCount } from '../utils/mission';
@@ -26,6 +27,10 @@ export function HomePage() {
   );
 
   const last = recentResults[0];
+  const mascotMood = last ? (last.accuracy >= 0.9 ? 'cheer' : last.accuracy >= 0.65 ? 'happy' : 'normal') : 'happy';
+  const mascotComment = last
+    ? `${subjectLabels[last.subject]}で ${last.correct}/${last.total} せいかい！ つぎも いっしょに がんばろう！`
+    : 'きょうも ぼうけんスタート！ はじめの 1もんを いっしょに やってみよう。';
 
   return (
     <section className="stack">
@@ -59,7 +64,8 @@ export function HomePage() {
       </div>
 
       <div className="card mascot">
-        <p>あいぼう「ポコ」: まちがいは たから！ つぎで もっと できるよ！</p>
+        <h2>あいぼう はむちー</h2>
+        <PokoIllustration mood={mascotMood} comment={mascotComment} showCaption={false} />
       </div>
     </section>
   );
