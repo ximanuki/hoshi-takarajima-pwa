@@ -55,7 +55,7 @@ export function AudioLabPage() {
       <article className="card stack">
         <h2>ステップで ひかく</h2>
         <p>Step 1: 音源ファイル（固定ループ）を再生</p>
-        <p>Step 2: Tone.jsシーケンサー（3パターン）を再生</p>
+        <p>Step 2: Tone.jsシーケンサー（Lo-fi 2曲 + Ambient 2曲）を再生</p>
         <p>どちらも同じ音量で聞き比べできます。現在: {engineLabel[engine]}</p>
       </article>
 
@@ -90,7 +90,7 @@ export function AudioLabPage() {
       </article>
 
       <article className="card stack">
-        <h2>Tone.js 3パターン</h2>
+        <h2>Tone.js 4パターン（全曲32小節ループ）</h2>
         <div className="audio-lab-preset-grid">
           {tonePresets.map((preset) => (
             <button

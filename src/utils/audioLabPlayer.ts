@@ -1,101 +1,334 @@
 import type { FeedbackDelay, Gain, MembraneSynth, MonoSynth, NoiseSynth, PolySynth, Reverb, Sequence } from 'tone';
 
 export type AudioLabEngine = 'none' | 'asset' | 'tone';
-export type TonePresetId = 'morning' | 'adventure' | 'night';
+export type TonePresetId = 'lofi_cafe' | 'lofi_rain' | 'ambient_stars' | 'ambient_dream';
+
+type ToneModule = typeof import('tone');
 
 type TonePresetMeta = {
   id: TonePresetId;
   name: string;
   description: string;
+  genre: 'lofi' | 'ambient';
 };
 
 type TonePresetConfig = TonePresetMeta & {
   bpm: number;
-  leadOsc: 'triangle8' | 'square6' | 'sine';
-  leadNotes: Array<string | null>;
-  bassNotes: Array<string | null>;
-  chords: string[][];
-  kickSteps: number[];
-  hatSteps: number[];
+  bars: number;
+  barChords: string[][];
+  leadMotifs: Array<Array<string | null>>;
+  bassMotifs: Array<Array<string | null>>;
+  kickMotif: number[];
+  snareMotif: number[];
+  hatMotif: number[];
+  crackleMotif: number[];
+  leadDuration: string;
+  bassDuration: string;
+  padDuration: string;
   leadVelocity: number;
   bassVelocity: number;
+  padVelocity: number;
+  kickVelocity: number;
+  snareVelocity: number;
   hatVelocity: number;
+  crackleVelocity: number;
   reverbWet: number;
   delayWet: number;
   masterGain: number;
+  padStrideBars: number;
 };
 
-type ToneModule = typeof import('tone');
+const STEPS_PER_BAR = 8;
+const LOOP_BARS = 32;
 
 const TONE_PRESET_LIBRARY: Record<TonePresetId, TonePresetConfig> = {
-  morning: {
-    id: 'morning',
-    name: 'ハムチーのあさ',
-    description: 'かわいく明るい、朝のスタート向け',
-    bpm: 112,
-    leadOsc: 'triangle8',
-    leadNotes: ['C5', null, 'E5', null, 'G5', null, 'E5', 'D5', 'C5', null, 'E5', null, 'A5', 'G5', 'E5', 'D5'],
-    bassNotes: ['C2', null, 'D2', null, 'E2', null, 'D2', null],
-    chords: [
-      ['C4', 'E4', 'G4'],
-      ['F4', 'A4', 'C5'],
-      ['G4', 'B4', 'D5'],
-      ['C4', 'E4', 'G4'],
+  lofi_cafe: {
+    id: 'lofi_cafe',
+    name: 'Lo-fi 1: ほうかごカフェ',
+    description: 'Lo-fi beats / 32小節ループ / あたたかい放課後',
+    genre: 'lofi',
+    bpm: 78,
+    bars: LOOP_BARS,
+    barChords: [
+      ['C4', 'E4', 'G4', 'B4'],
+      ['A3', 'C4', 'E4', 'G4'],
+      ['D4', 'F4', 'A4', 'C5'],
+      ['G3', 'B3', 'D4', 'F4'],
+      ['C4', 'E4', 'G4', 'B4'],
+      ['A3', 'C4', 'E4', 'G4'],
+      ['F3', 'A3', 'C4', 'E4'],
+      ['G3', 'B3', 'D4', 'F4'],
+      ['E3', 'G3', 'B3', 'D4'],
+      ['A3', 'C4', 'E4', 'G4'],
+      ['D4', 'F4', 'A4', 'C5'],
+      ['G3', 'B3', 'D4', 'F4'],
+      ['C4', 'E4', 'G4', 'B4'],
+      ['B3', 'D4', 'F4', 'A4'],
+      ['E3', 'G3', 'B3', 'D4'],
+      ['A3', 'C4', 'E4', 'G4'],
+      ['F3', 'A3', 'C4', 'E4'],
+      ['G3', 'B3', 'D4', 'F4'],
+      ['E3', 'G3', 'B3', 'D4'],
+      ['A3', 'C4', 'E4', 'G4'],
+      ['D4', 'F4', 'A4', 'C5'],
+      ['G3', 'B3', 'D4', 'F4'],
+      ['C4', 'E4', 'G4', 'B4'],
+      ['G3', 'B3', 'D4', 'F4'],
+      ['C4', 'E4', 'G4', 'B4'],
+      ['A3', 'C4', 'E4', 'G4'],
+      ['D4', 'F4', 'A4', 'C5'],
+      ['G3', 'B3', 'D4', 'F4'],
+      ['F3', 'A3', 'C4', 'E4'],
+      ['E3', 'G3', 'B3', 'D4'],
+      ['D4', 'F4', 'A4', 'C5'],
+      ['G3', 'B3', 'D4', 'F4'],
     ],
-    kickSteps: [0, 4, 8, 12],
-    hatSteps: [2, 6, 10, 14],
-    leadVelocity: 0.56,
-    bassVelocity: 0.7,
-    hatVelocity: 0.34,
-    reverbWet: 0.16,
-    delayWet: 0.12,
-    masterGain: 0.9,
+    leadMotifs: [
+      [null, 'E4', null, 'G4', null, 'A4', null, 'G4'],
+      [null, 'D4', null, 'E4', null, 'G4', null, 'E4'],
+      [null, 'G4', null, 'A4', null, 'B4', null, 'A4'],
+      [null, 'E4', null, 'D4', null, 'C4', null, null],
+    ],
+    bassMotifs: [
+      ['C2', null, null, null, 'G1', null, null, null],
+      ['A1', null, null, null, 'E2', null, null, null],
+      ['D2', null, null, null, 'A1', null, null, null],
+      ['G1', null, null, null, 'D2', null, null, null],
+    ],
+    kickMotif: [0, 5],
+    snareMotif: [4],
+    hatMotif: [1, 3, 5, 7],
+    crackleMotif: [2, 6],
+    leadDuration: '8n',
+    bassDuration: '4n',
+    padDuration: '1m',
+    leadVelocity: 0.34,
+    bassVelocity: 0.58,
+    padVelocity: 0.2,
+    kickVelocity: 0.64,
+    snareVelocity: 0.2,
+    hatVelocity: 0.12,
+    crackleVelocity: 0.05,
+    reverbWet: 0.2,
+    delayWet: 0.16,
+    masterGain: 0.85,
+    padStrideBars: 1,
   },
-  adventure: {
-    id: 'adventure',
-    name: 'たからじま だいぼうけん',
-    description: 'テンポ速め、前に進みたくなる冒険系',
-    bpm: 132,
-    leadOsc: 'square6',
-    leadNotes: ['E5', 'G5', 'A5', 'G5', 'B5', 'A5', 'G5', 'E5', 'F5', 'A5', 'B5', 'A5', 'C6', 'B5', 'A5', 'G5'],
-    bassNotes: ['E2', null, 'E2', null, 'F2', null, 'G2', null],
-    chords: [
-      ['E4', 'G4', 'B4'],
-      ['F4', 'A4', 'C5'],
-      ['G4', 'B4', 'D5'],
-      ['A4', 'C5', 'E5'],
+  lofi_rain: {
+    id: 'lofi_rain',
+    name: 'Lo-fi 2: あめのとしょしつ',
+    description: 'Lo-fi beats / 32小節ループ / 雨音みたいな質感',
+    genre: 'lofi',
+    bpm: 72,
+    bars: LOOP_BARS,
+    barChords: [
+      ['D4', 'F4', 'A4', 'C5'],
+      ['G3', 'B3', 'D4', 'F4'],
+      ['C4', 'E4', 'G4', 'B4'],
+      ['A3', 'C4', 'E4', 'G4'],
+      ['D4', 'F4', 'A4', 'C5'],
+      ['G3', 'B3', 'D4', 'F4'],
+      ['F3', 'A3', 'C4', 'E4'],
+      ['A3', 'C4', 'E4', 'G4'],
+      ['E3', 'G3', 'B3', 'D4'],
+      ['A3', 'C4', 'E4', 'G4'],
+      ['D4', 'F4', 'A4', 'C5'],
+      ['G3', 'B3', 'D4', 'F4'],
+      ['C4', 'E4', 'G4', 'B4'],
+      ['B3', 'D4', 'F4', 'A4'],
+      ['E3', 'G3', 'B3', 'D4'],
+      ['A3', 'C4', 'E4', 'G4'],
+      ['F3', 'A3', 'C4', 'E4'],
+      ['A3', 'C4', 'E4', 'G4'],
+      ['D4', 'F4', 'A4', 'C5'],
+      ['G3', 'B3', 'D4', 'F4'],
+      ['E3', 'G3', 'B3', 'D4'],
+      ['A3', 'C4', 'E4', 'G4'],
+      ['D4', 'F4', 'A4', 'C5'],
+      ['G3', 'B3', 'D4', 'F4'],
+      ['D4', 'F4', 'A4', 'C5'],
+      ['G3', 'B3', 'D4', 'F4'],
+      ['C4', 'E4', 'G4', 'B4'],
+      ['A3', 'C4', 'E4', 'G4'],
+      ['F3', 'A3', 'C4', 'E4'],
+      ['E3', 'G3', 'B3', 'D4'],
+      ['D4', 'F4', 'A4', 'C5'],
+      ['A3', 'C4', 'E4', 'G4'],
     ],
-    kickSteps: [0, 3, 4, 7, 8, 11, 12, 15],
-    hatSteps: [1, 2, 5, 6, 9, 10, 13, 14],
-    leadVelocity: 0.52,
-    bassVelocity: 0.72,
-    hatVelocity: 0.28,
-    reverbWet: 0.1,
-    delayWet: 0.14,
-    masterGain: 0.86,
-  },
-  night: {
-    id: 'night',
-    name: 'きらぼしナイト',
-    description: 'ゆったり幻想的、考える時間向け',
-    bpm: 96,
-    leadOsc: 'sine',
-    leadNotes: ['A4', null, 'C5', null, 'E5', null, 'D5', null, 'G4', null, 'B4', null, 'E5', null, 'D5', null],
-    bassNotes: ['A1', null, null, null, 'G1', null, null, null],
-    chords: [
-      ['A3', 'C4', 'E4'],
-      ['G3', 'B3', 'D4'],
-      ['F3', 'A3', 'C4'],
-      ['E3', 'G3', 'B3'],
+    leadMotifs: [
+      [null, null, 'F4', null, null, 'A4', null, null],
+      [null, 'E4', null, null, 'G4', null, null, null],
+      [null, null, 'D4', null, null, 'F4', null, null],
+      [null, 'C4', null, null, 'E4', null, null, null],
     ],
-    kickSteps: [0, 8],
-    hatSteps: [4, 12],
-    leadVelocity: 0.5,
-    bassVelocity: 0.62,
-    hatVelocity: 0.2,
+    bassMotifs: [
+      ['D2', null, null, null, null, null, 'A1', null],
+      ['G1', null, null, null, null, null, 'D2', null],
+      ['C2', null, null, null, null, null, 'G1', null],
+      ['A1', null, null, null, null, null, 'E2', null],
+    ],
+    kickMotif: [0],
+    snareMotif: [4],
+    hatMotif: [2, 6],
+    crackleMotif: [1, 5],
+    leadDuration: '8n',
+    bassDuration: '2n',
+    padDuration: '1m',
+    leadVelocity: 0.3,
+    bassVelocity: 0.55,
+    padVelocity: 0.22,
+    kickVelocity: 0.58,
+    snareVelocity: 0.18,
+    hatVelocity: 0.1,
+    crackleVelocity: 0.06,
     reverbWet: 0.24,
-    delayWet: 0.18,
+    delayWet: 0.14,
     masterGain: 0.82,
+    padStrideBars: 1,
+  },
+  ambient_stars: {
+    id: 'ambient_stars',
+    name: 'Ambient 1: ほしぞらのうみ',
+    description: 'Ambient / 32小節ループ / ひろがる空間',
+    genre: 'ambient',
+    bpm: 64,
+    bars: LOOP_BARS,
+    barChords: [
+      ['C4', 'G4', 'B4', 'D5'],
+      ['A3', 'E4', 'G4', 'C5'],
+      ['F3', 'C4', 'E4', 'A4'],
+      ['G3', 'D4', 'F4', 'A4'],
+      ['C4', 'G4', 'B4', 'E5'],
+      ['A3', 'E4', 'G4', 'C5'],
+      ['F3', 'C4', 'E4', 'A4'],
+      ['G3', 'D4', 'F4', 'B4'],
+      ['E3', 'B3', 'D4', 'G4'],
+      ['A3', 'E4', 'G4', 'C5'],
+      ['D4', 'A4', 'C5', 'F5'],
+      ['G3', 'D4', 'F4', 'A4'],
+      ['C4', 'G4', 'B4', 'D5'],
+      ['G3', 'D4', 'F4', 'B4'],
+      ['E3', 'B3', 'D4', 'G4'],
+      ['A3', 'E4', 'G4', 'C5'],
+      ['F3', 'C4', 'E4', 'A4'],
+      ['G3', 'D4', 'F4', 'B4'],
+      ['C4', 'G4', 'B4', 'E5'],
+      ['A3', 'E4', 'G4', 'C5'],
+      ['D4', 'A4', 'C5', 'F5'],
+      ['G3', 'D4', 'F4', 'A4'],
+      ['E3', 'B3', 'D4', 'G4'],
+      ['A3', 'E4', 'G4', 'C5'],
+      ['C4', 'G4', 'B4', 'D5'],
+      ['A3', 'E4', 'G4', 'C5'],
+      ['F3', 'C4', 'E4', 'A4'],
+      ['G3', 'D4', 'F4', 'A4'],
+      ['E3', 'B3', 'D4', 'G4'],
+      ['A3', 'E4', 'G4', 'C5'],
+      ['D4', 'A4', 'C5', 'F5'],
+      ['C4', 'G4', 'B4', 'E5'],
+    ],
+    leadMotifs: [
+      ['G5', null, null, null, 'E5', null, null, null],
+      [null, null, 'A5', null, null, null, 'G5', null],
+      ['F5', null, null, null, 'D5', null, null, null],
+      [null, null, 'E5', null, null, null, 'C5', null],
+    ],
+    bassMotifs: [
+      ['C2', null, null, null, null, null, null, null],
+      ['A1', null, null, null, null, null, null, null],
+      ['F1', null, null, null, null, null, null, null],
+      ['G1', null, null, null, null, null, null, null],
+    ],
+    kickMotif: [],
+    snareMotif: [],
+    hatMotif: [],
+    crackleMotif: [3],
+    leadDuration: '2n',
+    bassDuration: '1m',
+    padDuration: '2m',
+    leadVelocity: 0.24,
+    bassVelocity: 0.34,
+    padVelocity: 0.25,
+    kickVelocity: 0,
+    snareVelocity: 0,
+    hatVelocity: 0,
+    crackleVelocity: 0.025,
+    reverbWet: 0.36,
+    delayWet: 0.24,
+    masterGain: 0.74,
+    padStrideBars: 2,
+  },
+  ambient_dream: {
+    id: 'ambient_dream',
+    name: 'Ambient 2: ゆめみるしんかい',
+    description: 'Ambient / 32小節ループ / 深く静かな浮遊感',
+    genre: 'ambient',
+    bpm: 58,
+    bars: LOOP_BARS,
+    barChords: [
+      ['A3', 'E4', 'G4', 'C5'],
+      ['F3', 'C4', 'E4', 'A4'],
+      ['D3', 'A3', 'C4', 'F4'],
+      ['G3', 'D4', 'F4', 'A4'],
+      ['A3', 'E4', 'G4', 'C5'],
+      ['F3', 'C4', 'E4', 'A4'],
+      ['E3', 'B3', 'D4', 'G4'],
+      ['G3', 'D4', 'F4', 'A4'],
+      ['C4', 'G4', 'B4', 'D5'],
+      ['A3', 'E4', 'G4', 'C5'],
+      ['F3', 'C4', 'E4', 'A4'],
+      ['D3', 'A3', 'C4', 'F4'],
+      ['E3', 'B3', 'D4', 'G4'],
+      ['G3', 'D4', 'F4', 'A4'],
+      ['A3', 'E4', 'G4', 'C5'],
+      ['F3', 'C4', 'E4', 'A4'],
+      ['D3', 'A3', 'C4', 'F4'],
+      ['G3', 'D4', 'F4', 'A4'],
+      ['C4', 'G4', 'B4', 'D5'],
+      ['A3', 'E4', 'G4', 'C5'],
+      ['F3', 'C4', 'E4', 'A4'],
+      ['D3', 'A3', 'C4', 'F4'],
+      ['E3', 'B3', 'D4', 'G4'],
+      ['G3', 'D4', 'F4', 'A4'],
+      ['A3', 'E4', 'G4', 'C5'],
+      ['F3', 'C4', 'E4', 'A4'],
+      ['D3', 'A3', 'C4', 'F4'],
+      ['G3', 'D4', 'F4', 'A4'],
+      ['E3', 'B3', 'D4', 'G4'],
+      ['A3', 'E4', 'G4', 'C5'],
+      ['F3', 'C4', 'E4', 'A4'],
+      ['A3', 'E4', 'G4', 'C5'],
+    ],
+    leadMotifs: [
+      [null, null, 'C5', null, null, null, 'E5', null],
+      [null, null, 'B4', null, null, null, 'D5', null],
+      [null, null, 'A4', null, null, null, 'C5', null],
+      [null, null, 'G4', null, null, null, 'B4', null],
+    ],
+    bassMotifs: [
+      ['A1', null, null, null, null, null, null, null],
+      ['F1', null, null, null, null, null, null, null],
+      ['D1', null, null, null, null, null, null, null],
+      ['G1', null, null, null, null, null, null, null],
+    ],
+    kickMotif: [],
+    snareMotif: [],
+    hatMotif: [],
+    crackleMotif: [5],
+    leadDuration: '2n',
+    bassDuration: '1m',
+    padDuration: '2m',
+    leadVelocity: 0.22,
+    bassVelocity: 0.32,
+    padVelocity: 0.24,
+    kickVelocity: 0,
+    snareVelocity: 0,
+    hatVelocity: 0,
+    crackleVelocity: 0.02,
+    reverbWet: 0.42,
+    delayWet: 0.28,
+    masterGain: 0.72,
+    padStrideBars: 2,
   },
 };
 
@@ -117,12 +350,14 @@ export class AudioLabPlayer {
   private toneLead: PolySynth | null = null;
   private toneBass: MonoSynth | null = null;
   private toneKick: MembraneSynth | null = null;
+  private toneSnare: NoiseSynth | null = null;
   private toneHat: NoiseSynth | null = null;
+  private toneCrackle: NoiseSynth | null = null;
   private tonePad: PolySynth | null = null;
   private toneReverb: Reverb | null = null;
   private toneDelay: FeedbackDelay | null = null;
   private toneSequence: Sequence<number> | null = null;
-  private currentTonePreset: TonePresetId = 'morning';
+  private currentTonePreset: TonePresetId = 'lofi_cafe';
   private engine: AudioLabEngine = 'none';
   private volume = 0.65;
 
@@ -132,8 +367,8 @@ export class AudioLabPlayer {
 
   getTonePresets(): TonePresetMeta[] {
     return (Object.keys(TONE_PRESET_LIBRARY) as TonePresetId[]).map((id) => {
-      const { name, description } = TONE_PRESET_LIBRARY[id];
-      return { id, name, description };
+      const { name, description, genre } = TONE_PRESET_LIBRARY[id];
+      return { id, name, description, genre };
     });
   }
 
@@ -261,40 +496,53 @@ export class AudioLabPlayer {
 
   private buildToneGraph(tone: ToneModule, presetId: TonePresetId) {
     const preset = TONE_PRESET_LIBRARY[presetId];
+    const totalSteps = preset.bars * STEPS_PER_BAR;
+
     tone.Transport.stop();
     tone.Transport.cancel(0);
     tone.Transport.position = 0;
     tone.Transport.bpm.value = preset.bpm;
-    tone.Destination.volume.value = -8;
+    tone.Destination.volume.value = -9;
+    tone.Transport.swing = preset.genre === 'lofi' ? 0.12 : 0;
+    tone.Transport.swingSubdivision = '8n';
 
     this.toneGain = new tone.Gain(curvedVolume(this.volume) * preset.masterGain).toDestination();
-    this.toneReverb = new tone.Reverb({ decay: 1.6, wet: preset.reverbWet }).connect(this.toneGain);
-    this.toneDelay = new tone.FeedbackDelay('8n', 0.16);
+    this.toneReverb = new tone.Reverb({ decay: preset.genre === 'ambient' ? 4.6 : 2.2, wet: preset.reverbWet }).connect(
+      this.toneGain,
+    );
+    this.toneDelay = new tone.FeedbackDelay('8n', preset.genre === 'ambient' ? 0.26 : 0.18);
     this.toneDelay.wet.value = preset.delayWet;
     this.toneDelay.connect(this.toneGain);
 
-    this.toneLead = new tone.PolySynth(tone.Synth, {
-      oscillator: { type: preset.leadOsc },
-      envelope: { attack: 0.01, decay: 0.12, sustain: 0.24, release: 0.16 },
+    this.toneLead = new tone.PolySynth(tone.AMSynth, {
+      harmonicity: preset.genre === 'ambient' ? 1.2 : 1.45,
+      envelope: { attack: preset.genre === 'ambient' ? 0.08 : 0.02, decay: 0.2, sustain: 0.28, release: 0.4 },
+      modulation: { type: 'sine' },
+      modulationEnvelope: { attack: 0.01, decay: 0.18, sustain: 0.2, release: 0.3 },
     });
     this.toneLead.connect(this.toneReverb);
     this.toneLead.connect(this.toneDelay);
 
     this.tonePad = new tone.PolySynth(tone.Synth, {
-      oscillator: { type: 'triangle4' },
-      envelope: { attack: 0.02, decay: 0.24, sustain: 0.4, release: 0.5 },
+      oscillator: { type: 'sine' },
+      envelope: { attack: 0.14, decay: 0.35, sustain: 0.5, release: 0.9 },
     }).connect(this.toneReverb);
 
     this.toneBass = new tone.MonoSynth({
-      oscillator: { type: 'sine' },
-      envelope: { attack: 0.01, decay: 0.2, sustain: 0.16, release: 0.1 },
-      filterEnvelope: { attack: 0.01, decay: 0.16, sustain: 0.05, release: 0.08, baseFrequency: 120, octaves: 2 },
+      oscillator: { type: 'triangle' },
+      envelope: { attack: 0.02, decay: 0.2, sustain: 0.22, release: 0.12 },
+      filterEnvelope: { attack: 0.02, decay: 0.16, sustain: 0.05, release: 0.08, baseFrequency: 90, octaves: 2.2 },
     }).connect(this.toneGain);
 
     this.toneKick = new tone.MembraneSynth({
       pitchDecay: 0.03,
-      octaves: 7,
-      envelope: { attack: 0.001, decay: 0.14, sustain: 0 },
+      octaves: 6,
+      envelope: { attack: 0.001, decay: 0.12, sustain: 0 },
+    }).connect(this.toneGain);
+
+    this.toneSnare = new tone.NoiseSynth({
+      noise: { type: 'pink' },
+      envelope: { attack: 0.001, decay: 0.12, sustain: 0 },
     }).connect(this.toneGain);
 
     this.toneHat = new tone.NoiseSynth({
@@ -302,30 +550,48 @@ export class AudioLabPlayer {
       envelope: { attack: 0.001, decay: 0.05, sustain: 0 },
     }).connect(this.toneGain);
 
-    const steps = Array.from({ length: 16 }, (_, step) => step);
+    this.toneCrackle = new tone.NoiseSynth({
+      noise: { type: 'brown' },
+      envelope: { attack: 0.001, decay: 0.03, sustain: 0 },
+    }).connect(this.toneGain);
 
+    const steps = Array.from({ length: totalSteps }, (_, step) => step);
     this.toneSequence = new tone.Sequence((time, step) => {
-      const leadNote = preset.leadNotes[step];
+      const bar = Math.floor(step / STEPS_PER_BAR);
+      const section = Math.floor(bar / 8);
+      const stepInBar = step % STEPS_PER_BAR;
+
+      const leadMotif = preset.leadMotifs[(bar + section) % preset.leadMotifs.length];
+      const leadNote = leadMotif[stepInBar];
       if (leadNote) {
-        this.toneLead?.triggerAttackRelease(leadNote, '16n', time, preset.leadVelocity);
+        this.toneLead?.triggerAttackRelease(leadNote, preset.leadDuration, time, preset.leadVelocity);
       }
 
-      const bassNote = preset.bassNotes[step % preset.bassNotes.length];
+      const bassMotif = preset.bassMotifs[bar % preset.bassMotifs.length];
+      const bassNote = bassMotif[stepInBar];
       if (bassNote) {
-        this.toneBass?.triggerAttackRelease(bassNote, '8n', time, preset.bassVelocity);
+        this.toneBass?.triggerAttackRelease(bassNote, preset.bassDuration, time, preset.bassVelocity);
       }
 
-      if (step % 4 === 0) {
-        const chord = preset.chords[(step / 4) % preset.chords.length];
-        this.tonePad?.triggerAttackRelease(chord, '2n', time, 0.2);
+      if (stepInBar === 0 && bar % preset.padStrideBars === 0) {
+        const chord = preset.barChords[bar % preset.barChords.length];
+        this.tonePad?.triggerAttackRelease(chord, preset.padDuration, time, preset.padVelocity);
       }
 
-      if (preset.kickSteps.includes(step)) {
-        this.toneKick?.triggerAttackRelease('C1', '8n', time, 0.88);
+      if (preset.kickMotif.includes(stepInBar)) {
+        this.toneKick?.triggerAttackRelease('C1', '8n', time, preset.kickVelocity);
       }
 
-      if (preset.hatSteps.includes(step)) {
+      if (preset.snareMotif.includes(stepInBar)) {
+        this.toneSnare?.triggerAttackRelease('16n', time, preset.snareVelocity);
+      }
+
+      if (preset.hatMotif.includes(stepInBar)) {
         this.toneHat?.triggerAttackRelease('32n', time, preset.hatVelocity);
+      }
+
+      if (preset.crackleMotif.includes(stepInBar)) {
+        this.toneCrackle?.triggerAttackRelease('64n', time, preset.crackleVelocity);
       }
     }, steps, '8n');
 
@@ -343,8 +609,12 @@ export class AudioLabPlayer {
     this.toneBass = null;
     this.toneKick?.dispose();
     this.toneKick = null;
+    this.toneSnare?.dispose();
+    this.toneSnare = null;
     this.toneHat?.dispose();
     this.toneHat = null;
+    this.toneCrackle?.dispose();
+    this.toneCrackle = null;
     this.toneDelay?.dispose();
     this.toneDelay = null;
     this.toneReverb?.dispose();
