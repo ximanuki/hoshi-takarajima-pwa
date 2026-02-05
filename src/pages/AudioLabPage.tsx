@@ -68,6 +68,7 @@ export function AudioLabPage() {
         <h2>ステップで ひかく</h2>
         <p>Step 1: 音源ファイル（固定ループ）を再生</p>
         <p>Step 2: Tone.jsシーケンサー（Lo-fi / Jersey / UK Garage / Future Garage / UK Dubstep / Ambient）を再生</p>
+        <p>Step 2は曲ごとの専用SEセット + マスター段（EQ3 / Multiband / Stereo）で質感を作り分けます</p>
         <p>どちらも同じ音量で聞き比べできます。現在: {engineLabel[engine]}</p>
       </article>
 
@@ -127,7 +128,7 @@ export function AudioLabPage() {
             </button>
           ))}
         </div>
-        <p className="audio-lab-note">各BGMごとに音色を作り分けた効果音です。曲を切り替えると効果音の質感も変わります。</p>
+        <p className="audio-lab-note">各BGMごとの専用SEセットです。曲を切り替えると効果音のキャラも切り替わります。</p>
       </article>
 
       <article className="card audio-lab-grid">

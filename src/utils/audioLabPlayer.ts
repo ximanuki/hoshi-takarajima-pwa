@@ -52,6 +52,74 @@ type TonePresetConfig = TonePresetMeta & {
   sfxScale: string[];
 };
 
+type ToneSfxSignature = {
+  outputGain: number;
+  transientGain: number;
+  transientHighpassHz: number;
+  limiterDb: number;
+  compressorThreshold: number;
+  compressorRatio: number;
+  reverbDecay: number;
+  reverbWet: number;
+  delayTime: string;
+  delayFeedback: number;
+  delayWet: number;
+  sparkleHarmonicity: number;
+  sparkleModulationIndex: number;
+  sparkleAttack: number;
+  sparkleRelease: number;
+  bodyHarmonicity: number;
+  bodyAttack: number;
+  bodyDecay: number;
+  bodySustain: number;
+  bodyRelease: number;
+  pluckDampening: number;
+  punchOscillator: 'sine' | 'triangle' | 'square' | 'sawtooth';
+  punchBaseFrequency: number;
+  punchOctaves: number;
+  clickHarmonicity: number;
+  clickModulationIndex: number;
+  clickResonance: number;
+  clickOctaves: number;
+  clickDecay: number;
+  snapNoise: 'white' | 'pink' | 'brown';
+  tapOffsets: [number, number];
+  correctOffsets: [number, number, number];
+  missOffsets: [number, number, number];
+  clearOffsetsA: [number, number, number];
+  clearOffsetsB: [number, number, number];
+  finalOffset: number;
+  tapAccentChance: number;
+  tapAccentDelaySec: number;
+  clearTagChance: number;
+  syncNudgeSec: number;
+  disposeMs: number;
+};
+
+type ToneMasterStageConfig = {
+  tapeDrive: number;
+  tapeWet: number;
+  colorCutoffHz: number;
+  colorQ: number;
+  eqLowDb: number;
+  eqMidDb: number;
+  eqHighDb: number;
+  eqLowFrequencyHz: number;
+  eqHighFrequencyHz: number;
+  busCompThreshold: number;
+  busCompRatio: number;
+  busCompAttack: number;
+  busCompRelease: number;
+  multibandLowThreshold: number;
+  multibandLowRatio: number;
+  multibandMidThreshold: number;
+  multibandMidRatio: number;
+  multibandHighThreshold: number;
+  multibandHighRatio: number;
+  stereoWidth: number;
+  limiterDb: number;
+};
+
 const STEPS_PER_BAR = 16;
 const LOOP_BARS = 32;
 
@@ -117,6 +185,22 @@ function getSectionTexture(section: number, genre: 'lofi' | 'ambient'): number {
 
 function shouldTrigger(probability: number): boolean {
   return Math.random() <= clamp01(probability);
+}
+
+function shiftNoteOctave(note: string, octaveShift: number): string {
+  const match = note.match(/^([A-G]#?)(-?\d+)$/);
+  if (!match) return note;
+  const [, pitch, octaveText] = match;
+  return `${pitch}${Number(octaveText) + octaveShift}`;
+}
+
+function pickScaleNote(scale: string[], offset: number): string {
+  const fallbackScale = ['C4', 'D4', 'E4', 'G4', 'A4', 'C5', 'E5'];
+  const source = scale.length > 0 ? scale : fallbackScale;
+  const length = source.length;
+  const index = ((offset % length) + length) % length;
+  const octaveShift = Math.floor(offset / length);
+  return shiftNoteOctave(source[index] ?? 'C4', octaveShift);
 }
 
 const TONE_PRESET_LIBRARY: Record<TonePresetId, TonePresetConfig> = {
@@ -590,6 +674,521 @@ const TONE_PRESET_LIBRARY: Record<TonePresetId, TonePresetConfig> = {
   },
 };
 
+const BASE_SFX_SIGNATURE: ToneSfxSignature = {
+  outputGain: 0.86,
+  transientGain: 0.92,
+  transientHighpassHz: 6800,
+  limiterDb: -1.2,
+  compressorThreshold: -24,
+  compressorRatio: 3.2,
+  reverbDecay: 2.8,
+  reverbWet: 0.26,
+  delayTime: '8n',
+  delayFeedback: 0.24,
+  delayWet: 0.16,
+  sparkleHarmonicity: 1.38,
+  sparkleModulationIndex: 6.4,
+  sparkleAttack: 0.008,
+  sparkleRelease: 0.35,
+  bodyHarmonicity: 1.52,
+  bodyAttack: 0.005,
+  bodyDecay: 0.18,
+  bodySustain: 0.08,
+  bodyRelease: 0.3,
+  pluckDampening: 4800,
+  punchOscillator: 'triangle',
+  punchBaseFrequency: 70,
+  punchOctaves: 3.1,
+  clickHarmonicity: 6.8,
+  clickModulationIndex: 26,
+  clickResonance: 1600,
+  clickOctaves: 1.6,
+  clickDecay: 0.09,
+  snapNoise: 'white',
+  tapOffsets: [2, 4],
+  correctOffsets: [1, 3, 5],
+  missOffsets: [1, 0, 2],
+  clearOffsetsA: [0, 2, 4],
+  clearOffsetsB: [1, 3, 5],
+  finalOffset: 6,
+  tapAccentChance: 0.25,
+  tapAccentDelaySec: 0.065,
+  clearTagChance: 0.35,
+  syncNudgeSec: 0,
+  disposeMs: 2400,
+};
+
+const TONE_SFX_SIGNATURE_LIBRARY: Record<TonePresetId, ToneSfxSignature> = {
+  lofi_cafe: {
+    ...BASE_SFX_SIGNATURE,
+    transientHighpassHz: 6400,
+    pluckDampening: 4300,
+    snapNoise: 'pink',
+    tapAccentChance: 0.22,
+  },
+  lofi_rain: {
+    ...BASE_SFX_SIGNATURE,
+    outputGain: 0.82,
+    transientGain: 0.85,
+    transientHighpassHz: 5200,
+    reverbDecay: 3.8,
+    reverbWet: 0.34,
+    delayFeedback: 0.32,
+    delayWet: 0.23,
+    sparkleRelease: 0.48,
+    bodyRelease: 0.42,
+    pluckDampening: 3600,
+    snapNoise: 'pink',
+    tapOffsets: [1, 3],
+    correctOffsets: [0, 2, 4],
+    clearTagChance: 0.44,
+    disposeMs: 3000,
+  },
+  lofi_jersey: {
+    ...BASE_SFX_SIGNATURE,
+    outputGain: 0.9,
+    transientHighpassHz: 7600,
+    compressorRatio: 3.8,
+    delayTime: '16n',
+    delayWet: 0.14,
+    sparkleHarmonicity: 1.56,
+    sparkleModulationIndex: 7.4,
+    bodyHarmonicity: 1.62,
+    pluckDampening: 5100,
+    punchOscillator: 'square',
+    punchBaseFrequency: 62,
+    punchOctaves: 3.4,
+    clickHarmonicity: 7.2,
+    clickModulationIndex: 28,
+    clickResonance: 2100,
+    clickOctaves: 1.8,
+    tapOffsets: [2, 5],
+    correctOffsets: [2, 4, 6],
+    missOffsets: [2, 1, 0],
+    clearOffsetsA: [1, 3, 5],
+    clearOffsetsB: [2, 4, 6],
+    tapAccentChance: 0.72,
+    tapAccentDelaySec: 0.058,
+    syncNudgeSec: 0.01,
+    disposeMs: 2200,
+  },
+  lofi_2step: {
+    ...BASE_SFX_SIGNATURE,
+    outputGain: 0.88,
+    transientHighpassHz: 7000,
+    delayTime: '8t',
+    delayFeedback: 0.27,
+    delayWet: 0.18,
+    pluckDampening: 4600,
+    punchOscillator: 'square',
+    punchBaseFrequency: 66,
+    punchOctaves: 3.2,
+    clickDecay: 0.08,
+    tapOffsets: [1, 5],
+    correctOffsets: [1, 4, 6],
+    clearOffsetsA: [0, 3, 5],
+    clearOffsetsB: [1, 4, 6],
+    tapAccentChance: 0.55,
+    tapAccentDelaySec: 0.05,
+    clearTagChance: 0.48,
+    syncNudgeSec: 0.014,
+  },
+  uk_garage_neon: {
+    ...BASE_SFX_SIGNATURE,
+    outputGain: 0.89,
+    transientHighpassHz: 7400,
+    reverbDecay: 2.6,
+    reverbWet: 0.2,
+    delayTime: '16n',
+    delayWet: 0.14,
+    sparkleHarmonicity: 1.5,
+    sparkleModulationIndex: 7.2,
+    pluckDampening: 5000,
+    punchOscillator: 'square',
+    punchBaseFrequency: 64,
+    punchOctaves: 3.35,
+    clickHarmonicity: 7.4,
+    clickModulationIndex: 30,
+    clickResonance: 2200,
+    clickOctaves: 1.85,
+    tapOffsets: [1, 4],
+    correctOffsets: [1, 4, 5],
+    missOffsets: [2, 0, 1],
+    clearOffsetsA: [0, 3, 5],
+    clearOffsetsB: [1, 4, 6],
+    tapAccentChance: 0.64,
+    tapAccentDelaySec: 0.055,
+    syncNudgeSec: 0.008,
+    disposeMs: 2200,
+  },
+  future_garage_mist: {
+    ...BASE_SFX_SIGNATURE,
+    outputGain: 0.8,
+    transientGain: 0.84,
+    transientHighpassHz: 4600,
+    compressorThreshold: -26,
+    compressorRatio: 2.4,
+    reverbDecay: 4.8,
+    reverbWet: 0.36,
+    delayFeedback: 0.35,
+    delayWet: 0.28,
+    sparkleHarmonicity: 1.14,
+    sparkleModulationIndex: 3.8,
+    sparkleAttack: 0.018,
+    sparkleRelease: 0.62,
+    bodyHarmonicity: 1.2,
+    bodyAttack: 0.012,
+    bodyDecay: 0.24,
+    bodySustain: 0.16,
+    bodyRelease: 0.48,
+    pluckDampening: 3000,
+    punchOscillator: 'triangle',
+    punchBaseFrequency: 58,
+    punchOctaves: 2.5,
+    clickHarmonicity: 3.8,
+    clickModulationIndex: 18,
+    clickResonance: 1200,
+    clickOctaves: 1.2,
+    clickDecay: 0.06,
+    snapNoise: 'pink',
+    tapOffsets: [1, 5],
+    correctOffsets: [0, 3, 5],
+    clearOffsetsA: [0, 2, 5],
+    clearOffsetsB: [1, 4, 6],
+    finalOffset: 5,
+    tapAccentChance: 0.3,
+    tapAccentDelaySec: 0.07,
+    clearTagChance: 0.52,
+    syncNudgeSec: 0.004,
+    disposeMs: 3400,
+  },
+  dubstep_nightbus: {
+    ...BASE_SFX_SIGNATURE,
+    outputGain: 0.82,
+    transientGain: 0.86,
+    transientHighpassHz: 5200,
+    compressorThreshold: -25,
+    compressorRatio: 2.8,
+    reverbDecay: 3.9,
+    reverbWet: 0.3,
+    delayFeedback: 0.31,
+    delayWet: 0.24,
+    sparkleHarmonicity: 1.22,
+    sparkleModulationIndex: 4.7,
+    sparkleAttack: 0.016,
+    sparkleRelease: 0.45,
+    bodyHarmonicity: 1.28,
+    bodyAttack: 0.01,
+    bodyDecay: 0.22,
+    bodySustain: 0.14,
+    bodyRelease: 0.38,
+    pluckDampening: 2800,
+    punchOscillator: 'sawtooth',
+    punchBaseFrequency: 54,
+    punchOctaves: 2.2,
+    clickHarmonicity: 4.2,
+    clickModulationIndex: 20,
+    clickResonance: 1300,
+    clickOctaves: 1.35,
+    clickDecay: 0.07,
+    snapNoise: 'pink',
+    tapOffsets: [0, 3],
+    correctOffsets: [0, 2, 4],
+    missOffsets: [2, 1, 0],
+    clearOffsetsA: [0, 2, 4],
+    clearOffsetsB: [1, 3, 5],
+    finalOffset: 4,
+    tapAccentChance: 0.38,
+    tapAccentDelaySec: 0.062,
+    clearTagChance: 0.4,
+    syncNudgeSec: 0.003,
+    disposeMs: 3200,
+  },
+  ambient_stars: {
+    ...BASE_SFX_SIGNATURE,
+    outputGain: 0.7,
+    transientGain: 0.72,
+    transientHighpassHz: 4200,
+    compressorThreshold: -28,
+    compressorRatio: 2.1,
+    reverbDecay: 6.4,
+    reverbWet: 0.48,
+    delayFeedback: 0.34,
+    delayWet: 0.26,
+    sparkleHarmonicity: 1.08,
+    sparkleModulationIndex: 3.2,
+    sparkleAttack: 0.02,
+    sparkleRelease: 0.9,
+    bodyHarmonicity: 1.1,
+    bodyAttack: 0.015,
+    bodyDecay: 0.28,
+    bodySustain: 0.24,
+    bodyRelease: 0.78,
+    pluckDampening: 2600,
+    punchBaseFrequency: 62,
+    punchOctaves: 2.4,
+    clickHarmonicity: 3.2,
+    clickModulationIndex: 18,
+    clickResonance: 900,
+    clickOctaves: 1.1,
+    clickDecay: 0.05,
+    snapNoise: 'pink',
+    tapOffsets: [2, 5],
+    tapAccentChance: 0.18,
+    tapAccentDelaySec: 0.075,
+    clearTagChance: 0.55,
+    disposeMs: 3800,
+  },
+  ambient_dream: {
+    ...BASE_SFX_SIGNATURE,
+    outputGain: 0.68,
+    transientGain: 0.7,
+    transientHighpassHz: 4000,
+    compressorThreshold: -29,
+    compressorRatio: 2,
+    reverbDecay: 7.2,
+    reverbWet: 0.54,
+    delayFeedback: 0.37,
+    delayWet: 0.3,
+    sparkleHarmonicity: 1.04,
+    sparkleModulationIndex: 2.8,
+    sparkleAttack: 0.024,
+    sparkleRelease: 1,
+    bodyHarmonicity: 1.05,
+    bodyAttack: 0.018,
+    bodyDecay: 0.3,
+    bodySustain: 0.26,
+    bodyRelease: 0.84,
+    pluckDampening: 2400,
+    punchOscillator: 'sine',
+    punchBaseFrequency: 60,
+    punchOctaves: 2.2,
+    clickHarmonicity: 2.8,
+    clickModulationIndex: 15,
+    clickResonance: 760,
+    clickOctaves: 1.05,
+    clickDecay: 0.045,
+    snapNoise: 'brown',
+    tapOffsets: [1, 4],
+    correctOffsets: [0, 2, 4],
+    finalOffset: 5,
+    tapAccentChance: 0.14,
+    tapAccentDelaySec: 0.08,
+    clearTagChance: 0.62,
+    disposeMs: 4000,
+  },
+};
+
+const TONE_MASTER_STAGE_LIBRARY: Record<TonePresetId, ToneMasterStageConfig> = {
+  lofi_cafe: {
+    tapeDrive: 0.12,
+    tapeWet: 0.2,
+    colorCutoffHz: 5600,
+    colorQ: 1.4,
+    eqLowDb: 1.1,
+    eqMidDb: 0.35,
+    eqHighDb: -0.4,
+    eqLowFrequencyHz: 190,
+    eqHighFrequencyHz: 3600,
+    busCompThreshold: -20,
+    busCompRatio: 3.2,
+    busCompAttack: 0.016,
+    busCompRelease: 0.18,
+    multibandLowThreshold: -24,
+    multibandLowRatio: 2.8,
+    multibandMidThreshold: -22,
+    multibandMidRatio: 2.4,
+    multibandHighThreshold: -19,
+    multibandHighRatio: 1.8,
+    stereoWidth: 0.56,
+    limiterDb: -1.1,
+  },
+  lofi_rain: {
+    tapeDrive: 0.1,
+    tapeWet: 0.22,
+    colorCutoffHz: 5000,
+    colorQ: 1.1,
+    eqLowDb: 1.3,
+    eqMidDb: -0.1,
+    eqHighDb: -0.9,
+    eqLowFrequencyHz: 180,
+    eqHighFrequencyHz: 3200,
+    busCompThreshold: -21,
+    busCompRatio: 3,
+    busCompAttack: 0.02,
+    busCompRelease: 0.22,
+    multibandLowThreshold: -25,
+    multibandLowRatio: 2.9,
+    multibandMidThreshold: -22,
+    multibandMidRatio: 2.2,
+    multibandHighThreshold: -20,
+    multibandHighRatio: 1.9,
+    stereoWidth: 0.58,
+    limiterDb: -1.2,
+  },
+  lofi_jersey: {
+    tapeDrive: 0.15,
+    tapeWet: 0.24,
+    colorCutoffHz: 6200,
+    colorQ: 1.5,
+    eqLowDb: 1,
+    eqMidDb: 0.9,
+    eqHighDb: 0.8,
+    eqLowFrequencyHz: 200,
+    eqHighFrequencyHz: 4200,
+    busCompThreshold: -19,
+    busCompRatio: 3.5,
+    busCompAttack: 0.012,
+    busCompRelease: 0.14,
+    multibandLowThreshold: -23,
+    multibandLowRatio: 3.1,
+    multibandMidThreshold: -21,
+    multibandMidRatio: 2.5,
+    multibandHighThreshold: -18,
+    multibandHighRatio: 2.1,
+    stereoWidth: 0.66,
+    limiterDb: -1,
+  },
+  lofi_2step: {
+    tapeDrive: 0.13,
+    tapeWet: 0.22,
+    colorCutoffHz: 6000,
+    colorQ: 1.35,
+    eqLowDb: 1.2,
+    eqMidDb: 0.6,
+    eqHighDb: 0.45,
+    eqLowFrequencyHz: 195,
+    eqHighFrequencyHz: 4000,
+    busCompThreshold: -19.5,
+    busCompRatio: 3.4,
+    busCompAttack: 0.013,
+    busCompRelease: 0.15,
+    multibandLowThreshold: -23,
+    multibandLowRatio: 3,
+    multibandMidThreshold: -21,
+    multibandMidRatio: 2.4,
+    multibandHighThreshold: -18.5,
+    multibandHighRatio: 2,
+    stereoWidth: 0.64,
+    limiterDb: -1.05,
+  },
+  uk_garage_neon: {
+    tapeDrive: 0.14,
+    tapeWet: 0.23,
+    colorCutoffHz: 6400,
+    colorQ: 1.55,
+    eqLowDb: 0.9,
+    eqMidDb: 1.1,
+    eqHighDb: 1,
+    eqLowFrequencyHz: 210,
+    eqHighFrequencyHz: 4600,
+    busCompThreshold: -18.5,
+    busCompRatio: 3.7,
+    busCompAttack: 0.01,
+    busCompRelease: 0.13,
+    multibandLowThreshold: -22,
+    multibandLowRatio: 3.1,
+    multibandMidThreshold: -20.5,
+    multibandMidRatio: 2.6,
+    multibandHighThreshold: -17.5,
+    multibandHighRatio: 2.2,
+    stereoWidth: 0.68,
+    limiterDb: -0.95,
+  },
+  future_garage_mist: {
+    tapeDrive: 0.09,
+    tapeWet: 0.16,
+    colorCutoffHz: 4600,
+    colorQ: 1,
+    eqLowDb: 1.4,
+    eqMidDb: -0.4,
+    eqHighDb: -0.2,
+    eqLowFrequencyHz: 170,
+    eqHighFrequencyHz: 3000,
+    busCompThreshold: -22,
+    busCompRatio: 2.7,
+    busCompAttack: 0.024,
+    busCompRelease: 0.24,
+    multibandLowThreshold: -26,
+    multibandLowRatio: 2.7,
+    multibandMidThreshold: -23,
+    multibandMidRatio: 2,
+    multibandHighThreshold: -21,
+    multibandHighRatio: 1.7,
+    stereoWidth: 0.72,
+    limiterDb: -1.2,
+  },
+  dubstep_nightbus: {
+    tapeDrive: 0.08,
+    tapeWet: 0.14,
+    colorCutoffHz: 4200,
+    colorQ: 1.2,
+    eqLowDb: 2,
+    eqMidDb: -0.55,
+    eqHighDb: -0.65,
+    eqLowFrequencyHz: 160,
+    eqHighFrequencyHz: 2800,
+    busCompThreshold: -21,
+    busCompRatio: 2.9,
+    busCompAttack: 0.018,
+    busCompRelease: 0.26,
+    multibandLowThreshold: -27,
+    multibandLowRatio: 3.2,
+    multibandMidThreshold: -24,
+    multibandMidRatio: 2.1,
+    multibandHighThreshold: -22,
+    multibandHighRatio: 1.8,
+    stereoWidth: 0.62,
+    limiterDb: -1.15,
+  },
+  ambient_stars: {
+    tapeDrive: 0.035,
+    tapeWet: 0.1,
+    colorCutoffHz: 7600,
+    colorQ: 0.85,
+    eqLowDb: 0.45,
+    eqMidDb: -0.15,
+    eqHighDb: 0.8,
+    eqLowFrequencyHz: 220,
+    eqHighFrequencyHz: 5200,
+    busCompThreshold: -24,
+    busCompRatio: 2,
+    busCompAttack: 0.03,
+    busCompRelease: 0.32,
+    multibandLowThreshold: -28,
+    multibandLowRatio: 2.2,
+    multibandMidThreshold: -25,
+    multibandMidRatio: 1.8,
+    multibandHighThreshold: -23,
+    multibandHighRatio: 1.6,
+    stereoWidth: 0.76,
+    limiterDb: -1.3,
+  },
+  ambient_dream: {
+    tapeDrive: 0.03,
+    tapeWet: 0.08,
+    colorCutoffHz: 7000,
+    colorQ: 0.8,
+    eqLowDb: 0.35,
+    eqMidDb: -0.25,
+    eqHighDb: 0.95,
+    eqLowFrequencyHz: 210,
+    eqHighFrequencyHz: 5000,
+    busCompThreshold: -25,
+    busCompRatio: 1.9,
+    busCompAttack: 0.032,
+    busCompRelease: 0.35,
+    multibandLowThreshold: -29,
+    multibandLowRatio: 2.1,
+    multibandMidThreshold: -26,
+    multibandMidRatio: 1.7,
+    multibandHighThreshold: -24,
+    multibandHighRatio: 1.5,
+    stereoWidth: 0.79,
+    limiterDb: -1.35,
+  },
+};
+
 export class AudioLabPlayer {
   private assetAudio: HTMLAudioElement | null = null;
   private tone: ToneModule | null = null;
@@ -703,20 +1302,30 @@ export class AudioLabPlayer {
     }
 
     const preset = TONE_PRESET_LIBRARY[presetId];
-    const profile = preset.rhythmProfile;
-    const isAmbientProfile = profile === 'ambient';
-    const isJerseyProfile = profile === 'jersey';
-    const isUkgProfile = profile === 'ukg';
-    const isFutureGarageProfile = profile === 'future_garage';
-    const isDubstepProfile = profile === 'dubstep';
-    const [n1 = 'C4', n2 = 'D4', n3 = 'E4', n4 = 'G4', n5 = 'A4', n6 = 'C5', n7 = 'E5'] = preset.sfxScale;
+    const signature = TONE_SFX_SIGNATURE_LIBRARY[presetId];
+    const scale = preset.sfxScale;
+    const tapMain = pickScaleNote(scale, signature.tapOffsets[0]);
+    const tapColor = pickScaleNote(scale, signature.tapOffsets[1]);
+    const correctA = pickScaleNote(scale, signature.correctOffsets[0]);
+    const correctB = pickScaleNote(scale, signature.correctOffsets[1]);
+    const correctC = pickScaleNote(scale, signature.correctOffsets[2]);
+    const missA = noteAtOctave(pickScaleNote(scale, signature.missOffsets[0]), 2);
+    const missB = noteAtOctave(pickScaleNote(scale, signature.missOffsets[1]), 2);
+    const missC = noteAtOctave(pickScaleNote(scale, signature.missOffsets[2]), 2);
+    const clearA = pickScaleNote(scale, signature.clearOffsetsA[0]);
+    const clearB = pickScaleNote(scale, signature.clearOffsetsA[1]);
+    const clearC = pickScaleNote(scale, signature.clearOffsetsA[2]);
+    const clearD = pickScaleNote(scale, signature.clearOffsetsB[0]);
+    const clearE = pickScaleNote(scale, signature.clearOffsetsB[1]);
+    const clearF = pickScaleNote(scale, signature.clearOffsetsB[2]);
+    const finalNote = pickScaleNote(scale, signature.finalOffset);
     const now = tone.now();
-    const output = new tone.Gain(curvedVolume(this.sfxVolume) * (isAmbientProfile ? 0.7 : isDubstepProfile ? 0.82 : 0.86)).toDestination();
-    const limiter = new tone.Limiter(-1.2);
-    const comp = new tone.Compressor(-24, isAmbientProfile ? 2.1 : isDubstepProfile ? 2.6 : 3.4);
+    const output = new tone.Gain(curvedVolume(this.sfxVolume) * signature.outputGain).toDestination();
+    const limiter = new tone.Limiter(signature.limiterDb);
+    const comp = new tone.Compressor(signature.compressorThreshold, signature.compressorRatio);
     const tonalBus = new tone.Gain(1);
-    const transientBus = new tone.Gain(0.92);
-    const transientShape = new tone.Filter(isAmbientProfile ? 4200 : isDubstepProfile ? 5200 : 6800, 'highpass');
+    const transientBus = new tone.Gain(signature.transientGain);
+    const transientShape = new tone.Filter(signature.transientHighpassHz, 'highpass');
 
     tonalBus.connect(comp);
     transientBus.connect(comp);
@@ -725,70 +1334,77 @@ export class AudioLabPlayer {
     transientShape.connect(transientBus);
 
     const reverb = new tone.Reverb({
-      decay: isAmbientProfile ? 6.2 : isFutureGarageProfile || isDubstepProfile ? 3.4 : 2.8,
-      wet: isAmbientProfile ? 0.46 : isFutureGarageProfile ? 0.32 : isDubstepProfile ? 0.28 : 0.26,
+      decay: signature.reverbDecay,
+      wet: signature.reverbWet,
     });
     reverb.connect(tonalBus);
-    const delay = new tone.FeedbackDelay('8n', isAmbientProfile ? 0.34 : isDubstepProfile ? 0.31 : 0.24);
-    delay.wet.value = isAmbientProfile ? 0.26 : isFutureGarageProfile ? 0.2 : isDubstepProfile ? 0.22 : 0.16;
+    const delay = new tone.FeedbackDelay(signature.delayTime, signature.delayFeedback);
+    delay.wet.value = signature.delayWet;
     delay.connect(tonalBus);
 
     const sparkle = new tone.PolySynth(tone.FMSynth, {
-      harmonicity: isAmbientProfile ? 1.08 : isDubstepProfile ? 1.22 : 1.38,
-      modulationIndex: isAmbientProfile ? 3.2 : isDubstepProfile ? 4.5 : 6.4,
+      harmonicity: signature.sparkleHarmonicity,
+      modulationIndex: signature.sparkleModulationIndex,
       envelope: {
-        attack: isAmbientProfile ? 0.02 : isDubstepProfile ? 0.016 : 0.008,
+        attack: signature.sparkleAttack,
         decay: 0.2,
         sustain: 0.15,
-        release: isAmbientProfile ? 0.9 : isFutureGarageProfile ? 0.52 : isDubstepProfile ? 0.44 : 0.35,
+        release: signature.sparkleRelease,
       },
     });
     sparkle.connect(reverb);
     sparkle.connect(delay);
 
     const body = new tone.PolySynth(tone.AMSynth, {
-      harmonicity: isAmbientProfile ? 1.1 : isDubstepProfile ? 1.25 : 1.52,
+      harmonicity: signature.bodyHarmonicity,
       envelope: {
-        attack: isAmbientProfile ? 0.015 : isDubstepProfile ? 0.012 : 0.005,
-        decay: isAmbientProfile ? 0.28 : isDubstepProfile ? 0.24 : 0.18,
-        sustain: isAmbientProfile ? 0.24 : isFutureGarageProfile || isDubstepProfile ? 0.14 : 0.08,
-        release: isAmbientProfile ? 0.78 : isFutureGarageProfile ? 0.42 : isDubstepProfile ? 0.36 : 0.3,
+        attack: signature.bodyAttack,
+        decay: signature.bodyDecay,
+        sustain: signature.bodySustain,
+        release: signature.bodyRelease,
       },
     });
     body.connect(tonalBus);
 
     const pluck = new tone.PluckSynth({
       attackNoise: 0.7,
-      dampening: isAmbientProfile ? 2600 : isFutureGarageProfile ? 3200 : isDubstepProfile ? 2900 : 4800,
+      dampening: signature.pluckDampening,
       resonance: 0.9,
     });
     pluck.connect(delay);
     pluck.connect(tonalBus);
 
     const punch = new tone.MonoSynth({
-      oscillator: { type: isJerseyProfile || isUkgProfile || preset.id === 'lofi_2step' ? 'square' : 'triangle' },
+      oscillator: { type: signature.punchOscillator },
       envelope: { attack: 0.004, decay: 0.2, sustain: 0.09, release: 0.24 },
-      filterEnvelope: { attack: 0.008, decay: 0.16, sustain: 0.08, release: 0.14, baseFrequency: isDubstepProfile ? 58 : 70, octaves: isDubstepProfile ? 2.4 : 3.1 },
+      filterEnvelope: {
+        attack: 0.008,
+        decay: 0.16,
+        sustain: 0.08,
+        release: 0.14,
+        baseFrequency: signature.punchBaseFrequency,
+        octaves: signature.punchOctaves,
+      },
     });
     punch.connect(tonalBus);
 
     const snap = new tone.NoiseSynth({
-      noise: { type: isAmbientProfile || isFutureGarageProfile ? 'pink' : 'white' },
+      noise: { type: signature.snapNoise },
       envelope: { attack: 0.001, decay: 0.07, sustain: 0 },
     });
     snap.connect(transientShape);
 
     const click = new tone.MetalSynth({
-      envelope: { attack: 0.001, decay: isAmbientProfile ? 0.05 : isDubstepProfile ? 0.07 : 0.09, release: 0.03 },
-      harmonicity: isAmbientProfile ? 3.2 : isDubstepProfile ? 4.2 : 6.8,
-      modulationIndex: isAmbientProfile ? 18 : isDubstepProfile ? 20 : 26,
-      resonance: isAmbientProfile ? 900 : isDubstepProfile ? 1300 : 1600,
-      octaves: isAmbientProfile ? 1.1 : isDubstepProfile ? 1.3 : 1.6,
+      envelope: { attack: 0.001, decay: signature.clickDecay, release: 0.03 },
+      harmonicity: signature.clickHarmonicity,
+      modulationIndex: signature.clickModulationIndex,
+      resonance: signature.clickResonance,
+      octaves: signature.clickOctaves,
     });
     click.connect(transientShape);
 
     const rise = new tone.Synth({
-      oscillator: { type: isAmbientProfile ? 'sine' : isDubstepProfile ? 'sawtooth' : 'triangle' },
+      oscillator: { type: signature.punchOscillator === 'square' ? 'triangle' : signature.punchOscillator },
       envelope: { attack: 0.02, decay: 0.35, sustain: 0, release: 0.35 },
     });
     rise.connect(delay);
@@ -811,66 +1427,60 @@ export class AudioLabPlayer {
       click,
       rise,
     ];
-    const lowN1 = noteAtOctave(n1, 2);
-    const lowN2 = noteAtOctave(n2, 2);
-    const lowN3 = noteAtOctave(n3, 2);
-    const garageAccent = isJerseyProfile || isUkgProfile || preset.id === 'lofi_2step';
-    const syncNudge = preset.id === 'lofi_2step' ? 0.014 : isJerseyProfile ? 0.01 : isUkgProfile ? 0.008 : isFutureGarageProfile ? 0.004 : 0;
+    const garageAccent = signature.tapAccentChance >= 0.5;
+    const syncNudge = signature.syncNudgeSec;
     const velocityHuman = (base: number, spread: number) => Math.max(0, base + randomBetween(-spread, spread));
-    const tapAccent = garageAccent && shouldTrigger(0.68);
+    const tapAccent = garageAccent && shouldTrigger(signature.tapAccentChance);
 
     if (sfxId === 'tap') {
       click.triggerAttackRelease('64n', now, velocityHuman(0.14, 0.02));
-      snap.triggerAttackRelease('128n', now + 0.004, velocityHuman(isAmbientProfile ? 0.04 : isDubstepProfile ? 0.05 : 0.06, 0.01));
-      pluck.triggerAttack(n3, now + 0.01);
-      body.triggerAttackRelease([n5], '16n', now + 0.03 + syncNudge, velocityHuman(0.18, 0.03));
+      snap.triggerAttackRelease('128n', now + 0.004, velocityHuman(0.05, 0.01));
+      pluck.triggerAttack(tapMain, now + 0.01);
+      body.triggerAttackRelease([tapColor], '16n', now + 0.03 + syncNudge, velocityHuman(0.18, 0.03));
       if (tapAccent) {
-        click.triggerAttackRelease('64n', now + 0.065, velocityHuman(0.1, 0.02));
+        click.triggerAttackRelease('64n', now + signature.tapAccentDelaySec, velocityHuman(0.1, 0.02));
       }
-      if (isAmbientProfile || isFutureGarageProfile) {
-        sparkle.triggerAttackRelease([n6], '8n', now + 0.08, velocityHuman(0.1, 0.03));
+      if (signature.disposeMs >= 3200) {
+        sparkle.triggerAttackRelease([correctC], '8n', now + 0.08, velocityHuman(0.1, 0.03));
       }
     } else if (sfxId === 'correct') {
-      const burstOffset = isJerseyProfile ? 0.058 : isUkgProfile ? 0.07 : isDubstepProfile ? 0.1 : 0.085;
-      sparkle.triggerAttackRelease([n2], '16n', now, velocityHuman(0.2, 0.03));
-      sparkle.triggerAttackRelease([n4], '16n', now + burstOffset, velocityHuman(0.23, 0.03));
-      sparkle.triggerAttackRelease([n6], '8n', now + burstOffset * 2, velocityHuman(0.22, 0.03));
-      body.triggerAttackRelease([n3, n5], '8n', now + 0.02, velocityHuman(0.16, 0.02));
-      pluck.triggerAttack(n5, now + 0.12 + syncNudge);
+      const burstOffset = Math.max(0.056, signature.tapAccentDelaySec + 0.012);
+      sparkle.triggerAttackRelease([correctA], '16n', now, velocityHuman(0.2, 0.03));
+      sparkle.triggerAttackRelease([correctB], '16n', now + burstOffset, velocityHuman(0.23, 0.03));
+      sparkle.triggerAttackRelease([correctC], '8n', now + burstOffset * 2, velocityHuman(0.22, 0.03));
+      body.triggerAttackRelease([tapMain, tapColor], '8n', now + 0.02, velocityHuman(0.16, 0.02));
+      pluck.triggerAttack(correctB, now + 0.12 + syncNudge);
       click.triggerAttackRelease('64n', now + 0.015, velocityHuman(0.12, 0.02));
       snap.triggerAttackRelease('32n', now + 0.2, velocityHuman(0.09, 0.02));
-      if (isDubstepProfile) {
-        punch.triggerAttackRelease(lowN1, '8n', now + 0.04, velocityHuman(0.18, 0.03));
+      if (preset.rhythmProfile === 'dubstep') {
+        punch.triggerAttackRelease(missA, '8n', now + 0.04, velocityHuman(0.18, 0.03));
       }
     } else if (sfxId === 'miss') {
-      punch.triggerAttackRelease(lowN2, '8n', now, velocityHuman(0.22, 0.03));
-      punch.triggerAttackRelease(lowN1, '8n', now + 0.1 + syncNudge, velocityHuman(0.17, 0.03));
-      punch.triggerAttackRelease(lowN3, '16n', now + 0.18 + syncNudge, velocityHuman(0.1, 0.02));
+      punch.triggerAttackRelease(missB, '8n', now, velocityHuman(0.22, 0.03));
+      punch.triggerAttackRelease(missA, '8n', now + 0.1 + syncNudge, velocityHuman(0.17, 0.03));
+      punch.triggerAttackRelease(missC, '16n', now + 0.18 + syncNudge, velocityHuman(0.1, 0.02));
       snap.triggerAttackRelease('16n', now + 0.01, velocityHuman(0.08, 0.02));
-      sparkle.triggerAttackRelease([n3], '16n', now + 0.07, velocityHuman(0.11, 0.02));
+      sparkle.triggerAttackRelease([tapMain], '16n', now + 0.07, velocityHuman(0.11, 0.02));
       if (shouldTrigger(0.42)) {
         click.triggerAttackRelease('64n', now + 0.13, velocityHuman(0.08, 0.02));
       }
     } else {
-      sparkle.triggerAttackRelease([n1, n3, n5], '8n', now, velocityHuman(0.2, 0.03));
-      sparkle.triggerAttackRelease([n2, n4, n6], '4n', now + 0.14, velocityHuman(0.21, 0.03));
-      body.triggerAttackRelease([n4, n6], '8n', now + 0.08, velocityHuman(0.14, 0.02));
-      pluck.triggerAttack(n7, now + 0.26 + syncNudge);
-      punch.triggerAttackRelease(lowN1, '8n', now + 0.02, velocityHuman(0.15, 0.02));
-      rise.triggerAttackRelease(n7, '8n', now + 0.22, velocityHuman(0.14, 0.03));
+      sparkle.triggerAttackRelease([clearA, clearB, clearC], '8n', now, velocityHuman(0.2, 0.03));
+      sparkle.triggerAttackRelease([clearD, clearE, clearF], '4n', now + 0.14, velocityHuman(0.21, 0.03));
+      body.triggerAttackRelease([correctB, correctC], '8n', now + 0.08, velocityHuman(0.14, 0.02));
+      pluck.triggerAttack(finalNote, now + 0.26 + syncNudge);
+      punch.triggerAttackRelease(missA, '8n', now + 0.02, velocityHuman(0.15, 0.02));
+      rise.triggerAttackRelease(finalNote, '8n', now + 0.22, velocityHuman(0.14, 0.03));
       click.triggerAttackRelease('64n', now + 0.28, velocityHuman(0.13, 0.03));
       snap.triggerAttackRelease('32n', now + 0.34, velocityHuman(0.09, 0.02));
-      if (garageAccent) {
+      if (shouldTrigger(signature.clearTagChance)) {
         click.triggerAttackRelease('64n', now + 0.41, velocityHuman(0.11, 0.02));
       }
     }
 
-    window.setTimeout(
-      () => {
-        disposeList.forEach((node) => node.dispose());
-      },
-      isAmbientProfile || isFutureGarageProfile ? 3600 : isDubstepProfile ? 3200 : 2400,
-    );
+    window.setTimeout(() => {
+      disposeList.forEach((node) => node.dispose());
+    }, signature.disposeMs);
   }
 
   stop() {
@@ -946,6 +1556,7 @@ export class AudioLabPlayer {
     const isDubstep = profile === 'dubstep';
     const isClubPreset = isJersey || isUkg || preset.id === 'lofi_2step';
     const isHalfTimeBass = isDubstep || isFutureGarage;
+    const masterStage = TONE_MASTER_STAGE_LIBRARY[presetId];
 
     tone.Transport.stop();
     tone.Transport.cancel(0);
@@ -957,19 +1568,58 @@ export class AudioLabPlayer {
 
     const master = this.registerNode(new tone.Gain(curvedVolume(this.bgmVolume) * preset.masterGain).toDestination());
     this.toneGain = master;
-    const limiter = this.registerNode(new tone.Limiter(-1.1));
-    const comp = this.registerNode(new tone.Compressor(-20, isAmbient ? 2 : isDubstep ? 2.6 : 3.3));
-    const color = this.registerNode(new tone.Filter(isAmbient ? 7600 : isDubstep ? 4800 : 5400, 'lowpass'));
-    color.Q.value = isAmbient ? 0.8 : isDubstep ? 1.2 : 1.45;
-    const tape = this.registerNode(new tone.Distortion(isAmbient ? 0.035 : isDubstep ? 0.05 : 0.12));
-    tape.wet.value = isAmbient ? 0.1 : isDubstep ? 0.12 : 0.2;
+    const limiter = this.registerNode(new tone.Limiter(masterStage.limiterDb));
+    const stereo = this.registerNode(new tone.StereoWidener(masterStage.stereoWidth));
+    const multiband = this.registerNode(
+      new tone.MultibandCompressor({
+        lowFrequency: masterStage.eqLowFrequencyHz,
+        highFrequency: masterStage.eqHighFrequencyHz,
+        low: {
+          threshold: masterStage.multibandLowThreshold,
+          ratio: masterStage.multibandLowRatio,
+          attack: 0.03,
+          release: 0.22,
+        },
+        mid: {
+          threshold: masterStage.multibandMidThreshold,
+          ratio: masterStage.multibandMidRatio,
+          attack: 0.02,
+          release: 0.16,
+        },
+        high: {
+          threshold: masterStage.multibandHighThreshold,
+          ratio: masterStage.multibandHighRatio,
+          attack: 0.012,
+          release: 0.12,
+        },
+      }),
+    );
+    const busComp = this.registerNode(new tone.Compressor(masterStage.busCompThreshold, masterStage.busCompRatio));
+    busComp.attack.value = masterStage.busCompAttack;
+    busComp.release.value = masterStage.busCompRelease;
+    const eq = this.registerNode(
+      new tone.EQ3({
+        low: masterStage.eqLowDb,
+        mid: masterStage.eqMidDb,
+        high: masterStage.eqHighDb,
+        lowFrequency: masterStage.eqLowFrequencyHz,
+        highFrequency: masterStage.eqHighFrequencyHz,
+      }),
+    );
+    const color = this.registerNode(new tone.Filter(masterStage.colorCutoffHz, 'lowpass'));
+    color.Q.value = masterStage.colorQ;
+    const tape = this.registerNode(new tone.Distortion(masterStage.tapeDrive));
+    tape.wet.value = masterStage.tapeWet;
     const sidechain = this.registerNode(new tone.Gain(1));
     const bus = this.registerNode(new tone.Gain(1));
     bus.connect(sidechain);
     sidechain.connect(tape);
     tape.connect(color);
-    color.connect(comp);
-    comp.connect(limiter);
+    color.connect(eq);
+    eq.connect(busComp);
+    busComp.connect(multiband);
+    multiband.connect(stereo);
+    stereo.connect(limiter);
     limiter.connect(master);
 
     const reverb = this.registerNode(new tone.Reverb({ decay: isAmbient ? 6.2 : isFutureGarage ? 4.2 : isDubstep ? 3.8 : 2.8, wet: preset.reverbWet }));
@@ -982,8 +1632,8 @@ export class AudioLabPlayer {
     const wobble = this.registerNode(
       new tone.LFO({
         frequency: isAmbient ? 0.07 : isDubstep ? 0.12 : 0.16,
-        min: isAmbient ? 2800 : isDubstep ? 1300 : 1800,
-        max: isAmbient ? 8400 : isDubstep ? 4300 : 5600,
+        min: Math.max(900, masterStage.colorCutoffHz - (isAmbient ? 2400 : isDubstep ? 1800 : 2000)),
+        max: masterStage.colorCutoffHz + (isAmbient ? 900 : isDubstep ? 500 : 700),
       }).start(),
     );
     wobble.connect(color.frequency);
@@ -995,6 +1645,14 @@ export class AudioLabPlayer {
       }).start(),
     );
     delayFlutter.connect(delay.delayTime);
+    const stereoDrift = this.registerNode(
+      new tone.LFO({
+        frequency: isAmbient ? 0.035 : isFutureGarage ? 0.08 : 0.12,
+        min: Math.max(0.42, masterStage.stereoWidth - 0.08),
+        max: Math.min(0.88, masterStage.stereoWidth + 0.08),
+      }).start(),
+    );
+    stereoDrift.connect(stereo.width);
 
     const ambienceFilter = this.registerNode(new tone.Filter(isAmbient || isFutureGarage || isDubstep ? 5100 : 6200, 'highpass'));
     const ambienceGain = this.registerNode(new tone.Gain(isAmbient ? 0.018 : isFutureGarage ? 0.015 : isDubstep ? 0.013 : 0.011));
@@ -1143,17 +1801,20 @@ export class AudioLabPlayer {
 
       if (stepInBar === 0) {
         const colorTarget = isAmbient
-          ? 5200 + section * 850
+          ? masterStage.colorCutoffHz + section * 520
           : isDubstep
-            ? 2400 + section * 430
+            ? masterStage.colorCutoffHz + section * 260
             : isFutureGarage
-              ? 3400 + section * 520
-              : 3000 + section * 720;
-        color.frequency.setTargetAtTime(colorTarget + (isFillBar ? 420 : 0), time, 0.4);
+              ? masterStage.colorCutoffHz + section * 320
+              : masterStage.colorCutoffHz + section * 440;
+        color.frequency.setTargetAtTime(colorTarget + (isFillBar ? 260 : 0), time, 0.4);
         delay.wet.setTargetAtTime(Math.min(0.62, preset.delayWet + sectionTexture * (isFutureGarage || isDubstep ? 0.44 : 0.35)), time, 0.7);
         delay.feedback.setTargetAtTime(Math.min(0.52, (isAmbient ? 0.28 : isDubstep ? 0.26 : 0.2) + sectionTexture * 0.38), time, 0.8);
         reverb.wet.setTargetAtTime(Math.min(0.7, preset.reverbWet + sectionTexture * 0.26), time, 1.1);
         ambienceGain.gain.setTargetAtTime((isAmbient ? 0.014 : isFutureGarage ? 0.012 : isDubstep ? 0.011 : 0.009) + sectionTexture * (isAmbient || isFutureGarage || isDubstep ? 0.024 : 0.012), time, 1.2);
+        eq.low.setTargetAtTime(masterStage.eqLowDb + sectionTexture * (isHalfTimeBass ? 1.3 : 0.8), time, 0.9);
+        eq.mid.setTargetAtTime(masterStage.eqMidDb + (isLiftSection ? 0.22 : 0), time, 0.9);
+        eq.high.setTargetAtTime(masterStage.eqHighDb + sectionTexture * (isAmbient ? 0.65 : isDubstep ? 0.35 : 0.5), time, 0.9);
       }
 
       if (stepInBar === 0 && bar % preset.padStrideBars === 0) {
