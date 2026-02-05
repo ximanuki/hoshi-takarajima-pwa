@@ -1,6 +1,7 @@
 import type { Settings } from '../types';
 import type { AudioLabPlayer } from './audioLabPlayer';
 
+type AudioPerformanceProfile = import('./audioLabPlayer').AudioPerformanceProfile;
 type AssetBgmId = import('./audioLabPlayer').AssetBgmId;
 type TonePresetId = import('./audioLabPlayer').TonePresetId;
 type ToneSfxId = import('./audioLabPlayer').ToneSfxId;
@@ -47,9 +48,27 @@ function clamp01(value: number): number {
   return Math.max(0, Math.min(1, value));
 }
 
+function detectPerformanceProfile(): AudioPerformanceProfile {
+  if (typeof navigator === 'undefined') return 'full';
+  const ua = navigator.userAgent.toLowerCase();
+  const isMobile =
+    /android|iphone|ipad|ipod|mobile/.test(ua) ||
+    (typeof window !== 'undefined' && window.matchMedia?.('(max-width: 900px)').matches);
+
+  const cores = typeof navigator.hardwareConcurrency === 'number' ? navigator.hardwareConcurrency : 8;
+  const memory = typeof (navigator as Navigator & { deviceMemory?: number }).deviceMemory === 'number'
+    ? (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8
+    : 8;
+  const isLowSpec = cores <= 4 || memory <= 4;
+
+  return isMobile || isLowSpec ? 'lite' : 'full';
+}
+
 class AudioManager {
   private player: AudioLabPlayer | null = null;
   private playerLoadPromise: Promise<AudioLabPlayer> | null = null;
+  private performanceProfile: AudioPerformanceProfile = detectPerformanceProfile();
+  private tonePrewarmed = false;
   private unlocked = false;
   private bgmSuppressed = false;
   private settings: Settings = DEFAULT_SETTINGS;
@@ -95,6 +114,11 @@ class AudioManager {
 
   async unlock() {
     if (!this.settings.soundEnabled) return;
+    const player = await this.ensurePlayer();
+    if (!this.tonePrewarmed) {
+      this.tonePrewarmed = true;
+      void player.prewarmTone();
+    }
     this.unlocked = true;
     if (this.settings.soundEnabled && !this.bgmSuppressed) {
       await this.startSceneIfReady();
@@ -148,6 +172,7 @@ class AudioManager {
         const nextPlayer = new module.AudioLabPlayer();
         nextPlayer.setBgmVolume(this.settings.bgmVolume);
         nextPlayer.setSfxVolume(this.settings.sfxVolume);
+        nextPlayer.setPerformanceProfile(this.performanceProfile);
         this.player = nextPlayer;
         return nextPlayer;
       })

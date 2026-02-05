@@ -2,6 +2,7 @@ import type { Gain, Sequence } from 'tone';
 
 export type AudioLabEngine = 'none' | 'asset' | 'tone';
 export type AssetBgmId = 'default' | 'home' | 'mission' | 'play' | 'result';
+export type AudioPerformanceProfile = 'full' | 'lite';
 export type TonePresetId =
   | 'lofi_cafe'
   | 'lofi_rain'
@@ -1211,6 +1212,7 @@ export class AudioLabPlayer {
   private engine: AudioLabEngine = 'none';
   private bgmVolume = 0.65;
   private sfxVolume = 0.8;
+  private performanceProfile: AudioPerformanceProfile = 'full';
 
   getEngine(): AudioLabEngine {
     return this.engine;
@@ -1253,6 +1255,19 @@ export class AudioLabPlayer {
 
   setSfxVolume(nextVolume: number) {
     this.sfxVolume = clamp01(nextVolume);
+  }
+
+  setPerformanceProfile(profile: AudioPerformanceProfile) {
+    this.performanceProfile = profile;
+  }
+
+  async prewarmTone() {
+    const tone = await this.loadTone();
+    try {
+      await tone.start();
+    } catch {
+      // Ignore; next user gesture will retry unlock path.
+    }
   }
 
   async unlock() {
@@ -1304,6 +1319,11 @@ export class AudioLabPlayer {
     try {
       await tone.start();
     } catch {
+      return;
+    }
+
+    if (this.performanceProfile === 'lite') {
+      this.playToneSfxLite(tone, sfxId, presetId);
       return;
     }
 
@@ -1487,6 +1507,74 @@ export class AudioLabPlayer {
     window.setTimeout(() => {
       disposeList.forEach((node) => node.dispose());
     }, signature.disposeMs);
+  }
+
+  private playToneSfxLite(tone: ToneModule, sfxId: ToneSfxId, presetId: TonePresetId) {
+    const preset = TONE_PRESET_LIBRARY[presetId];
+    const scale = preset.sfxScale;
+    const a = pickScaleNote(scale, 0);
+    const b = pickScaleNote(scale, 2);
+    const c = pickScaleNote(scale, 4);
+    const lowA = noteAtOctave(a, 2);
+    const lowB = noteAtOctave(b, 2);
+    const now = tone.now();
+
+    const output = new tone.Gain(curvedVolume(this.sfxVolume) * 0.72).toDestination();
+    const limiter = new tone.Limiter(-1.6);
+    const comp = new tone.Compressor(-28, 2.2);
+    const reverb = new tone.Reverb({ decay: 1.8, wet: 0.12 });
+    const synth = new tone.PolySynth(tone.Synth, {
+      oscillator: { type: 'triangle' },
+      envelope: { attack: 0.006, decay: 0.14, sustain: 0.08, release: 0.22 },
+    });
+    const low = new tone.Synth({
+      oscillator: { type: 'sine' },
+      envelope: { attack: 0.004, decay: 0.16, sustain: 0.04, release: 0.12 },
+    });
+    const click = new tone.MetalSynth({
+      envelope: { attack: 0.001, decay: 0.04, release: 0.02 },
+      harmonicity: 4.8,
+      modulationIndex: 16,
+      resonance: 1100,
+      octaves: 1.1,
+    });
+
+    synth.connect(comp);
+    synth.connect(reverb);
+    low.connect(comp);
+    click.connect(comp);
+    reverb.connect(comp);
+    comp.connect(limiter);
+    limiter.connect(output);
+
+    if (sfxId === 'tap') {
+      click.triggerAttackRelease('64n', now, 0.08);
+      synth.triggerAttackRelease([b], '32n', now + 0.01, 0.1);
+    } else if (sfxId === 'correct') {
+      synth.triggerAttackRelease([a], '16n', now, 0.15);
+      synth.triggerAttackRelease([b], '16n', now + 0.06, 0.16);
+      synth.triggerAttackRelease([c], '8n', now + 0.12, 0.18);
+      click.triggerAttackRelease('64n', now + 0.02, 0.09);
+    } else if (sfxId === 'miss') {
+      low.triggerAttackRelease(lowB, '8n', now, 0.14);
+      low.triggerAttackRelease(lowA, '8n', now + 0.1, 0.11);
+      synth.triggerAttackRelease([a], '16n', now + 0.08, 0.08);
+    } else {
+      synth.triggerAttackRelease([a, b], '8n', now, 0.16);
+      synth.triggerAttackRelease([b, c], '8n', now + 0.12, 0.16);
+      low.triggerAttackRelease(lowA, '8n', now + 0.02, 0.11);
+      click.triggerAttackRelease('64n', now + 0.24, 0.1);
+    }
+
+    window.setTimeout(() => {
+      output.dispose();
+      limiter.dispose();
+      comp.dispose();
+      reverb.dispose();
+      synth.dispose();
+      low.dispose();
+      click.dispose();
+    }, 1200);
   }
 
   stop() {
