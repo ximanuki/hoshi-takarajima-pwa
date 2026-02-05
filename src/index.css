@@ -414,6 +414,117 @@ p {
   word-break: break-word;
 }
 
+.poko-wrap {
+  margin-top: 6px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 2px dashed #b8d5ff;
+  background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+}
+
+.poko-svg {
+  width: min(320px, 100%);
+  height: auto;
+}
+
+.poko-shadow {
+  fill: rgba(66, 105, 168, 0.2);
+}
+
+.poko-body {
+  fill: url(#poko-body);
+  stroke: #cf9858;
+  stroke-width: 3;
+}
+
+.poko-belly {
+  fill: url(#poko-belly);
+  stroke: #e7c790;
+  stroke-width: 2;
+}
+
+.poko-ear {
+  fill: #ffde9b;
+  stroke: #cf9858;
+  stroke-width: 3;
+}
+
+.poko-arm,
+.poko-foot {
+  fill: #ffd98f;
+  stroke: #cf9858;
+  stroke-width: 2.5;
+}
+
+.poko-cheek {
+  fill: #ffb8a6;
+  opacity: 0.85;
+}
+
+.poko-eye {
+  fill: #2f435f;
+}
+
+.poko-eye-shine {
+  fill: #ffffff;
+}
+
+.poko-line {
+  fill: none;
+  stroke: #2f435f;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.poko-star-eye {
+  fill: #2f435f;
+}
+
+.poko-mouth {
+  fill: none;
+  stroke: #9d4c44;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.poko-mouth.sleepy {
+  stroke-width: 3;
+}
+
+.poko-mouth-inner {
+  fill: none;
+  stroke: #c86b60;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.poko-star {
+  fill: #fff2b7;
+  stroke: #cf9858;
+  stroke-width: 2.5;
+}
+
+.poko-scarf {
+  fill: #87b9ff;
+}
+
+.poko-scarf-knot {
+  fill: #5e91dd;
+}
+
+.poko-sleep {
+  fill: #607aa8;
+  font-size: 15px;
+}
+
+.poko-cheer {
+  fill: #4478ce;
+  font-size: 14px;
+}
+
 .preview-grid {
   display: grid;
   gap: 12px;
@@ -450,6 +561,22 @@ p {
   outline: 0;
   border-color: #7fc5d0;
   box-shadow: 0 0 0 3px rgba(127, 197, 208, 0.22);
+}
+
+.preview-chip {
+  min-height: 38px;
+  border-radius: 999px;
+  border: 2px solid #d3e5ef;
+  background: #f4fbff;
+  color: #215c60;
+  padding: 6px 14px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.preview-chip.active {
+  border-color: #7fc5d0;
+  background: #e8f8ff;
 }
 
 .choice-btn {

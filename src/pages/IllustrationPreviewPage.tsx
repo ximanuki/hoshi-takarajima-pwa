@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { PokoIllustration } from '../components/PokoIllustration';
+import type { PokoMood, PokoPose } from '../components/PokoIllustration';
 import { QuestionIllustration } from '../components/QuestionIllustration';
 import { ICON_DICTIONARY, ILLUSTRATION_SCENE_DICTIONARY } from '../data/illustrationDictionary';
 import { questionBank } from '../data/questions';
@@ -20,11 +22,25 @@ const previewItems: PreviewItem[] = [
   { id: 'i25', title: 'なかまはずれ（odd_one_out）' },
 ];
 
+const pokoMoods: Array<{ label: string; value: PokoMood }> = [
+  { label: 'ふつう', value: 'normal' },
+  { label: 'にっこり', value: 'happy' },
+  { label: 'おうえん', value: 'cheer' },
+  { label: 'ねむたい', value: 'sleepy' },
+];
+
+const pokoPoses: Array<{ label: string; value: PokoPose }> = [
+  { label: 'たつ', value: 'stand' },
+  { label: 'ジャンプ', value: 'jump' },
+];
+
 export function IllustrationPreviewPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialId = searchParams.get('id')?.trim() || 'i25';
   const [inputId, setInputId] = useState(initialId);
   const [selectedId, setSelectedId] = useState(initialId);
+  const [pokoMood, setPokoMood] = useState<PokoMood>('normal');
+  const [pokoPose, setPokoPose] = useState<PokoPose>('stand');
   const [error, setError] = useState<string | null>(null);
 
   const questionMap = useMemo(() => new Map(questionBank.map((question) => [question.id, question])), []);
@@ -67,6 +83,7 @@ export function IllustrationPreviewPage() {
       <article className="card preview-card">
         <p>この画面で、実装中のSVGイラストをGUIで確認できます。</p>
         <p>SVGの実装元: `src/components/QuestionIllustration.tsx`</p>
+        <p>ポコ実装元: `src/components/PokoIllustration.tsx`</p>
         <p>問題→可視化データ変換: `src/utils/questionVisuals.ts`</p>
         <p>
           イラスト対応:
@@ -129,6 +146,36 @@ export function IllustrationPreviewPage() {
           <p>指定した問題にイラストを表示できませんでした。</p>
         </article>
       )}
+
+      <article className="card preview-card">
+        <h2>あいぼう「ポコ」プレビュー</h2>
+        <p className="preview-meta">表情とポーズを切り替えて確認できます。</p>
+        <div className="inline-actions">
+          {pokoMoods.map((mood) => (
+            <button
+              className={`preview-chip ${pokoMood === mood.value ? 'active' : ''}`}
+              key={mood.value}
+              type="button"
+              onClick={() => setPokoMood(mood.value)}
+            >
+              {mood.label}
+            </button>
+          ))}
+        </div>
+        <div className="inline-actions">
+          {pokoPoses.map((pose) => (
+            <button
+              className={`preview-chip ${pokoPose === pose.value ? 'active' : ''}`}
+              key={pose.value}
+              type="button"
+              onClick={() => setPokoPose(pose.value)}
+            >
+              {pose.label}
+            </button>
+          ))}
+        </div>
+        <PokoIllustration mood={pokoMood} pose={pokoPose} />
+      </article>
 
       <Link className="ghost-btn" to="/settings">
         せっていへ もどる
