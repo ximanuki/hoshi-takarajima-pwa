@@ -425,158 +425,33 @@ p {
   justify-items: center;
 }
 
-.poko-svg {
-  width: min(340px, 100%);
+.poko-stage {
+  width: min(360px, 100%);
+  border-radius: 16px;
+  border: 2px solid #e4eef9;
+  background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+  display: grid;
+  place-items: end center;
+  overflow: hidden;
+  padding: 10px;
+}
+
+.poko-image {
+  width: min(320px, 100%);
   height: auto;
-  animation: poko-breathe 2.8s ease-in-out infinite;
+  display: block;
+  filter: drop-shadow(0 8px 14px rgba(37, 73, 117, 0.22));
+  user-select: none;
 }
 
-.poko-shadow {
-  fill: rgba(88, 101, 133, 0.24);
+.poko-image.jump {
+  transform: translateY(-8px);
 }
 
-.poko-body,
-.poko-head {
-  fill: url(#poko-fur-main);
-  stroke: #1f1a17;
-  stroke-width: 4;
-  stroke-linejoin: round;
-}
-
-.poko-ear {
-  fill: #b7845e;
-  stroke: #1f1a17;
-  stroke-width: 4;
-}
-
-.poko-ear-inner {
-  fill: #f1c4b2;
-  stroke: #6e5748;
-  stroke-width: 2;
-}
-
-.poko-side-fur {
-  fill: #da9b55;
-  opacity: 0.82;
-}
-
-.poko-tail {
-  fill: #eeb779;
-  stroke: #1f1a17;
-  stroke-width: 3;
-}
-
-.poko-fur-spike {
-  fill: none;
-  stroke: #1f1a17;
-  stroke-width: 2.4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.poko-muzzle,
-.poko-belly {
-  fill: url(#poko-fur-light);
-  stroke: #d9b88a;
-  stroke-width: 2;
-}
-
-.poko-cheek {
-  fill: url(#poko-cheek);
-}
-
-.poko-nose {
-  fill: #ce9682;
-  stroke: #775647;
-  stroke-width: 1.2;
-}
-
-.poko-eye {
-  fill: #161514;
-}
-
-.poko-eye-shine {
-  fill: #ffffff;
-}
-
-.poko-eye-line {
-  fill: none;
-  stroke: #1f1a17;
-  stroke-width: 4;
-  stroke-linecap: round;
-}
-
-.poko-star-eye {
-  fill: #1f1a17;
-}
-
-.poko-mouth {
-  fill: none;
-  stroke: #1f1a17;
-  stroke-width: 3.2;
-  stroke-linecap: round;
-}
-
-.poko-mouth.sleepy {
-  stroke-width: 2.7;
-}
-
-.poko-mouth-inner {
-  fill: none;
-  stroke: #ad6257;
-  stroke-width: 2.8;
-  stroke-linecap: round;
-}
-
-.poko-whisker {
-  fill: none;
-  stroke: #766254;
-  stroke-width: 2.4;
-  stroke-linecap: round;
-}
-
-.poko-paw {
-  fill: #efbf84;
-  stroke: #1f1a17;
-  stroke-width: 3;
-}
-
-.poko-foot {
-  fill: #f1c48e;
-  stroke: #1f1a17;
-  stroke-width: 3;
-}
-
-.poko-bandana {
-  fill: #85b6ff;
-  stroke: #1f4f9f;
-  stroke-width: 2.2;
-}
-
-.poko-bandana-knot {
-  fill: #1f4f9f;
-}
-
-.poko-star {
-  fill: #ffe185;
-  stroke: #a06f2f;
-  stroke-width: 2.2;
-}
-
-.poko-emote {
-  fill: #3d63a8;
-  font-size: 14px;
-  font-weight: 800;
-}
-
-@keyframes poko-breathe {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-1.5px);
-  }
+.poko-note {
+  font-size: 0.8rem;
+  color: #4a6f95;
+  text-align: center;
 }
 
 .preview-grid {

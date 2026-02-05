@@ -83,7 +83,7 @@ export function IllustrationPreviewPage() {
       <article className="card preview-card">
         <p>この画面で、実装中のSVGイラストをGUIで確認できます。</p>
         <p>SVGの実装元: `src/components/QuestionIllustration.tsx`</p>
-        <p>ポコ実装元: `src/components/PokoIllustration.tsx`</p>
+        <p>ポコ実装元: `src/components/PokoIllustration.tsx` / 画像: `public/assets/hamchee/*.png`</p>
         <p>問題→可視化データ変換: `src/utils/questionVisuals.ts`</p>
         <p>
           イラスト対応:
