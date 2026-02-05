@@ -1687,9 +1687,43 @@ export class AudioLabPlayer {
         envelope: { attack: isAmbient ? 0.05 : isDubstep ? 0.018 : 0.012, decay: isAmbient ? 0.24 : isDubstep ? 0.24 : 0.2, sustain: isAmbient ? 0.3 : isDubstep ? 0.2 : 0.28, release: isAmbient ? 0.65 : isFutureGarage || isDubstep ? 0.62 : 0.5 },
       }),
     );
-    lead.connect(bus);
-    lead.connect(delay);
-    lead.connect(chorus);
+    const leadDouble = this.registerNode(
+      new tone.PolySynth(tone.Synth, {
+        volume: -10,
+        oscillator: { type: isAmbient || isFutureGarage ? 'triangle' : 'sawtooth' },
+        envelope: { attack: isAmbient ? 0.02 : 0.012, decay: 0.14, sustain: isAmbient ? 0.12 : 0.08, release: isAmbient || isFutureGarage ? 0.38 : 0.26 },
+      }),
+    );
+    const leadAttack = this.registerNode(
+      new tone.PluckSynth({
+        attackNoise: isAmbient || isFutureGarage ? 0.28 : 0.42,
+        dampening: isAmbient || isFutureGarage ? 2600 : 4300,
+        resonance: 0.84,
+      }),
+    );
+    const leadToneBus = this.registerNode(new tone.Gain(1));
+    const leadColor = this.registerNode(new tone.Filter(isAmbient ? 2600 : isFutureGarage ? 3000 : isDubstep ? 2200 : 3600, 'bandpass'));
+    leadColor.Q.value = isAmbient || isFutureGarage ? 1.05 : isDubstep ? 1.22 : 1.35;
+    const leadSaturator = this.registerNode(new tone.Distortion(isAmbient ? 0.03 : isDubstep ? 0.055 : 0.085));
+    leadSaturator.wet.value = isAmbient ? 0.08 : isDubstep ? 0.14 : 0.2;
+    const leadSpread = this.registerNode(new tone.StereoWidener(isAmbient || isFutureGarage ? 0.68 : 0.58));
+    const leadFormant = this.registerNode(
+      new tone.LFO({
+        frequency: isAmbient ? 0.08 : isFutureGarage ? 0.14 : isDubstep ? 0.11 : 0.2,
+        min: isAmbient ? 1800 : isFutureGarage ? 2200 : isDubstep ? 1700 : 2600,
+        max: isAmbient ? 4200 : isFutureGarage ? 5000 : isDubstep ? 4200 : 6200,
+      }).start(),
+    );
+    leadFormant.connect(leadColor.frequency);
+    lead.connect(leadToneBus);
+    leadDouble.connect(leadToneBus);
+    leadAttack.connect(leadToneBus);
+    leadToneBus.connect(leadColor);
+    leadColor.connect(leadSaturator);
+    leadSaturator.connect(leadSpread);
+    leadSpread.connect(bus);
+    leadSpread.connect(delay);
+    leadSpread.connect(chorus);
 
     const counterLead = this.registerNode(
       new tone.PolySynth(tone.Synth, {
@@ -1812,8 +1846,8 @@ export class AudioLabPlayer {
         },
       }),
     );
-    leadBody.connect(delay);
-    leadBody.connect(bus);
+    leadBody.connect(leadToneBus);
+    leadBody.connect(reverb);
     const leadBreathFilter = this.registerNode(new tone.Filter(isAmbient || isFutureGarage ? 3400 : 4800, 'highpass'));
     const leadBreath = this.registerNode(
       new tone.NoiseSynth({
@@ -1822,6 +1856,7 @@ export class AudioLabPlayer {
       }),
     );
     leadBreath.connect(leadBreathFilter);
+    leadBreathFilter.connect(leadSpread);
     leadBreathFilter.connect(reverb);
 
     const bassBody = this.registerNode(
@@ -1989,9 +2024,26 @@ export class AudioLabPlayer {
         if (!isDropBar) {
           const leadTime = humanizedTime();
           const leadVelocity = velocityHuman(preset.leadVelocity * (0.9 + section * 0.08), 0.06);
-          lead.triggerAttackRelease(note, preset.leadDuration, leadTime, leadVelocity);
+          const leadFrequency = tone.Frequency(note).toFrequency();
+          const leadDetuneCents = randomBetween(-7, 7);
+          const leadDoubleDetuneCents = randomBetween(9, 16) * (Math.random() > 0.5 ? 1 : -1);
+          const leadPrimaryHz = leadFrequency * Math.pow(2, leadDetuneCents / 1200);
+          const leadDoubleHz = leadFrequency * Math.pow(2, leadDoubleDetuneCents / 1200);
+          lead.triggerAttackRelease(leadPrimaryHz, preset.leadDuration, leadTime, leadVelocity);
+          leadDouble.triggerAttackRelease(leadDoubleHz, isAmbient || isFutureGarage ? '8n' : '16n', leadTime + 0.006, velocityHuman(leadVelocity * 0.54, 0.04));
           const bodyNote = tone.Frequency(note).transpose(isAmbient ? -12 : 0).toNote();
-          leadBody.triggerAttackRelease(bodyNote, isAmbient ? '8n' : '16n', leadTime + 0.01, velocityHuman(leadVelocity * 0.58, 0.04));
+          const bodyFrequency = tone.Frequency(bodyNote).toFrequency() * Math.pow(2, randomBetween(-3, 3) / 1200);
+          leadBody.triggerAttackRelease(bodyFrequency, isAmbient ? '8n' : '16n', leadTime + 0.01, velocityHuman(leadVelocity * 0.58, 0.04));
+          if (shouldTrigger(isAmbient || isFutureGarage ? 0.52 : 0.38)) {
+            leadAttack.triggerAttack(note, leadTime + 0.004);
+          }
+          const leadColorTarget = (isAmbient ? 2100 : isFutureGarage ? 2600 : isDubstep ? 2000 : 3200) + leadVelocity * 3400 + sectionTexture * 1200;
+          leadColor.frequency.setTargetAtTime(leadColorTarget, leadTime, 0.06);
+          leadSaturator.wet.setTargetAtTime(
+            Math.min(0.36, (isAmbient ? 0.08 : isDubstep ? 0.14 : 0.2) + leadVelocity * (isDubstep ? 0.12 : 0.1)),
+            leadTime,
+            0.09,
+          );
           if (shouldTrigger(isAmbient || isFutureGarage ? 0.34 : 0.18)) {
             leadBreath.triggerAttackRelease('64n', leadTime + 0.012, velocityHuman(leadVelocity * 0.2, 0.03));
           }
