@@ -600,7 +600,8 @@ export class AudioLabPlayer {
   private activeNodes: Array<{ dispose: () => void }> = [];
   private currentTonePreset: TonePresetId = 'lofi_cafe';
   private engine: AudioLabEngine = 'none';
-  private volume = 0.65;
+  private bgmVolume = 0.65;
+  private sfxVolume = 0.8;
 
   getEngine(): AudioLabEngine {
     return this.engine;
@@ -622,12 +623,27 @@ export class AudioLabPlayer {
   }
 
   setVolume(nextVolume: number) {
-    this.volume = clamp01(nextVolume);
-    const next = curvedVolume(this.volume);
+    const normalized = clamp01(nextVolume);
+    this.bgmVolume = normalized;
+    this.sfxVolume = normalized;
+    const next = curvedVolume(this.bgmVolume);
     if (this.assetAudio) this.assetAudio.volume = next;
     if (this.toneGain?.gain?.rampTo) {
       this.toneGain.gain.rampTo(next * 0.9, 0.08);
     }
+  }
+
+  setBgmVolume(nextVolume: number) {
+    this.bgmVolume = clamp01(nextVolume);
+    const next = curvedVolume(this.bgmVolume);
+    if (this.assetAudio) this.assetAudio.volume = next;
+    if (this.toneGain?.gain?.rampTo) {
+      this.toneGain.gain.rampTo(next * 0.9, 0.08);
+    }
+  }
+
+  setSfxVolume(nextVolume: number) {
+    this.sfxVolume = clamp01(nextVolume);
   }
 
   async unlock() {
@@ -645,7 +661,7 @@ export class AudioLabPlayer {
     if (!this.assetAudio) return;
 
     this.assetAudio.currentTime = 0;
-    this.assetAudio.volume = curvedVolume(this.volume);
+    this.assetAudio.volume = curvedVolume(this.bgmVolume);
     this.engine = 'asset';
 
     try {
@@ -695,7 +711,7 @@ export class AudioLabPlayer {
     const isDubstepProfile = profile === 'dubstep';
     const [n1 = 'C4', n2 = 'D4', n3 = 'E4', n4 = 'G4', n5 = 'A4', n6 = 'C5', n7 = 'E5'] = preset.sfxScale;
     const now = tone.now();
-    const output = new tone.Gain(curvedVolume(this.volume) * (isAmbientProfile ? 0.7 : isDubstepProfile ? 0.82 : 0.86)).toDestination();
+    const output = new tone.Gain(curvedVolume(this.sfxVolume) * (isAmbientProfile ? 0.7 : isDubstepProfile ? 0.82 : 0.86)).toDestination();
     const limiter = new tone.Limiter(-1.2);
     const comp = new tone.Compressor(-24, isAmbientProfile ? 2.1 : isDubstepProfile ? 2.6 : 3.4);
     const tonalBus = new tone.Gain(1);
@@ -939,7 +955,7 @@ export class AudioLabPlayer {
     tone.Transport.swingSubdivision = isClubPreset || isUkg ? '8n' : '16n';
     tone.Destination.volume.value = -9;
 
-    const master = this.registerNode(new tone.Gain(curvedVolume(this.volume) * preset.masterGain).toDestination());
+    const master = this.registerNode(new tone.Gain(curvedVolume(this.bgmVolume) * preset.masterGain).toDestination());
     this.toneGain = master;
     const limiter = this.registerNode(new tone.Limiter(-1.1));
     const comp = this.registerNode(new tone.Compressor(-20, isAmbient ? 2 : isDubstep ? 2.6 : 3.3));
