@@ -151,6 +151,41 @@ p {
   transition: width 0.2s ease;
 }
 
+.combo-card {
+  border-style: solid;
+  border-color: #e5f2ff;
+  background: linear-gradient(180deg, #f8fcff 0%, #ffffff 100%);
+}
+
+.combo-card h2 {
+  color: #1f6388;
+  font-size: 1.2rem;
+}
+
+.combo-card.active h2 {
+  color: #0f7b62;
+}
+
+.combo-card.burst {
+  animation: comboBurst 0.65s ease;
+}
+
+.combo-track {
+  width: 100%;
+  margin-top: 4px;
+  height: 11px;
+  border-radius: 999px;
+  background: #e9f3fb;
+  overflow: hidden;
+}
+
+.combo-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7ecff3 0%, #79df8b 55%, #ffd262 100%);
+  transition: width 0.24s ease;
+}
+
 .choices {
   margin-top: 12px;
   display: grid;
@@ -558,6 +593,104 @@ p {
   background: #f5ffef;
 }
 
+.answer-feedback {
+  border: 2px solid transparent;
+}
+
+.answer-feedback.correct {
+  border-color: #86dcb4;
+  background: linear-gradient(180deg, #ecfff4 0%, #f7fff8 100%);
+  animation: answerRise 0.42s ease;
+}
+
+.answer-feedback.wrong {
+  border-color: #f0c3a8;
+  background: linear-gradient(180deg, #fff8f1 0%, #fffdf8 100%);
+  animation: answerShakeSoft 0.46s ease;
+}
+
+.answer-feedback.combo {
+  box-shadow: 0 0 0 3px rgba(255, 214, 120, 0.28);
+}
+
+.result-hero {
+  position: relative;
+  overflow: hidden;
+}
+
+.celebration-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.celebration-star {
+  position: absolute;
+  top: 105%;
+  font-size: 1.05rem;
+  opacity: 0;
+  animation-name: starFloat;
+  animation-timing-function: ease-in;
+  animation-iteration-count: infinite;
+}
+
+.celebration-layer.high .celebration-star {
+  font-size: 1.18rem;
+}
+
+@keyframes comboBurst {
+  0% {
+    transform: scale(0.985);
+  }
+  35% {
+    transform: scale(1.018);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes answerRise {
+  0% {
+    transform: translateY(4px);
+    opacity: 0.65;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes answerShakeSoft {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  30% {
+    transform: translateX(-3px);
+  }
+  60% {
+    transform: translateX(3px);
+  }
+}
+
+@keyframes starFloat {
+  0% {
+    transform: translateY(0) scale(0.82) rotate(0deg);
+    opacity: 0;
+  }
+  16% {
+    opacity: 0.95;
+  }
+  80% {
+    opacity: 0.92;
+  }
+  100% {
+    transform: translateY(-128%) scale(1.15) rotate(12deg);
+    opacity: 0;
+  }
+}
+
 .badge-grid {
   display: grid;
   gap: 10px;
@@ -619,5 +752,19 @@ p {
 
   .top-stats {
     font-size: 0.95rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .combo-card.burst,
+  .answer-feedback.correct,
+  .answer-feedback.wrong,
+  .celebration-star {
+    animation: none !important;
+  }
+
+  .combo-fill,
+  .progress-fill {
+    transition: none;
   }
 }

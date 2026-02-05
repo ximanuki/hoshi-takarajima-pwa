@@ -1,13 +1,32 @@
 import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 import { audioManager } from '../utils/audioManager';
 
 export function SoundController() {
   const settings = useAppStore((state) => state.settings);
+  const location = useLocation();
 
   useEffect(() => {
     audioManager.setSettings(settings);
   }, [settings]);
+
+  useEffect(() => {
+    const pathname = location.pathname;
+    if (pathname === '/play') {
+      audioManager.setScene('play');
+      return;
+    }
+    if (pathname === '/result') {
+      audioManager.setScene('result');
+      return;
+    }
+    if (pathname === '/mission') {
+      audioManager.setScene('mission');
+      return;
+    }
+    audioManager.setScene('home');
+  }, [location.pathname]);
 
   useEffect(() => {
     const unlockAudio = () => {

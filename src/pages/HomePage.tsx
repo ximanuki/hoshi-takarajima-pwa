@@ -4,6 +4,7 @@ import { PokoIllustration } from '../components/PokoIllustration';
 import type { PokoMood } from '../components/PokoIllustration';
 import { useAppStore } from '../store/useAppStore';
 import type { Subject } from '../types';
+import { audioManager } from '../utils/audioManager';
 import { getDueReviewCount } from '../utils/mission';
 
 const subjectLabels: Record<Subject, string> = {
@@ -296,7 +297,7 @@ export function HomePage() {
         <p className="eyebrow">きょうのぼうけん</p>
         <h1>ミッションを えらんで ほしを あつめよう！</h1>
         <p>れんぞく {streakDays} にち たっせいちゅう ✨</p>
-        <Link className="primary-btn" to="/mission">
+        <Link className="primary-btn" to="/mission" onClick={() => audioManager.playSfx('tap')}>
           はじめる
         </Link>
       </div>

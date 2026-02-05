@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 import type { Subject } from '../types';
 import { getDueReviewCount, getSubjectMastery } from '../utils/mission';
+import { audioManager } from '../utils/audioManager';
 
 const missionCards: Array<{ subject: Subject; title: string; desc: string }> = [
   { subject: 'math', title: 'さんすうのしま', desc: 'たしざん・ひきざんをクリアしよう' },
@@ -32,6 +33,7 @@ export function MissionPage() {
   );
 
   const onStart = (subject: Subject) => {
+    audioManager.playSfx('tap');
     startMission(subject);
     navigate('/play');
   };
