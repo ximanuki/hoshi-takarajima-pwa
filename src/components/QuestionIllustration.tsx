@@ -1,5 +1,5 @@
 import type { Question } from '../types';
-import { resolveIconToken } from '../data/illustrationDictionary';
+import { resolveIconToken, resolveTokenCategory, type IllustrationCategory } from '../data/illustrationDictionary';
 import { getQuestionVisual, type MoneyItem } from '../utils/questionVisuals';
 
 type Props = {
@@ -8,17 +8,18 @@ type Props = {
 
 const MONEY_DENOMS = [1000, 500, 100, 50, 10, 5, 1] as const;
 
-function getOddOneOutToken(item: string): { icon: string; isText: boolean } {
+function getOddOneOutToken(item: string): { icon: string; isText: boolean; category: IllustrationCategory | 'number' } {
   const mapped = resolveIconToken(item);
+  const category = resolveTokenCategory(item);
   if (mapped) {
-    return { icon: mapped, isText: false };
+    return { icon: mapped, isText: false, category: category ?? 'other' };
   }
 
   if (/^\d+$/.test(item)) {
-    return { icon: item, isText: true };
+    return { icon: item, isText: true, category: 'number' };
   }
 
-  return { icon: item.slice(0, 2), isText: true };
+  return { icon: item.slice(0, 2), isText: true, category: category ?? 'other' };
 }
 
 function toPoint(cx: number, cy: number, radius: number, angleDeg: number) {
@@ -286,8 +287,8 @@ function OddOneOutIllustration({ items }: { items: string[] }) {
         {items.map((item) => {
           const token = getOddOneOutToken(item);
           return (
-            <div className="odd-one-out-card" key={item}>
-              <p className={`odd-one-out-icon ${token.isText ? 'text' : ''}`}>{token.icon}</p>
+            <div className={`odd-one-out-card cat-${token.category}`} key={item}>
+              <p className={`odd-one-out-icon ${token.isText ? `text cat-${token.category}` : ''}`}>{token.icon}</p>
               <p className="odd-one-out-label">{item}</p>
             </div>
           );

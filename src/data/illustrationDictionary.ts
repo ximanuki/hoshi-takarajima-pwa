@@ -6,6 +6,19 @@ export type IllustrationScene = {
   defaultTokens: string[];
 };
 
+export type IllustrationCategory =
+  | 'transport'
+  | 'animal'
+  | 'food'
+  | 'school'
+  | 'wear'
+  | 'nature'
+  | 'time'
+  | 'shape'
+  | 'action'
+  | 'money'
+  | 'other';
+
 export const ICON_DICTIONARY: Record<string, string> = {
   // Transport
   でんしゃ: '🚆',
@@ -114,6 +127,41 @@ export const ICON_ALIASES: Record<string, string> = {
   コース: 'でんしゃ',
 };
 
+const CATEGORY_GROUPS: Record<IllustrationCategory, string[]> = {
+  transport: ['でんしゃ', 'バス', 'ひこうき', 'くるま', 'じてんしゃ'],
+  animal: ['いぬ', 'ねこ', 'さかな', 'とり', 'うま', 'にわとり', 'すずめ', 'はと'],
+  food: [
+    'りんご',
+    'みかん',
+    'さくらんぼ',
+    'ぶどう',
+    'ばなな',
+    'きゅうり',
+    'アイス',
+    'パン',
+    'カレー',
+    'うどん',
+    'ケーキ',
+    'ジュース',
+    'ぎゅうにゅう',
+    'みず',
+  ],
+  school: ['がっこう', 'としょかん', 'えんぴつ', 'けしごむ', 'ノート', 'ランドセル', 'ほん'],
+  wear: ['ぼうし', 'てぶくろ', 'ふく', 'くつ', 'かさ', 'ヘルメット'],
+  nature: ['うみ', 'こうえん', 'やま', 'かわ', 'そら', 'あめ', 'たいふう', 'かみなり', 'ひ', 'つき', 'ほし'],
+  time: ['あさ', 'ひる', 'よる', 'ごご'],
+  shape: ['まる', 'さんかく', 'しかく', 'あか', 'あお', 'きいろ'],
+  action: ['はしる', 'まつ', 'つかう', 'たべる', 'のむ', 'あそぶ'],
+  money: ['おかね', '1えん', '5えん', '10えん', '50えん', '100えん', '500えん', '1000えん'],
+  other: [],
+};
+
+export const ICON_CATEGORY_DICTIONARY: Record<string, IllustrationCategory> = Object.fromEntries(
+  (Object.entries(CATEGORY_GROUPS) as Array<[IllustrationCategory, string[]]>).flatMap(([category, tokens]) =>
+    tokens.map((token) => [token, category]),
+  ),
+) as Record<string, IllustrationCategory>;
+
 export const ILLUSTRATION_SCENE_DICTIONARY: Record<string, IllustrationScene> = {
   clock_hour: {
     skillId: 'clock_hour',
@@ -212,15 +260,19 @@ function normalizeToken(token: string): string {
   return token.trim();
 }
 
-export function resolveIconToken(token: string): string | undefined {
+function resolveCanonicalToken(token: string): string {
   const normalized = normalizeToken(token);
-  const direct = ICON_DICTIONARY[normalized];
+  return ICON_ALIASES[normalized] ?? normalized;
+}
+
+export function resolveIconToken(token: string): string | undefined {
+  const canonical = resolveCanonicalToken(token);
+  const direct = ICON_DICTIONARY[canonical];
   if (direct) return direct;
-
-  const aliased = ICON_ALIASES[normalized];
-  if (aliased) {
-    return ICON_DICTIONARY[aliased];
-  }
-
   return undefined;
+}
+
+export function resolveTokenCategory(token: string): IllustrationCategory | undefined {
+  const canonical = resolveCanonicalToken(token);
+  return ICON_CATEGORY_DICTIONARY[canonical];
 }
