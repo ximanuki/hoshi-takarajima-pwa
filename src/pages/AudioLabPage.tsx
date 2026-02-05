@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { audioManager } from '../utils/audioManager';
-import { AudioLabPlayer, type AudioLabEngine } from '../utils/audioLabPlayer';
+import { AudioLabPlayer, type AudioLabEngine, type TonePresetId } from '../utils/audioLabPlayer';
 
 const engineLabel: Record<AudioLabEngine, string> = {
   none: '停止中',
@@ -11,9 +11,11 @@ const engineLabel: Record<AudioLabEngine, string> = {
 
 export function AudioLabPage() {
   const player = useMemo(() => new AudioLabPlayer(), []);
+  const tonePresets = player.getTonePresets();
   const [engine, setEngine] = useState<AudioLabEngine>('none');
   const [volume, setVolume] = useState(0.65);
   const [toneLoading, setToneLoading] = useState(false);
+  const [selectedPreset, setSelectedPreset] = useState<TonePresetId>(player.getCurrentTonePreset());
 
   useEffect(() => {
     audioManager.setBgmSuppressed(true);
@@ -28,9 +30,10 @@ export function AudioLabPage() {
     setEngine(player.getEngine());
   };
 
-  const onPlayTone = async () => {
+  const onPlayTone = async (presetId: TonePresetId) => {
     setToneLoading(true);
-    await player.playTone();
+    setSelectedPreset(presetId);
+    await player.playTone(presetId);
     setEngine(player.getEngine());
     setToneLoading(player.isToneLoading());
   };
@@ -52,7 +55,7 @@ export function AudioLabPage() {
       <article className="card stack">
         <h2>ステップで ひかく</h2>
         <p>Step 1: 音源ファイル（固定ループ）を再生</p>
-        <p>Step 2: Tone.jsシーケンサー（動的生成）を再生</p>
+        <p>Step 2: Tone.jsシーケンサー（3パターン）を再生</p>
         <p>どちらも同じ音量で聞き比べできます。現在: {engineLabel[engine]}</p>
       </article>
 
@@ -73,7 +76,7 @@ export function AudioLabPage() {
           <button className="primary-btn" onClick={() => void onPlayAsset()}>
             1) 音源ループを再生
           </button>
-          <button className="ghost-btn" disabled={toneLoading} onClick={() => void onPlayTone()}>
+          <button className="ghost-btn" disabled={toneLoading} onClick={() => void onPlayTone(selectedPreset)}>
             {toneLoading ? 'Tone.js を準備中…' : '2) Tone.jsシーケンサーを再生'}
           </button>
           <button className="danger-btn" onClick={onStop}>
@@ -84,6 +87,23 @@ export function AudioLabPage() {
         <p className="audio-lab-note">
           メモ: ここではホームBGMを自動停止して、比較音だけを鳴らします。Tone.js初回は少し読み込みます。
         </p>
+      </article>
+
+      <article className="card stack">
+        <h2>Tone.js 3パターン</h2>
+        <div className="audio-lab-preset-grid">
+          {tonePresets.map((preset) => (
+            <button
+              key={preset.id}
+              className={`audio-lab-preset-btn ${selectedPreset === preset.id ? 'active' : ''}`}
+              disabled={toneLoading}
+              onClick={() => void onPlayTone(preset.id)}
+            >
+              <span>{preset.name}</span>
+              <small>{preset.description}</small>
+            </button>
+          ))}
+        </div>
       </article>
 
       <article className="card audio-lab-grid">

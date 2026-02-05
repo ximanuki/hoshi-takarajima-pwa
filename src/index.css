@@ -727,12 +727,44 @@ p {
   font-size: 0.9rem;
 }
 
+.audio-lab-preset-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.audio-lab-preset-btn {
+  border: 2px solid #c8e6e0;
+  border-radius: 14px;
+  background: #f3fffc;
+  color: #155a5b;
+  text-align: left;
+  padding: 10px 12px;
+  font: inherit;
+  display: grid;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.audio-lab-preset-btn small {
+  color: #2b6c6d;
+  font-size: 0.78rem;
+}
+
+.audio-lab-preset-btn.active {
+  border-color: #56c7b4;
+  background: #e7fffa;
+}
+
 .audio-lab-grid {
   display: grid;
   gap: 12px;
 }
 
 @media (min-width: 768px) {
+  .audio-lab-preset-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .audio-lab-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
