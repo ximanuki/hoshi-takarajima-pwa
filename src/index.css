@@ -722,6 +722,22 @@ p {
   align-items: center;
 }
 
+.audio-lab-note {
+  color: #1a5f60;
+  font-size: 0.9rem;
+}
+
+.audio-lab-grid {
+  display: grid;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .audio-lab-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .bottom-nav {
   position: sticky;
   bottom: 0;

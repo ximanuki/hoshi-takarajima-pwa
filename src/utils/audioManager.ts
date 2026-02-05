@@ -80,6 +80,9 @@ class AudioManager {
   private unlocked = false;
   private bgmLoopTimer: number | null = null;
   private sceneSwitchTimer: number | null = null;
+  private bgmLoopGeneration = 0;
+  private bgmOscillators = new Set<OscillatorNode>();
+  private bgmSuppressed = false;
   private settings: Settings = DEFAULT_SETTINGS;
   private scene: AudioScene = 'home';
   private lastEffectAt: Partial<Record<SoundEffect, number>> = {};
@@ -88,8 +91,22 @@ class AudioManager {
     if (this.scene === scene) return;
     this.scene = scene;
 
-    if (!this.context || !this.unlocked || !this.settings.soundEnabled) return;
+    if (!this.context || !this.unlocked || !this.settings.soundEnabled || this.bgmSuppressed) return;
     this.transitionScene();
+  }
+
+  setBgmSuppressed(suppressed: boolean) {
+    this.bgmSuppressed = suppressed;
+    if (!this.context) return;
+
+    if (suppressed) {
+      this.stopBgm();
+      return;
+    }
+
+    if (this.settings.soundEnabled && this.unlocked) {
+      this.startBgm();
+    }
   }
 
   setSettings(next: Settings) {
@@ -108,7 +125,7 @@ class AudioManager {
     }
 
     this.applyGainValues(this.context.currentTime);
-    if (this.unlocked) {
+    if (this.unlocked && !this.bgmSuppressed) {
       this.startBgm();
     }
   }
@@ -126,7 +143,7 @@ class AudioManager {
 
     this.unlocked = true;
     this.applyGainValues(this.context.currentTime);
-    if (this.settings.soundEnabled) {
+    if (this.settings.soundEnabled && !this.bgmSuppressed) {
       this.startBgm();
     }
   }
@@ -224,11 +241,24 @@ class AudioManager {
   }
 
   private startBgm() {
-    if (!this.context || !this.bgmGain || !this.settings.soundEnabled || this.bgmLoopTimer !== null) return;
-    this.scheduleBgmLoop();
+    if (
+      !this.context ||
+      !this.bgmGain ||
+      this.bgmSuppressed ||
+      !this.settings.soundEnabled ||
+      this.bgmLoopTimer !== null ||
+      this.sceneSwitchTimer !== null
+    ) {
+      return;
+    }
+
+    const generation = ++this.bgmLoopGeneration;
+    this.scheduleBgmLoop(generation);
   }
 
   private stopBgm() {
+    this.bgmLoopGeneration += 1;
+
     if (this.sceneSwitchTimer !== null) {
       window.clearTimeout(this.sceneSwitchTimer);
       this.sceneSwitchTimer = null;
@@ -242,6 +272,7 @@ class AudioManager {
     if (!this.context || !this.bgmGain) return;
 
     const now = this.context.currentTime;
+    this.stopScheduledBgmVoices(now);
     this.bgmGain.gain.cancelScheduledValues(now);
     this.bgmGain.gain.setTargetAtTime(0, now, 0.08);
   }
@@ -259,18 +290,28 @@ class AudioManager {
       this.bgmLoopTimer = null;
     }
 
+    const generation = ++this.bgmLoopGeneration;
     const now = this.context.currentTime;
+    this.stopScheduledBgmVoices(now);
     this.bgmGain.gain.cancelScheduledValues(now);
     this.bgmGain.gain.setTargetAtTime(0.0001, now, 0.08);
 
     this.sceneSwitchTimer = window.setTimeout(() => {
       this.sceneSwitchTimer = null;
-      if (!this.context || !this.bgmGain || !this.settings.soundEnabled || !this.unlocked) return;
+      if (
+        generation !== this.bgmLoopGeneration ||
+        !this.context ||
+        !this.bgmGain ||
+        !this.settings.soundEnabled ||
+        !this.unlocked
+      ) {
+        return;
+      }
 
       const startAt = this.context.currentTime;
       this.bgmGain.gain.cancelScheduledValues(startAt);
       this.bgmGain.gain.setValueAtTime(0.0001, startAt);
-      this.scheduleBgmLoop();
+      this.scheduleBgmLoop(generation);
       this.bgmGain.gain.setTargetAtTime(this.getBgmTarget(), startAt, 0.14);
     }, 210);
   }
@@ -287,7 +328,11 @@ class AudioManager {
     this.bgmGain.gain.setTargetAtTime(target, atTime + 0.16, 0.11);
   }
 
-  private scheduleBgmLoop() {
+  private scheduleBgmLoop(generation: number) {
+    if (generation !== this.bgmLoopGeneration) {
+      return;
+    }
+
     if (!this.context || !this.bgmGain || !this.settings.soundEnabled || !this.unlocked) {
       this.stopBgm();
       return;
@@ -336,9 +381,21 @@ class AudioManager {
 
     const loopMs = Math.round(config.melody.length * config.beat * 1000);
     this.bgmLoopTimer = window.setTimeout(() => {
+      if (generation !== this.bgmLoopGeneration) return;
       this.bgmLoopTimer = null;
-      this.scheduleBgmLoop();
+      this.scheduleBgmLoop(generation);
     }, loopMs);
+  }
+
+  private stopScheduledBgmVoices(atTime: number) {
+    this.bgmOscillators.forEach((oscillator) => {
+      try {
+        oscillator.stop(atTime + 0.01);
+      } catch {
+        // Ignore nodes already ended.
+      }
+    });
+    this.bgmOscillators.clear();
   }
 
   private playTone({
@@ -370,6 +427,13 @@ class AudioManager {
 
     oscillator.connect(envelope);
     envelope.connect(output);
+
+    if (output === this.bgmGain) {
+      this.bgmOscillators.add(oscillator);
+      oscillator.addEventListener('ended', () => {
+        this.bgmOscillators.delete(oscillator);
+      });
+    }
 
     oscillator.start(at);
     oscillator.stop(at + duration + 0.03);

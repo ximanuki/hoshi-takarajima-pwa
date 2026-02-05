@@ -72,6 +72,9 @@ export function SettingsPage() {
         <Link className="ghost-btn" to="/parent">
           保護者画面へ
         </Link>
+        <Link className="ghost-btn" to="/settings/audio-lab">
+          BGM比較ラボへ
+        </Link>
         <Link className="ghost-btn" to="/illustrations">
           SVGプレビューへ
         </Link>
