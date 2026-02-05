@@ -41,7 +41,12 @@ export type RouteVisual = {
   bestRoute: string;
 };
 
-export type QuestionVisual = ClockVisual | MoneyVisual | FractionVisual | RouteVisual;
+export type OddOneOutVisual = {
+  kind: 'odd_one_out';
+  items: string[];
+};
+
+export type QuestionVisual = ClockVisual | MoneyVisual | FractionVisual | RouteVisual | OddOneOutVisual;
 
 function normalizeHour(hour: number): number {
   const normalized = hour % 12;
@@ -235,6 +240,21 @@ function parseRouteVisual(question: Question): RouteVisual | undefined {
   };
 }
 
+function parseOddOneOutVisual(question: Question): OddOneOutVisual | undefined {
+  if (question.skillId !== 'odd_one_out') return undefined;
+
+  const items = question.choices
+    .map((choice) => choice.trim())
+    .filter((choice) => choice.length > 0);
+
+  if (items.length !== 3) return undefined;
+
+  return {
+    kind: 'odd_one_out',
+    items,
+  };
+}
+
 export function getQuestionVisual(question: Question): QuestionVisual | undefined {
   if (question.subject === 'life' && question.skillId.startsWith('clock_')) {
     const answer = question.choices[question.answerIndex];
@@ -259,6 +279,10 @@ export function getQuestionVisual(question: Question): QuestionVisual | undefine
 
   if (question.skillId === 'route_optimization') {
     return parseRouteVisual(question);
+  }
+
+  if (question.skillId === 'odd_one_out') {
+    return parseOddOneOutVisual(question);
   }
 
   return undefined;

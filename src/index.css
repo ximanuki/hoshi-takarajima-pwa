@@ -365,6 +365,50 @@ p {
   fill: #c65d1a;
 }
 
+.odd-one-out-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.odd-one-out-card {
+  border: 2px solid #cde9f3;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #f8fdff 0%, #ffffff 100%);
+  padding: 10px 6px;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+}
+
+.odd-one-out-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.odd-one-out-label {
+  font-size: 0.85rem;
+  color: #205f60;
+  text-align: center;
+  word-break: break-word;
+}
+
+.preview-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.preview-card {
+  display: grid;
+  gap: 8px;
+}
+
+.preview-meta {
+  font-size: 0.82rem;
+  color: #2b6f70;
+}
+
 .choice-btn {
   background: #f7f7ff;
   color: var(--ink);

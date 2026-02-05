@@ -72,6 +72,9 @@ export function SettingsPage() {
         <Link className="ghost-btn" to="/parent">
           保護者画面へ
         </Link>
+        <Link className="ghost-btn" to="/illustrations">
+          SVGプレビューへ
+        </Link>
         <button className="danger-btn" onClick={onReset}>
           データをリセット
         </button>
@@ -81,6 +84,7 @@ export function SettingsPage() {
         <h2>もんだいデータの 参照元</h2>
         <p>編集元: docs/question_bank_master.md</p>
         <p>アプリ参照: src/data/questions.generated.ts （src/data/questions.ts けいゆ）</p>
+        <p>SVG描画: src/components/QuestionIllustration.tsx / src/utils/questionVisuals.ts</p>
         <p>
           もんだい数:
           {' '}

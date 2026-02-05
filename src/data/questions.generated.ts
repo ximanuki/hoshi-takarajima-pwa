@@ -14021,7 +14021,7 @@ export const questionBank: Question[] = [
     "subject": "insight",
     "skillId": "observation_compare",
     "difficulty": 2,
-    "prompt": "えんぴつ5ほん、けしごむ2こ。すうが おおいのは？",
+    "prompt": "えんぴつ5ほん、けしごむ2こ。おおいのは？",
     "choices": [
       "けしごむ",
       "おなじ",

@@ -7,6 +7,37 @@ type Props = {
 
 const MONEY_DENOMS = [1000, 500, 100, 50, 10, 5, 1] as const;
 
+const ODD_ONE_OUT_ICON_MAP: Record<string, string> = {
+  でんしゃ: '🚆',
+  バス: '🚌',
+  ひこうき: '✈️',
+  りんご: '🍎',
+  みかん: '🍊',
+  さくらんぼ: '🍒',
+  ぶどう: '🍇',
+  きゅうり: '🥒',
+  アイス: '🍨',
+  えんぴつ: '✏️',
+  けしごむ: '🧽',
+  ぼうし: '🧢',
+  てぶくろ: '🧤',
+  いぬ: '🐶',
+  ねこ: '🐱',
+  さかな: '🐟',
+  にわとり: '🐔',
+  すずめ: '🐦',
+  うみ: '🌊',
+  がっこう: '🏫',
+  としょかん: '📚',
+  はしる: '🏃',
+  あお: '🔵',
+  まる: '⚪',
+  さんかく: '🔺',
+  しかく: '⬜',
+  あさ: '🌅',
+  ひる: '☀️',
+};
+
 function toPoint(cx: number, cy: number, radius: number, angleDeg: number) {
   const rad = ((angleDeg - 90) * Math.PI) / 180;
   return {
@@ -264,6 +295,23 @@ function RouteIllustration({ options, bestRoute }: RouteProps) {
   );
 }
 
+function OddOneOutIllustration({ items }: { items: string[] }) {
+  return (
+    <div className="question-illustration" aria-live="polite">
+      <p className="question-illustration-title">なかまさがしイラスト</p>
+      <div className="odd-one-out-grid">
+        {items.map((item) => (
+          <div className="odd-one-out-card" key={item}>
+            <p className="odd-one-out-icon">{ODD_ONE_OUT_ICON_MAP[item] ?? '❔'}</p>
+            <p className="odd-one-out-label">{item}</p>
+          </div>
+        ))}
+      </div>
+      <p className="question-illustration-caption">なかまが ちがう 1つを みつけよう。</p>
+    </div>
+  );
+}
+
 export function QuestionIllustration({ question }: Props) {
   const visual = getQuestionVisual(question);
   if (!visual) return null;
@@ -296,6 +344,10 @@ export function QuestionIllustration({ question }: Props) {
 
   if (visual.kind === 'route') {
     return <RouteIllustration options={visual.options} bestRoute={visual.bestRoute} />;
+  }
+
+  if (visual.kind === 'odd_one_out') {
+    return <OddOneOutIllustration items={visual.items} />;
   }
 
   return null;
