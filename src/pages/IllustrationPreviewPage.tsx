@@ -1,6 +1,9 @@
-import { Link } from 'react-router-dom';
+import { useMemo, useState } from 'react';
+import type { FormEvent } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { QuestionIllustration } from '../components/QuestionIllustration';
 import { questionBank } from '../data/questions';
+import { getQuestionVisual } from '../utils/questionVisuals';
 
 type PreviewItem = {
   id: string;
@@ -17,32 +20,102 @@ const previewItems: PreviewItem[] = [
 ];
 
 export function IllustrationPreviewPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialId = searchParams.get('id')?.trim() || 'i25';
+  const [inputId, setInputId] = useState(initialId);
+  const [selectedId, setSelectedId] = useState(initialId);
+  const [error, setError] = useState<string | null>(null);
+
+  const questionMap = useMemo(() => new Map(questionBank.map((question) => [question.id, question])), []);
+  const selectedQuestion = questionMap.get(selectedId);
+  const visualizableCount = useMemo(
+    () => questionBank.filter((question) => getQuestionVisual(question)).length,
+    [],
+  );
+
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const nextId = inputId.trim();
+
+    if (!nextId) {
+      setError('IDを入力してね。');
+      return;
+    }
+
+    if (!questionMap.has(nextId)) {
+      setError(`ID「${nextId}」は見つからなかったよ。`);
+      return;
+    }
+
+    setSelectedId(nextId);
+    setError(null);
+    setSearchParams({ id: nextId });
+  };
+
+  const selectQuickId = (id: string) => {
+    setSelectedId(id);
+    setInputId(id);
+    setError(null);
+    setSearchParams({ id });
+  };
+
   return (
     <section className="stack">
       <h1>SVGプレビュー</h1>
-      <article className="card">
+
+      <article className="card preview-card">
         <p>この画面で、実装中のSVGイラストをGUIで確認できます。</p>
         <p>SVGの実装元: `src/components/QuestionIllustration.tsx`</p>
         <p>問題→可視化データ変換: `src/utils/questionVisuals.ts`</p>
+        <p>
+          イラスト対応:
+          {' '}
+          {visualizableCount}
+          /
+          {questionBank.length}
+          問
+        </p>
       </article>
 
-      <div className="preview-grid">
-        {previewItems.map((item) => {
-          const question = questionBank.find((entry) => entry.id === item.id);
-          if (!question) return null;
+      <article className="card preview-card">
+        <h2>ID指定で確認</h2>
+        <form className="preview-search" onSubmit={onSubmit}>
+          <input
+            className="preview-search-input"
+            placeholder="例: i25 / l61 / m405"
+            value={inputId}
+            onChange={(event) => setInputId(event.target.value)}
+          />
+          <button className="primary-btn" type="submit">
+            表示
+          </button>
+        </form>
 
-          return (
-            <article className="card preview-card" key={item.id}>
-              <h2>{item.title}</h2>
-              <p className="preview-meta">
-                ID: {question.id} / skill: {question.skillId}
-              </p>
-              <p>{question.prompt}</p>
-              <QuestionIllustration question={question} />
-            </article>
-          );
-        })}
-      </div>
+        <div className="inline-actions">
+          {previewItems.map((item) => (
+            <button className="ghost-btn" key={item.id} type="button" onClick={() => selectQuickId(item.id)}>
+              {item.id}
+            </button>
+          ))}
+        </div>
+
+        {error ? <p className="hint">⚠️ {error}</p> : null}
+      </article>
+
+      {selectedQuestion ? (
+        <article className="card preview-card">
+          <h2>選択中の問題</h2>
+          <p className="preview-meta">
+            ID: {selectedQuestion.id} / subject: {selectedQuestion.subject} / skill: {selectedQuestion.skillId}
+          </p>
+          <p>{selectedQuestion.prompt}</p>
+          <QuestionIllustration question={selectedQuestion} />
+        </article>
+      ) : (
+        <article className="card preview-card">
+          <p>指定した問題にイラストを表示できませんでした。</p>
+        </article>
+      )}
 
       <Link className="ghost-btn" to="/settings">
         せっていへ もどる

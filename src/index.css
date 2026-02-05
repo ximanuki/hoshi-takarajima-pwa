@@ -387,6 +387,19 @@ p {
   line-height: 1;
 }
 
+.odd-one-out-icon.text {
+  font-size: 1rem;
+  font-weight: 800;
+  min-width: 2.1rem;
+  min-height: 2.1rem;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #f0f6ff;
+  border: 2px solid #bfd4f6;
+  color: #274a83;
+}
+
 .odd-one-out-label {
   font-size: 0.85rem;
   color: #205f60;
@@ -407,6 +420,29 @@ p {
 .preview-meta {
   font-size: 0.82rem;
   color: #2b6f70;
+}
+
+.preview-search {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.preview-search-input {
+  flex: 1 1 220px;
+  min-height: 42px;
+  border-radius: 12px;
+  border: 2px solid #c9e8ef;
+  padding: 8px 10px;
+  font: inherit;
+  color: var(--ink);
+  background: #ffffff;
+}
+
+.preview-search-input:focus {
+  outline: 0;
+  border-color: #7fc5d0;
+  box-shadow: 0 0 0 3px rgba(127, 197, 208, 0.22);
 }
 
 .choice-btn {

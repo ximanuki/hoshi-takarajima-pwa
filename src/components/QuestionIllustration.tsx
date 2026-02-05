@@ -38,6 +38,19 @@ const ODD_ONE_OUT_ICON_MAP: Record<string, string> = {
   ひる: '☀️',
 };
 
+function getOddOneOutToken(item: string): { icon: string; isText: boolean } {
+  const mapped = ODD_ONE_OUT_ICON_MAP[item];
+  if (mapped) {
+    return { icon: mapped, isText: false };
+  }
+
+  if (/^\d+$/.test(item)) {
+    return { icon: item, isText: true };
+  }
+
+  return { icon: item.slice(0, 2), isText: true };
+}
+
 function toPoint(cx: number, cy: number, radius: number, angleDeg: number) {
   const rad = ((angleDeg - 90) * Math.PI) / 180;
   return {
@@ -300,12 +313,15 @@ function OddOneOutIllustration({ items }: { items: string[] }) {
     <div className="question-illustration" aria-live="polite">
       <p className="question-illustration-title">なかまさがしイラスト</p>
       <div className="odd-one-out-grid">
-        {items.map((item) => (
-          <div className="odd-one-out-card" key={item}>
-            <p className="odd-one-out-icon">{ODD_ONE_OUT_ICON_MAP[item] ?? '❔'}</p>
-            <p className="odd-one-out-label">{item}</p>
-          </div>
-        ))}
+        {items.map((item) => {
+          const token = getOddOneOutToken(item);
+          return (
+            <div className="odd-one-out-card" key={item}>
+              <p className={`odd-one-out-icon ${token.isText ? 'text' : ''}`}>{token.icon}</p>
+              <p className="odd-one-out-label">{item}</p>
+            </div>
+          );
+        })}
       </div>
       <p className="question-illustration-caption">なかまが ちがう 1つを みつけよう。</p>
     </div>
