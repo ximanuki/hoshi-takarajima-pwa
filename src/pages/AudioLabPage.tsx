@@ -67,7 +67,7 @@ export function AudioLabPage() {
       <article className="card stack">
         <h2>ステップで ひかく</h2>
         <p>Step 1: 音源ファイル（固定ループ）を再生</p>
-        <p>Step 2: Tone.jsシーケンサー（Lo-fi + Jersey + 2step + Ambient）を再生</p>
+        <p>Step 2: Tone.jsシーケンサー（Lo-fi / Jersey / UK Garage / Future Garage / UK Dubstep / Ambient）を再生</p>
         <p>どちらも同じ音量で聞き比べできます。現在: {engineLabel[engine]}</p>
       </article>
 

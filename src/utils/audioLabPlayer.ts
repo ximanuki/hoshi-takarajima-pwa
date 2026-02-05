@@ -1,7 +1,16 @@
 import type { Gain, Sequence } from 'tone';
 
 export type AudioLabEngine = 'none' | 'asset' | 'tone';
-export type TonePresetId = 'lofi_cafe' | 'lofi_rain' | 'lofi_jersey' | 'lofi_2step' | 'ambient_stars' | 'ambient_dream';
+export type TonePresetId =
+  | 'lofi_cafe'
+  | 'lofi_rain'
+  | 'lofi_jersey'
+  | 'lofi_2step'
+  | 'uk_garage_neon'
+  | 'future_garage_mist'
+  | 'dubstep_nightbus'
+  | 'ambient_stars'
+  | 'ambient_dream';
 export type ToneSfxId = 'tap' | 'correct' | 'miss' | 'clear';
 
 type ToneModule = typeof import('tone');
@@ -17,6 +26,7 @@ type TonePresetConfig = TonePresetMeta & {
   bpm: number;
   bars: number;
   swing: number;
+  rhythmProfile: 'lofi' | 'jersey' | 'ukg' | 'future_garage' | 'dubstep' | 'ambient';
   humanizeSec: number;
   chordProgression: string[][];
   leadMotifs: Array<Array<string | null>>;
@@ -115,6 +125,7 @@ const TONE_PRESET_LIBRARY: Record<TonePresetId, TonePresetConfig> = {
     name: 'Lo-fi 1: ほうかごカフェ',
     description: 'Lo-fi / Boom Bap / 32小節',
     genre: 'lofi',
+    rhythmProfile: 'lofi',
     bpm: 84,
     bars: LOOP_BARS,
     swing: 0.14,
@@ -166,6 +177,7 @@ const TONE_PRESET_LIBRARY: Record<TonePresetId, TonePresetConfig> = {
     name: 'Lo-fi 2: あめのとしょしつ',
     description: 'Lo-fi / Rainy Groove / 32小節',
     genre: 'lofi',
+    rhythmProfile: 'lofi',
     bpm: 76,
     bars: LOOP_BARS,
     swing: 0.1,
@@ -217,7 +229,8 @@ const TONE_PRESET_LIBRARY: Record<TonePresetId, TonePresetConfig> = {
     name: 'Lo-fi 3: Jersey Mellow',
     description: 'Lo-fi + Jersey Clubニュアンス / 32小節',
     genre: 'lofi',
-    bpm: 136,
+    rhythmProfile: 'jersey',
+    bpm: 138,
     bars: LOOP_BARS,
     swing: 0.03,
     humanizeSec: 0.007,
@@ -244,10 +257,10 @@ const TONE_PRESET_LIBRARY: Record<TonePresetId, TonePresetConfig> = {
       ['A1', null, null, null, 'E2', null, null, null, 'A1', null, null, null, 'E2', null, null, null],
     ],
     keyPattern: pattern([2, 6, 10, 14], 0.22),
-    kickPattern: pattern([0, 3, 6, 8, 11, 13, 14], 0.62),
-    clapPattern: pattern([4, 12], 0.26),
-    hatPattern: pattern([2, 6, 10, 14], 0.16),
-    ghostPattern: pattern([1, 7, 9, 15], 0.12),
+    kickPattern: pattern([0, 4, 8, 11, 14], 0.66),
+    clapPattern: pattern([8, 11], 0.28),
+    hatPattern: pattern([2, 6, 10, 14], 0.2),
+    ghostPattern: pattern([1, 7, 10, 15], 0.13),
     openHatPattern: pattern([15], 0.24),
     texturePattern: pattern([5, 13], 0.1),
     subPattern: pattern([0, 8], 0.22),
@@ -268,6 +281,7 @@ const TONE_PRESET_LIBRARY: Record<TonePresetId, TonePresetConfig> = {
     name: 'Lo-fi 4: Night 2step',
     description: 'Lo-fi + 2stepガレージニュアンス / 32小節',
     genre: 'lofi',
+    rhythmProfile: 'lofi',
     bpm: 132,
     bars: LOOP_BARS,
     swing: 0.06,
@@ -314,11 +328,168 @@ const TONE_PRESET_LIBRARY: Record<TonePresetId, TonePresetConfig> = {
     delayWet: 0.14,
     sfxScale: ['E4', 'G4', 'A4', 'B4', 'D5', 'E5', 'G5'],
   },
+  uk_garage_neon: {
+    id: 'uk_garage_neon',
+    name: 'UK Garage 1: Neon Skip',
+    description: 'UK Garage / 2-step Shuffle / 32小節',
+    genre: 'lofi',
+    rhythmProfile: 'ukg',
+    bpm: 132,
+    bars: LOOP_BARS,
+    swing: 0.17,
+    humanizeSec: 0.01,
+    chordProgression: [
+      ['A3', 'C4', 'E4', 'G4'],
+      ['F3', 'A3', 'C4', 'E4'],
+      ['G3', 'B3', 'D4', 'F4'],
+      ['E3', 'G3', 'B3', 'D4'],
+      ['D3', 'F3', 'A3', 'C4'],
+      ['G3', 'B3', 'D4', 'F4'],
+      ['C4', 'E4', 'G4', 'B4'],
+      ['E3', 'G3', 'B3', 'D4'],
+    ],
+    leadMotifs: [
+      [null, 'E4', null, null, 'G4', null, 'A4', null, null, 'G4', null, 'E4', null, 'D4', null, null],
+      [null, 'D4', null, null, 'F4', null, 'G4', null, null, 'F4', null, 'D4', null, 'C4', null, null],
+      [null, 'G4', null, null, 'A4', null, 'B4', null, null, 'A4', null, 'G4', null, 'E4', null, null],
+      [null, 'E4', null, null, 'D4', null, 'C4', null, null, 'D4', null, 'E4', null, 'G4', null, null],
+    ],
+    bassMotifs: [
+      ['A1', null, null, null, null, null, 'E2', null, null, null, 'A1', null, null, null, null, null],
+      ['F1', null, null, null, null, null, 'C2', null, null, null, 'F1', null, null, null, null, null],
+      ['G1', null, null, null, null, null, 'D2', null, null, null, 'G1', null, null, null, null, null],
+      ['E1', null, null, null, null, null, 'B1', null, null, null, 'E2', null, null, null, null, null],
+    ],
+    keyPattern: pattern([1, 5, 9, 13], 0.24),
+    kickPattern: pattern([0, 6, 10], 0.66),
+    clapPattern: pattern([4, 12], 0.3),
+    hatPattern: pattern([1, 3, 6, 8, 10, 14], 0.18),
+    ghostPattern: pattern([7, 11, 15], 0.13),
+    openHatPattern: pattern([15], 0.2),
+    texturePattern: pattern([2, 10], 0.08),
+    subPattern: pattern([0, 8], 0.2),
+    padStrideBars: 1,
+    padDuration: '1m',
+    leadDuration: '16n',
+    bassDuration: '8n',
+    leadVelocity: 0.33,
+    bassVelocity: 0.54,
+    padVelocity: 0.2,
+    masterGain: 0.84,
+    reverbWet: 0.14,
+    delayWet: 0.13,
+    sfxScale: ['A4', 'B4', 'C5', 'E5', 'F5', 'G5', 'A5'],
+  },
+  future_garage_mist: {
+    id: 'future_garage_mist',
+    name: 'Future Garage: Mist Echo',
+    description: 'Future Garage / Off-kilter / 32小節',
+    genre: 'lofi',
+    rhythmProfile: 'future_garage',
+    bpm: 134,
+    bars: LOOP_BARS,
+    swing: 0.11,
+    humanizeSec: 0.014,
+    chordProgression: [
+      ['C4', 'D#4', 'G4', 'A#4'],
+      ['G3', 'A#3', 'D4', 'F4'],
+      ['A#3', 'D4', 'F4', 'A4'],
+      ['F3', 'A3', 'C4', 'D#4'],
+      ['D#3', 'G3', 'A#3', 'D4'],
+      ['G3', 'A#3', 'D4', 'F4'],
+      ['C4', 'D#4', 'G4', 'A#4'],
+      ['F3', 'A3', 'C4', 'D#4'],
+    ],
+    leadMotifs: [
+      [null, null, 'D#5', null, null, null, null, null, null, null, 'C5', null, null, null, null, null],
+      [null, null, 'D5', null, null, null, null, null, null, null, 'A#4', null, null, null, null, null],
+      [null, null, 'F5', null, null, null, null, null, null, null, 'D5', null, null, null, null, null],
+      [null, null, 'C5', null, null, null, null, null, null, null, 'A#4', null, null, null, null, null],
+    ],
+    bassMotifs: [
+      ['C2', null, null, null, null, null, null, null, 'G1', null, null, null, null, null, null, null],
+      ['G1', null, null, null, null, null, null, null, 'D2', null, null, null, null, null, null, null],
+      ['A#1', null, null, null, null, null, null, null, 'F1', null, null, null, null, null, null, null],
+      ['F1', null, null, null, null, null, null, null, 'C2', null, null, null, null, null, null, null],
+    ],
+    keyPattern: pattern([3, 11], 0.14),
+    kickPattern: pattern([0, 9], 0.62),
+    clapPattern: pattern([8], 0.26),
+    hatPattern: pattern([2, 6, 10, 14], 0.13),
+    ghostPattern: pattern([7, 11, 15], 0.12),
+    openHatPattern: pattern([15], 0.16),
+    texturePattern: pattern([0, 4, 8, 12], 0.12),
+    subPattern: pattern([0, 8], 0.24),
+    padStrideBars: 2,
+    padDuration: '2m',
+    leadDuration: '8n',
+    bassDuration: '4n',
+    leadVelocity: 0.24,
+    bassVelocity: 0.58,
+    padVelocity: 0.23,
+    masterGain: 0.8,
+    reverbWet: 0.26,
+    delayWet: 0.2,
+    sfxScale: ['C4', 'D#4', 'F4', 'G4', 'A#4', 'C5', 'D5'],
+  },
+  dubstep_nightbus: {
+    id: 'dubstep_nightbus',
+    name: 'UK Dubstep: Night Bus',
+    description: 'UK Dubstep / Burial Mood / 32小節',
+    genre: 'lofi',
+    rhythmProfile: 'dubstep',
+    bpm: 140,
+    bars: LOOP_BARS,
+    swing: 0.08,
+    humanizeSec: 0.012,
+    chordProgression: [
+      ['F3', 'G#3', 'C4', 'D#4'],
+      ['D#3', 'G3', 'A#3', 'D4'],
+      ['C3', 'D#3', 'G3', 'A#3'],
+      ['A#2', 'D3', 'F3', 'A3'],
+      ['F3', 'G#3', 'C4', 'D#4'],
+      ['D#3', 'G3', 'A#3', 'D4'],
+      ['G3', 'A#3', 'D4', 'F4'],
+      ['A#2', 'D3', 'F3', 'A3'],
+    ],
+    leadMotifs: [
+      [null, null, null, null, 'C5', null, null, null, null, null, null, null, 'A#4', null, null, null],
+      [null, null, null, null, 'D5', null, null, null, null, null, null, null, 'C5', null, null, null],
+      [null, null, null, null, 'A#4', null, null, null, null, null, null, null, 'G4', null, null, null],
+      [null, null, null, null, 'F4', null, null, null, null, null, null, null, 'D4', null, null, null],
+    ],
+    bassMotifs: [
+      ['F1', null, null, null, null, null, null, null, 'C2', null, null, null, null, null, null, null],
+      ['D#1', null, null, null, null, null, null, null, 'A#1', null, null, null, null, null, null, null],
+      ['C1', null, null, null, null, null, null, null, 'G1', null, null, null, null, null, null, null],
+      ['A#0', null, null, null, null, null, null, null, 'F1', null, null, null, null, null, null, null],
+    ],
+    keyPattern: pattern([6, 14], 0.12),
+    kickPattern: pattern([0, 6, 11], 0.68),
+    clapPattern: pattern([8], 0.3),
+    hatPattern: pattern([3, 7, 11, 15], 0.15),
+    ghostPattern: pattern([14], 0.1),
+    openHatPattern: pattern([15], 0.17),
+    texturePattern: pattern([2, 10], 0.09),
+    subPattern: pattern([0, 8], 0.28),
+    padStrideBars: 2,
+    padDuration: '2m',
+    leadDuration: '8n',
+    bassDuration: '4n',
+    leadVelocity: 0.2,
+    bassVelocity: 0.62,
+    padVelocity: 0.2,
+    masterGain: 0.81,
+    reverbWet: 0.21,
+    delayWet: 0.19,
+    sfxScale: ['F4', 'G4', 'A#4', 'C5', 'D5', 'F5', 'G5'],
+  },
   ambient_stars: {
     id: 'ambient_stars',
     name: 'Ambient 1: ほしぞらのうみ',
     description: 'Ambient / 32小節 / シネマティック',
     genre: 'ambient',
+    rhythmProfile: 'ambient',
     bpm: 68,
     bars: LOOP_BARS,
     swing: 0,
@@ -370,6 +541,7 @@ const TONE_PRESET_LIBRARY: Record<TonePresetId, TonePresetConfig> = {
     name: 'Ambient 2: ゆめみるしんかい',
     description: 'Ambient / 32小節 / 深いゆらぎ',
     genre: 'ambient',
+    rhythmProfile: 'ambient',
     bpm: 60,
     bars: LOOP_BARS,
     swing: 0,
@@ -515,14 +687,20 @@ export class AudioLabPlayer {
     }
 
     const preset = TONE_PRESET_LIBRARY[presetId];
+    const profile = preset.rhythmProfile;
+    const isAmbientProfile = profile === 'ambient';
+    const isJerseyProfile = profile === 'jersey';
+    const isUkgProfile = profile === 'ukg';
+    const isFutureGarageProfile = profile === 'future_garage';
+    const isDubstepProfile = profile === 'dubstep';
     const [n1 = 'C4', n2 = 'D4', n3 = 'E4', n4 = 'G4', n5 = 'A4', n6 = 'C5', n7 = 'E5'] = preset.sfxScale;
     const now = tone.now();
-    const output = new tone.Gain(curvedVolume(this.volume) * (preset.genre === 'ambient' ? 0.7 : 0.86)).toDestination();
+    const output = new tone.Gain(curvedVolume(this.volume) * (isAmbientProfile ? 0.7 : isDubstepProfile ? 0.82 : 0.86)).toDestination();
     const limiter = new tone.Limiter(-1.2);
-    const comp = new tone.Compressor(-24, preset.genre === 'ambient' ? 2.1 : 3.4);
+    const comp = new tone.Compressor(-24, isAmbientProfile ? 2.1 : isDubstepProfile ? 2.6 : 3.4);
     const tonalBus = new tone.Gain(1);
     const transientBus = new tone.Gain(0.92);
-    const transientShape = new tone.Filter(preset.genre === 'ambient' ? 4200 : 6800, 'highpass');
+    const transientShape = new tone.Filter(isAmbientProfile ? 4200 : isDubstepProfile ? 5200 : 6800, 'highpass');
 
     tonalBus.connect(comp);
     transientBus.connect(comp);
@@ -531,70 +709,70 @@ export class AudioLabPlayer {
     transientShape.connect(transientBus);
 
     const reverb = new tone.Reverb({
-      decay: preset.genre === 'ambient' ? 6.2 : 2.8,
-      wet: preset.genre === 'ambient' ? 0.46 : 0.26,
+      decay: isAmbientProfile ? 6.2 : isFutureGarageProfile || isDubstepProfile ? 3.4 : 2.8,
+      wet: isAmbientProfile ? 0.46 : isFutureGarageProfile ? 0.32 : isDubstepProfile ? 0.28 : 0.26,
     });
     reverb.connect(tonalBus);
-    const delay = new tone.FeedbackDelay('8n', preset.genre === 'ambient' ? 0.34 : 0.24);
-    delay.wet.value = preset.genre === 'ambient' ? 0.26 : 0.16;
+    const delay = new tone.FeedbackDelay('8n', isAmbientProfile ? 0.34 : isDubstepProfile ? 0.31 : 0.24);
+    delay.wet.value = isAmbientProfile ? 0.26 : isFutureGarageProfile ? 0.2 : isDubstepProfile ? 0.22 : 0.16;
     delay.connect(tonalBus);
 
     const sparkle = new tone.PolySynth(tone.FMSynth, {
-      harmonicity: preset.genre === 'ambient' ? 1.08 : 1.38,
-      modulationIndex: preset.genre === 'ambient' ? 3.2 : 6.4,
+      harmonicity: isAmbientProfile ? 1.08 : isDubstepProfile ? 1.22 : 1.38,
+      modulationIndex: isAmbientProfile ? 3.2 : isDubstepProfile ? 4.5 : 6.4,
       envelope: {
-        attack: preset.genre === 'ambient' ? 0.02 : 0.008,
+        attack: isAmbientProfile ? 0.02 : isDubstepProfile ? 0.016 : 0.008,
         decay: 0.2,
         sustain: 0.15,
-        release: preset.genre === 'ambient' ? 0.9 : 0.35,
+        release: isAmbientProfile ? 0.9 : isFutureGarageProfile ? 0.52 : isDubstepProfile ? 0.44 : 0.35,
       },
     });
     sparkle.connect(reverb);
     sparkle.connect(delay);
 
     const body = new tone.PolySynth(tone.AMSynth, {
-      harmonicity: preset.genre === 'ambient' ? 1.1 : 1.52,
+      harmonicity: isAmbientProfile ? 1.1 : isDubstepProfile ? 1.25 : 1.52,
       envelope: {
-        attack: preset.genre === 'ambient' ? 0.015 : 0.005,
-        decay: preset.genre === 'ambient' ? 0.28 : 0.18,
-        sustain: preset.genre === 'ambient' ? 0.24 : 0.08,
-        release: preset.genre === 'ambient' ? 0.78 : 0.3,
+        attack: isAmbientProfile ? 0.015 : isDubstepProfile ? 0.012 : 0.005,
+        decay: isAmbientProfile ? 0.28 : isDubstepProfile ? 0.24 : 0.18,
+        sustain: isAmbientProfile ? 0.24 : isFutureGarageProfile || isDubstepProfile ? 0.14 : 0.08,
+        release: isAmbientProfile ? 0.78 : isFutureGarageProfile ? 0.42 : isDubstepProfile ? 0.36 : 0.3,
       },
     });
     body.connect(tonalBus);
 
     const pluck = new tone.PluckSynth({
       attackNoise: 0.7,
-      dampening: preset.genre === 'ambient' ? 2600 : 4800,
+      dampening: isAmbientProfile ? 2600 : isFutureGarageProfile ? 3200 : isDubstepProfile ? 2900 : 4800,
       resonance: 0.9,
     });
     pluck.connect(delay);
     pluck.connect(tonalBus);
 
     const punch = new tone.MonoSynth({
-      oscillator: { type: preset.id === 'lofi_jersey' || preset.id === 'lofi_2step' ? 'square' : 'triangle' },
+      oscillator: { type: isJerseyProfile || isUkgProfile || preset.id === 'lofi_2step' ? 'square' : 'triangle' },
       envelope: { attack: 0.004, decay: 0.2, sustain: 0.09, release: 0.24 },
-      filterEnvelope: { attack: 0.008, decay: 0.16, sustain: 0.08, release: 0.14, baseFrequency: 70, octaves: 3.1 },
+      filterEnvelope: { attack: 0.008, decay: 0.16, sustain: 0.08, release: 0.14, baseFrequency: isDubstepProfile ? 58 : 70, octaves: isDubstepProfile ? 2.4 : 3.1 },
     });
     punch.connect(tonalBus);
 
     const snap = new tone.NoiseSynth({
-      noise: { type: preset.genre === 'ambient' ? 'pink' : 'white' },
+      noise: { type: isAmbientProfile || isFutureGarageProfile ? 'pink' : 'white' },
       envelope: { attack: 0.001, decay: 0.07, sustain: 0 },
     });
     snap.connect(transientShape);
 
     const click = new tone.MetalSynth({
-      envelope: { attack: 0.001, decay: preset.genre === 'ambient' ? 0.05 : 0.09, release: 0.03 },
-      harmonicity: preset.genre === 'ambient' ? 3.2 : 6.8,
-      modulationIndex: preset.genre === 'ambient' ? 18 : 26,
-      resonance: preset.genre === 'ambient' ? 900 : 1600,
-      octaves: preset.genre === 'ambient' ? 1.1 : 1.6,
+      envelope: { attack: 0.001, decay: isAmbientProfile ? 0.05 : isDubstepProfile ? 0.07 : 0.09, release: 0.03 },
+      harmonicity: isAmbientProfile ? 3.2 : isDubstepProfile ? 4.2 : 6.8,
+      modulationIndex: isAmbientProfile ? 18 : isDubstepProfile ? 20 : 26,
+      resonance: isAmbientProfile ? 900 : isDubstepProfile ? 1300 : 1600,
+      octaves: isAmbientProfile ? 1.1 : isDubstepProfile ? 1.3 : 1.6,
     });
     click.connect(transientShape);
 
     const rise = new tone.Synth({
-      oscillator: { type: preset.genre === 'ambient' ? 'sine' : 'triangle' },
+      oscillator: { type: isAmbientProfile ? 'sine' : isDubstepProfile ? 'sawtooth' : 'triangle' },
       envelope: { attack: 0.02, decay: 0.35, sustain: 0, release: 0.35 },
     });
     rise.connect(delay);
@@ -620,24 +798,24 @@ export class AudioLabPlayer {
     const lowN1 = noteAtOctave(n1, 2);
     const lowN2 = noteAtOctave(n2, 2);
     const lowN3 = noteAtOctave(n3, 2);
-    const lofiAccent = preset.id === 'lofi_jersey' || preset.id === 'lofi_2step';
-    const syncNudge = preset.id === 'lofi_2step' ? 0.014 : preset.id === 'lofi_jersey' ? 0.01 : 0;
+    const garageAccent = isJerseyProfile || isUkgProfile || preset.id === 'lofi_2step';
+    const syncNudge = preset.id === 'lofi_2step' ? 0.014 : isJerseyProfile ? 0.01 : isUkgProfile ? 0.008 : isFutureGarageProfile ? 0.004 : 0;
     const velocityHuman = (base: number, spread: number) => Math.max(0, base + randomBetween(-spread, spread));
-    const tapAccent = lofiAccent && shouldTrigger(0.68);
+    const tapAccent = garageAccent && shouldTrigger(0.68);
 
     if (sfxId === 'tap') {
       click.triggerAttackRelease('64n', now, velocityHuman(0.14, 0.02));
-      snap.triggerAttackRelease('128n', now + 0.004, velocityHuman(preset.genre === 'ambient' ? 0.04 : 0.06, 0.01));
+      snap.triggerAttackRelease('128n', now + 0.004, velocityHuman(isAmbientProfile ? 0.04 : isDubstepProfile ? 0.05 : 0.06, 0.01));
       pluck.triggerAttack(n3, now + 0.01);
       body.triggerAttackRelease([n5], '16n', now + 0.03 + syncNudge, velocityHuman(0.18, 0.03));
       if (tapAccent) {
         click.triggerAttackRelease('64n', now + 0.065, velocityHuman(0.1, 0.02));
       }
-      if (preset.genre === 'ambient') {
+      if (isAmbientProfile || isFutureGarageProfile) {
         sparkle.triggerAttackRelease([n6], '8n', now + 0.08, velocityHuman(0.1, 0.03));
       }
     } else if (sfxId === 'correct') {
-      const burstOffset = preset.id === 'lofi_jersey' ? 0.06 : 0.085;
+      const burstOffset = isJerseyProfile ? 0.058 : isUkgProfile ? 0.07 : isDubstepProfile ? 0.1 : 0.085;
       sparkle.triggerAttackRelease([n2], '16n', now, velocityHuman(0.2, 0.03));
       sparkle.triggerAttackRelease([n4], '16n', now + burstOffset, velocityHuman(0.23, 0.03));
       sparkle.triggerAttackRelease([n6], '8n', now + burstOffset * 2, velocityHuman(0.22, 0.03));
@@ -645,6 +823,9 @@ export class AudioLabPlayer {
       pluck.triggerAttack(n5, now + 0.12 + syncNudge);
       click.triggerAttackRelease('64n', now + 0.015, velocityHuman(0.12, 0.02));
       snap.triggerAttackRelease('32n', now + 0.2, velocityHuman(0.09, 0.02));
+      if (isDubstepProfile) {
+        punch.triggerAttackRelease(lowN1, '8n', now + 0.04, velocityHuman(0.18, 0.03));
+      }
     } else if (sfxId === 'miss') {
       punch.triggerAttackRelease(lowN2, '8n', now, velocityHuman(0.22, 0.03));
       punch.triggerAttackRelease(lowN1, '8n', now + 0.1 + syncNudge, velocityHuman(0.17, 0.03));
@@ -663,7 +844,7 @@ export class AudioLabPlayer {
       rise.triggerAttackRelease(n7, '8n', now + 0.22, velocityHuman(0.14, 0.03));
       click.triggerAttackRelease('64n', now + 0.28, velocityHuman(0.13, 0.03));
       snap.triggerAttackRelease('32n', now + 0.34, velocityHuman(0.09, 0.02));
-      if (lofiAccent) {
+      if (garageAccent) {
         click.triggerAttackRelease('64n', now + 0.41, velocityHuman(0.11, 0.02));
       }
     }
@@ -672,7 +853,7 @@ export class AudioLabPlayer {
       () => {
         disposeList.forEach((node) => node.dispose());
       },
-      preset.genre === 'ambient' ? 3600 : 2400,
+      isAmbientProfile || isFutureGarageProfile ? 3600 : isDubstepProfile ? 3200 : 2400,
     );
   }
 
@@ -741,25 +922,31 @@ export class AudioLabPlayer {
   private buildToneGraph(tone: ToneModule, presetId: TonePresetId) {
     const preset = TONE_PRESET_LIBRARY[presetId];
     const totalSteps = preset.bars * STEPS_PER_BAR;
-    const isAmbient = preset.genre === 'ambient';
-    const isClubPreset = preset.id === 'lofi_jersey' || preset.id === 'lofi_2step';
+    const profile = preset.rhythmProfile;
+    const isAmbient = profile === 'ambient';
+    const isJersey = profile === 'jersey';
+    const isUkg = profile === 'ukg';
+    const isFutureGarage = profile === 'future_garage';
+    const isDubstep = profile === 'dubstep';
+    const isClubPreset = isJersey || isUkg || preset.id === 'lofi_2step';
+    const isHalfTimeBass = isDubstep || isFutureGarage;
 
     tone.Transport.stop();
     tone.Transport.cancel(0);
     tone.Transport.position = 0;
     tone.Transport.bpm.value = preset.bpm;
     tone.Transport.swing = preset.swing;
-    tone.Transport.swingSubdivision = isClubPreset ? '8n' : '16n';
+    tone.Transport.swingSubdivision = isClubPreset || isUkg ? '8n' : '16n';
     tone.Destination.volume.value = -9;
 
     const master = this.registerNode(new tone.Gain(curvedVolume(this.volume) * preset.masterGain).toDestination());
     this.toneGain = master;
     const limiter = this.registerNode(new tone.Limiter(-1.1));
-    const comp = this.registerNode(new tone.Compressor(-20, isAmbient ? 2 : 3.3));
-    const color = this.registerNode(new tone.Filter(isAmbient ? 7600 : 5400, 'lowpass'));
-    color.Q.value = isAmbient ? 0.8 : 1.45;
-    const tape = this.registerNode(new tone.Distortion(isAmbient ? 0.035 : 0.12));
-    tape.wet.value = isAmbient ? 0.1 : 0.2;
+    const comp = this.registerNode(new tone.Compressor(-20, isAmbient ? 2 : isDubstep ? 2.6 : 3.3));
+    const color = this.registerNode(new tone.Filter(isAmbient ? 7600 : isDubstep ? 4800 : 5400, 'lowpass'));
+    color.Q.value = isAmbient ? 0.8 : isDubstep ? 1.2 : 1.45;
+    const tape = this.registerNode(new tone.Distortion(isAmbient ? 0.035 : isDubstep ? 0.05 : 0.12));
+    tape.wet.value = isAmbient ? 0.1 : isDubstep ? 0.12 : 0.2;
     const sidechain = this.registerNode(new tone.Gain(1));
     const bus = this.registerNode(new tone.Gain(1));
     bus.connect(sidechain);
@@ -769,33 +956,33 @@ export class AudioLabPlayer {
     comp.connect(limiter);
     limiter.connect(master);
 
-    const reverb = this.registerNode(new tone.Reverb({ decay: isAmbient ? 6.2 : 2.8, wet: preset.reverbWet }));
+    const reverb = this.registerNode(new tone.Reverb({ decay: isAmbient ? 6.2 : isFutureGarage ? 4.2 : isDubstep ? 3.8 : 2.8, wet: preset.reverbWet }));
     reverb.connect(master);
-    const delay = this.registerNode(new tone.FeedbackDelay('8n', isAmbient ? 0.32 : 0.24));
+    const delay = this.registerNode(new tone.FeedbackDelay('8n', isAmbient ? 0.32 : isDubstep ? 0.29 : 0.24));
     delay.wet.value = preset.delayWet;
     delay.connect(master);
-    const chorus = this.registerNode(new tone.Chorus(2.8, 2.2, isAmbient ? 0.42 : 0.24).start());
+    const chorus = this.registerNode(new tone.Chorus(2.8, 2.2, isAmbient ? 0.42 : isFutureGarage ? 0.3 : 0.24).start());
     chorus.connect(master);
     const wobble = this.registerNode(
       new tone.LFO({
-        frequency: isAmbient ? 0.07 : 0.16,
-        min: isAmbient ? 2800 : 1800,
-        max: isAmbient ? 8400 : 5600,
+        frequency: isAmbient ? 0.07 : isDubstep ? 0.12 : 0.16,
+        min: isAmbient ? 2800 : isDubstep ? 1300 : 1800,
+        max: isAmbient ? 8400 : isDubstep ? 4300 : 5600,
       }).start(),
     );
     wobble.connect(color.frequency);
     const delayFlutter = this.registerNode(
       new tone.LFO({
-        frequency: isAmbient ? 0.09 : 0.18,
-        min: isAmbient ? 0.245 : 0.12,
-        max: isAmbient ? 0.275 : 0.17,
+        frequency: isAmbient ? 0.09 : isFutureGarage ? 0.13 : 0.18,
+        min: isAmbient ? 0.245 : isFutureGarage ? 0.16 : 0.12,
+        max: isAmbient ? 0.275 : isFutureGarage ? 0.24 : 0.17,
       }).start(),
     );
     delayFlutter.connect(delay.delayTime);
 
-    const ambienceFilter = this.registerNode(new tone.Filter(isAmbient ? 5100 : 6200, 'highpass'));
-    const ambienceGain = this.registerNode(new tone.Gain(isAmbient ? 0.018 : 0.011));
-    const ambienceNoise = this.registerNode(new tone.Noise(isAmbient ? 'brown' : 'pink'));
+    const ambienceFilter = this.registerNode(new tone.Filter(isAmbient || isFutureGarage || isDubstep ? 5100 : 6200, 'highpass'));
+    const ambienceGain = this.registerNode(new tone.Gain(isAmbient ? 0.018 : isFutureGarage ? 0.015 : isDubstep ? 0.013 : 0.011));
+    const ambienceNoise = this.registerNode(new tone.Noise(isAmbient || isFutureGarage || isDubstep ? 'brown' : 'pink'));
     ambienceNoise.connect(ambienceFilter);
     ambienceFilter.connect(ambienceGain);
     ambienceGain.connect(master);
@@ -803,8 +990,8 @@ export class AudioLabPlayer {
 
     const pad = this.registerNode(
       new tone.PolySynth(tone.Synth, {
-        oscillator: { type: isAmbient ? 'triangle' : 'sine' },
-        envelope: { attack: isAmbient ? 0.2 : 0.12, decay: 0.3, sustain: isAmbient ? 0.56 : 0.5, release: isAmbient ? 1.35 : 1.02 },
+        oscillator: { type: isAmbient || isFutureGarage ? 'triangle' : 'sine' },
+        envelope: { attack: isAmbient ? 0.2 : isFutureGarage || isDubstep ? 0.16 : 0.12, decay: 0.3, sustain: isAmbient ? 0.56 : isFutureGarage ? 0.58 : 0.5, release: isAmbient ? 1.35 : isFutureGarage || isDubstep ? 1.16 : 1.02 },
       }),
     );
     pad.connect(bus);
@@ -812,8 +999,8 @@ export class AudioLabPlayer {
 
     const keys = this.registerNode(
       new tone.PolySynth(tone.AMSynth, {
-        harmonicity: isAmbient ? 1.15 : 1.56,
-        envelope: { attack: isAmbient ? 0.03 : 0.01, decay: isAmbient ? 0.2 : 0.12, sustain: isAmbient ? 0.22 : 0.19, release: isAmbient ? 0.42 : 0.24 },
+        harmonicity: isAmbient ? 1.15 : isDubstep ? 1.34 : 1.56,
+        envelope: { attack: isAmbient ? 0.03 : isFutureGarage || isDubstep ? 0.02 : 0.01, decay: isAmbient ? 0.2 : isFutureGarage ? 0.18 : 0.12, sustain: isAmbient ? 0.22 : isFutureGarage ? 0.24 : 0.19, release: isAmbient ? 0.42 : isFutureGarage ? 0.32 : 0.24 },
       }),
     );
     keys.connect(bus);
@@ -821,9 +1008,9 @@ export class AudioLabPlayer {
 
     const lead = this.registerNode(
       new tone.PolySynth(tone.FMSynth, {
-        harmonicity: isAmbient ? 1.08 : isClubPreset ? 1.7 : 1.42,
-        modulationIndex: isAmbient ? 3.5 : isClubPreset ? 7 : 5.6,
-        envelope: { attack: isAmbient ? 0.05 : 0.012, decay: isAmbient ? 0.24 : 0.2, sustain: isAmbient ? 0.3 : 0.28, release: isAmbient ? 0.65 : 0.5 },
+        harmonicity: isAmbient ? 1.08 : isClubPreset ? 1.7 : isDubstep ? 1.24 : 1.42,
+        modulationIndex: isAmbient ? 3.5 : isClubPreset ? 7 : isDubstep ? 4.8 : 5.6,
+        envelope: { attack: isAmbient ? 0.05 : isDubstep ? 0.018 : 0.012, decay: isAmbient ? 0.24 : isDubstep ? 0.24 : 0.2, sustain: isAmbient ? 0.3 : isDubstep ? 0.2 : 0.28, release: isAmbient ? 0.65 : isFutureGarage || isDubstep ? 0.62 : 0.5 },
       }),
     );
     lead.connect(bus);
@@ -832,8 +1019,8 @@ export class AudioLabPlayer {
 
     const counterLead = this.registerNode(
       new tone.PolySynth(tone.Synth, {
-        oscillator: { type: isAmbient ? 'sine' : 'triangle' },
-        envelope: { attack: isAmbient ? 0.04 : 0.018, decay: 0.14, sustain: isAmbient ? 0.08 : 0.06, release: isAmbient ? 0.5 : 0.35 },
+        oscillator: { type: isAmbient || isFutureGarage ? 'sine' : 'triangle' },
+        envelope: { attack: isAmbient ? 0.04 : isFutureGarage ? 0.03 : 0.018, decay: 0.14, sustain: isAmbient ? 0.08 : isFutureGarage ? 0.12 : 0.06, release: isAmbient ? 0.5 : isFutureGarage ? 0.46 : 0.35 },
       }),
     );
     counterLead.connect(delay);
@@ -841,9 +1028,9 @@ export class AudioLabPlayer {
 
     const bass = this.registerNode(
       new tone.MonoSynth({
-        oscillator: { type: isClubPreset ? 'square' : 'triangle' },
-        envelope: { attack: 0.01, decay: 0.22, sustain: 0.2, release: 0.12 },
-        filterEnvelope: { attack: 0.01, decay: 0.15, sustain: 0.1, release: 0.1, baseFrequency: isAmbient ? 75 : 90, octaves: isClubPreset ? 3.2 : 2.7 },
+        oscillator: { type: isDubstep ? 'sawtooth' : isClubPreset ? 'square' : 'triangle' },
+        envelope: { attack: 0.01, decay: 0.22, sustain: isDubstep ? 0.25 : 0.2, release: 0.12 },
+        filterEnvelope: { attack: 0.01, decay: 0.15, sustain: 0.1, release: 0.1, baseFrequency: isAmbient ? 75 : isDubstep ? 58 : 90, octaves: isClubPreset ? 3.2 : isDubstep ? 2.2 : 2.7 },
       }),
     );
     bass.connect(bus);
@@ -895,8 +1082,8 @@ export class AudioLabPlayer {
 
     const texture = this.registerNode(
       new tone.NoiseSynth({
-        noise: { type: isAmbient ? 'brown' : 'pink' },
-        envelope: { attack: 0.001, decay: isAmbient ? 0.12 : 0.07, sustain: 0 },
+        noise: { type: isAmbient || isFutureGarage || isDubstep ? 'brown' : 'pink' },
+        envelope: { attack: 0.001, decay: isAmbient ? 0.12 : isFutureGarage ? 0.1 : isDubstep ? 0.09 : 0.07, sustain: 0 },
       }),
     );
     texture.connect(chorus);
@@ -905,21 +1092,21 @@ export class AudioLabPlayer {
     const kickBasePattern = preset.kickPattern;
     const kickLiftPattern = accentPattern(
       preset.id === 'lofi_2step' ? rotatePattern(kickBasePattern, 1) : kickBasePattern,
-      preset.id === 'lofi_jersey' ? [3, 7, 11, 15] : preset.id === 'lofi_2step' ? [5, 9, 13, 15] : [7, 11, 14],
+      isJersey ? [3, 7, 11, 15] : isUkg || preset.id === 'lofi_2step' ? [5, 9, 13, 15] : isFutureGarage ? [9, 15] : isDubstep ? [6, 11] : [7, 11, 14],
       1.08,
-      preset.id === 'lofi_jersey' ? 0.64 : 0.58,
+      isJersey ? 0.66 : isUkg ? 0.6 : isDubstep ? 0.62 : 0.58,
     );
     const clapBasePattern = preset.clapPattern;
-    const clapLiftPattern = accentPattern(clapBasePattern, isClubPreset ? [5, 13, 15] : [4, 12], 1.06, isAmbient ? 0.16 : 0.28);
+    const clapLiftPattern = accentPattern(clapBasePattern, isClubPreset ? [5, 13, 15] : isFutureGarage || isDubstep ? [8, 15] : [4, 12], 1.06, isAmbient ? 0.16 : isFutureGarage || isDubstep ? 0.22 : 0.28);
     const hatBasePattern = rotatePattern(preset.hatPattern, preset.id === 'lofi_2step' ? 1 : 0);
-    const hatLiftPattern = accentPattern(hatBasePattern, isClubPreset ? [1, 7, 11, 15] : [6, 14], 1.1, isAmbient ? 0.1 : 0.2);
+    const hatLiftPattern = accentPattern(hatBasePattern, isClubPreset || isUkg ? [1, 7, 11, 15] : isFutureGarage || isDubstep ? [7, 15] : [6, 14], 1.1, isAmbient ? 0.1 : isFutureGarage ? 0.16 : isDubstep ? 0.14 : 0.2);
     const ghostBasePattern = preset.id === 'lofi_2step' ? rotatePattern(preset.ghostPattern, 1) : preset.ghostPattern;
-    const ghostLiftPattern = accentPattern(ghostBasePattern, [3, 7, 11, 15], 1.05, 0.14);
-    const textureLiftPattern = accentPattern(preset.texturePattern, [0, 4, 8, 12], 1.12, isAmbient ? 0.14 : 0.11);
-    const keyLiftPattern = accentPattern(preset.keyPattern, isClubPreset ? [1, 5, 9, 13] : [2, 6, 10, 14], 1.08, isAmbient ? 0.16 : 0.24);
-    const subLiftPattern = accentPattern(preset.subPattern, [0, 4, 8, 12], 1.1, isAmbient ? 0.18 : 0.24);
+    const ghostLiftPattern = accentPattern(ghostBasePattern, isDubstep ? [14, 15] : [3, 7, 11, 15], 1.05, isDubstep ? 0.11 : 0.14);
+    const textureLiftPattern = accentPattern(preset.texturePattern, isFutureGarage || isDubstep ? [2, 6, 10, 14] : [0, 4, 8, 12], 1.12, isAmbient ? 0.14 : isFutureGarage || isDubstep ? 0.14 : 0.11);
+    const keyLiftPattern = accentPattern(preset.keyPattern, isClubPreset || isUkg ? [1, 5, 9, 13] : [2, 6, 10, 14], 1.08, isAmbient ? 0.16 : isFutureGarage ? 0.2 : 0.24);
+    const subLiftPattern = accentPattern(preset.subPattern, isHalfTimeBass ? [0, 8] : [0, 4, 8, 12], 1.1, isAmbient ? 0.18 : isDubstep ? 0.3 : 0.24);
 
-    const sidechainDepthBase = isAmbient ? 0.05 : 0.16;
+    const sidechainDepthBase = isAmbient ? 0.05 : isDubstep ? 0.1 : 0.16;
 
     const steps = Array.from({ length: totalSteps }, (_, step) => step);
     this.toneSequence = new tone.Sequence((time, step) => {
@@ -931,7 +1118,7 @@ export class AudioLabPlayer {
       const sectionTexture = getSectionTexture(section, preset.genre);
       const isLiftSection = section >= 2;
       const isFillBar = barInSection === 7;
-      const isDropBar = preset.id === 'lofi_2step' && section === 1 && barInSection === 3;
+      const isDropBar = (preset.id === 'lofi_2step' || isUkg) && section === 1 && barInSection === 3;
       const humanizedTime = (multiplier: number = 1) => time + randomBetween(-preset.humanizeSec, preset.humanizeSec) * multiplier;
       const velocityHuman = (base: number, spread: number) => Math.max(0, base + randomBetween(-spread, spread));
 
@@ -939,19 +1126,25 @@ export class AudioLabPlayer {
       const chord = section % 2 === 1 && bar % 2 === 0 ? rotateChord(chordBase, 1) : chordBase;
 
       if (stepInBar === 0) {
-        const colorTarget = isAmbient ? 5200 + section * 850 : 3000 + section * 720;
+        const colorTarget = isAmbient
+          ? 5200 + section * 850
+          : isDubstep
+            ? 2400 + section * 430
+            : isFutureGarage
+              ? 3400 + section * 520
+              : 3000 + section * 720;
         color.frequency.setTargetAtTime(colorTarget + (isFillBar ? 420 : 0), time, 0.4);
-        delay.wet.setTargetAtTime(Math.min(0.58, preset.delayWet + sectionTexture * 0.35), time, 0.7);
-        delay.feedback.setTargetAtTime(Math.min(0.5, (isAmbient ? 0.28 : 0.2) + sectionTexture * 0.38), time, 0.8);
+        delay.wet.setTargetAtTime(Math.min(0.62, preset.delayWet + sectionTexture * (isFutureGarage || isDubstep ? 0.44 : 0.35)), time, 0.7);
+        delay.feedback.setTargetAtTime(Math.min(0.52, (isAmbient ? 0.28 : isDubstep ? 0.26 : 0.2) + sectionTexture * 0.38), time, 0.8);
         reverb.wet.setTargetAtTime(Math.min(0.7, preset.reverbWet + sectionTexture * 0.26), time, 1.1);
-        ambienceGain.gain.setTargetAtTime((isAmbient ? 0.014 : 0.009) + sectionTexture * (isAmbient ? 0.024 : 0.012), time, 1.2);
+        ambienceGain.gain.setTargetAtTime((isAmbient ? 0.014 : isFutureGarage ? 0.012 : isDubstep ? 0.011 : 0.009) + sectionTexture * (isAmbient || isFutureGarage || isDubstep ? 0.024 : 0.012), time, 1.2);
       }
 
       if (stepInBar === 0 && bar % preset.padStrideBars === 0) {
         pad.triggerAttackRelease(chord, preset.padDuration, humanizedTime(0.7), velocityHuman(preset.padVelocity * sectionEnergy, 0.03));
         if (isLiftSection && shouldTrigger(isAmbient ? 0.45 : 0.3)) {
           const counterChord = chord.map((note) => tone.Frequency(note).transpose(12).toNote());
-          counterLead.triggerAttackRelease(counterChord, '4n', humanizedTime(0.6), velocityHuman(isAmbient ? 0.12 : 0.1, 0.03));
+          counterLead.triggerAttackRelease(counterChord, isFutureGarage || isDubstep ? '8n' : '4n', humanizedTime(0.6), velocityHuman(isAmbient || isFutureGarage ? 0.12 : 0.1, 0.03));
         }
       }
 
@@ -964,15 +1157,15 @@ export class AudioLabPlayer {
       const leadNote = leadMotif[stepInBar];
       if (leadNote) {
         let note = leadNote;
-        if (preset.genre === 'lofi' && isFillBar && stepInBar >= 12) {
+        if ((preset.genre === 'lofi' || isUkg || isJersey) && isFillBar && stepInBar >= 12) {
           note = tone.Frequency(leadNote).transpose(12).toNote();
-        } else if (isAmbient && isLiftSection && shouldTrigger(0.24) && stepInBar % 4 === 2) {
+        } else if ((isAmbient || isFutureGarage) && isLiftSection && shouldTrigger(0.24) && stepInBar % 4 === 2) {
           note = tone.Frequency(leadNote).transpose(7).toNote();
         }
         if (!isDropBar) {
           lead.triggerAttackRelease(note, preset.leadDuration, humanizedTime(), velocityHuman(preset.leadVelocity * (0.9 + section * 0.08), 0.06));
         }
-        if (isAmbient && shouldTrigger(0.16)) {
+        if ((isAmbient || isFutureGarage) && shouldTrigger(0.16)) {
           const response = tone.Frequency(note).transpose(12).toNote();
           counterLead.triggerAttackRelease(response, '8n', humanizedTime(0.6) + 0.06, velocityHuman(0.11, 0.02));
         }
@@ -981,7 +1174,7 @@ export class AudioLabPlayer {
       const bassMotif = preset.bassMotifs[(bar + section * 2) % preset.bassMotifs.length];
       const bassNote = bassMotif[stepInBar];
       if (bassNote && !isDropBar) {
-        const bassBase = preset.bassVelocity * (isClubPreset ? 1.06 : 1);
+        const bassBase = preset.bassVelocity * (isClubPreset ? 1.06 : isDubstep ? 1.1 : 1);
         bass.triggerAttackRelease(bassNote, preset.bassDuration, humanizedTime(0.6), velocityHuman(bassBase * (0.9 + section * 0.06), 0.05));
       }
 
@@ -993,12 +1186,12 @@ export class AudioLabPlayer {
       const kickVelocity = patternValue(isLiftSection ? kickLiftPattern : kickBasePattern, stepInBar);
       if (kickVelocity > 0 && !isDropBar) {
         const kickTime = humanizedTime(0.4);
-        kick.triggerAttackRelease('C1', '8n', kickTime, velocityHuman(kickVelocity * (0.9 + section * 0.06), 0.04));
+        kick.triggerAttackRelease('C1', isDubstep ? '4n' : '8n', kickTime, velocityHuman(kickVelocity * (0.9 + section * 0.06), 0.04));
         const duckDepth = Math.min(0.36, sidechainDepthBase + (isLiftSection ? 0.03 : 0) + (isFillBar ? 0.02 : 0));
         sidechain.gain.cancelScheduledValues(kickTime);
         sidechain.gain.setValueAtTime(1, kickTime);
         sidechain.gain.linearRampToValueAtTime(Math.max(0.58, 1 - duckDepth), kickTime + 0.012);
-        sidechain.gain.exponentialRampToValueAtTime(1, kickTime + (isAmbient ? 0.33 : 0.24));
+        sidechain.gain.exponentialRampToValueAtTime(1, kickTime + (isAmbient ? 0.33 : isDubstep ? 0.29 : 0.24));
       }
 
       const clapVelocity = patternValue(isLiftSection ? clapLiftPattern : clapBasePattern, stepInBar);
@@ -1007,12 +1200,12 @@ export class AudioLabPlayer {
       }
 
       const hatVelocity = patternValue(isLiftSection ? hatLiftPattern : hatBasePattern, stepInBar);
-      if (hatVelocity > 0 && shouldTrigger(isAmbient ? 0.62 : 0.87)) {
+      if (hatVelocity > 0 && shouldTrigger(isAmbient ? 0.62 : isFutureGarage || isDubstep ? 0.74 : 0.87)) {
         hat.triggerAttackRelease('32n', humanizedTime(0.28), velocityHuman(hatVelocity * (0.88 + section * 0.06), 0.04));
       }
 
       const ghostVelocity = patternValue(isLiftSection ? ghostLiftPattern : ghostBasePattern, stepInBar);
-      if (ghostVelocity > 0 && shouldTrigger(isAmbient ? 0.52 : 0.78)) {
+      if (ghostVelocity > 0 && shouldTrigger(isAmbient ? 0.52 : isFutureGarage ? 0.86 : isDubstep ? 0.66 : 0.78)) {
         ghost.triggerAttackRelease('64n', humanizedTime(0.2), velocityHuman(ghostVelocity, 0.03));
       }
 
@@ -1022,7 +1215,7 @@ export class AudioLabPlayer {
       }
 
       const textureVelocity = patternValue(isLiftSection ? textureLiftPattern : preset.texturePattern, stepInBar);
-      if (textureVelocity > 0 && shouldTrigger(isAmbient ? 0.8 : 0.7)) {
+      if (textureVelocity > 0 && shouldTrigger(isAmbient ? 0.8 : isFutureGarage || isDubstep ? 0.84 : 0.7)) {
         texture.triggerAttackRelease('32n', humanizedTime(0.5), velocityHuman(textureVelocity, 0.03));
       }
 
@@ -1034,11 +1227,15 @@ export class AudioLabPlayer {
         kick.triggerAttackRelease('C1', '16n', humanizedTime(0.2), velocityHuman(0.52, 0.03));
       }
 
+      if (isUkg && isFillBar && (stepInBar === 13 || stepInBar === 15) && shouldTrigger(0.62)) {
+        clap.triggerAttackRelease('64n', humanizedTime(0.2), velocityHuman(0.16, 0.02));
+      }
+
       if (preset.id === 'lofi_2step' && isLiftSection && (stepInBar === 3 || stepInBar === 11) && shouldTrigger(0.46)) {
         clap.triggerAttackRelease('64n', humanizedTime(0.2), velocityHuman(0.14, 0.02));
       }
 
-      if (isAmbient && stepInBar === 15 && shouldTrigger(0.36)) {
+      if ((isAmbient || isFutureGarage || isDubstep) && stepInBar === 15 && shouldTrigger(isDubstep ? 0.2 : 0.36)) {
         counterLead.triggerAttackRelease(chord.map((note) => tone.Frequency(note).transpose(12).toNote()), '8n', humanizedTime(0.4), velocityHuman(0.1, 0.02));
       }
     }, steps, '16n');
