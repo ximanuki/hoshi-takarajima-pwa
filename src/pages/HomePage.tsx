@@ -206,6 +206,24 @@ function getPerformanceBand(accuracy: number | null): PerformanceBand {
   return 'retry';
 }
 
+function hashText(value: string): number {
+  let hash = 2166136261;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+function getTimeSlotSeed(date: Date): number {
+  const y = date.getFullYear();
+  const m = date.getMonth() + 1;
+  const d = date.getDate();
+  const h = date.getHours();
+  const quarter = Math.floor(date.getMinutes() / 15);
+  return y * 1000000 + m * 10000 + d * 100 + h * 4 + quarter;
+}
+
 function createSessionSeed(): number {
   if (typeof globalThis !== 'undefined' && 'crypto' in globalThis && typeof globalThis.crypto?.getRandomValues === 'function') {
     const buffer = new Uint32Array(1);
@@ -216,20 +234,26 @@ function createSessionSeed(): number {
 }
 
 function buildMoodPool(dayPart: DayPart, band: PerformanceBand): PokoMood[] {
-  if (band === 'excellent') return dayPart === 'night' ? ['cheer', 'happy', 'normal', 'sleepy'] : ['cheer', 'cheer', 'happy', 'normal'];
-  if (band === 'good') return dayPart === 'night' ? ['happy', 'normal', 'sleepy', 'cheer'] : ['happy', 'happy', 'normal', 'cheer'];
-  if (band === 'retry') return dayPart === 'night' ? ['sleepy', 'normal', 'happy', 'cheer'] : ['normal', 'happy', 'sleepy', 'cheer'];
-  return dayPart === 'night' ? ['sleepy', 'normal', 'happy', 'cheer'] : ['happy', 'normal', 'cheer', 'sleepy'];
+  if (band === 'excellent') return dayPart === 'night' ? ['cheer', 'happy', 'sleepy', 'sleepy', 'normal'] : ['cheer', 'cheer', 'happy', 'normal', 'sleepy'];
+  if (band === 'good') return dayPart === 'night' ? ['happy', 'normal', 'sleepy', 'sleepy', 'cheer'] : ['happy', 'happy', 'normal', 'cheer', 'sleepy'];
+  if (band === 'retry') return dayPart === 'night' ? ['sleepy', 'sleepy', 'normal', 'happy', 'cheer'] : ['normal', 'happy', 'sleepy', 'sleepy', 'cheer'];
+  return dayPart === 'night' ? ['sleepy', 'sleepy', 'normal', 'happy', 'cheer'] : ['happy', 'normal', 'cheer', 'sleepy', 'sleepy'];
 }
 
 const SESSION_RANDOM_SEED = createSessionSeed();
+const sleepySuffixes = [
+  'はむちー、ねむねむ だけど おうえんは ぜんりょく！',
+  'ちょっと まぶたが おもいけど きみの ちからは しんじてるよ。',
+  'すやっと モードでも いっしょに こつこつ すすもうね。',
+  'ねむたい ときこそ ゆっくり ていねいに いこう。',
+  'おやすみ まえの 1もん、はむちー と しずかに クリアしよう。',
+];
 
 export function HomePage() {
   const streakDays = useAppStore((state) => state.streakDays);
   const recentResults = useAppStore((state) => state.recentResults);
   const adaptiveBySubject = useAppStore((state) => state.adaptiveBySubject);
   const skillProgress = useAppStore((state) => state.skillProgress);
-  const randomSeed = SESSION_RANDOM_SEED;
 
   const dueReviews = useMemo(
     () =>
@@ -238,28 +262,33 @@ export function HomePage() {
   );
 
   const last = recentResults[0];
-  const dayPart = getDayPart(new Date());
+  const now = new Date();
+  const dayPart = getDayPart(now);
+  const timeSlotSeed = getTimeSlotSeed(now);
   const accuracy = last ? last.accuracy : null;
   const performanceBand = getPerformanceBand(accuracy);
+  const resultSeed = hashText(last?.date ?? 'no-result');
+  const baseSeed = mixSeed(mixSeed(SESSION_RANDOM_SEED, timeSlotSeed), resultSeed);
 
   const mascotMood = useMemo(() => {
     const pool = buildMoodPool(dayPart, performanceBand);
-    return pickBySeed(pool, mixSeed(randomSeed, 11));
-  }, [dayPart, performanceBand, randomSeed]);
+    return pickBySeed(pool, mixSeed(baseSeed, 11));
+  }, [baseSeed, dayPart, performanceBand]);
 
   const mascotComment = useMemo(() => {
-    const opener = pickBySeed(dayPartOpeners[dayPart], mixSeed(randomSeed, 1));
-    const tone = pickBySeed(performanceSegments[performanceBand].tone, mixSeed(randomSeed, 2));
-    const action = pickBySeed(performanceSegments[performanceBand].actions, mixSeed(randomSeed, 3));
-    const closer = pickBySeed(performanceSegments[performanceBand].closers, mixSeed(randomSeed, 4));
+    const opener = pickBySeed(dayPartOpeners[dayPart], mixSeed(baseSeed, 1));
+    const tone = pickBySeed(performanceSegments[performanceBand].tone, mixSeed(baseSeed, 2));
+    const action = pickBySeed(performanceSegments[performanceBand].actions, mixSeed(baseSeed, 3));
+    const closer = pickBySeed(performanceSegments[performanceBand].closers, mixSeed(baseSeed, 4));
+    const sleepySuffix = mascotMood === 'sleepy' ? ` ${pickBySeed(sleepySuffixes, mixSeed(baseSeed, 5))}` : '';
 
     if (!last) {
-      return `${opener} ${tone} ${action} ${closer}`;
+      return `${opener} ${tone} ${action} ${closer}${sleepySuffix}`;
     }
 
     const score = Math.round(last.accuracy * 100);
-    return `${opener} ${subjectLabels[last.subject]}で ${last.correct}/${last.total} せいかい（せいとうりつ ${score}%）。 ${tone} ${action} ${closer}`;
-  }, [dayPart, last, performanceBand, randomSeed]);
+    return `${opener} ${subjectLabels[last.subject]}で ${last.correct}/${last.total} せいかい（せいとうりつ ${score}%）。 ${tone} ${action} ${closer}${sleepySuffix}`;
+  }, [baseSeed, dayPart, last, mascotMood, performanceBand]);
 
   return (
     <section className="stack">
