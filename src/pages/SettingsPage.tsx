@@ -85,6 +85,7 @@ export function SettingsPage() {
         <p>編集元: docs/question_bank_master.md</p>
         <p>アプリ参照: src/data/questions.generated.ts （src/data/questions.ts けいゆ）</p>
         <p>SVG描画: src/components/QuestionIllustration.tsx / src/utils/questionVisuals.ts</p>
+        <p>辞書データ: src/data/illustrationDictionary.ts</p>
         <p>
           もんだい数:
           {' '}

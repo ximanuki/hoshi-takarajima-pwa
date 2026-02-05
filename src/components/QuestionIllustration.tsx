@@ -1,4 +1,5 @@
 import type { Question } from '../types';
+import { resolveIconToken } from '../data/illustrationDictionary';
 import { getQuestionVisual, type MoneyItem } from '../utils/questionVisuals';
 
 type Props = {
@@ -7,39 +8,8 @@ type Props = {
 
 const MONEY_DENOMS = [1000, 500, 100, 50, 10, 5, 1] as const;
 
-const ODD_ONE_OUT_ICON_MAP: Record<string, string> = {
-  でんしゃ: '🚆',
-  バス: '🚌',
-  ひこうき: '✈️',
-  りんご: '🍎',
-  みかん: '🍊',
-  さくらんぼ: '🍒',
-  ぶどう: '🍇',
-  きゅうり: '🥒',
-  アイス: '🍨',
-  えんぴつ: '✏️',
-  けしごむ: '🧽',
-  ぼうし: '🧢',
-  てぶくろ: '🧤',
-  いぬ: '🐶',
-  ねこ: '🐱',
-  さかな: '🐟',
-  にわとり: '🐔',
-  すずめ: '🐦',
-  うみ: '🌊',
-  がっこう: '🏫',
-  としょかん: '📚',
-  はしる: '🏃',
-  あお: '🔵',
-  まる: '⚪',
-  さんかく: '🔺',
-  しかく: '⬜',
-  あさ: '🌅',
-  ひる: '☀️',
-};
-
 function getOddOneOutToken(item: string): { icon: string; isText: boolean } {
-  const mapped = ODD_ONE_OUT_ICON_MAP[item];
+  const mapped = resolveIconToken(item);
   if (mapped) {
     return { icon: mapped, isText: false };
   }

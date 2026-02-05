@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { QuestionIllustration } from '../components/QuestionIllustration';
+import { ICON_DICTIONARY, ILLUSTRATION_SCENE_DICTIONARY } from '../data/illustrationDictionary';
 import { questionBank } from '../data/questions';
 import { getQuestionVisual } from '../utils/questionVisuals';
 
@@ -74,6 +75,17 @@ export function IllustrationPreviewPage() {
           /
           {questionBank.length}
           問
+        </p>
+        <p>
+          アイコン辞書:
+          {' '}
+          {Object.keys(ICON_DICTIONARY).length}
+          {' '}
+          語 / シーン辞書:
+          {' '}
+          {Object.keys(ILLUSTRATION_SCENE_DICTIONARY).length}
+          {' '}
+          スキル
         </p>
       </article>
 
