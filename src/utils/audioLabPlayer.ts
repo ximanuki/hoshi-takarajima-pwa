@@ -1763,6 +1763,140 @@ export class AudioLabPlayer {
     texture.connect(chorus);
     texture.connect(reverb);
 
+    const padShimmer = this.registerNode(
+      new tone.PolySynth(tone.FMSynth, {
+        harmonicity: isAmbient || isFutureGarage ? 1.12 : 1.42,
+        modulationIndex: isAmbient || isFutureGarage ? 2.9 : 4.8,
+        envelope: {
+          attack: isAmbient ? 0.16 : 0.11,
+          decay: 0.22,
+          sustain: isAmbient ? 0.38 : 0.3,
+          release: isAmbient || isFutureGarage ? 1.25 : 0.92,
+        },
+      }),
+    );
+    padShimmer.connect(reverb);
+    padShimmer.connect(chorus);
+
+    const keyBody = this.registerNode(
+      new tone.PolySynth(tone.Synth, {
+        oscillator: { type: isAmbient || isFutureGarage ? 'triangle' : 'sine' },
+        envelope: {
+          attack: isAmbient ? 0.014 : 0.008,
+          decay: isAmbient || isFutureGarage ? 0.2 : 0.14,
+          sustain: isAmbient ? 0.16 : 0.1,
+          release: isAmbient ? 0.32 : 0.22,
+        },
+      }),
+    );
+    keyBody.connect(bus);
+    keyBody.connect(chorus);
+    const keyHammerFilter = this.registerNode(new tone.Filter(isAmbient ? 2600 : 3200, 'highpass'));
+    const keyHammer = this.registerNode(
+      new tone.NoiseSynth({
+        noise: { type: isAmbient ? 'pink' : 'white' },
+        envelope: { attack: 0.001, decay: isAmbient ? 0.018 : 0.026, sustain: 0 },
+      }),
+    );
+    keyHammer.connect(keyHammerFilter);
+    keyHammerFilter.connect(bus);
+
+    const leadBody = this.registerNode(
+      new tone.PolySynth(tone.Synth, {
+        oscillator: { type: isAmbient || isFutureGarage ? 'sine' : 'triangle' },
+        envelope: {
+          attack: isAmbient ? 0.02 : 0.012,
+          decay: isAmbient ? 0.24 : 0.16,
+          sustain: isAmbient ? 0.16 : 0.11,
+          release: isAmbient || isFutureGarage ? 0.48 : 0.32,
+        },
+      }),
+    );
+    leadBody.connect(delay);
+    leadBody.connect(bus);
+    const leadBreathFilter = this.registerNode(new tone.Filter(isAmbient || isFutureGarage ? 3400 : 4800, 'highpass'));
+    const leadBreath = this.registerNode(
+      new tone.NoiseSynth({
+        noise: { type: isAmbient || isFutureGarage ? 'pink' : 'white' },
+        envelope: { attack: 0.001, decay: isAmbient ? 0.05 : 0.035, sustain: 0 },
+      }),
+    );
+    leadBreath.connect(leadBreathFilter);
+    leadBreathFilter.connect(reverb);
+
+    const bassBody = this.registerNode(
+      new tone.MonoSynth({
+        oscillator: { type: isDubstep ? 'triangle' : 'sine' },
+        envelope: { attack: 0.008, decay: 0.18, sustain: 0.14, release: 0.1 },
+        filterEnvelope: {
+          attack: 0.01,
+          decay: 0.12,
+          sustain: 0.12,
+          release: 0.08,
+          baseFrequency: isDubstep ? 64 : 78,
+          octaves: isDubstep ? 1.8 : 2.2,
+        },
+      }),
+    );
+    bassBody.connect(bus);
+    const bassFingerFilter = this.registerNode(new tone.Filter(isDubstep ? 2200 : 3000, 'highpass'));
+    const bassFinger = this.registerNode(
+      new tone.NoiseSynth({
+        noise: { type: 'pink' },
+        envelope: { attack: 0.001, decay: 0.02, sustain: 0 },
+      }),
+    );
+    bassFinger.connect(bassFingerFilter);
+    bassFingerFilter.connect(bus);
+
+    const kickClickFilter = this.registerNode(new tone.Filter(2100, 'highpass'));
+    const kickClick = this.registerNode(
+      new tone.NoiseSynth({
+        noise: { type: 'white' },
+        envelope: { attack: 0.001, decay: 0.012, sustain: 0 },
+      }),
+    );
+    kickClick.connect(kickClickFilter);
+    kickClickFilter.connect(bus);
+
+    const snareTone = this.registerNode(
+      new tone.Synth({
+        oscillator: { type: 'triangle' },
+        envelope: { attack: 0.001, decay: isAmbient ? 0.08 : 0.12, sustain: 0, release: 0.02 },
+      }),
+    );
+    snareTone.connect(bus);
+    const snareSnapFilter = this.registerNode(new tone.Filter(isAmbient ? 2200 : 2600, 'highpass'));
+    const snareSnap = this.registerNode(
+      new tone.NoiseSynth({
+        noise: { type: 'white' },
+        envelope: { attack: 0.001, decay: isAmbient ? 0.045 : 0.065, sustain: 0 },
+      }),
+    );
+    snareSnap.connect(snareSnapFilter);
+    snareSnapFilter.connect(bus);
+
+    const hatOpen = this.registerNode(
+      new tone.MetalSynth({
+        envelope: { attack: 0.001, decay: isAmbient ? 0.08 : 0.12, release: 0.06 },
+        harmonicity: isAmbient ? 3.2 : 4.8,
+        modulationIndex: isAmbient ? 12 : 18,
+        resonance: isAmbient ? 1200 : 1800,
+        octaves: isAmbient ? 1.1 : 1.3,
+      }),
+    );
+    hatOpen.connect(bus);
+    hatOpen.connect(reverb);
+
+    const percussionWood = this.registerNode(
+      new tone.PluckSynth({
+        attackNoise: 0.5,
+        dampening: isAmbient ? 2600 : 4200,
+        resonance: 0.86,
+      }),
+    );
+    percussionWood.connect(bus);
+
     const kickBasePattern = preset.kickPattern;
     const kickLiftPattern = accentPattern(
       preset.id === 'lofi_2step' ? rotatePattern(kickBasePattern, 1) : kickBasePattern,
@@ -1819,6 +1953,13 @@ export class AudioLabPlayer {
 
       if (stepInBar === 0 && bar % preset.padStrideBars === 0) {
         pad.triggerAttackRelease(chord, preset.padDuration, humanizedTime(0.7), velocityHuman(preset.padVelocity * sectionEnergy, 0.03));
+        const shimmerChord = chord.map((note) => tone.Frequency(note).transpose(12).toNote());
+        padShimmer.triggerAttackRelease(
+          shimmerChord,
+          isAmbient || isFutureGarage ? '2n' : '1m',
+          humanizedTime(0.6),
+          velocityHuman(preset.padVelocity * 0.36 * sectionEnergy, 0.03),
+        );
         if (isLiftSection && shouldTrigger(isAmbient ? 0.45 : 0.3)) {
           const counterChord = chord.map((note) => tone.Frequency(note).transpose(12).toNote());
           counterLead.triggerAttackRelease(counterChord, isFutureGarage || isDubstep ? '8n' : '4n', humanizedTime(0.6), velocityHuman(isAmbient || isFutureGarage ? 0.12 : 0.1, 0.03));
@@ -1827,7 +1968,13 @@ export class AudioLabPlayer {
 
       const keyVelocity = patternValue(isLiftSection ? keyLiftPattern : preset.keyPattern, stepInBar);
       if (keyVelocity > 0) {
-        keys.triggerAttackRelease(chord, '16n', humanizedTime(), velocityHuman(keyVelocity * (0.84 + section * 0.07), 0.05));
+        const keyTime = humanizedTime();
+        const keyMainVelocity = velocityHuman(keyVelocity * (0.84 + section * 0.07), 0.05);
+        keys.triggerAttackRelease(chord, '16n', keyTime, keyMainVelocity);
+        keyBody.triggerAttackRelease(chord, '16n', keyTime + 0.004, velocityHuman(keyMainVelocity * 0.72, 0.04));
+        if (shouldTrigger(isAmbient ? 0.52 : 0.74)) {
+          keyHammer.triggerAttackRelease('128n', keyTime, velocityHuman(keyMainVelocity * 0.28, 0.03));
+        }
       }
 
       const leadMotif = preset.leadMotifs[(bar + section + (isLiftSection ? 1 : 0)) % preset.leadMotifs.length];
@@ -1840,7 +1987,14 @@ export class AudioLabPlayer {
           note = tone.Frequency(leadNote).transpose(7).toNote();
         }
         if (!isDropBar) {
-          lead.triggerAttackRelease(note, preset.leadDuration, humanizedTime(), velocityHuman(preset.leadVelocity * (0.9 + section * 0.08), 0.06));
+          const leadTime = humanizedTime();
+          const leadVelocity = velocityHuman(preset.leadVelocity * (0.9 + section * 0.08), 0.06);
+          lead.triggerAttackRelease(note, preset.leadDuration, leadTime, leadVelocity);
+          const bodyNote = tone.Frequency(note).transpose(isAmbient ? -12 : 0).toNote();
+          leadBody.triggerAttackRelease(bodyNote, isAmbient ? '8n' : '16n', leadTime + 0.01, velocityHuman(leadVelocity * 0.58, 0.04));
+          if (shouldTrigger(isAmbient || isFutureGarage ? 0.34 : 0.18)) {
+            leadBreath.triggerAttackRelease('64n', leadTime + 0.012, velocityHuman(leadVelocity * 0.2, 0.03));
+          }
         }
         if ((isAmbient || isFutureGarage) && shouldTrigger(0.16)) {
           const response = tone.Frequency(note).transpose(12).toNote();
@@ -1852,7 +2006,13 @@ export class AudioLabPlayer {
       const bassNote = bassMotif[stepInBar];
       if (bassNote && !isDropBar) {
         const bassBase = preset.bassVelocity * (isClubPreset ? 1.06 : isDubstep ? 1.1 : 1);
-        bass.triggerAttackRelease(bassNote, preset.bassDuration, humanizedTime(0.6), velocityHuman(bassBase * (0.9 + section * 0.06), 0.05));
+        const bassTime = humanizedTime(0.6);
+        const bassVelocity = velocityHuman(bassBase * (0.9 + section * 0.06), 0.05);
+        bass.triggerAttackRelease(bassNote, preset.bassDuration, bassTime, bassVelocity);
+        bassBody.triggerAttackRelease(bassNote, '16n', bassTime + 0.006, velocityHuman(bassVelocity * 0.45, 0.03));
+        if (shouldTrigger(isDubstep ? 0.46 : 0.28)) {
+          bassFinger.triggerAttackRelease('128n', bassTime + 0.003, velocityHuman(bassVelocity * 0.2, 0.02));
+        }
       }
 
       const subVelocity = patternValue(isLiftSection ? subLiftPattern : preset.subPattern, stepInBar);
@@ -1863,7 +2023,9 @@ export class AudioLabPlayer {
       const kickVelocity = patternValue(isLiftSection ? kickLiftPattern : kickBasePattern, stepInBar);
       if (kickVelocity > 0 && !isDropBar) {
         const kickTime = humanizedTime(0.4);
-        kick.triggerAttackRelease('C1', isDubstep ? '4n' : '8n', kickTime, velocityHuman(kickVelocity * (0.9 + section * 0.06), 0.04));
+        const kickPower = velocityHuman(kickVelocity * (0.9 + section * 0.06), 0.04);
+        kick.triggerAttackRelease('C1', isDubstep ? '4n' : '8n', kickTime, kickPower);
+        kickClick.triggerAttackRelease('128n', kickTime, velocityHuman(kickPower * 0.32, 0.03));
         const duckDepth = Math.min(0.36, sidechainDepthBase + (isLiftSection ? 0.03 : 0) + (isFillBar ? 0.02 : 0));
         sidechain.gain.cancelScheduledValues(kickTime);
         sidechain.gain.setValueAtTime(1, kickTime);
@@ -1873,22 +2035,36 @@ export class AudioLabPlayer {
 
       const clapVelocity = patternValue(isLiftSection ? clapLiftPattern : clapBasePattern, stepInBar);
       if (clapVelocity > 0) {
-        clap.triggerAttackRelease('16n', humanizedTime(0.35), velocityHuman(clapVelocity * (0.92 + section * 0.05), 0.05));
+        const clapTime = humanizedTime(0.35);
+        const clapPower = velocityHuman(clapVelocity * (0.92 + section * 0.05), 0.05);
+        clap.triggerAttackRelease('16n', clapTime, clapPower);
+        snareSnap.triggerAttackRelease('32n', clapTime, velocityHuman(clapPower * 0.52, 0.04));
+        snareTone.triggerAttackRelease(isAmbient ? 'D3' : 'E3', '32n', clapTime + 0.004, velocityHuman(clapPower * 0.42, 0.04));
       }
 
       const hatVelocity = patternValue(isLiftSection ? hatLiftPattern : hatBasePattern, stepInBar);
       if (hatVelocity > 0 && shouldTrigger(isAmbient ? 0.62 : isFutureGarage || isDubstep ? 0.74 : 0.87)) {
-        hat.triggerAttackRelease('32n', humanizedTime(0.28), velocityHuman(hatVelocity * (0.88 + section * 0.06), 0.04));
+        const hatTime = humanizedTime(0.28);
+        const hatPower = velocityHuman(hatVelocity * (0.88 + section * 0.06), 0.04);
+        hat.triggerAttackRelease('32n', hatTime, hatPower);
+        if (shouldTrigger(isClubPreset || isUkg ? 0.2 : 0.1)) {
+          hatOpen.triggerAttackRelease('16n', hatTime + 0.02, velocityHuman(hatPower * 0.32, 0.03));
+        }
       }
 
       const ghostVelocity = patternValue(isLiftSection ? ghostLiftPattern : ghostBasePattern, stepInBar);
       if (ghostVelocity > 0 && shouldTrigger(isAmbient ? 0.52 : isFutureGarage ? 0.86 : isDubstep ? 0.66 : 0.78)) {
-        ghost.triggerAttackRelease('64n', humanizedTime(0.2), velocityHuman(ghostVelocity, 0.03));
+        const ghostTime = humanizedTime(0.2);
+        const ghostPower = velocityHuman(ghostVelocity, 0.03);
+        ghost.triggerAttackRelease('64n', ghostTime, ghostPower);
+        if (shouldTrigger(0.28)) {
+          percussionWood.triggerAttack(noteAtOctave(chord[1], 5), ghostTime + 0.006);
+        }
       }
 
       const openHatVelocity = preset.openHatPattern[stepInBar];
       if (openHatVelocity > 0) {
-        hat.triggerAttackRelease('8n', humanizedTime(0.2), velocityHuman(openHatVelocity * (0.9 + section * 0.05), 0.03));
+        hatOpen.triggerAttackRelease('8n', humanizedTime(0.2), velocityHuman(openHatVelocity * (0.9 + section * 0.05), 0.03));
       }
 
       const textureVelocity = patternValue(isLiftSection ? textureLiftPattern : preset.texturePattern, stepInBar);
@@ -1897,7 +2073,9 @@ export class AudioLabPlayer {
       }
 
       if (preset.genre === 'lofi' && isFillBar && (stepInBar === 14 || stepInBar === 15)) {
-        clap.triggerAttackRelease('64n', humanizedTime(0.2), velocityHuman(0.12, 0.02));
+        const fillTime = humanizedTime(0.2);
+        clap.triggerAttackRelease('64n', fillTime, velocityHuman(0.12, 0.02));
+        snareTone.triggerAttackRelease('F3', '64n', fillTime + 0.004, velocityHuman(0.1, 0.02));
       }
 
       if (preset.id === 'lofi_jersey' && isFillBar && (stepInBar === 13 || stepInBar === 15)) {
@@ -1905,11 +2083,15 @@ export class AudioLabPlayer {
       }
 
       if (isUkg && isFillBar && (stepInBar === 13 || stepInBar === 15) && shouldTrigger(0.62)) {
-        clap.triggerAttackRelease('64n', humanizedTime(0.2), velocityHuman(0.16, 0.02));
+        const ukgFillTime = humanizedTime(0.2);
+        clap.triggerAttackRelease('64n', ukgFillTime, velocityHuman(0.16, 0.02));
+        snareSnap.triggerAttackRelease('64n', ukgFillTime + 0.004, velocityHuman(0.11, 0.02));
       }
 
       if (preset.id === 'lofi_2step' && isLiftSection && (stepInBar === 3 || stepInBar === 11) && shouldTrigger(0.46)) {
-        clap.triggerAttackRelease('64n', humanizedTime(0.2), velocityHuman(0.14, 0.02));
+        const twoStepGhostTime = humanizedTime(0.2);
+        clap.triggerAttackRelease('64n', twoStepGhostTime, velocityHuman(0.14, 0.02));
+        percussionWood.triggerAttack(noteAtOctave(chord[2], 5), twoStepGhostTime + 0.006);
       }
 
       if ((isAmbient || isFutureGarage || isDubstep) && stepInBar === 15 && shouldTrigger(isDubstep ? 0.2 : 0.36)) {
