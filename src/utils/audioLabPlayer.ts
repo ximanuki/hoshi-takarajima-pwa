@@ -2,6 +2,7 @@ import type { FeedbackDelay, Gain, MembraneSynth, MonoSynth, NoiseSynth, PolySyn
 
 export type AudioLabEngine = 'none' | 'asset' | 'tone';
 export type TonePresetId = 'lofi_cafe' | 'lofi_rain' | 'ambient_stars' | 'ambient_dream';
+export type ToneSfxId = 'tap' | 'correct' | 'miss' | 'clear';
 
 type ToneModule = typeof import('tone');
 
@@ -435,6 +436,162 @@ export class AudioLabPlayer {
     this.buildToneGraph(tone, presetId);
     tone.Transport.start('+0.04');
     this.engine = 'tone';
+  }
+
+  async playToneSfx(sfxId: ToneSfxId, presetId: TonePresetId = this.currentTonePreset) {
+    const tone = await this.loadTone();
+    try {
+      await tone.start();
+    } catch {
+      return;
+    }
+
+    const preset = TONE_PRESET_LIBRARY[presetId];
+    const now = tone.now();
+    const output = new tone.Gain(curvedVolume(this.volume) * 0.8).toDestination();
+    const reverb = new tone.Reverb({ decay: preset.genre === 'ambient' ? 4.8 : 2.2, wet: preset.genre === 'ambient' ? 0.34 : 0.2 });
+    reverb.connect(output);
+    const delay = new tone.FeedbackDelay('16n', preset.genre === 'ambient' ? 0.3 : 0.18);
+    delay.wet.value = preset.genre === 'ambient' ? 0.22 : 0.12;
+    delay.connect(output);
+
+    const disposables: Array<{ dispose: () => void }> = [output, reverb, delay];
+
+    if (presetId === 'lofi_cafe') {
+      if (sfxId === 'tap') {
+        const pluck = new tone.PluckSynth({ attackNoise: 0.8, dampening: 3600, resonance: 0.7 }).connect(delay);
+        pluck.triggerAttack('E5', now);
+        disposables.push(pluck);
+      } else if (sfxId === 'correct') {
+        const chord = new tone.PolySynth(tone.Synth, {
+          oscillator: { type: 'triangle' },
+          envelope: { attack: 0.01, decay: 0.12, sustain: 0.25, release: 0.16 },
+        });
+        chord.connect(reverb);
+        chord.triggerAttackRelease(['C5', 'E5', 'G5'], '8n', now, 0.32);
+        disposables.push(chord);
+      } else if (sfxId === 'miss') {
+        const mono = new tone.MonoSynth({
+          oscillator: { type: 'square' },
+          envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.1 },
+        }).connect(output);
+        mono.triggerAttackRelease('B2', '8n', now, 0.2);
+        mono.triggerAttackRelease('G2', '8n', now + 0.11, 0.17);
+        disposables.push(mono);
+      } else {
+        const bell = new tone.PolySynth(tone.AMSynth, {
+          harmonicity: 1.6,
+          envelope: { attack: 0.01, decay: 0.3, sustain: 0.2, release: 0.35 },
+        });
+        bell.connect(reverb);
+        bell.triggerAttackRelease(['C5', 'E5', 'A5'], '4n', now, 0.35);
+        disposables.push(bell);
+      }
+    } else if (presetId === 'lofi_rain') {
+      if (sfxId === 'tap') {
+        const drop = new tone.Synth({
+          oscillator: { type: 'sine' },
+          envelope: { attack: 0.002, decay: 0.12, sustain: 0, release: 0.14 },
+        }).connect(delay);
+        drop.triggerAttackRelease('D5', '16n', now, 0.28);
+        disposables.push(drop);
+      } else if (sfxId === 'correct') {
+        const soft = new tone.PolySynth(tone.Synth, {
+          oscillator: { type: 'triangle' },
+          envelope: { attack: 0.01, decay: 0.26, sustain: 0.15, release: 0.24 },
+        });
+        soft.connect(reverb);
+        soft.triggerAttackRelease(['D5', 'F5', 'A5'], '8n', now, 0.28);
+        disposables.push(soft);
+      } else if (sfxId === 'miss') {
+        const noise = new tone.NoiseSynth({
+          noise: { type: 'pink' },
+          envelope: { attack: 0.001, decay: 0.12, sustain: 0 },
+        }).connect(output);
+        noise.triggerAttackRelease('16n', now, 0.14);
+        disposables.push(noise);
+      } else {
+        const swell = new tone.PolySynth(tone.AMSynth, {
+          harmonicity: 1.25,
+          envelope: { attack: 0.02, decay: 0.25, sustain: 0.2, release: 0.32 },
+        });
+        swell.connect(reverb);
+        swell.triggerAttackRelease(['A4', 'C5', 'E5'], '4n', now, 0.3);
+        disposables.push(swell);
+      }
+    } else if (presetId === 'ambient_stars') {
+      if (sfxId === 'tap') {
+        const blip = new tone.FMSynth({
+          harmonicity: 2,
+          modulationIndex: 4,
+          envelope: { attack: 0.005, decay: 0.2, sustain: 0, release: 0.22 },
+        }).connect(reverb);
+        blip.triggerAttackRelease('G5', '8n', now, 0.23);
+        disposables.push(blip);
+      } else if (sfxId === 'correct') {
+        const shimmer = new tone.PolySynth(tone.FMSynth, {
+          harmonicity: 1.2,
+          modulationIndex: 6,
+          envelope: { attack: 0.06, decay: 0.3, sustain: 0.2, release: 0.8 },
+        });
+        shimmer.connect(reverb);
+        shimmer.triggerAttackRelease(['C5', 'E5', 'G5', 'B5'], '2n', now, 0.24);
+        disposables.push(shimmer);
+      } else if (sfxId === 'miss') {
+        const low = new tone.MonoSynth({
+          oscillator: { type: 'sine' },
+          envelope: { attack: 0.02, decay: 0.25, sustain: 0.12, release: 0.45 },
+        }).connect(reverb);
+        low.triggerAttackRelease('E2', '4n', now, 0.12);
+        disposables.push(low);
+      } else {
+        const clear = new tone.PolySynth(tone.Synth, {
+          oscillator: { type: 'sine' },
+          envelope: { attack: 0.08, decay: 0.2, sustain: 0.28, release: 1 },
+        });
+        clear.connect(reverb);
+        clear.triggerAttackRelease(['C5', 'G5', 'D6'], '1n', now, 0.22);
+        disposables.push(clear);
+      }
+    } else {
+      if (sfxId === 'tap') {
+        const pulse = new tone.Synth({
+          oscillator: { type: 'triangle' },
+          envelope: { attack: 0.01, decay: 0.18, sustain: 0.06, release: 0.26 },
+        }).connect(reverb);
+        pulse.triggerAttackRelease('A4', '8n', now, 0.2);
+        disposables.push(pulse);
+      } else if (sfxId === 'correct') {
+        const dream = new tone.PolySynth(tone.AMSynth, {
+          harmonicity: 1.1,
+          envelope: { attack: 0.05, decay: 0.28, sustain: 0.24, release: 0.9 },
+        });
+        dream.connect(reverb);
+        dream.triggerAttackRelease(['A4', 'C5', 'E5', 'G5'], '2n', now, 0.24);
+        disposables.push(dream);
+      } else if (sfxId === 'miss') {
+        const hollow = new tone.MonoSynth({
+          oscillator: { type: 'triangle' },
+          envelope: { attack: 0.02, decay: 0.2, sustain: 0.08, release: 0.35 },
+        }).connect(reverb);
+        hollow.triggerAttackRelease('D2', '4n', now, 0.12);
+        hollow.triggerAttackRelease('C2', '8n', now + 0.2, 0.1);
+        disposables.push(hollow);
+      } else {
+        const rise = new tone.PolySynth(tone.FMSynth, {
+          harmonicity: 1.3,
+          modulationIndex: 3.8,
+          envelope: { attack: 0.09, decay: 0.2, sustain: 0.2, release: 1.1 },
+        });
+        rise.connect(reverb);
+        rise.triggerAttackRelease(['E5', 'A5', 'C6'], '1n', now, 0.2);
+        disposables.push(rise);
+      }
+    }
+
+    window.setTimeout(() => {
+      disposables.forEach((node) => node.dispose());
+    }, preset.genre === 'ambient' ? 2600 : 1500);
   }
 
   stop() {

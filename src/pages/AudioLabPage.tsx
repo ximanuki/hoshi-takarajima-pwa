@@ -1,12 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { audioManager } from '../utils/audioManager';
-import { AudioLabPlayer, type AudioLabEngine, type TonePresetId } from '../utils/audioLabPlayer';
+import { AudioLabPlayer, type AudioLabEngine, type TonePresetId, type ToneSfxId } from '../utils/audioLabPlayer';
 
 const engineLabel: Record<AudioLabEngine, string> = {
   none: '停止中',
   asset: '1) 音源ファイル ループ方式',
   tone: '2) Tone.js シーケンサー方式',
+};
+
+const sfxLabel: Record<ToneSfxId, string> = {
+  tap: 'タップ',
+  correct: 'せいかい',
+  miss: 'ざんねん',
+  clear: 'クリア',
 };
 
 export function AudioLabPage() {
@@ -16,6 +23,7 @@ export function AudioLabPage() {
   const [volume, setVolume] = useState(0.65);
   const [toneLoading, setToneLoading] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState<TonePresetId>(player.getCurrentTonePreset());
+  const selectedPresetMeta = tonePresets.find((preset) => preset.id === selectedPreset) ?? tonePresets[0];
 
   useEffect(() => {
     audioManager.setBgmSuppressed(true);
@@ -41,6 +49,10 @@ export function AudioLabPage() {
   const onStop = () => {
     player.stop();
     setEngine(player.getEngine());
+  };
+
+  const onPlaySfx = async (sfxId: ToneSfxId) => {
+    await player.playToneSfx(sfxId, selectedPreset);
   };
 
   const onVolumeChange = (nextVolume: number) => {
@@ -104,6 +116,18 @@ export function AudioLabPage() {
             </button>
           ))}
         </div>
+      </article>
+
+      <article className="card stack">
+        <h2>プリセット専用効果音: {selectedPresetMeta.name}</h2>
+        <div className="audio-lab-sfx-grid">
+          {(Object.keys(sfxLabel) as ToneSfxId[]).map((sfxId) => (
+            <button key={sfxId} className="ghost-btn" disabled={toneLoading} onClick={() => void onPlaySfx(sfxId)}>
+              {sfxLabel[sfxId]}
+            </button>
+          ))}
+        </div>
+        <p className="audio-lab-note">各BGMごとに音色を作り分けた効果音です。曲を切り替えると効果音の質感も変わります。</p>
       </article>
 
       <article className="card audio-lab-grid">
