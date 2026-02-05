@@ -148,7 +148,7 @@ export function IllustrationPreviewPage() {
       )}
 
       <article className="card preview-card">
-        <h2>あいぼう「ポコ」プレビュー</h2>
+        <h2>あいぼう「ポコ（ハムチーモデル）」プレビュー</h2>
         <p className="preview-meta">表情とポーズを切り替えて確認できます。</p>
         <div className="inline-actions">
           {pokoMoods.map((mood) => (

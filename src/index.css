@@ -418,8 +418,8 @@ p {
   margin-top: 6px;
   padding: 12px;
   border-radius: 14px;
-  border: 2px dashed #b8d5ff;
-  background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+  border: 2px dashed #b9d9ff;
+  background: radial-gradient(circle at 50% 0%, #fbfdff 0%, #f2f8ff 48%, #ffffff 100%);
   display: grid;
   gap: 8px;
   justify-items: center;
@@ -428,44 +428,70 @@ p {
 .poko-svg {
   width: min(320px, 100%);
   height: auto;
+  animation: poko-breathe 3.2s ease-in-out infinite;
 }
 
 .poko-shadow {
-  fill: rgba(66, 105, 168, 0.2);
+  fill: rgba(93, 111, 155, 0.22);
 }
 
 .poko-body {
-  fill: url(#poko-body);
-  stroke: #cf9858;
-  stroke-width: 3;
+  fill: url(#poko-body-fur);
+  stroke: #be8442;
+  stroke-width: 3.2;
 }
 
 .poko-belly {
-  fill: url(#poko-belly);
-  stroke: #e7c790;
+  fill: url(#poko-cream-fur);
+  stroke: #debd87;
+  stroke-width: 2;
+}
+
+.poko-head {
+  fill: url(#poko-body-fur);
+  stroke: #be8442;
+  stroke-width: 3.1;
+}
+
+.poko-spot {
+  fill: #d39646;
+  opacity: 0.75;
+}
+
+.poko-tail {
+  fill: #f4be74;
+  stroke: #be8442;
   stroke-width: 2;
 }
 
 .poko-ear {
-  fill: #ffde9b;
-  stroke: #cf9858;
-  stroke-width: 3;
+  fill: #f5bf6f;
+  stroke: #be8442;
+  stroke-width: 2.8;
 }
 
-.poko-arm,
-.poko-foot {
-  fill: #ffd98f;
-  stroke: #cf9858;
-  stroke-width: 2.5;
+.poko-ear-inner {
+  fill: #ffdec5;
+  stroke: #dfa677;
+  stroke-width: 1.7;
+}
+
+.poko-muzzle {
+  fill: url(#poko-cream-fur);
+  stroke: #e2c290;
+  stroke-width: 1.8;
 }
 
 .poko-cheek {
-  fill: #ffb8a6;
-  opacity: 0.85;
+  fill: url(#poko-cheek-grad);
+}
+
+.poko-nose {
+  fill: #b56e5d;
 }
 
 .poko-eye {
-  fill: #2f435f;
+  fill: #2d3f59;
 }
 
 .poko-eye-shine {
@@ -485,7 +511,7 @@ p {
 
 .poko-mouth {
   fill: none;
-  stroke: #9d4c44;
+  stroke: #8f4d45;
   stroke-width: 4;
   stroke-linecap: round;
 }
@@ -496,33 +522,55 @@ p {
 
 .poko-mouth-inner {
   fill: none;
-  stroke: #c86b60;
+  stroke: #bc6a60;
   stroke-width: 3;
   stroke-linecap: round;
 }
 
+.poko-whisker {
+  fill: none;
+  stroke: #7c6659;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.poko-paw,
+.poko-foot {
+  fill: #f5c474;
+  stroke: #be8442;
+  stroke-width: 2.4;
+}
+
+.poko-bandana {
+  fill: #80aff2;
+  stroke: #4f85d0;
+  stroke-width: 2;
+}
+
+.poko-bandana-knot {
+  fill: #4e80c8;
+}
+
 .poko-star {
-  fill: #fff2b7;
-  stroke: #cf9858;
-  stroke-width: 2.5;
+  fill: #ffec9a;
+  stroke: #c88b3c;
+  stroke-width: 2.2;
 }
 
-.poko-scarf {
-  fill: #87b9ff;
-}
-
-.poko-scarf-knot {
-  fill: #5e91dd;
-}
-
-.poko-sleep {
-  fill: #607aa8;
-  font-size: 15px;
-}
-
-.poko-cheer {
-  fill: #4478ce;
+.poko-emote {
+  fill: #4976bb;
   font-size: 14px;
+  font-weight: 800;
+}
+
+@keyframes poko-breathe {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1.8px);
+  }
 }
 
 .preview-grid {
