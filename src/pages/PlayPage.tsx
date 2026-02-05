@@ -4,6 +4,7 @@ import { QuestionIllustration } from '../components/QuestionIllustration';
 import { questionMetaById } from '../data/question_meta';
 import { useAppStore } from '../store/useAppStore';
 import { getMisconceptionFeedback } from '../utils/misconceptions';
+import { audioManager } from '../utils/audioManager';
 
 const modeLabel = {
   learn: 'まなび',
@@ -46,6 +47,7 @@ export function PlayPage() {
       submitAnswer(selected);
       const correct = selected === question.answerIndex;
       const errorTag = questionMetaById[question.id]?.wrongChoiceTags?.[selected];
+      audioManager.playSfx(correct ? 'correct' : 'wrong');
       setFeedback({
         correct,
         message: correct ? 'せいかい！ そのちょうし！' : errorTag ? getMisconceptionFeedback(errorTag) : 'もういちど みてみよう',

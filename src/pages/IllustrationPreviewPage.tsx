@@ -87,7 +87,7 @@ export function IllustrationPreviewPage() {
           {' '}
           スキル
         </p>
-        <p>なかまさがしカードはカテゴリ辞書に応じて配色が自動で変わります。</p>
+        <p>なかまさがしカードは同じ配色で表示されます（色ヒントなし）。</p>
       </article>
 
       <article className="card preview-card">

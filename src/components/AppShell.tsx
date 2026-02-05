@@ -1,6 +1,7 @@
 import { Link, NavLink } from 'react-router-dom';
 import type { PropsWithChildren } from 'react';
 import { useAppStore } from '../store/useAppStore';
+import { SoundController } from './SoundController';
 
 export function AppShell({ children }: PropsWithChildren) {
   const level = useAppStore((state) => state.level);
@@ -9,6 +10,7 @@ export function AppShell({ children }: PropsWithChildren) {
 
   return (
     <div className="app-frame">
+      <SoundController />
       <header className="topbar">
         <Link to="/" className="logo">
           ほしのたからじま

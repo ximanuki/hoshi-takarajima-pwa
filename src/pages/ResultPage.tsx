@@ -1,6 +1,8 @@
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 import { getMisconceptionFeedback, getMisconceptionLabel } from '../utils/misconceptions';
+import { audioManager } from '../utils/audioManager';
 
 const modeLabel = {
   learn: 'まなびミッション',
@@ -10,6 +12,14 @@ const modeLabel = {
 
 export function ResultPage() {
   const result = useAppStore((state) => state.latestResult);
+  const lastPlayedResultDate = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!result) return;
+    if (lastPlayedResultDate.current === result.date) return;
+    lastPlayedResultDate.current = result.date;
+    audioManager.playSfx('clear');
+  }, [result]);
 
   if (!result) {
     return (
