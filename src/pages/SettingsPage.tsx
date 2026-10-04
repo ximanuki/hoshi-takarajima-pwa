@@ -1,27 +1,27 @@
 import { Link } from 'react-router-dom';
 import { questionBank } from '../data/questions';
+import { SUBJECTS, createSubjectRecord, subjectInfo } from '../data/subjects';
 import { useAppStore } from '../store/useAppStore';
-import type { Subject } from '../types';
+import type { ThemePreference } from '../types';
+import { isSpeechSupported, speak } from '../utils/speech';
 
-const subjectLabels: Record<Subject, string> = {
-  math: 'さんすう',
-  japanese: 'こくご',
-  life: 'くらし',
-  insight: 'ひらめき',
-};
+const THEME_OPTIONS: Array<{ value: ThemePreference; label: string }> = [
+  { value: 'system', label: 'じどう' },
+  { value: 'light', label: '☀️ ひる' },
+  { value: 'dark', label: '🌙 よる' },
+];
 
 export function SettingsPage() {
-  const soundEnabled = useAppStore((state) => state.settings.soundEnabled);
-  const bgmVolume = useAppStore((state) => state.settings.bgmVolume);
-  const sfxVolume = useAppStore((state) => state.settings.sfxVolume);
+  const settings = useAppStore((state) => state.settings);
   const updateSettings = useAppStore((state) => state.updateSettings);
   const clearProgress = useAppStore((state) => state.clearProgress);
-  const subjectCounts = questionBank.reduce<Record<Subject, number>>(
-    (counts, question) => ({
-      ...counts,
-      [question.subject]: counts[question.subject] + 1,
-    }),
-    { math: 0, japanese: 0, life: 0, insight: 0 },
+  const speechSupported = isSpeechSupported();
+  const subjectCounts = questionBank.reduce(
+    (counts, question) => {
+      counts[question.subject] += 1;
+      return counts;
+    },
+    createSubjectRecord(() => 0),
   );
 
   const onReset = () => {
@@ -31,72 +31,125 @@ export function SettingsPage() {
 
   return (
     <section className="stack">
-      <h1>せってい</h1>
+      <div>
+        <p className="eyebrow">じぶんに あわせよう</p>
+        <h1>せってい</h1>
+      </div>
 
-      <article className="card">
+      <article className="card settings-group">
+        <h2>🔈 おと</h2>
         <label className="field-row">
           <span>サウンド</span>
           <input
-            checked={soundEnabled}
+            className="switch"
+            checked={settings.soundEnabled}
             type="checkbox"
             onChange={(event) => updateSettings({ soundEnabled: event.target.checked })}
           />
         </label>
 
         <label className="field-stack">
-          <span>BGM おんりょう: {Math.round(bgmVolume * 100)}%</span>
+          <span>BGM おんりょう: {Math.round(settings.bgmVolume * 100)}%</span>
           <input
             max={1}
             min={0}
             step={0.1}
             type="range"
-            value={bgmVolume}
+            value={settings.bgmVolume}
             onChange={(event) => updateSettings({ bgmVolume: Number(event.target.value) })}
           />
         </label>
 
         <label className="field-stack">
-          <span>こうかおん: {Math.round(sfxVolume * 100)}%</span>
+          <span>こうかおん: {Math.round(settings.sfxVolume * 100)}%</span>
           <input
             max={1}
             min={0}
             step={0.1}
             type="range"
-            value={sfxVolume}
+            value={settings.sfxVolume}
             onChange={(event) => updateSettings({ sfxVolume: Number(event.target.value) })}
           />
         </label>
       </article>
 
-      <div className="card inline-actions">
-        <Link className="ghost-btn" to="/parent">
-          保護者画面へ
-        </Link>
-        <Link className="ghost-btn" to="/settings/audio-lab">
-          BGM比較ラボへ
-        </Link>
-        <Link className="ghost-btn" to="/illustrations">
-          SVGプレビューへ
-        </Link>
+      <article className="card settings-group">
+        <h2>👀 みやすさ・よみあげ</h2>
+        <label className="field-row">
+          <span>
+            もんだいを よみあげる
+            <small>{speechSupported ? 'もんだいが でたら じどうで よむよ' : 'この きかいでは つかえません'}</small>
+          </span>
+          <input
+            className="switch"
+            checked={settings.readAloud}
+            disabled={!speechSupported}
+            type="checkbox"
+            onChange={(event) => {
+              updateSettings({ readAloud: event.target.checked });
+              if (event.target.checked) speak('もんだいを よみあげるよ');
+            }}
+          />
+        </label>
+
+        <label className="field-row">
+          <span>
+            もじを おおきく
+            <small>ちいさい がめんでも よみやすく</small>
+          </span>
+          <input
+            className="switch"
+            checked={settings.largeText}
+            type="checkbox"
+            onChange={(event) => updateSettings({ largeText: event.target.checked })}
+          />
+        </label>
+
+        <div className="field-row">
+          <span>
+            がめんの いろ
+            <small>よるは めに やさしい いろに</small>
+          </span>
+          <div className="segmented" role="group" aria-label="がめんの いろ">
+            {THEME_OPTIONS.map((option) => (
+              <button
+                aria-pressed={settings.theme === option.value}
+                key={option.value}
+                onClick={() => updateSettings({ theme: option.value })}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </article>
+
+      <article className="card stack">
+        <h2>👪 おうちの かた・かいはつ</h2>
+        <div className="link-list">
+          <Link className="link-row" to="/parent">
+            保護者ダッシュボード <span aria-hidden="true">›</span>
+          </Link>
+          <Link className="link-row" to="/settings/audio-lab">
+            BGM比較ラボ <span aria-hidden="true">›</span>
+          </Link>
+          <Link className="link-row" to="/illustrations">
+            SVGプレビュー <span aria-hidden="true">›</span>
+          </Link>
+        </div>
         <button className="danger-btn" onClick={onReset}>
           データをリセット
         </button>
-      </div>
+      </article>
 
-      <article className="card">
-        <h2>もんだいデータの 参照元</h2>
-        <p>編集元: docs/question_bank_master.md</p>
-        <p>アプリ参照: src/data/questions.generated.ts （src/data/questions.ts けいゆ）</p>
-        <p>SVG描画: src/components/QuestionIllustration.tsx / src/utils/questionVisuals.ts</p>
-        <p>辞書データ: src/data/illustrationDictionary.ts</p>
-        <p>
-          もんだい数:
-          {' '}
-          {(Object.keys(subjectLabels) as Subject[])
-            .map((subject) => `${subjectLabels[subject]} ${subjectCounts[subject]}`)
-            .join(' / ')}
-          {' '}
-          / ごうけい {questionBank.length}
+      <article className="card stack" style={{ gap: 6 }}>
+        <h2>📚 もんだいデータ</h2>
+        <p className="muted" style={{ fontSize: '0.85rem' }}>
+          {SUBJECTS.map((subject) => `${subjectInfo[subject].emoji}${subjectInfo[subject].label} ${subjectCounts[subject]}`).join(' / ')}
+          {' '}/ ごうけい {questionBank.length}もん
+        </p>
+        <p className="muted" style={{ fontSize: '0.75rem' }}>
+          編集元: docs/question_bank_master.md → src/data/questions.generated.ts
         </p>
       </article>
     </section>

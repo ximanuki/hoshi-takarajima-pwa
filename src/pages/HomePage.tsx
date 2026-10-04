@@ -1,20 +1,16 @@
 import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import { PokoIllustration } from '../components/PokoIllustration';
-import type { PokoMood } from '../components/PokoIllustration';
+import type { CSSProperties } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { DailyQuestCard } from '../components/DailyQuestCard';
+import { hamcheeSrc } from '../utils/hamchee';
+import type { PokoMood } from '../utils/hamchee';
+import { SUBJECTS, subjectInfo } from '../data/subjects';
 import { useAppStore } from '../store/useAppStore';
 import type { Subject } from '../types';
 import { audioManager } from '../utils/audioManager';
 import { getDueReviewCount } from '../utils/mission';
-
-const subjectLabels: Record<Subject, string> = {
-  math: 'さんすう',
-  japanese: 'こくご',
-  life: 'くらし',
-  insight: 'ひらめき',
-};
-
-const homeSubjects: Subject[] = ['math', 'japanese', 'life', 'insight'];
+import { getLevelTitle, levelProgress } from '../utils/progression';
+import { isSpeechSupported, speak } from '../utils/speech';
 type DayPart = 'morning' | 'daytime' | 'night';
 type PerformanceBand = 'no_data' | 'excellent' | 'good' | 'retry';
 
@@ -251,14 +247,15 @@ const sleepySuffixes = [
 ];
 
 export function HomePage() {
+  const navigate = useNavigate();
+  const xp = useAppStore((state) => state.xp);
   const streakDays = useAppStore((state) => state.streakDays);
   const recentResults = useAppStore((state) => state.recentResults);
-  const adaptiveBySubject = useAppStore((state) => state.adaptiveBySubject);
   const skillProgress = useAppStore((state) => state.skillProgress);
+  const startMission = useAppStore((state) => state.startMission);
 
   const dueReviews = useMemo(
-    () =>
-      Object.fromEntries(homeSubjects.map((subject) => [subject, getDueReviewCount(subject, skillProgress)])) as Record<Subject, number>,
+    () => Object.fromEntries(SUBJECTS.map((subject) => [subject, getDueReviewCount(subject, skillProgress)])) as Record<Subject, number>,
     [skillProgress],
   );
 
@@ -270,6 +267,7 @@ export function HomePage() {
   const performanceBand = getPerformanceBand(accuracy);
   const resultSeed = hashText(last?.date ?? 'no-result');
   const baseSeed = mixSeed(mixSeed(SESSION_RANDOM_SEED, timeSlotSeed), resultSeed);
+  const progress = levelProgress(xp);
 
   const mascotMood = useMemo(() => {
     const pool = buildMoodPool(dayPart, performanceBand);
@@ -288,44 +286,122 @@ export function HomePage() {
     }
 
     const score = Math.round(last.accuracy * 100);
-    return `${opener} ${subjectLabels[last.subject]}で ${last.correct}/${last.total} せいかい（せいとうりつ ${score}%）。 ${tone} ${action} ${closer}${sleepySuffix}`;
+    return `${opener} ${subjectInfo[last.subject].label}で ${last.correct}/${last.total} せいかい（せいとうりつ ${score}%）。 ${tone} ${action} ${closer}${sleepySuffix}`;
   }, [baseSeed, dayPart, last, mascotMood, performanceBand]);
+
+  // つぎに いく しま: ふくしゅうが いちばん たまっている しま → なければ さいごに あそんだ しま いがい
+  const suggestedSubject = useMemo<Subject>(() => {
+    const byReview = [...SUBJECTS].sort((a, b) => dueReviews[b] - dueReviews[a]);
+    if (dueReviews[byReview[0]] > 0) return byReview[0];
+    const recentSubjects = new Set(recentResults.slice(0, 4).map((result) => result.subject));
+    return SUBJECTS.find((subject) => !recentSubjects.has(subject)) ?? SUBJECTS[0];
+  }, [dueReviews, recentResults]);
+
+  const onQuickStart = (subject: Subject) => {
+    audioManager.playSfx('tap');
+    startMission(subject);
+    navigate('/play');
+  };
 
   return (
     <section className="stack">
-      <div className="hero-card">
-        <p className="eyebrow">きょうのぼうけん</p>
-        <h1>ミッションを えらんで ほしを あつめよう！</h1>
-        <p>れんぞく {streakDays} にち たっせいちゅう ✨</p>
-        <Link className="primary-btn" to="/mission" onClick={() => audioManager.playSfx('tap')}>
-          はじめる
-        </Link>
+      <div className="hero-card home-hero">
+        <div className="home-hero-top">
+          <div className="home-hero-mascot">
+            <img src={hamcheeSrc(mascotMood)} alt="あいぼう はむちー" width={512} height={512} decoding="async" />
+          </div>
+          <div className="speech-bubble" aria-live="polite">
+            {mascotComment}
+            {isSpeechSupported() ? (
+              <button
+                className="icon-btn"
+                style={{ width: 34, height: 34, fontSize: '1rem', marginLeft: 6, verticalAlign: 'middle' }}
+                onClick={() => speak(mascotComment)}
+                aria-label="はむちーの ことばを よみあげる"
+              >
+                🔊
+              </button>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="level-card">
+          <div className="level-row">
+            <strong>
+              Lv.{progress.level} {getLevelTitle(progress.level)}
+            </strong>
+            <span className="muted">
+              つぎまで {progress.needed - progress.current} XP
+            </span>
+          </div>
+          <div className="meter" aria-hidden="true">
+            <div className="meter-fill" style={{ width: `${progress.ratio * 100}%` }} />
+          </div>
+        </div>
+
+        <button className="primary-btn btn-lg btn-block" onClick={() => onQuickStart(suggestedSubject)}>
+          {subjectInfo[suggestedSubject].emoji} {subjectInfo[suggestedSubject].island}へ しゅっぱつ！
+        </button>
+        <p className="muted" style={{ fontSize: '0.82rem', textAlign: 'center' }}>
+          {streakDays > 0 ? `🔥 れんぞく ${streakDays}にち たっせいちゅう！` : 'きょうから れんぞく きろくを はじめよう！'}
+        </p>
       </div>
 
-      <div className="card">
-        <h2>おすすめレベル</h2>
-        {homeSubjects.map((subject) => (
-          <p key={subject}>
-            {subjectLabels[subject]} Lv.{adaptiveBySubject[subject].targetDifficulty}（ふくしゅう {dueReviews[subject]}）
-          </p>
-        ))}
-      </div>
+      <section className="card" aria-labelledby="islands-title">
+        <div className="section-title">
+          <h2 id="islands-title">🗺️ しまを えらぶ</h2>
+          <Link to="/mission" className="muted" style={{ fontSize: '0.82rem' }} onClick={() => audioManager.playSfx('tap')}>
+            マップを みる ›
+          </Link>
+        </div>
+        <div className="island-shortcuts" style={{ marginTop: 12 }}>
+          {SUBJECTS.map((subject) => (
+            <button
+              className="island-chip"
+              key={subject}
+              style={{ '--h': subjectInfo[subject].hue } as CSSProperties}
+              onClick={() => onQuickStart(subject)}
+              aria-label={`${subjectInfo[subject].island}で あそぶ${dueReviews[subject] > 0 ? `（ふくしゅう ${dueReviews[subject]}）` : ''}`}
+            >
+              <span className="chip-emoji" aria-hidden="true">
+                {subjectInfo[subject].emoji}
+              </span>
+              {subjectInfo[subject].label}
+              {dueReviews[subject] > 0 ? <span className="chip-badge">{dueReviews[subject]}</span> : null}
+            </button>
+          ))}
+        </div>
+      </section>
 
-      <div className="card">
-        <h2>さいきんの きろく</h2>
-        {last ? (
-          <p>
-            {subjectLabels[last.subject]}: {last.correct}/{last.total} せいかい
-          </p>
+      <DailyQuestCard />
+
+      <section className="card">
+        <h2>📝 さいきんの きろく</h2>
+        {recentResults.length > 0 ? (
+          <ul className="quest-list" style={{ listStyle: 'none', padding: 0 }}>
+            {recentResults.slice(0, 3).map((result) => (
+              <li className="quest-item" key={result.date}>
+                <span className="quest-icon" aria-hidden="true">
+                  {subjectInfo[result.subject].emoji}
+                </span>
+                <div className="quest-body">
+                  <span className="quest-title">{subjectInfo[result.subject].island}</span>
+                  <span className="quest-count">
+                    {new Date(result.date).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' })} ・ ⭐+{result.earnedStars}
+                  </span>
+                </div>
+                <strong>
+                  {result.correct}/{result.total}
+                </strong>
+              </li>
+            ))}
+          </ul>
         ) : (
-          <p>まだ きろくが ありません。さいしょの ぼうけんへ！</p>
+          <p className="muted" style={{ marginTop: 8 }}>
+            まだ きろくが ありません。さいしょの ぼうけんへ！
+          </p>
         )}
-      </div>
-
-      <div className="card mascot">
-        <h2>あいぼう はむちー</h2>
-        <PokoIllustration mood={mascotMood} comment={mascotComment} showCaption={false} />
-      </div>
+      </section>
     </section>
   );
 }

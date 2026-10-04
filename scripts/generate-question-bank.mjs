@@ -5,6 +5,8 @@ const root = resolve(new URL('..', import.meta.url).pathname);
 const sourcePath = resolve(root, 'docs/question_bank_master.md');
 const outputPath = resolve(root, 'src/data/questions.generated.ts');
 
+const SUBJECTS = ['math', 'japanese', 'life', 'insight', 'nature'];
+
 const START = '<!-- QUESTION_TABLE_START -->';
 const END = '<!-- QUESTION_TABLE_END -->';
 
@@ -43,8 +45,8 @@ function parseTable(markdown) {
     const answerIndex = Number(answerRaw);
 
     if (!id) throw new Error(`Row ${index + 1}: id is required.`);
-    if (!['math', 'japanese', 'life', 'insight'].includes(subject)) {
-      throw new Error(`Row ${index + 1}: subject must be math|japanese|life|insight.`);
+    if (!SUBJECTS.includes(subject)) {
+      throw new Error(`Row ${index + 1}: subject must be ${SUBJECTS.join('|')}.`);
     }
     if (!skillId) throw new Error(`Row ${index + 1}: skillId is required.`);
     if (!Number.isInteger(difficulty) || difficulty < 1 || difficulty > 5) {
@@ -71,6 +73,15 @@ function parseTable(markdown) {
 
 const markdown = readFileSync(sourcePath, 'utf8');
 const questionBank = parseTable(markdown);
+
+const seenIds = new Set();
+for (const question of questionBank) {
+  if (seenIds.has(question.id)) throw new Error(`Duplicate question id: ${question.id}`);
+  seenIds.add(question.id);
+  if (new Set(question.choices).size !== question.choices.length) {
+    throw new Error(`Question ${question.id} has duplicate choices.`);
+  }
+}
 
 const file = `import type { Question } from '../types';\n\n` +
   `// Auto-generated from docs/question_bank_master.md by scripts/generate-question-bank.mjs\n` +

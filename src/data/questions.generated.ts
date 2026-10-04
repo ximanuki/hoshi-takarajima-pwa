@@ -9055,7 +9055,7 @@ export const questionBank: Question[] = [
     "choices": [
       "2じ10ふん",
       "1じ10ふん",
-      "1じ10ふん"
+      "1じ20ふん"
     ],
     "answerIndex": 1,
     "hint": "とけいの はりを すすめて かんがえよう。"
@@ -9068,7 +9068,7 @@ export const questionBank: Question[] = [
     "prompt": "2じ から 20ぷん たつと なんじ なんぷん？",
     "choices": [
       "2じ20ふん",
-      "2じ20ふん",
+      "2じ30ふん",
       "3じ20ふん"
     ],
     "answerIndex": 0,
@@ -9081,7 +9081,7 @@ export const questionBank: Question[] = [
     "difficulty": 4,
     "prompt": "3じ から 30ぷん たつと なんじ なんぷん？",
     "choices": [
-      "3じ30ふん",
+      "3じ40ふん",
       "4じ30ふん",
       "3じ30ふん"
     ],
@@ -9097,7 +9097,7 @@ export const questionBank: Question[] = [
     "choices": [
       "5じ10ふん",
       "4じ10ふん",
-      "4じ10ふん"
+      "4じ20ふん"
     ],
     "answerIndex": 1,
     "hint": "とけいの はりを すすめて かんがえよう。"
@@ -9110,7 +9110,7 @@ export const questionBank: Question[] = [
     "prompt": "5じ から 20ぷん たつと なんじ なんぷん？",
     "choices": [
       "5じ20ふん",
-      "5じ20ふん",
+      "5じ30ふん",
       "6じ20ふん"
     ],
     "answerIndex": 0,
@@ -9123,7 +9123,7 @@ export const questionBank: Question[] = [
     "difficulty": 4,
     "prompt": "6じ から 30ぷん たつと なんじ なんぷん？",
     "choices": [
-      "6じ30ふん",
+      "6じ40ふん",
       "7じ30ふん",
       "6じ30ふん"
     ],
@@ -9139,7 +9139,7 @@ export const questionBank: Question[] = [
     "choices": [
       "8じ10ふん",
       "7じ10ふん",
-      "7じ10ふん"
+      "7じ20ふん"
     ],
     "answerIndex": 1,
     "hint": "とけいの はりを すすめて かんがえよう。"
@@ -9152,7 +9152,7 @@ export const questionBank: Question[] = [
     "prompt": "8じ から 20ぷん たつと なんじ なんぷん？",
     "choices": [
       "8じ20ふん",
-      "8じ20ふん",
+      "8じ30ふん",
       "9じ20ふん"
     ],
     "answerIndex": 0,
@@ -9165,7 +9165,7 @@ export const questionBank: Question[] = [
     "difficulty": 4,
     "prompt": "9じ から 30ぷん たつと なんじ なんぷん？",
     "choices": [
-      "9じ30ふん",
+      "9じ40ふん",
       "10じ30ふん",
       "9じ30ふん"
     ],
@@ -9181,7 +9181,7 @@ export const questionBank: Question[] = [
     "choices": [
       "11じ10ふん",
       "10じ10ふん",
-      "10じ10ふん"
+      "10じ20ふん"
     ],
     "answerIndex": 1,
     "hint": "とけいの はりを すすめて かんがえよう。"
@@ -9194,7 +9194,7 @@ export const questionBank: Question[] = [
     "prompt": "1じ から 20ぷん たつと なんじ なんぷん？",
     "choices": [
       "1じ20ふん",
-      "1じ20ふん",
+      "1じ30ふん",
       "2じ20ふん"
     ],
     "answerIndex": 0,
@@ -9207,7 +9207,7 @@ export const questionBank: Question[] = [
     "difficulty": 4,
     "prompt": "2じ から 30ぷん たつと なんじ なんぷん？",
     "choices": [
-      "2じ30ふん",
+      "2じ40ふん",
       "3じ30ふん",
       "2じ30ふん"
     ],
@@ -9223,7 +9223,7 @@ export const questionBank: Question[] = [
     "choices": [
       "4じ10ふん",
       "3じ10ふん",
-      "3じ10ふん"
+      "3じ20ふん"
     ],
     "answerIndex": 1,
     "hint": "とけいの はりを すすめて かんがえよう。"
@@ -9236,7 +9236,7 @@ export const questionBank: Question[] = [
     "prompt": "4じ から 20ぷん たつと なんじ なんぷん？",
     "choices": [
       "4じ20ふん",
-      "4じ20ふん",
+      "4じ30ふん",
       "5じ20ふん"
     ],
     "answerIndex": 0,
@@ -9249,7 +9249,7 @@ export const questionBank: Question[] = [
     "difficulty": 4,
     "prompt": "5じ から 30ぷん たつと なんじ なんぷん？",
     "choices": [
-      "5じ30ふん",
+      "5じ40ふん",
       "6じ30ふん",
       "5じ30ふん"
     ],
@@ -10075,7 +10075,7 @@ export const questionBank: Question[] = [
     "difficulty": 3,
     "prompt": "かんじ「雨」の よみは どれ？",
     "choices": [
-      "ひ",
+      "やま",
       "ひ",
       "あめ"
     ],
@@ -10285,7 +10285,7 @@ export const questionBank: Question[] = [
     "difficulty": 4,
     "prompt": "かんじ「雨」の よみは どれ？",
     "choices": [
-      "ひ",
+      "やま",
       "ひ",
       "あめ"
     ],
@@ -14505,5 +14505,3715 @@ export const questionBank: Question[] = [
     ],
     "answerIndex": 0,
     "hint": "じょうきょうから もっとも しぜんな こたえを。"
+  },
+  {
+    "id": "n1",
+    "subject": "nature",
+    "skillId": "animals_life",
+    "difficulty": 1,
+    "prompt": "ミルクを のんで そだつ どうぶつは？",
+    "choices": [
+      "うし",
+      "にわとり",
+      "かえる"
+    ],
+    "answerIndex": 0,
+    "hint": "あかちゃんに おちちを あげる なかまは？"
+  },
+  {
+    "id": "n2",
+    "subject": "nature",
+    "skillId": "animals_life",
+    "difficulty": 1,
+    "prompt": "たまごから うまれる どうぶつは？",
+    "choices": [
+      "いぬ",
+      "にわとり",
+      "ねこ"
+    ],
+    "answerIndex": 1,
+    "hint": "とりの なかまは たまごから。"
+  },
+  {
+    "id": "n3",
+    "subject": "nature",
+    "skillId": "animals_life",
+    "difficulty": 1,
+    "prompt": "みずの なかで えらで いきを する いきものは？",
+    "choices": [
+      "うさぎ",
+      "りす",
+      "さかな"
+    ],
+    "answerIndex": 2,
+    "hint": "えらは みずの なかで いきを する ところ。"
+  },
+  {
+    "id": "n4",
+    "subject": "nature",
+    "skillId": "animals_life",
+    "difficulty": 1,
+    "prompt": "はねで そらを とぶ どうぶつは？",
+    "choices": [
+      "すずめ",
+      "ぶた",
+      "くま"
+    ],
+    "answerIndex": 0,
+    "hint": "はねが ある どうぶつを さがそう。"
+  },
+  {
+    "id": "n5",
+    "subject": "nature",
+    "skillId": "animals_life",
+    "difficulty": 1,
+    "prompt": "ながい はなを もつ どうぶつは？",
+    "choices": [
+      "きりん",
+      "ぞう",
+      "かば"
+    ],
+    "answerIndex": 1,
+    "hint": "はなで みずを すうよ。"
+  },
+  {
+    "id": "n6",
+    "subject": "nature",
+    "skillId": "animals_life",
+    "difficulty": 1,
+    "prompt": "くびが とても ながい どうぶつは？",
+    "choices": [
+      "さる",
+      "ひつじ",
+      "きりん"
+    ],
+    "answerIndex": 2,
+    "hint": "たかい きの はっぱを たべるよ。"
+  },
+  {
+    "id": "n7",
+    "subject": "nature",
+    "skillId": "animals_life",
+    "difficulty": 2,
+    "prompt": "ふゆに ながい ねむりを する どうぶつは？",
+    "choices": [
+      "くま",
+      "いぬ",
+      "すずめ"
+    ],
+    "answerIndex": 0,
+    "hint": "「ふゆごもり」を する どうぶつ。"
+  },
+  {
+    "id": "n8",
+    "subject": "nature",
+    "skillId": "animals_life",
+    "difficulty": 2,
+    "prompt": "おなかの ふくろで こどもを そだてる どうぶつは？",
+    "choices": [
+      "ライオン",
+      "カンガルー",
+      "しまうま"
+    ],
+    "answerIndex": 1,
+    "hint": "オーストラリアに すむよ。"
+  },
+  {
+    "id": "n9",
+    "subject": "nature",
+    "skillId": "animals_life",
+    "difficulty": 2,
+    "prompt": "かえるの こどもは なんと よぶ？",
+    "choices": [
+      "ひよこ",
+      "こいぬ",
+      "おたまじゃくし"
+    ],
+    "answerIndex": 2,
+    "hint": "しっぽで およぐ こどもだよ。"
+  },
+  {
+    "id": "n10",
+    "subject": "nature",
+    "skillId": "animals_life",
+    "difficulty": 2,
+    "prompt": "くさを たべる どうぶつは？",
+    "choices": [
+      "うさぎ",
+      "ライオン",
+      "わし"
+    ],
+    "answerIndex": 0,
+    "hint": "にんじんや はっぱが すき。"
+  },
+  {
+    "id": "n11",
+    "subject": "nature",
+    "skillId": "animals_life",
+    "difficulty": 2,
+    "prompt": "ほかの どうぶつを たべる どうぶつは？",
+    "choices": [
+      "うし",
+      "ライオン",
+      "ひつじ"
+    ],
+    "answerIndex": 1,
+    "hint": "するどい きばが あるよ。"
+  },
+  {
+    "id": "n12",
+    "subject": "nature",
+    "skillId": "animals_life",
+    "difficulty": 2,
+    "prompt": "よるに かつどうする とりは？",
+    "choices": [
+      "にわとり",
+      "つばめ",
+      "ふくろう"
+    ],
+    "answerIndex": 2,
+    "hint": "おおきな めで よるも みえるよ。"
+  },
+  {
+    "id": "n13",
+    "subject": "nature",
+    "skillId": "animals_life",
+    "difficulty": 3,
+    "prompt": "くじらは なんの なかま？",
+    "choices": [
+      "ほにゅうるい",
+      "さかな",
+      "むし"
+    ],
+    "answerIndex": 0,
+    "hint": "いきは はいで して、おちちで そだてるよ。"
+  },
+  {
+    "id": "n14",
+    "subject": "nature",
+    "skillId": "animals_life",
+    "difficulty": 3,
+    "prompt": "へびの からだの とくちょうは？",
+    "choices": [
+      "はねが ある",
+      "あしが ない",
+      "けが ふさふさ"
+    ],
+    "answerIndex": 1,
+    "hint": "からだを くねらせて すすむよ。"
+  },
+  {
+    "id": "n15",
+    "subject": "nature",
+    "skillId": "animals_life",
+    "difficulty": 3,
+    "prompt": "らくだの こぶには なにが たくわえられている？",
+    "choices": [
+      "みず",
+      "いし",
+      "あぶら"
+    ],
+    "answerIndex": 2,
+    "hint": "えいようを ためて いるよ。"
+  },
+  {
+    "id": "n16",
+    "subject": "nature",
+    "skillId": "animals_life",
+    "difficulty": 3,
+    "prompt": "ペンギンは どんな とり？",
+    "choices": [
+      "とべないが およげる",
+      "そらを たかく とぶ",
+      "きに すを つくる"
+    ],
+    "answerIndex": 0,
+    "hint": "はねは ひれの ように つかうよ。"
+  },
+  {
+    "id": "n17",
+    "subject": "nature",
+    "skillId": "animals_life",
+    "difficulty": 4,
+    "prompt": "カメレオンが からだの いろを かえる りゆうは？",
+    "choices": [
+      "ねむるため",
+      "みを まもるため",
+      "あめを ふらすため"
+    ],
+    "answerIndex": 1,
+    "hint": "まわりに とけこむと みつかりにくいね。"
+  },
+  {
+    "id": "n18",
+    "subject": "nature",
+    "skillId": "animals_life",
+    "difficulty": 4,
+    "prompt": "わたりどりの つばめが あきに みなみへ いく りゆうは？",
+    "choices": [
+      "ゆきを みるため",
+      "すを こわすため",
+      "あたたかい ばしょで えさを とるため"
+    ],
+    "answerIndex": 2,
+    "hint": "さむいと えさの むしが へるよ。"
+  },
+  {
+    "id": "n19",
+    "subject": "nature",
+    "skillId": "animals_life",
+    "difficulty": 4,
+    "prompt": "いるかは どこで いきを する？",
+    "choices": [
+      "あたまの うえの あなで くうきを すう",
+      "えらで みずから",
+      "しっぽで"
+    ],
+    "answerIndex": 0,
+    "hint": "みずの うえに でて いきを するよ。"
+  },
+  {
+    "id": "n20",
+    "subject": "nature",
+    "skillId": "animals_life",
+    "difficulty": 5,
+    "prompt": "こうもりが くらやみで とべる ひみつは？",
+    "choices": [
+      "ひかる め",
+      "おとの はねかえりで まわりを しる",
+      "ながい ひげ"
+    ],
+    "answerIndex": 1,
+    "hint": "こえを だして はねかえりを きくよ。"
+  },
+  {
+    "id": "n21",
+    "subject": "nature",
+    "skillId": "plants_growth",
+    "difficulty": 1,
+    "prompt": "たねを まいた あと、さいしょに でてくるのは？",
+    "choices": [
+      "め",
+      "はな",
+      "み"
+    ],
+    "answerIndex": 0,
+    "hint": "つちから ちょこんと かおを だすよ。"
+  },
+  {
+    "id": "n22",
+    "subject": "nature",
+    "skillId": "plants_growth",
+    "difficulty": 1,
+    "prompt": "しょくぶつが そだつのに ひつようなのは？",
+    "choices": [
+      "すなと かぜ",
+      "みずと ひかり",
+      "くらやみ だけ"
+    ],
+    "answerIndex": 1,
+    "hint": "まいにち みずやりを するよね。"
+  },
+  {
+    "id": "n23",
+    "subject": "nature",
+    "skillId": "plants_growth",
+    "difficulty": 1,
+    "prompt": "ひまわりの はなは どんな いろ？",
+    "choices": [
+      "あお",
+      "くろ",
+      "きいろ"
+    ],
+    "answerIndex": 2,
+    "hint": "たいようの ような いろ。"
+  },
+  {
+    "id": "n24",
+    "subject": "nature",
+    "skillId": "plants_growth",
+    "difficulty": 1,
+    "prompt": "あさがおが さくのは いつ ごろ？",
+    "choices": [
+      "あさ",
+      "よなか",
+      "ゆうがた"
+    ],
+    "answerIndex": 0,
+    "hint": "なまえに ヒントが あるよ。"
+  },
+  {
+    "id": "n25",
+    "subject": "nature",
+    "skillId": "plants_growth",
+    "difficulty": 1,
+    "prompt": "チューリップは なにから そだてる？",
+    "choices": [
+      "たまご",
+      "きゅうこん",
+      "いし"
+    ],
+    "answerIndex": 1,
+    "hint": "たまねぎの ような かたちだよ。"
+  },
+  {
+    "id": "n26",
+    "subject": "nature",
+    "skillId": "plants_growth",
+    "difficulty": 2,
+    "prompt": "みずを すいあげるのは しょくぶつの どこ？",
+    "choices": [
+      "はな",
+      "み",
+      "ね"
+    ],
+    "answerIndex": 2,
+    "hint": "つちの なかに ひろがって いるよ。"
+  },
+  {
+    "id": "n27",
+    "subject": "nature",
+    "skillId": "plants_growth",
+    "difficulty": 2,
+    "prompt": "たねが できるのは はなの あと。そのあと できるのは？",
+    "choices": [
+      "み",
+      "め",
+      "ね"
+    ],
+    "answerIndex": 0,
+    "hint": "りんごや トマトも そうだよ。"
+  },
+  {
+    "id": "n28",
+    "subject": "nature",
+    "skillId": "plants_growth",
+    "difficulty": 2,
+    "prompt": "たんぽぽの たねは どうやって とんでいく？",
+    "choices": [
+      "あしで あるく",
+      "わたげで かぜに のる",
+      "みずに しずむ"
+    ],
+    "answerIndex": 1,
+    "hint": "ふーっと ふくと とんでいくね。"
+  },
+  {
+    "id": "n29",
+    "subject": "nature",
+    "skillId": "plants_growth",
+    "difficulty": 2,
+    "prompt": "あきに はっぱが あかや きいろに なる きは？",
+    "choices": [
+      "まつ",
+      "さぼてん",
+      "もみじ"
+    ],
+    "answerIndex": 2,
+    "hint": "こうよう で ゆうめいな き。"
+  },
+  {
+    "id": "n30",
+    "subject": "nature",
+    "skillId": "plants_growth",
+    "difficulty": 2,
+    "prompt": "さぼてんが すきな ばしょは？",
+    "choices": [
+      "かわいた ところ",
+      "みずの なか",
+      "こおりの うえ"
+    ],
+    "answerIndex": 0,
+    "hint": "さばくにも はえて いるよ。"
+  },
+  {
+    "id": "n31",
+    "subject": "nature",
+    "skillId": "plants_growth",
+    "difficulty": 2,
+    "prompt": "じゃがいもは しょくぶつの どこを たべる？",
+    "choices": [
+      "はな",
+      "つちの なかの くき",
+      "はっぱ"
+    ],
+    "answerIndex": 1,
+    "hint": "つちを ほると でてくるよ。"
+  },
+  {
+    "id": "n32",
+    "subject": "nature",
+    "skillId": "plants_growth",
+    "difficulty": 3,
+    "prompt": "はっぱが みどりいろなのは なんの ため？",
+    "choices": [
+      "むしを よぶ",
+      "みずを すてる",
+      "ひかりを つかって えいようを つくる"
+    ],
+    "answerIndex": 2,
+    "hint": "たいようの ひかりで ごはんを つくるよ。"
+  },
+  {
+    "id": "n33",
+    "subject": "nature",
+    "skillId": "plants_growth",
+    "difficulty": 3,
+    "prompt": "ミニトマトの はなは なにいろ？",
+    "choices": [
+      "きいろ",
+      "むらさき",
+      "あお"
+    ],
+    "answerIndex": 0,
+    "hint": "ちいさな ほしの ような はな。"
+  },
+  {
+    "id": "n34",
+    "subject": "nature",
+    "skillId": "plants_growth",
+    "difficulty": 3,
+    "prompt": "あさがおの つるは どうやって のびる？",
+    "choices": [
+      "じめんに もぐって",
+      "ぼうに まきついて うえへ",
+      "よこに とんで"
+    ],
+    "answerIndex": 1,
+    "hint": "ささえに くるくる まきつくよ。"
+  },
+  {
+    "id": "n35",
+    "subject": "nature",
+    "skillId": "plants_growth",
+    "difficulty": 3,
+    "prompt": "ひかりが あたらない ところで そだてた めは？",
+    "choices": [
+      "ふとくて こい みどり",
+      "すぐ はなが さく",
+      "ひょろひょろで しろっぽい"
+    ],
+    "answerIndex": 2,
+    "hint": "ひかりが たりないと げんきが でないよ。"
+  },
+  {
+    "id": "n36",
+    "subject": "nature",
+    "skillId": "plants_growth",
+    "difficulty": 3,
+    "prompt": "はちが はなに くる とき、はなの ために なることは？",
+    "choices": [
+      "かふんを はこぶ",
+      "はなを たべる",
+      "はを おとす"
+    ],
+    "answerIndex": 0,
+    "hint": "かふんが はこばれると みが できるよ。"
+  },
+  {
+    "id": "n37",
+    "subject": "nature",
+    "skillId": "plants_growth",
+    "difficulty": 4,
+    "prompt": "たねに ふくまれて いて、めが でるときに つかうのは？",
+    "choices": [
+      "すな",
+      "えいよう",
+      "くうき だけ"
+    ],
+    "answerIndex": 1,
+    "hint": "たねの なかの おべんとう。"
+  },
+  {
+    "id": "n38",
+    "subject": "nature",
+    "skillId": "plants_growth",
+    "difficulty": 4,
+    "prompt": "ひまわりの わかい つぼみが うごく ようすは？",
+    "choices": [
+      "くるくる まわり つづける",
+      "つちに もぐる",
+      "たいようの ほうを むく"
+    ],
+    "answerIndex": 2,
+    "hint": "ひかりを たくさん うけたいんだね。"
+  },
+  {
+    "id": "n39",
+    "subject": "nature",
+    "skillId": "plants_growth",
+    "difficulty": 4,
+    "prompt": "おちばが つちに なるのを たすける いきものは？",
+    "choices": [
+      "みみず",
+      "すずめ",
+      "ねこ"
+    ],
+    "answerIndex": 0,
+    "hint": "つちの なかで はたらく いきもの。"
+  },
+  {
+    "id": "n40",
+    "subject": "nature",
+    "skillId": "plants_growth",
+    "difficulty": 5,
+    "prompt": "きの ねんりんで わかることは？",
+    "choices": [
+      "きの いろ",
+      "きの としの かず",
+      "はっぱの かず"
+    ],
+    "answerIndex": 1,
+    "hint": "わっかが 1ねんに 1つ ふえるよ。"
+  },
+  {
+    "id": "n41",
+    "subject": "nature",
+    "skillId": "seasons",
+    "difficulty": 1,
+    "prompt": "さくらが さく きせつは？",
+    "choices": [
+      "なつ",
+      "ふゆ",
+      "はる"
+    ],
+    "answerIndex": 2,
+    "hint": "にゅうがくしきの ころ だよ。"
+  },
+  {
+    "id": "n42",
+    "subject": "nature",
+    "skillId": "seasons",
+    "difficulty": 1,
+    "prompt": "うみで およぐのに ぴったりの きせつは？",
+    "choices": [
+      "なつ",
+      "ふゆ",
+      "あき"
+    ],
+    "answerIndex": 0,
+    "hint": "いちばん あつい きせつ。"
+  },
+  {
+    "id": "n43",
+    "subject": "nature",
+    "skillId": "seasons",
+    "difficulty": 1,
+    "prompt": "ゆきだるまを つくれる きせつは？",
+    "choices": [
+      "なつ",
+      "ふゆ",
+      "はる"
+    ],
+    "answerIndex": 1,
+    "hint": "ゆきが ふる さむい きせつ。"
+  },
+  {
+    "id": "n44",
+    "subject": "nature",
+    "skillId": "seasons",
+    "difficulty": 1,
+    "prompt": "どんぐりが おちて いる きせつは？",
+    "choices": [
+      "はる",
+      "なつ",
+      "あき"
+    ],
+    "answerIndex": 2,
+    "hint": "こうよう の きせつ だよ。"
+  },
+  {
+    "id": "n45",
+    "subject": "nature",
+    "skillId": "seasons",
+    "difficulty": 1,
+    "prompt": "せみが なく きせつは？",
+    "choices": [
+      "なつ",
+      "ふゆ",
+      "はる"
+    ],
+    "answerIndex": 0,
+    "hint": "ミーンミーン と きこえるね。"
+  },
+  {
+    "id": "n46",
+    "subject": "nature",
+    "skillId": "seasons",
+    "difficulty": 2,
+    "prompt": "つゆ（ながい あめ）は どの きせつの はじめ？",
+    "choices": [
+      "あき",
+      "なつ",
+      "ふゆ"
+    ],
+    "answerIndex": 1,
+    "hint": "6がつ ごろ だよ。"
+  },
+  {
+    "id": "n47",
+    "subject": "nature",
+    "skillId": "seasons",
+    "difficulty": 2,
+    "prompt": "おつきみを する きせつは？",
+    "choices": [
+      "はる",
+      "なつ",
+      "あき"
+    ],
+    "answerIndex": 2,
+    "hint": "まんげつと おだんご。"
+  },
+  {
+    "id": "n48",
+    "subject": "nature",
+    "skillId": "seasons",
+    "difficulty": 2,
+    "prompt": "こたつが だいかつやく する きせつは？",
+    "choices": [
+      "ふゆ",
+      "なつ",
+      "はる"
+    ],
+    "answerIndex": 0,
+    "hint": "さむい ひに あたたまるよ。"
+  },
+  {
+    "id": "n49",
+    "subject": "nature",
+    "skillId": "seasons",
+    "difficulty": 2,
+    "prompt": "つくしが はえて くる きせつは？",
+    "choices": [
+      "あき",
+      "はる",
+      "ふゆ"
+    ],
+    "answerIndex": 1,
+    "hint": "あたたかく なると でてくるよ。"
+  },
+  {
+    "id": "n50",
+    "subject": "nature",
+    "skillId": "seasons",
+    "difficulty": 2,
+    "prompt": "すいかが おいしい きせつは？",
+    "choices": [
+      "ふゆ",
+      "あき",
+      "なつ"
+    ],
+    "answerIndex": 2,
+    "hint": "すずしく なる くだもの。"
+  },
+  {
+    "id": "n51",
+    "subject": "nature",
+    "skillId": "seasons",
+    "difficulty": 2,
+    "prompt": "こどもの ひ（こいのぼり）が ある きせつは？",
+    "choices": [
+      "はる",
+      "なつ",
+      "あき"
+    ],
+    "answerIndex": 0,
+    "hint": "5がつ5にち だよ。"
+  },
+  {
+    "id": "n52",
+    "subject": "nature",
+    "skillId": "seasons",
+    "difficulty": 3,
+    "prompt": "ひるが いちばん ながい きせつは？",
+    "choices": [
+      "ふゆ",
+      "なつ",
+      "あき"
+    ],
+    "answerIndex": 1,
+    "hint": "ゆうがたも なかなか くらく ならないね。"
+  },
+  {
+    "id": "n53",
+    "subject": "nature",
+    "skillId": "seasons",
+    "difficulty": 3,
+    "prompt": "よるが いちばん ながい きせつは？",
+    "choices": [
+      "なつ",
+      "はる",
+      "ふゆ"
+    ],
+    "answerIndex": 2,
+    "hint": "ゆうがた すぐ くらく なるね。"
+  },
+  {
+    "id": "n54",
+    "subject": "nature",
+    "skillId": "seasons",
+    "difficulty": 3,
+    "prompt": "はくちょうが きたの くにから わたって くる きせつは？",
+    "choices": [
+      "ふゆ",
+      "なつ",
+      "はる"
+    ],
+    "answerIndex": 0,
+    "hint": "さむい くにより あたたかいから くるよ。"
+  },
+  {
+    "id": "n55",
+    "subject": "nature",
+    "skillId": "seasons",
+    "difficulty": 3,
+    "prompt": "いねかりを する きせつは？",
+    "choices": [
+      "はる",
+      "あき",
+      "ふゆ"
+    ],
+    "answerIndex": 1,
+    "hint": "きんいろの たんぼ。"
+  },
+  {
+    "id": "n56",
+    "subject": "nature",
+    "skillId": "seasons",
+    "difficulty": 3,
+    "prompt": "たうえを する きせつは？",
+    "choices": [
+      "あき",
+      "ふゆ",
+      "はる"
+    ],
+    "answerIndex": 2,
+    "hint": "みずを はった たんぼに なえを うえるよ。"
+  },
+  {
+    "id": "n57",
+    "subject": "nature",
+    "skillId": "seasons",
+    "difficulty": 4,
+    "prompt": "きせつが うつる じゅんばんで ただしいのは？",
+    "choices": [
+      "はる→なつ→あき→ふゆ",
+      "はる→あき→なつ→ふゆ",
+      "なつ→はる→ふゆ→あき"
+    ],
+    "answerIndex": 0,
+    "hint": "さくら→うみ→もみじ→ゆき。"
+  },
+  {
+    "id": "n58",
+    "subject": "nature",
+    "skillId": "seasons",
+    "difficulty": 4,
+    "prompt": "あきの つぎの きせつに さく はなは？",
+    "choices": [
+      "ひまわり",
+      "つばき",
+      "あさがお"
+    ],
+    "answerIndex": 1,
+    "hint": "あきの つぎは ふゆ。"
+  },
+  {
+    "id": "n59",
+    "subject": "nature",
+    "skillId": "seasons",
+    "difficulty": 4,
+    "prompt": "ふゆの つぎの きせつの ぎょうじは？",
+    "choices": [
+      "なつまつり",
+      "おつきみ",
+      "おはなみ"
+    ],
+    "answerIndex": 2,
+    "hint": "ふゆの つぎは はる。"
+  },
+  {
+    "id": "n60",
+    "subject": "nature",
+    "skillId": "seasons",
+    "difficulty": 5,
+    "prompt": "みなみはんきゅうの オーストラリアで 12がつの きせつは？",
+    "choices": [
+      "なつ",
+      "ふゆ",
+      "あき"
+    ],
+    "answerIndex": 0,
+    "hint": "にほんと きせつが はんたい だよ。"
+  },
+  {
+    "id": "n61",
+    "subject": "nature",
+    "skillId": "weather_sky",
+    "difficulty": 1,
+    "prompt": "あめが ふる ときに つかう ものは？",
+    "choices": [
+      "うきわ",
+      "てぶくろ",
+      "かさ"
+    ],
+    "answerIndex": 2,
+    "hint": "ぬれないように さすよ。"
+  },
+  {
+    "id": "n62",
+    "subject": "nature",
+    "skillId": "weather_sky",
+    "difficulty": 1,
+    "prompt": "たいようが のぼる ほうがくは？",
+    "choices": [
+      "ひがし",
+      "にし",
+      "きた"
+    ],
+    "answerIndex": 0,
+    "hint": "あさひは ひがしから。"
+  },
+  {
+    "id": "n63",
+    "subject": "nature",
+    "skillId": "weather_sky",
+    "difficulty": 1,
+    "prompt": "よるの そらで ひかって みえる まるい ものは？",
+    "choices": [
+      "たいよう",
+      "つき",
+      "にじ"
+    ],
+    "answerIndex": 1,
+    "hint": "かたちが かわって みえるよ。"
+  },
+  {
+    "id": "n64",
+    "subject": "nature",
+    "skillId": "weather_sky",
+    "difficulty": 1,
+    "prompt": "あめの あと、そらに でる なないろの はしは？",
+    "choices": [
+      "くも",
+      "かみなり",
+      "にじ"
+    ],
+    "answerIndex": 2,
+    "hint": "たいようと はんたいがわに でるよ。"
+  },
+  {
+    "id": "n65",
+    "subject": "nature",
+    "skillId": "weather_sky",
+    "difficulty": 2,
+    "prompt": "たいようが しずむ ほうがくは？",
+    "choices": [
+      "にし",
+      "ひがし",
+      "みなみ"
+    ],
+    "answerIndex": 0,
+    "hint": "ゆうひは にしへ。"
+  },
+  {
+    "id": "n66",
+    "subject": "nature",
+    "skillId": "weather_sky",
+    "difficulty": 2,
+    "prompt": "ゴロゴロと なって ピカッと ひかるのは？",
+    "choices": [
+      "にじ",
+      "かみなり",
+      "きり"
+    ],
+    "answerIndex": 1,
+    "hint": "ひかったら たてものの なかへ。"
+  },
+  {
+    "id": "n67",
+    "subject": "nature",
+    "skillId": "weather_sky",
+    "difficulty": 2,
+    "prompt": "くもは なにから できて いる？",
+    "choices": [
+      "わた",
+      "けむり だけ",
+      "ちいさな みずや こおりの つぶ"
+    ],
+    "answerIndex": 2,
+    "hint": "ゆげの ような ものが あつまって いるよ。"
+  },
+  {
+    "id": "n68",
+    "subject": "nature",
+    "skillId": "weather_sky",
+    "difficulty": 2,
+    "prompt": "そとで かげが いちばん みじかく なる じかんは？",
+    "choices": [
+      "おひる",
+      "あさ",
+      "ゆうがた"
+    ],
+    "answerIndex": 0,
+    "hint": "たいようが いちばん たかい とき。"
+  },
+  {
+    "id": "n69",
+    "subject": "nature",
+    "skillId": "weather_sky",
+    "difficulty": 2,
+    "prompt": "ゆきは なにが こおった もの？",
+    "choices": [
+      "すな",
+      "みず",
+      "かみ"
+    ],
+    "answerIndex": 1,
+    "hint": "つめたい くもの なかで できるよ。"
+  },
+  {
+    "id": "n70",
+    "subject": "nature",
+    "skillId": "weather_sky",
+    "difficulty": 2,
+    "prompt": "かぜが つよい ひに おきる ことは？",
+    "choices": [
+      "ひが しずまない",
+      "ゆきが とける",
+      "きが ゆれる"
+    ],
+    "answerIndex": 2,
+    "hint": "まわりを みて みよう。"
+  },
+  {
+    "id": "n71",
+    "subject": "nature",
+    "skillId": "weather_sky",
+    "difficulty": 3,
+    "prompt": "みかづきの あと、つきは だんだん どうなる？",
+    "choices": [
+      "まるく なっていく",
+      "しかくく なる",
+      "いろが あおく なる"
+    ],
+    "answerIndex": 0,
+    "hint": "やがて まんげつに なるよ。"
+  },
+  {
+    "id": "n72",
+    "subject": "nature",
+    "skillId": "weather_sky",
+    "difficulty": 3,
+    "prompt": "あさ くさに つく みずの つぶを なんと いう？",
+    "choices": [
+      "あられ",
+      "つゆ",
+      "しも"
+    ],
+    "answerIndex": 1,
+    "hint": "すずしい よるの あとに できるよ。"
+  },
+  {
+    "id": "n73",
+    "subject": "nature",
+    "skillId": "weather_sky",
+    "difficulty": 3,
+    "prompt": "ひなたと ひかげ、じめんが あたたかいのは？",
+    "choices": [
+      "ひかげ",
+      "おなじ",
+      "ひなた"
+    ],
+    "answerIndex": 2,
+    "hint": "たいようの ひかりが あたる ほう。"
+  },
+  {
+    "id": "n74",
+    "subject": "nature",
+    "skillId": "weather_sky",
+    "difficulty": 3,
+    "prompt": "みずたまりが はれた ひに なくなる りゆうは？",
+    "choices": [
+      "じょうはつ して くうきに なる",
+      "じめんが のむ だけ",
+      "かぜが はこぶ だけ"
+    ],
+    "answerIndex": 0,
+    "hint": "みずは みえない すがたに かわるよ。"
+  },
+  {
+    "id": "n75",
+    "subject": "nature",
+    "skillId": "weather_sky",
+    "difficulty": 3,
+    "prompt": "たいようは なに？",
+    "choices": [
+      "おおきな つき",
+      "じぶんで ひかる ほし",
+      "くもの かたまり"
+    ],
+    "answerIndex": 1,
+    "hint": "よぞらの ほしの なかまだよ。"
+  },
+  {
+    "id": "n76",
+    "subject": "nature",
+    "skillId": "weather_sky",
+    "difficulty": 4,
+    "prompt": "たいふうが ちかづいた ときに だいじなのは？",
+    "choices": [
+      "うみを みにいく",
+      "かさを さして さんぽ",
+      "そとに でず じょうほうを きく"
+    ],
+    "answerIndex": 2,
+    "hint": "あんぜんな ばしょで すごそう。"
+  },
+  {
+    "id": "n77",
+    "subject": "nature",
+    "skillId": "weather_sky",
+    "difficulty": 4,
+    "prompt": "ちきゅうが 1かい じてんする と なにが おきる？",
+    "choices": [
+      "1にち（ひると よる）",
+      "1ねん",
+      "1かげつ"
+    ],
+    "answerIndex": 0,
+    "hint": "ひが のぼって しずむ くりかえし。"
+  },
+  {
+    "id": "n78",
+    "subject": "nature",
+    "skillId": "weather_sky",
+    "difficulty": 4,
+    "prompt": "つきが ひかって みえる りゆうは？",
+    "choices": [
+      "じぶんで もえて いる",
+      "たいようの ひかりを はねかえす",
+      "でんきが ついている"
+    ],
+    "answerIndex": 1,
+    "hint": "つきは じぶんでは ひからないよ。"
+  },
+  {
+    "id": "n79",
+    "subject": "nature",
+    "skillId": "weather_sky",
+    "difficulty": 5,
+    "prompt": "ちきゅうが たいようの まわりを 1しゅう する と？",
+    "choices": [
+      "1にち",
+      "1しゅうかん",
+      "1ねん"
+    ],
+    "answerIndex": 2,
+    "hint": "きせつが ひとまわり するよ。"
+  },
+  {
+    "id": "n80",
+    "subject": "nature",
+    "skillId": "weather_sky",
+    "difficulty": 5,
+    "prompt": "よぞらの ほしが よる うごいて みえる りゆうは？",
+    "choices": [
+      "ちきゅうが まわっているから",
+      "ほしが はしっているから",
+      "かぜで ながされるから"
+    ],
+    "answerIndex": 0,
+    "hint": "じぶんたちの ほうが まわっているよ。"
+  },
+  {
+    "id": "n81",
+    "subject": "nature",
+    "skillId": "body_health",
+    "difficulty": 1,
+    "prompt": "ものを みるのは からだの どこ？",
+    "choices": [
+      "みみ",
+      "め",
+      "はな"
+    ],
+    "answerIndex": 1,
+    "hint": "まぶたが あるよ。"
+  },
+  {
+    "id": "n82",
+    "subject": "nature",
+    "skillId": "body_health",
+    "difficulty": 1,
+    "prompt": "おとを きくのは からだの どこ？",
+    "choices": [
+      "くち",
+      "て",
+      "みみ"
+    ],
+    "answerIndex": 2,
+    "hint": "あたまの よこに あるよ。"
+  },
+  {
+    "id": "n83",
+    "subject": "nature",
+    "skillId": "body_health",
+    "difficulty": 1,
+    "prompt": "においを かぐのは からだの どこ？",
+    "choices": [
+      "はな",
+      "め",
+      "あし"
+    ],
+    "answerIndex": 0,
+    "hint": "くんくん するよ。"
+  },
+  {
+    "id": "n84",
+    "subject": "nature",
+    "skillId": "body_health",
+    "difficulty": 1,
+    "prompt": "ごはんの あとに する ことは？",
+    "choices": [
+      "すぐ ねる",
+      "はみがき",
+      "はしる"
+    ],
+    "answerIndex": 1,
+    "hint": "むしばを ふせごう。"
+  },
+  {
+    "id": "n85",
+    "subject": "nature",
+    "skillId": "body_health",
+    "difficulty": 1,
+    "prompt": "そとから かえったら まず する ことは？",
+    "choices": [
+      "おやつ",
+      "テレビ",
+      "てあらい・うがい"
+    ],
+    "answerIndex": 2,
+    "hint": "ばいきんを おとそう。"
+  },
+  {
+    "id": "n86",
+    "subject": "nature",
+    "skillId": "body_health",
+    "difficulty": 2,
+    "prompt": "からだを うごかすと しんぞうは どうなる？",
+    "choices": [
+      "どきどき はやく なる",
+      "とまる",
+      "ゆっくりに なる"
+    ],
+    "answerIndex": 0,
+    "hint": "むねに てを あてて みよう。"
+  },
+  {
+    "id": "n87",
+    "subject": "nature",
+    "skillId": "body_health",
+    "difficulty": 2,
+    "prompt": "からだを ささえて いる かたい ものは？",
+    "choices": [
+      "かみのけ",
+      "ほね",
+      "つめ"
+    ],
+    "answerIndex": 1,
+    "hint": "からだの なかの はしら。"
+  },
+  {
+    "id": "n88",
+    "subject": "nature",
+    "skillId": "body_health",
+    "difficulty": 2,
+    "prompt": "いきを すうと くうきが はいるのは？",
+    "choices": [
+      "い",
+      "ほね",
+      "はい"
+    ],
+    "answerIndex": 2,
+    "hint": "むねの なかで ふくらむよ。"
+  },
+  {
+    "id": "n89",
+    "subject": "nature",
+    "skillId": "body_health",
+    "difficulty": 2,
+    "prompt": "たべものを こなす ところは？",
+    "choices": [
+      "い",
+      "はい",
+      "め"
+    ],
+    "answerIndex": 0,
+    "hint": "おなかの なかの ふくろ。"
+  },
+  {
+    "id": "n90",
+    "subject": "nature",
+    "skillId": "body_health",
+    "difficulty": 2,
+    "prompt": "げんきな からだの ために よいのは？",
+    "choices": [
+      "よふかし",
+      "はやね はやおき",
+      "あさごはんを ぬく"
+    ],
+    "answerIndex": 1,
+    "hint": "ねる ことも だいじな しごと。"
+  },
+  {
+    "id": "n91",
+    "subject": "nature",
+    "skillId": "body_health",
+    "difficulty": 3,
+    "prompt": "さむい ときに からだが ぶるぶる ふるえるのは？",
+    "choices": [
+      "ねむるため",
+      "おなかが すくため",
+      "からだを あたためるため"
+    ],
+    "answerIndex": 2,
+    "hint": "うごくと ねつが うまれるよ。"
+  },
+  {
+    "id": "n92",
+    "subject": "nature",
+    "skillId": "body_health",
+    "difficulty": 3,
+    "prompt": "あつい ときに あせが でるのは？",
+    "choices": [
+      "からだを ひやすため",
+      "からだを おもく するため",
+      "かみを のばすため"
+    ],
+    "answerIndex": 0,
+    "hint": "あせが かわくと すずしく なるよ。"
+  },
+  {
+    "id": "n93",
+    "subject": "nature",
+    "skillId": "body_health",
+    "difficulty": 3,
+    "prompt": "こどもの はが ぬけて はえてくる はを なんと いう？",
+    "choices": [
+      "にゅうし",
+      "えいきゅうし",
+      "きば"
+    ],
+    "answerIndex": 1,
+    "hint": "いっしょう つかう はだよ。"
+  },
+  {
+    "id": "n94",
+    "subject": "nature",
+    "skillId": "body_health",
+    "difficulty": 3,
+    "prompt": "ほねを じょうぶに する たべものは？",
+    "choices": [
+      "あめ",
+      "ジュース",
+      "ぎゅうにゅう"
+    ],
+    "answerIndex": 2,
+    "hint": "カルシウムが たっぷり。"
+  },
+  {
+    "id": "n95",
+    "subject": "nature",
+    "skillId": "body_health",
+    "difficulty": 3,
+    "prompt": "ねっちゅうしょうを ふせぐ ために することは？",
+    "choices": [
+      "こまめに みずを のむ",
+      "ぼうしを ぬぐ",
+      "あついところで はしりつづける"
+    ],
+    "answerIndex": 0,
+    "hint": "のどが かわく まえに のもう。"
+  },
+  {
+    "id": "n96",
+    "subject": "nature",
+    "skillId": "body_health",
+    "difficulty": 4,
+    "prompt": "ちが からだじゅうを まわるのを おくりだすのは？",
+    "choices": [
+      "はい",
+      "しんぞう",
+      "い"
+    ],
+    "answerIndex": 1,
+    "hint": "ポンプの ような はたらき。"
+  },
+  {
+    "id": "n97",
+    "subject": "nature",
+    "skillId": "body_health",
+    "difficulty": 4,
+    "prompt": "むしばの げんいんに なりやすいのは？",
+    "choices": [
+      "みずを のむ",
+      "よく かむ",
+      "あまい ものを たべて みがかない"
+    ],
+    "answerIndex": 2,
+    "hint": "ばいきんが あまい ものを すきなんだ。"
+  },
+  {
+    "id": "n98",
+    "subject": "nature",
+    "skillId": "body_health",
+    "difficulty": 4,
+    "prompt": "けがを して ちが でたら まず することは？",
+    "choices": [
+      "きれいな ぬのや ガーゼで おさえる",
+      "なめる",
+      "すなを かける"
+    ],
+    "answerIndex": 0,
+    "hint": "おとなの ひとにも しらせよう。"
+  },
+  {
+    "id": "n99",
+    "subject": "nature",
+    "skillId": "body_health",
+    "difficulty": 5,
+    "prompt": "からだを うごかす ときに ほねを ひっぱるのは？",
+    "choices": [
+      "かみのけ",
+      "きんにく",
+      "つめ"
+    ],
+    "answerIndex": 1,
+    "hint": "ちからこぶの なかみ。"
+  },
+  {
+    "id": "n100",
+    "subject": "nature",
+    "skillId": "body_health",
+    "difficulty": 5,
+    "prompt": "にんげんの からだで いちばん おおきい ほねが ある ところは？",
+    "choices": [
+      "ゆび",
+      "みみ",
+      "ふともも"
+    ],
+    "answerIndex": 2,
+    "hint": "あるく ときに たくさん つかう ところ。"
+  },
+  {
+    "id": "n101",
+    "subject": "nature",
+    "skillId": "bugs_water",
+    "difficulty": 1,
+    "prompt": "あしが 6ぽん ある いきものは？",
+    "choices": [
+      "くも",
+      "たこ",
+      "ありなどの こんちゅう"
+    ],
+    "answerIndex": 2,
+    "hint": "こんちゅうは あしが 6ぽん。"
+  },
+  {
+    "id": "n102",
+    "subject": "nature",
+    "skillId": "bugs_water",
+    "difficulty": 1,
+    "prompt": "はなの みつを すう むしは？",
+    "choices": [
+      "ちょうちょ",
+      "かぶとむし",
+      "だんごむし"
+    ],
+    "answerIndex": 0,
+    "hint": "ひらひら とぶよ。"
+  },
+  {
+    "id": "n103",
+    "subject": "nature",
+    "skillId": "bugs_water",
+    "difficulty": 1,
+    "prompt": "あおむしは おおきく なると なにに なる？",
+    "choices": [
+      "とんぼ",
+      "ちょうちょ",
+      "せみ"
+    ],
+    "answerIndex": 1,
+    "hint": "さなぎの あとで へんしん。"
+  },
+  {
+    "id": "n104",
+    "subject": "nature",
+    "skillId": "bugs_water",
+    "difficulty": 1,
+    "prompt": "さわると まるく なる むしは？",
+    "choices": [
+      "ちょうちょ",
+      "ばった",
+      "だんごむし"
+    ],
+    "answerIndex": 2,
+    "hint": "おだんごの かたちに なるよ。"
+  },
+  {
+    "id": "n105",
+    "subject": "nature",
+    "skillId": "bugs_water",
+    "difficulty": 2,
+    "prompt": "とんぼの こどもを なんと いう？",
+    "choices": [
+      "やご",
+      "いもむし",
+      "おたまじゃくし"
+    ],
+    "answerIndex": 0,
+    "hint": "みずの なかで くらして いるよ。"
+  },
+  {
+    "id": "n106",
+    "subject": "nature",
+    "skillId": "bugs_water",
+    "difficulty": 2,
+    "prompt": "つのが ある つよそうな むしは？",
+    "choices": [
+      "てんとうむし",
+      "かぶとむし",
+      "あり"
+    ],
+    "answerIndex": 1,
+    "hint": "なつの きの みつに あつまるよ。"
+  },
+  {
+    "id": "n107",
+    "subject": "nature",
+    "skillId": "bugs_water",
+    "difficulty": 2,
+    "prompt": "くもの あしの かずは？",
+    "choices": [
+      "6ぽん",
+      "4ほん",
+      "8ほん"
+    ],
+    "answerIndex": 2,
+    "hint": "こんちゅうより おおいよ。"
+  },
+  {
+    "id": "n108",
+    "subject": "nature",
+    "skillId": "bugs_water",
+    "difficulty": 2,
+    "prompt": "ほたるの とくちょうは？",
+    "choices": [
+      "おしりが ひかる",
+      "みずを はく",
+      "うたを うたう"
+    ],
+    "answerIndex": 0,
+    "hint": "なつの よる、かわの ちかくで みられるよ。"
+  },
+  {
+    "id": "n109",
+    "subject": "nature",
+    "skillId": "bugs_water",
+    "difficulty": 2,
+    "prompt": "かにが あるく むきは？",
+    "choices": [
+      "まえ だけ",
+      "よこ",
+      "うしろ だけ"
+    ],
+    "answerIndex": 1,
+    "hint": "カニあるき って いうよね。"
+  },
+  {
+    "id": "n110",
+    "subject": "nature",
+    "skillId": "bugs_water",
+    "difficulty": 2,
+    "prompt": "ばったが とおくへ とぶ ために つかうのは？",
+    "choices": [
+      "つの",
+      "しっぽ",
+      "ながい うしろあし"
+    ],
+    "answerIndex": 2,
+    "hint": "ぴょーんと はねるよ。"
+  },
+  {
+    "id": "n111",
+    "subject": "nature",
+    "skillId": "bugs_water",
+    "difficulty": 3,
+    "prompt": "せみの こどもが くらす ばしょは？",
+    "choices": [
+      "つちの なか",
+      "うみの なか",
+      "くもの うえ"
+    ],
+    "answerIndex": 0,
+    "hint": "なんねんも じめんの なかに いるよ。"
+  },
+  {
+    "id": "n112",
+    "subject": "nature",
+    "skillId": "bugs_water",
+    "difficulty": 3,
+    "prompt": "ちょうちょが そだつ じゅんばんは？",
+    "choices": [
+      "たまご→さなぎ→せいちゅう→ようちゅう",
+      "たまご→ようちゅう→さなぎ→せいちゅう",
+      "ようちゅう→たまご→せいちゅう"
+    ],
+    "answerIndex": 1,
+    "hint": "さなぎで へんしんの じゅんび。"
+  },
+  {
+    "id": "n113",
+    "subject": "nature",
+    "skillId": "bugs_water",
+    "difficulty": 3,
+    "prompt": "こんちゅうの からだの わかれかたは？",
+    "choices": [
+      "あたま・しっぽ",
+      "からだ ひとつ",
+      "あたま・むね・はら"
+    ],
+    "answerIndex": 2,
+    "hint": "3つに わかれて いるよ。"
+  },
+  {
+    "id": "n114",
+    "subject": "nature",
+    "skillId": "bugs_water",
+    "difficulty": 3,
+    "prompt": "めだかが すむ ばしょは？",
+    "choices": [
+      "おがわや たんぼ",
+      "さばく",
+      "きの うえ"
+    ],
+    "answerIndex": 0,
+    "hint": "ながれが おだやかな みずべ。"
+  },
+  {
+    "id": "n115",
+    "subject": "nature",
+    "skillId": "bugs_water",
+    "difficulty": 3,
+    "prompt": "ありが ぎょうれつを つくれる ひみつは？",
+    "choices": [
+      "ちずを もっている",
+      "においの みちしるべ",
+      "こえで よびあう"
+    ],
+    "answerIndex": 1,
+    "hint": "なかまが のこした においを たどるよ。"
+  },
+  {
+    "id": "n116",
+    "subject": "nature",
+    "skillId": "bugs_water",
+    "difficulty": 4,
+    "prompt": "ざりがにが きけんを かんじた とき すすむ むきは？",
+    "choices": [
+      "まえ",
+      "うえ",
+      "うしろ"
+    ],
+    "answerIndex": 2,
+    "hint": "しっぽを つかって すばやく にげるよ。"
+  },
+  {
+    "id": "n117",
+    "subject": "nature",
+    "skillId": "bugs_water",
+    "difficulty": 4,
+    "prompt": "みつばちが すで つくる ものは？",
+    "choices": [
+      "はちみつ",
+      "ミルク",
+      "わた"
+    ],
+    "answerIndex": 0,
+    "hint": "はなの みつを あつめて つくるよ。"
+  },
+  {
+    "id": "n118",
+    "subject": "nature",
+    "skillId": "bugs_water",
+    "difficulty": 4,
+    "prompt": "てんとうむしが たべて くれる むしは？",
+    "choices": [
+      "ちょうちょ",
+      "あぶらむし",
+      "かぶとむし"
+    ],
+    "answerIndex": 1,
+    "hint": "はたけの みかた なんだ。"
+  },
+  {
+    "id": "n119",
+    "subject": "nature",
+    "skillId": "bugs_water",
+    "difficulty": 5,
+    "prompt": "さなぎに ならずに おとなに なる むしは？",
+    "choices": [
+      "ちょうちょ",
+      "かぶとむし",
+      "ばった"
+    ],
+    "answerIndex": 2,
+    "hint": "こどもの ときから かたちが にているよ。"
+  },
+  {
+    "id": "n120",
+    "subject": "nature",
+    "skillId": "bugs_water",
+    "difficulty": 5,
+    "prompt": "うみの いきもので ほねが ない なかまは？",
+    "choices": [
+      "たこ",
+      "まぐろ",
+      "いるか"
+    ],
+    "answerIndex": 0,
+    "hint": "ぐにゃぐにゃの からだ。"
+  },
+  {
+    "id": "lx1",
+    "subject": "life",
+    "skillId": "calendar_days",
+    "difficulty": 1,
+    "prompt": "きょうは にちようび。あしたは なんようび？",
+    "choices": [
+      "どようび",
+      "げつようび",
+      "すいようび"
+    ],
+    "answerIndex": 1,
+    "hint": "ようびの じゅんばんを いってみよう。"
+  },
+  {
+    "id": "lx2",
+    "subject": "life",
+    "skillId": "calendar_days",
+    "difficulty": 1,
+    "prompt": "きょうは げつようび。あしたは なんようび？",
+    "choices": [
+      "にちようび",
+      "もくようび",
+      "かようび"
+    ],
+    "answerIndex": 2,
+    "hint": "ようびの じゅんばんを いってみよう。"
+  },
+  {
+    "id": "lx3",
+    "subject": "life",
+    "skillId": "calendar_days",
+    "difficulty": 1,
+    "prompt": "きょうは かようび。あしたは なんようび？",
+    "choices": [
+      "すいようび",
+      "げつようび",
+      "きんようび"
+    ],
+    "answerIndex": 0,
+    "hint": "ようびの じゅんばんを いってみよう。"
+  },
+  {
+    "id": "lx4",
+    "subject": "life",
+    "skillId": "calendar_days",
+    "difficulty": 1,
+    "prompt": "きょうは すいようび。あしたは なんようび？",
+    "choices": [
+      "かようび",
+      "もくようび",
+      "どようび"
+    ],
+    "answerIndex": 1,
+    "hint": "ようびの じゅんばんを いってみよう。"
+  },
+  {
+    "id": "lx5",
+    "subject": "life",
+    "skillId": "calendar_days",
+    "difficulty": 1,
+    "prompt": "きょうは もくようび。あしたは なんようび？",
+    "choices": [
+      "すいようび",
+      "にちようび",
+      "きんようび"
+    ],
+    "answerIndex": 2,
+    "hint": "ようびの じゅんばんを いってみよう。"
+  },
+  {
+    "id": "lx6",
+    "subject": "life",
+    "skillId": "calendar_days",
+    "difficulty": 1,
+    "prompt": "きょうは きんようび。あしたは なんようび？",
+    "choices": [
+      "どようび",
+      "もくようび",
+      "げつようび"
+    ],
+    "answerIndex": 0,
+    "hint": "ようびの じゅんばんを いってみよう。"
+  },
+  {
+    "id": "lx7",
+    "subject": "life",
+    "skillId": "calendar_days",
+    "difficulty": 1,
+    "prompt": "きょうは どようび。あしたは なんようび？",
+    "choices": [
+      "きんようび",
+      "にちようび",
+      "かようび"
+    ],
+    "answerIndex": 1,
+    "hint": "ようびの じゅんばんを いってみよう。"
+  },
+  {
+    "id": "lx8",
+    "subject": "life",
+    "skillId": "calendar_days",
+    "difficulty": 2,
+    "prompt": "きょうは にちようび。きのうは なんようび？",
+    "choices": [
+      "げつようび",
+      "もくようび",
+      "どようび"
+    ],
+    "answerIndex": 2,
+    "hint": "きのうは ひとつ まえの ようび。"
+  },
+  {
+    "id": "lx9",
+    "subject": "life",
+    "skillId": "calendar_days",
+    "difficulty": 2,
+    "prompt": "きょうは げつようび。きのうは なんようび？",
+    "choices": [
+      "にちようび",
+      "かようび",
+      "きんようび"
+    ],
+    "answerIndex": 0,
+    "hint": "きのうは ひとつ まえの ようび。"
+  },
+  {
+    "id": "lx10",
+    "subject": "life",
+    "skillId": "calendar_days",
+    "difficulty": 2,
+    "prompt": "きょうは かようび。きのうは なんようび？",
+    "choices": [
+      "すいようび",
+      "げつようび",
+      "どようび"
+    ],
+    "answerIndex": 1,
+    "hint": "きのうは ひとつ まえの ようび。"
+  },
+  {
+    "id": "lx11",
+    "subject": "life",
+    "skillId": "calendar_days",
+    "difficulty": 2,
+    "prompt": "きょうは すいようび。きのうは なんようび？",
+    "choices": [
+      "もくようび",
+      "にちようび",
+      "かようび"
+    ],
+    "answerIndex": 2,
+    "hint": "きのうは ひとつ まえの ようび。"
+  },
+  {
+    "id": "lx12",
+    "subject": "life",
+    "skillId": "calendar_days",
+    "difficulty": 2,
+    "prompt": "きょうは もくようび。きのうは なんようび？",
+    "choices": [
+      "すいようび",
+      "きんようび",
+      "げつようび"
+    ],
+    "answerIndex": 0,
+    "hint": "きのうは ひとつ まえの ようび。"
+  },
+  {
+    "id": "lx13",
+    "subject": "life",
+    "skillId": "calendar_days",
+    "difficulty": 2,
+    "prompt": "きょうは きんようび。きのうは なんようび？",
+    "choices": [
+      "どようび",
+      "もくようび",
+      "かようび"
+    ],
+    "answerIndex": 1,
+    "hint": "きのうは ひとつ まえの ようび。"
+  },
+  {
+    "id": "lx14",
+    "subject": "life",
+    "skillId": "calendar_days",
+    "difficulty": 2,
+    "prompt": "きょうは どようび。きのうは なんようび？",
+    "choices": [
+      "にちようび",
+      "すいようび",
+      "きんようび"
+    ],
+    "answerIndex": 2,
+    "hint": "きのうは ひとつ まえの ようび。"
+  },
+  {
+    "id": "lx15",
+    "subject": "life",
+    "skillId": "calendar_days",
+    "difficulty": 2,
+    "prompt": "1がつの きせつは？",
+    "choices": [
+      "ふゆ",
+      "はる",
+      "なつ"
+    ],
+    "answerIndex": 0,
+    "hint": "はる3〜5がつ、なつ6〜8がつ、あき9〜11がつ、ふゆ12〜2がつ。"
+  },
+  {
+    "id": "lx16",
+    "subject": "life",
+    "skillId": "calendar_days",
+    "difficulty": 2,
+    "prompt": "4がつの きせつは？",
+    "choices": [
+      "あき",
+      "はる",
+      "ふゆ"
+    ],
+    "answerIndex": 1,
+    "hint": "はる3〜5がつ、なつ6〜8がつ、あき9〜11がつ、ふゆ12〜2がつ。"
+  },
+  {
+    "id": "lx17",
+    "subject": "life",
+    "skillId": "calendar_days",
+    "difficulty": 2,
+    "prompt": "8がつの きせつは？",
+    "choices": [
+      "ふゆ",
+      "はる",
+      "なつ"
+    ],
+    "answerIndex": 2,
+    "hint": "はる3〜5がつ、なつ6〜8がつ、あき9〜11がつ、ふゆ12〜2がつ。"
+  },
+  {
+    "id": "lx18",
+    "subject": "life",
+    "skillId": "calendar_days",
+    "difficulty": 2,
+    "prompt": "10がつの きせつは？",
+    "choices": [
+      "あき",
+      "はる",
+      "なつ"
+    ],
+    "answerIndex": 0,
+    "hint": "はる3〜5がつ、なつ6〜8がつ、あき9〜11がつ、ふゆ12〜2がつ。"
+  },
+  {
+    "id": "lx19",
+    "subject": "life",
+    "skillId": "calendar_days",
+    "difficulty": 3,
+    "prompt": "1しゅうかんは なんにち？",
+    "choices": [
+      "5にち",
+      "7にち",
+      "10にち"
+    ],
+    "answerIndex": 1,
+    "hint": "にちようびから どようびまで かぞえよう。"
+  },
+  {
+    "id": "lx20",
+    "subject": "life",
+    "skillId": "calendar_days",
+    "difficulty": 3,
+    "prompt": "1ねんは なんかげつ？",
+    "choices": [
+      "10かげつ",
+      "7かげつ",
+      "12かげつ"
+    ],
+    "answerIndex": 2,
+    "hint": "1がつから 12がつまで。"
+  },
+  {
+    "id": "lx21",
+    "subject": "life",
+    "skillId": "calendar_days",
+    "difficulty": 3,
+    "prompt": "きょうが 5にちなら、3にちごは なんにち？",
+    "choices": [
+      "8にち",
+      "7にち",
+      "2にち"
+    ],
+    "answerIndex": 0,
+    "hint": "5から 3 すすめよう。"
+  },
+  {
+    "id": "lx22",
+    "subject": "life",
+    "skillId": "calendar_days",
+    "difficulty": 4,
+    "prompt": "きょうは すいようび。3かごは なんようび？",
+    "choices": [
+      "きんようび",
+      "どようび",
+      "にちようび"
+    ],
+    "answerIndex": 1,
+    "hint": "もく→きん→ど と すすめよう。"
+  },
+  {
+    "id": "lx23",
+    "subject": "life",
+    "skillId": "calendar_days",
+    "difficulty": 4,
+    "prompt": "きょうは げつようび。2かまえは なんようび？",
+    "choices": [
+      "にちようび",
+      "かようび",
+      "どようび"
+    ],
+    "answerIndex": 2,
+    "hint": "にち→ど と もどろう。"
+  },
+  {
+    "id": "lx24",
+    "subject": "life",
+    "skillId": "calendar_days",
+    "difficulty": 5,
+    "prompt": "きょうは かようび。1しゅうかんごは なんようび？",
+    "choices": [
+      "かようび",
+      "すいようび",
+      "げつようび"
+    ],
+    "answerIndex": 0,
+    "hint": "7にち たつと おなじ ようびに もどるよ。"
+  },
+  {
+    "id": "lx25",
+    "subject": "life",
+    "skillId": "manners",
+    "difficulty": 1,
+    "prompt": "あさ ともだちに あったら？",
+    "choices": [
+      "だまって とおる",
+      "おはよう と あいさつ",
+      "おおごえで おこる"
+    ],
+    "answerIndex": 1,
+    "hint": "げんきな あいさつは きもちいいね。"
+  },
+  {
+    "id": "lx26",
+    "subject": "life",
+    "skillId": "manners",
+    "difficulty": 1,
+    "prompt": "なにかを もらったら？",
+    "choices": [
+      "なにも いわない",
+      "すてる",
+      "ありがとう と いう"
+    ],
+    "answerIndex": 2,
+    "hint": "かんしゃの きもちを ことばに。"
+  },
+  {
+    "id": "lx27",
+    "subject": "life",
+    "skillId": "manners",
+    "difficulty": 1,
+    "prompt": "ともだちに ぶつかって しまったら？",
+    "choices": [
+      "ごめんね と あやまる",
+      "わらう",
+      "にげる"
+    ],
+    "answerIndex": 0,
+    "hint": "あいての きもちを かんがえよう。"
+  },
+  {
+    "id": "lx28",
+    "subject": "life",
+    "skillId": "manners",
+    "difficulty": 1,
+    "prompt": "ごはんを たべる まえに いう ことばは？",
+    "choices": [
+      "ごちそうさま",
+      "いただきます",
+      "おやすみ"
+    ],
+    "answerIndex": 1,
+    "hint": "たべものと つくった ひとに かんしゃ。"
+  },
+  {
+    "id": "lx29",
+    "subject": "life",
+    "skillId": "manners",
+    "difficulty": 1,
+    "prompt": "ごはんを たべおわったら いう ことばは？",
+    "choices": [
+      "いただきます",
+      "いってきます",
+      "ごちそうさま"
+    ],
+    "answerIndex": 2,
+    "hint": "おいしかった きもちを つたえよう。"
+  },
+  {
+    "id": "lx30",
+    "subject": "life",
+    "skillId": "manners",
+    "difficulty": 2,
+    "prompt": "としょかんでの すごしかたは？",
+    "choices": [
+      "しずかに よむ",
+      "はしりまわる",
+      "おおごえで はなす"
+    ],
+    "answerIndex": 0,
+    "hint": "みんなが よんでいる ばしょだよ。"
+  },
+  {
+    "id": "lx31",
+    "subject": "life",
+    "skillId": "manners",
+    "difficulty": 2,
+    "prompt": "でんしゃの なかで だいじな ことは？",
+    "choices": [
+      "せきで ねころぶ",
+      "こえを ちいさく する",
+      "つりかわで あそぶ"
+    ],
+    "answerIndex": 1,
+    "hint": "みんなで つかう のりもの。"
+  },
+  {
+    "id": "lx32",
+    "subject": "life",
+    "skillId": "manners",
+    "difficulty": 2,
+    "prompt": "ともだちが はなしている ときは？",
+    "choices": [
+      "とちゅうで わりこむ",
+      "よそを むく",
+      "さいごまで きく"
+    ],
+    "answerIndex": 2,
+    "hint": "あいての めを みて きこう。"
+  },
+  {
+    "id": "lx33",
+    "subject": "life",
+    "skillId": "manners",
+    "difficulty": 2,
+    "prompt": "かりた ものを かえす ときは？",
+    "choices": [
+      "おれいを いって かえす",
+      "だまって おく",
+      "なくしたまま にする"
+    ],
+    "answerIndex": 0,
+    "hint": "「かしてくれて ありがとう」。"
+  },
+  {
+    "id": "lx34",
+    "subject": "life",
+    "skillId": "manners",
+    "difficulty": 2,
+    "prompt": "へやに はいる ときに することは？",
+    "choices": [
+      "ドアを けとばす",
+      "ノックを する",
+      "おおごえで さけぶ"
+    ],
+    "answerIndex": 1,
+    "hint": "なかの ひとに しらせよう。"
+  },
+  {
+    "id": "lx35",
+    "subject": "life",
+    "skillId": "manners",
+    "difficulty": 3,
+    "prompt": "おとしよりが でんしゃで たっていたら？",
+    "choices": [
+      "しらんぷり",
+      "にもつを おく",
+      "せきを ゆずる"
+    ],
+    "answerIndex": 2,
+    "hint": "こまっている ひとを たすけよう。"
+  },
+  {
+    "id": "lx36",
+    "subject": "life",
+    "skillId": "manners",
+    "difficulty": 3,
+    "prompt": "ならんでいる れつに あとから きたら？",
+    "choices": [
+      "いちばん うしろに ならぶ",
+      "まえに わりこむ",
+      "となりに たつ"
+    ],
+    "answerIndex": 0,
+    "hint": "じゅんばんを まもろう。"
+  },
+  {
+    "id": "lx37",
+    "subject": "life",
+    "skillId": "manners",
+    "difficulty": 3,
+    "prompt": "ともだちが ころんで ないていたら？",
+    "choices": [
+      "わらう",
+      "だいじょうぶ？ と こえを かける",
+      "みないふりを する"
+    ],
+    "answerIndex": 1,
+    "hint": "やさしい ひとことが ちからに なるよ。"
+  },
+  {
+    "id": "lx38",
+    "subject": "life",
+    "skillId": "manners",
+    "difficulty": 3,
+    "prompt": "ゲームで まけた ときは？",
+    "choices": [
+      "ものを なげる",
+      "もう あそばない と おこる",
+      "あいてを たたえる"
+    ],
+    "answerIndex": 2,
+    "hint": "つぎに がんばれば いいね。"
+  },
+  {
+    "id": "lx39",
+    "subject": "life",
+    "skillId": "manners",
+    "difficulty": 4,
+    "prompt": "ともだちの いやがる あだなで よばれていたら？",
+    "choices": [
+      "やめよう と いう／おとなに そうだん",
+      "いっしょに よぶ",
+      "わらって みている"
+    ],
+    "answerIndex": 0,
+    "hint": "だれかが きずつく ことは とめよう。"
+  },
+  {
+    "id": "lx40",
+    "subject": "life",
+    "skillId": "manners",
+    "difficulty": 4,
+    "prompt": "こうえんの あそびどうぐが こんでいる ときは？",
+    "choices": [
+      "ひとりじめ する",
+      "じゅんばんに かわりばんこで つかう",
+      "おしのける"
+    ],
+    "answerIndex": 1,
+    "hint": "みんなで たのしく つかおう。"
+  },
+  {
+    "id": "lx41",
+    "subject": "life",
+    "skillId": "eco_habit",
+    "difficulty": 1,
+    "prompt": "へやを でる ときに けすものは？",
+    "choices": [
+      "まど",
+      "でんき",
+      "ほん"
+    ],
+    "answerIndex": 1,
+    "hint": "つけっぱなしは もったいない。"
+  },
+  {
+    "id": "lx42",
+    "subject": "life",
+    "skillId": "eco_habit",
+    "difficulty": 1,
+    "prompt": "はみがきの あいだ みずは？",
+    "choices": [
+      "だしっぱなし",
+      "おゆに する",
+      "とめておく"
+    ],
+    "answerIndex": 2,
+    "hint": "みずを たいせつに。"
+  },
+  {
+    "id": "lx43",
+    "subject": "life",
+    "skillId": "eco_habit",
+    "difficulty": 1,
+    "prompt": "あきかんを すてる ところは？",
+    "choices": [
+      "かんの ごみばこ",
+      "もえるごみ",
+      "みちばた"
+    ],
+    "answerIndex": 0,
+    "hint": "わけて すてると また つかえるよ。"
+  },
+  {
+    "id": "lx44",
+    "subject": "life",
+    "skillId": "eco_habit",
+    "difficulty": 2,
+    "prompt": "かいものに もっていくと ごみが へる ものは？",
+    "choices": [
+      "かみぶくろ 10まい",
+      "エコバッグ",
+      "わりばし"
+    ],
+    "answerIndex": 1,
+    "hint": "くりかえし つかえる ふくろ。"
+  },
+  {
+    "id": "lx45",
+    "subject": "life",
+    "skillId": "eco_habit",
+    "difficulty": 2,
+    "prompt": "ペットボトルを すてる まえに することは？",
+    "choices": [
+      "すなを いれる",
+      "そのまま すてる",
+      "キャップと ラベルを はずす"
+    ],
+    "answerIndex": 2,
+    "hint": "わけると リサイクル しやすいよ。"
+  },
+  {
+    "id": "lx46",
+    "subject": "life",
+    "skillId": "eco_habit",
+    "difficulty": 2,
+    "prompt": "まだ つかえる ふくが ちいさく なったら？",
+    "choices": [
+      "ゆずる／リサイクル",
+      "すぐ すてる",
+      "やぶる"
+    ],
+    "answerIndex": 0,
+    "hint": "つぎの ひとに つかって もらおう。"
+  },
+  {
+    "id": "lx47",
+    "subject": "life",
+    "skillId": "eco_habit",
+    "difficulty": 2,
+    "prompt": "きゅうしょくを のこさず たべると？",
+    "choices": [
+      "ごみが ふえる",
+      "たべものの ごみが へる",
+      "でんきが ふえる"
+    ],
+    "answerIndex": 1,
+    "hint": "つくってくれた ひとも うれしいね。"
+  },
+  {
+    "id": "lx48",
+    "subject": "life",
+    "skillId": "eco_habit",
+    "difficulty": 3,
+    "prompt": "リサイクルの いみは？",
+    "choices": [
+      "ごみを うめる",
+      "ごみを もやす だけ",
+      "ごみを しげんに して また つかう"
+    ],
+    "answerIndex": 2,
+    "hint": "「ふたたび いかす」こと。"
+  },
+  {
+    "id": "lx49",
+    "subject": "life",
+    "skillId": "eco_habit",
+    "difficulty": 3,
+    "prompt": "れいぞうこの ドアは？",
+    "choices": [
+      "すぐ しめる",
+      "あけたまま えらぶ",
+      "あけっぱなし"
+    ],
+    "answerIndex": 0,
+    "hint": "ひやすのに でんきを つかうよ。"
+  },
+  {
+    "id": "lx50",
+    "subject": "life",
+    "skillId": "eco_habit",
+    "difficulty": 3,
+    "prompt": "ちかい ところへ いくのに かんきょうに やさしいのは？",
+    "choices": [
+      "くるまを よぶ",
+      "あるく",
+      "ひこうき"
+    ],
+    "answerIndex": 1,
+    "hint": "けんこうにも いいよ。"
+  },
+  {
+    "id": "lx51",
+    "subject": "life",
+    "skillId": "eco_habit",
+    "difficulty": 3,
+    "prompt": "かみの うらが しろい プリントは？",
+    "choices": [
+      "すぐ すてる",
+      "ぬらす",
+      "メモに つかう"
+    ],
+    "answerIndex": 2,
+    "hint": "もう いちど つかえるね。"
+  },
+  {
+    "id": "lx52",
+    "subject": "life",
+    "skillId": "eco_habit",
+    "difficulty": 4,
+    "prompt": "うみの ごみで いきものが こまる ものは？",
+    "choices": [
+      "プラスチック",
+      "すな",
+      "かいがら"
+    ],
+    "answerIndex": 0,
+    "hint": "たべものと まちがえて しまうよ。"
+  },
+  {
+    "id": "lx53",
+    "subject": "life",
+    "skillId": "eco_habit",
+    "difficulty": 4,
+    "prompt": "たいようの ひかりで でんきを つくるのは？",
+    "choices": [
+      "でんち",
+      "ソーラーパネル",
+      "ストーブ"
+    ],
+    "answerIndex": 1,
+    "hint": "やねの うえに ならべるよ。"
+  },
+  {
+    "id": "lx54",
+    "subject": "life",
+    "skillId": "eco_habit",
+    "difficulty": 4,
+    "prompt": "ごみを へらす 3つの R で ないのは？",
+    "choices": [
+      "リデュース",
+      "リサイクル",
+      "リラックス"
+    ],
+    "answerIndex": 2,
+    "hint": "へらす・くりかえし つかう・しげんに もどす。"
+  },
+  {
+    "id": "ix1",
+    "subject": "insight",
+    "skillId": "number_puzzle",
+    "difficulty": 1,
+    "prompt": "□ + 3 = 7。□は いくつ？",
+    "choices": [
+      "5",
+      "4",
+      "3"
+    ],
+    "answerIndex": 1,
+    "hint": "7から 3を ひくと わかるよ。"
+  },
+  {
+    "id": "ix2",
+    "subject": "insight",
+    "skillId": "number_puzzle",
+    "difficulty": 1,
+    "prompt": "□ + 2 = 8。□は いくつ？",
+    "choices": [
+      "7",
+      "5",
+      "6"
+    ],
+    "answerIndex": 2,
+    "hint": "8から 2を ひくと わかるよ。"
+  },
+  {
+    "id": "ix3",
+    "subject": "insight",
+    "skillId": "number_puzzle",
+    "difficulty": 2,
+    "prompt": "□ + 5 = 8。□は いくつ？",
+    "choices": [
+      "3",
+      "4",
+      "2"
+    ],
+    "answerIndex": 0,
+    "hint": "8から 5を ひくと わかるよ。"
+  },
+  {
+    "id": "ix4",
+    "subject": "insight",
+    "skillId": "number_puzzle",
+    "difficulty": 2,
+    "prompt": "□ + 4 = 9。□は いくつ？",
+    "choices": [
+      "6",
+      "5",
+      "4"
+    ],
+    "answerIndex": 1,
+    "hint": "9から 4を ひくと わかるよ。"
+  },
+  {
+    "id": "ix5",
+    "subject": "insight",
+    "skillId": "number_puzzle",
+    "difficulty": 3,
+    "prompt": "□ + 6 = 13。□は いくつ？",
+    "choices": [
+      "8",
+      "6",
+      "7"
+    ],
+    "answerIndex": 2,
+    "hint": "13から 6を ひくと わかるよ。"
+  },
+  {
+    "id": "ix6",
+    "subject": "insight",
+    "skillId": "number_puzzle",
+    "difficulty": 3,
+    "prompt": "□ + 8 = 13。□は いくつ？",
+    "choices": [
+      "5",
+      "6",
+      "4"
+    ],
+    "answerIndex": 0,
+    "hint": "13から 8を ひくと わかるよ。"
+  },
+  {
+    "id": "ix7",
+    "subject": "insight",
+    "skillId": "number_puzzle",
+    "difficulty": 4,
+    "prompt": "□ + 9 = 15。□は いくつ？",
+    "choices": [
+      "7",
+      "6",
+      "5"
+    ],
+    "answerIndex": 1,
+    "hint": "15から 9を ひくと わかるよ。"
+  },
+  {
+    "id": "ix8",
+    "subject": "insight",
+    "skillId": "number_puzzle",
+    "difficulty": 2,
+    "prompt": "9 − □ = 5。□は いくつ？",
+    "choices": [
+      "5",
+      "9",
+      "4"
+    ],
+    "answerIndex": 2,
+    "hint": "9から いくつ とったら 5に なるかな。"
+  },
+  {
+    "id": "ix9",
+    "subject": "insight",
+    "skillId": "number_puzzle",
+    "difficulty": 2,
+    "prompt": "8 − □ = 5。□は いくつ？",
+    "choices": [
+      "3",
+      "4",
+      "8"
+    ],
+    "answerIndex": 0,
+    "hint": "8から いくつ とったら 5に なるかな。"
+  },
+  {
+    "id": "ix10",
+    "subject": "insight",
+    "skillId": "number_puzzle",
+    "difficulty": 3,
+    "prompt": "12 − □ = 7。□は いくつ？",
+    "choices": [
+      "6",
+      "5",
+      "12"
+    ],
+    "answerIndex": 1,
+    "hint": "12から いくつ とったら 7に なるかな。"
+  },
+  {
+    "id": "ix11",
+    "subject": "insight",
+    "skillId": "number_puzzle",
+    "difficulty": 4,
+    "prompt": "15 − □ = 8。□は いくつ？",
+    "choices": [
+      "8",
+      "15",
+      "7"
+    ],
+    "answerIndex": 2,
+    "hint": "15から いくつ とったら 8に なるかな。"
+  },
+  {
+    "id": "ix12",
+    "subject": "insight",
+    "skillId": "number_puzzle",
+    "difficulty": 4,
+    "prompt": "18 − □ = 9。□は いくつ？",
+    "choices": [
+      "9",
+      "10",
+      "18"
+    ],
+    "answerIndex": 0,
+    "hint": "18から いくつ とったら 9に なるかな。"
+  },
+  {
+    "id": "ix13",
+    "subject": "insight",
+    "skillId": "number_puzzle",
+    "difficulty": 5,
+    "prompt": "20 − □ = 14。□は いくつ？",
+    "choices": [
+      "7",
+      "6",
+      "20"
+    ],
+    "answerIndex": 1,
+    "hint": "20から いくつ とったら 14に なるかな。"
+  },
+  {
+    "id": "ix14",
+    "subject": "insight",
+    "skillId": "number_puzzle",
+    "difficulty": 3,
+    "prompt": "あわせて 10。かたほうが 7なら もう かたほうは？",
+    "choices": [
+      "4",
+      "17",
+      "3"
+    ],
+    "answerIndex": 2,
+    "hint": "10の ともだち を おもいだそう。"
+  },
+  {
+    "id": "ix15",
+    "subject": "insight",
+    "skillId": "number_puzzle",
+    "difficulty": 3,
+    "prompt": "あわせて 10。かたほうが 2なら もう かたほうは？",
+    "choices": [
+      "8",
+      "7",
+      "12"
+    ],
+    "answerIndex": 0,
+    "hint": "10の ともだち を おもいだそう。"
+  },
+  {
+    "id": "ix16",
+    "subject": "insight",
+    "skillId": "number_puzzle",
+    "difficulty": 4,
+    "prompt": "□ + □ = 12。□は おなじ かず。□は？",
+    "choices": [
+      "5",
+      "6",
+      "7"
+    ],
+    "answerIndex": 1,
+    "hint": "おなじ かずを 2かい たして 12。"
+  },
+  {
+    "id": "ix17",
+    "subject": "insight",
+    "skillId": "number_puzzle",
+    "difficulty": 4,
+    "prompt": "□ + □ + □ = 9。□は おなじ かず。□は？",
+    "choices": [
+      "4",
+      "2",
+      "3"
+    ],
+    "answerIndex": 2,
+    "hint": "おなじ かずを 3かい たして 9。"
+  },
+  {
+    "id": "ix18",
+    "subject": "insight",
+    "skillId": "number_puzzle",
+    "difficulty": 5,
+    "prompt": "△ + 4 = 10、□ = △ + 2。□は？",
+    "choices": [
+      "8",
+      "6",
+      "10"
+    ],
+    "answerIndex": 0,
+    "hint": "まず △を みつけよう。"
+  },
+  {
+    "id": "ix19",
+    "subject": "insight",
+    "skillId": "number_puzzle",
+    "difficulty": 5,
+    "prompt": "□ − 3 = 3 + 4。□は？",
+    "choices": [
+      "7",
+      "10",
+      "4"
+    ],
+    "answerIndex": 1,
+    "hint": "みぎがわを さきに けいさん しよう。"
+  },
+  {
+    "id": "ix20",
+    "subject": "insight",
+    "skillId": "order_logic",
+    "difficulty": 1,
+    "prompt": "たろうは はなこより せが たかい。せが ひくいのは？",
+    "choices": [
+      "はなこ",
+      "たろう",
+      "おなじ"
+    ],
+    "answerIndex": 0,
+    "hint": "「たかい」の はんたいを かんがえよう。"
+  },
+  {
+    "id": "ix21",
+    "subject": "insight",
+    "skillId": "order_logic",
+    "difficulty": 1,
+    "prompt": "ぞう と ねずみ、おもいのは？",
+    "choices": [
+      "ねずみ",
+      "ぞう",
+      "おなじ"
+    ],
+    "answerIndex": 1,
+    "hint": "からだの おおきさを くらべよう。"
+  },
+  {
+    "id": "ix22",
+    "subject": "insight",
+    "skillId": "order_logic",
+    "difficulty": 2,
+    "prompt": "あかは あおより はやい。あおは きいろより はやい。いちばん はやいのは？",
+    "choices": [
+      "あお",
+      "きいろ",
+      "あか"
+    ],
+    "answerIndex": 2,
+    "hint": "ならべて かんがえよう。"
+  },
+  {
+    "id": "ix23",
+    "subject": "insight",
+    "skillId": "order_logic",
+    "difficulty": 2,
+    "prompt": "いぬは ねこより まえ。ねこは うさぎより まえ。いちばん うしろは？",
+    "choices": [
+      "うさぎ",
+      "いぬ",
+      "ねこ"
+    ],
+    "answerIndex": 0,
+    "hint": "いぬ→ねこ→うさぎ。"
+  },
+  {
+    "id": "ix24",
+    "subject": "insight",
+    "skillId": "order_logic",
+    "difficulty": 2,
+    "prompt": "Aの はこは Bより おもい。Bは Cより おもい。いちばん かるいのは？",
+    "choices": [
+      "A",
+      "C",
+      "B"
+    ],
+    "answerIndex": 1,
+    "hint": "A＞B＞C と ならべよう。"
+  },
+  {
+    "id": "ix25",
+    "subject": "insight",
+    "skillId": "order_logic",
+    "difficulty": 2,
+    "prompt": "れつの 3ばんめに ゆうき。ゆうきの すぐ まえは なんばんめ？",
+    "choices": [
+      "4ばんめ",
+      "1ばんめ",
+      "2ばんめ"
+    ],
+    "answerIndex": 2,
+    "hint": "まえは かずが 1 へるよ。"
+  },
+  {
+    "id": "ix26",
+    "subject": "insight",
+    "skillId": "order_logic",
+    "difficulty": 3,
+    "prompt": "まえから 4ばんめ、うしろから 2ばんめ。ぜんぶで なんにん？",
+    "choices": [
+      "5にん",
+      "6にん",
+      "4にん"
+    ],
+    "answerIndex": 0,
+    "hint": "じぶんを 2かい かぞえないように。"
+  },
+  {
+    "id": "ix27",
+    "subject": "insight",
+    "skillId": "order_logic",
+    "difficulty": 3,
+    "prompt": "けんは ゆいより はやく ついた。ゆいは そらより はやく ついた。2ばんめに ついたのは？",
+    "choices": [
+      "けん",
+      "ゆい",
+      "そら"
+    ],
+    "answerIndex": 1,
+    "hint": "けん→ゆい→そら。"
+  },
+  {
+    "id": "ix28",
+    "subject": "insight",
+    "skillId": "order_logic",
+    "difficulty": 3,
+    "prompt": "りんごは みかんより たかい。バナナは りんごより たかい。いちばん やすいのは？",
+    "choices": [
+      "りんご",
+      "バナナ",
+      "みかん"
+    ],
+    "answerIndex": 2,
+    "hint": "バナナ＞りんご＞みかん。"
+  },
+  {
+    "id": "ix29",
+    "subject": "insight",
+    "skillId": "order_logic",
+    "difficulty": 3,
+    "prompt": "かいだんの 5だんめに いる。2だん のぼって 1だん おりた。いまは？",
+    "choices": [
+      "6だんめ",
+      "7だんめ",
+      "8だんめ"
+    ],
+    "answerIndex": 0,
+    "hint": "5＋2−1 を けいさん。"
+  },
+  {
+    "id": "ix30",
+    "subject": "insight",
+    "skillId": "order_logic",
+    "difficulty": 3,
+    "prompt": "1れつに 7にん。まんなかの ひとは まえから なんばんめ？",
+    "choices": [
+      "3ばんめ",
+      "4ばんめ",
+      "5ばんめ"
+    ],
+    "answerIndex": 1,
+    "hint": "りょうがわに 3にんずつ。"
+  },
+  {
+    "id": "ix31",
+    "subject": "insight",
+    "skillId": "order_logic",
+    "difficulty": 4,
+    "prompt": "ふゆは あきより さむい。あきは なつより さむい。なつと ふゆ、あたたかいのは？",
+    "choices": [
+      "ふゆ",
+      "おなじ",
+      "なつ"
+    ],
+    "answerIndex": 2,
+    "hint": "さむい じゅんに ならべよう。"
+  },
+  {
+    "id": "ix32",
+    "subject": "insight",
+    "skillId": "order_logic",
+    "difficulty": 4,
+    "prompt": "Aは Bの みぎ。Cは Aの みぎ。いちばん ひだりは？",
+    "choices": [
+      "B",
+      "A",
+      "C"
+    ],
+    "answerIndex": 0,
+    "hint": "B→A→C と ならぶよ。"
+  },
+  {
+    "id": "ix33",
+    "subject": "insight",
+    "skillId": "order_logic",
+    "difficulty": 4,
+    "prompt": "まえから 6ばんめ、うしろから 6ばんめ。ぜんぶで なんにん？",
+    "choices": [
+      "12にん",
+      "11にん",
+      "10にん"
+    ],
+    "answerIndex": 1,
+    "hint": "6＋6 から じぶんの ぶん 1を ひこう。"
+  },
+  {
+    "id": "ix34",
+    "subject": "insight",
+    "skillId": "order_logic",
+    "difficulty": 4,
+    "prompt": "たけしは 3にんの なかで いちばん はやい。みきは いちばん おそく ない。2ばんめは？",
+    "choices": [
+      "たけし",
+      "もう ひとり",
+      "みき"
+    ],
+    "answerIndex": 2,
+    "hint": "いちばんでも さいごでも ない ひと。"
+  },
+  {
+    "id": "ix35",
+    "subject": "insight",
+    "skillId": "order_logic",
+    "difficulty": 5,
+    "prompt": "5にんで かけっこ。あおいは けんより はやく、けんは 3いだった。あおいは なんい の かのうせい が ある？",
+    "choices": [
+      "1いか 2い",
+      "4いか 5い",
+      "3い"
+    ],
+    "answerIndex": 0,
+    "hint": "けんより まえの じゅんい。"
+  },
+  {
+    "id": "ix36",
+    "subject": "insight",
+    "skillId": "word_chain",
+    "difficulty": 1,
+    "prompt": "しりとり: りんご → ？",
+    "choices": [
+      "ごりら",
+      "らっぱ",
+      "みかん"
+    ],
+    "answerIndex": 0,
+    "hint": "さいごの もじ「ご」から はじめよう。"
+  },
+  {
+    "id": "ix37",
+    "subject": "insight",
+    "skillId": "word_chain",
+    "difficulty": 1,
+    "prompt": "しりとり: すいか → ？",
+    "choices": [
+      "すずめ",
+      "からす",
+      "たぬき"
+    ],
+    "answerIndex": 1,
+    "hint": "さいごの もじ「か」から。"
+  },
+  {
+    "id": "ix38",
+    "subject": "insight",
+    "skillId": "word_chain",
+    "difficulty": 1,
+    "prompt": "しりとり: ねこ → ？",
+    "choices": [
+      "まめ",
+      "いぬ",
+      "こま"
+    ],
+    "answerIndex": 2,
+    "hint": "さいごの もじ「こ」から。"
+  },
+  {
+    "id": "ix39",
+    "subject": "insight",
+    "skillId": "word_chain",
+    "difficulty": 2,
+    "prompt": "しりとり: たぬき → ？",
+    "choices": [
+      "きつね",
+      "ねずみ",
+      "くま"
+    ],
+    "answerIndex": 0,
+    "hint": "さいごの もじ「き」から。"
+  },
+  {
+    "id": "ix40",
+    "subject": "insight",
+    "skillId": "word_chain",
+    "difficulty": 2,
+    "prompt": "しりとり: らっぱ → ？",
+    "choices": [
+      "だんご",
+      "ぱんだ",
+      "らいおん"
+    ],
+    "answerIndex": 1,
+    "hint": "さいごの もじ「ぱ」から。"
+  },
+  {
+    "id": "ix41",
+    "subject": "insight",
+    "skillId": "word_chain",
+    "difficulty": 2,
+    "prompt": "しりとりで まけて しまう ことばは？",
+    "choices": [
+      "めだか",
+      "うさぎ",
+      "みかん"
+    ],
+    "answerIndex": 2,
+    "hint": "「ん」で おわると つづかないね。"
+  },
+  {
+    "id": "ix42",
+    "subject": "insight",
+    "skillId": "word_chain",
+    "difficulty": 2,
+    "prompt": "しりとり: めがね → ？ → こあら。 ？は？",
+    "choices": [
+      "ねこ",
+      "ねずみ",
+      "かめ"
+    ],
+    "answerIndex": 0,
+    "hint": "「ね」で はじまって「こ」で おわる ことば。"
+  },
+  {
+    "id": "ix43",
+    "subject": "insight",
+    "skillId": "word_chain",
+    "difficulty": 3,
+    "prompt": "しりとり: くつ → ？ → きつね。？は？",
+    "choices": [
+      "つくえ",
+      "つみき",
+      "つばめ"
+    ],
+    "answerIndex": 1,
+    "hint": "「つ」で はじまって「き」で おわる ことば。"
+  },
+  {
+    "id": "ix44",
+    "subject": "insight",
+    "skillId": "word_chain",
+    "difficulty": 3,
+    "prompt": "さかさに よんでも おなじ ことばは？",
+    "choices": [
+      "えんぴつ",
+      "ともだち",
+      "しんぶんし"
+    ],
+    "answerIndex": 2,
+    "hint": "うしろから よんで みよう。"
+  },
+  {
+    "id": "ix45",
+    "subject": "insight",
+    "skillId": "word_chain",
+    "difficulty": 3,
+    "prompt": "さかさに よんでも おなじ ことばは？",
+    "choices": [
+      "トマト",
+      "キャベツ",
+      "レタス"
+    ],
+    "answerIndex": 0,
+    "hint": "ト・マ・ト を ぎゃくから。"
+  },
+  {
+    "id": "ix46",
+    "subject": "insight",
+    "skillId": "word_chain",
+    "difficulty": 3,
+    "prompt": "「いか」の あたまに「す」を つけると？",
+    "choices": [
+      "すいとう",
+      "すいか",
+      "すずめ"
+    ],
+    "answerIndex": 1,
+    "hint": "あたらしい ことばが うまれるよ。"
+  },
+  {
+    "id": "ix47",
+    "subject": "insight",
+    "skillId": "word_chain",
+    "difficulty": 4,
+    "prompt": "「かめ」の まんなかに「も」を いれると？",
+    "choices": [
+      "かもく",
+      "かまめ",
+      "かもめ"
+    ],
+    "answerIndex": 2,
+    "hint": "か・？・め に いれてみよう。"
+  },
+  {
+    "id": "ix48",
+    "subject": "insight",
+    "skillId": "word_chain",
+    "difficulty": 4,
+    "prompt": "しりとりが ただしく つづいて いるのは？",
+    "choices": [
+      "すずめ→めだか→かに",
+      "すずめ→かめ→めだか",
+      "めだか→にじ→じしゃく"
+    ],
+    "answerIndex": 0,
+    "hint": "まえの さいごの もじ と つぎの はじめの もじを くらべよう。"
+  },
+  {
+    "id": "ix49",
+    "subject": "insight",
+    "skillId": "word_chain",
+    "difficulty": 4,
+    "prompt": "「くつした」から「くつ」を とると？",
+    "choices": [
+      "くし",
+      "した",
+      "つした"
+    ],
+    "answerIndex": 1,
+    "hint": "はじめの 2もじを とろう。"
+  },
+  {
+    "id": "ix50",
+    "subject": "insight",
+    "skillId": "word_chain",
+    "difficulty": 5,
+    "prompt": "しりとり: かさ → さる → るす → ？ → かめ。 ？に はいるのは？",
+    "choices": [
+      "すずめ",
+      "すもう",
+      "すいか"
+    ],
+    "answerIndex": 2,
+    "hint": "「す」で はじまり「か」で おわる。"
+  },
+  {
+    "id": "ix51",
+    "subject": "insight",
+    "skillId": "word_chain",
+    "difficulty": 5,
+    "prompt": "さかさに よむと べつの いきものに なる ことばは？",
+    "choices": [
+      "いか（→かい）",
+      "たこ（→こた）",
+      "くま（→まく）"
+    ],
+    "answerIndex": 0,
+    "hint": "さかさに した ことばも いきもの かな？"
+  },
+  {
+    "id": "jx1",
+    "subject": "japanese",
+    "skillId": "onomatopoeia",
+    "difficulty": 1,
+    "prompt": "いぬの なきごえは？",
+    "choices": [
+      "ワンワン",
+      "ニャー",
+      "モー"
+    ],
+    "answerIndex": 0,
+    "hint": "げんきに ほえるよ。"
+  },
+  {
+    "id": "jx2",
+    "subject": "japanese",
+    "skillId": "onomatopoeia",
+    "difficulty": 1,
+    "prompt": "ねこの なきごえは？",
+    "choices": [
+      "コケコッコー",
+      "ニャー",
+      "ブーブー"
+    ],
+    "answerIndex": 1,
+    "hint": "あまえた こえで なくよ。"
+  },
+  {
+    "id": "jx3",
+    "subject": "japanese",
+    "skillId": "onomatopoeia",
+    "difficulty": 1,
+    "prompt": "あめが たくさん ふる おとは？",
+    "choices": [
+      "ポカポカ",
+      "キラキラ",
+      "ザーザー"
+    ],
+    "answerIndex": 2,
+    "hint": "つよい あめの おと。"
+  },
+  {
+    "id": "jx4",
+    "subject": "japanese",
+    "skillId": "onomatopoeia",
+    "difficulty": 1,
+    "prompt": "ほしが ひかる ようすは？",
+    "choices": [
+      "キラキラ",
+      "ドンドン",
+      "ゴロゴロ"
+    ],
+    "answerIndex": 0,
+    "hint": "めに みえる ようすの ことば。"
+  },
+  {
+    "id": "jx5",
+    "subject": "japanese",
+    "skillId": "onomatopoeia",
+    "difficulty": 1,
+    "prompt": "うしの なきごえは？",
+    "choices": [
+      "ワンワン",
+      "モー",
+      "ピヨピヨ"
+    ],
+    "answerIndex": 1,
+    "hint": "ぼくじょうで きこえるね。"
+  },
+  {
+    "id": "jx6",
+    "subject": "japanese",
+    "skillId": "onomatopoeia",
+    "difficulty": 2,
+    "prompt": "おなかが すいた ときの おとは？",
+    "choices": [
+      "チクタク",
+      "パチパチ",
+      "グーグー"
+    ],
+    "answerIndex": 2,
+    "hint": "おなかが なっちゃう。"
+  },
+  {
+    "id": "jx7",
+    "subject": "japanese",
+    "skillId": "onomatopoeia",
+    "difficulty": 2,
+    "prompt": "とけいの はりの おとは？",
+    "choices": [
+      "チクタク",
+      "ザブーン",
+      "ガラガラ"
+    ],
+    "answerIndex": 0,
+    "hint": "こまかく きざむ おと。"
+  },
+  {
+    "id": "jx8",
+    "subject": "japanese",
+    "skillId": "onomatopoeia",
+    "difficulty": 2,
+    "prompt": "はくしゅの おとは？",
+    "choices": [
+      "ゴシゴシ",
+      "パチパチ",
+      "ヒューヒュー"
+    ],
+    "answerIndex": 1,
+    "hint": "てを たたく おと。"
+  },
+  {
+    "id": "jx9",
+    "subject": "japanese",
+    "skillId": "onomatopoeia",
+    "difficulty": 2,
+    "prompt": "あたたかい ひざしの ようすは？",
+    "choices": [
+      "ビショビショ",
+      "カチカチ",
+      "ポカポカ"
+    ],
+    "answerIndex": 2,
+    "hint": "ぬくぬく きもちいい。"
+  },
+  {
+    "id": "jx10",
+    "subject": "japanese",
+    "skillId": "onomatopoeia",
+    "difficulty": 2,
+    "prompt": "こおりの ように かたい ようすは？",
+    "choices": [
+      "カチカチ",
+      "ふわふわ",
+      "ぬるぬる"
+    ],
+    "answerIndex": 0,
+    "hint": "さわると かたい。"
+  },
+  {
+    "id": "jx11",
+    "subject": "japanese",
+    "skillId": "onomatopoeia",
+    "difficulty": 3,
+    "prompt": "わたあめの さわりごこちは？",
+    "choices": [
+      "ザラザラ",
+      "ふわふわ",
+      "ゴツゴツ"
+    ],
+    "answerIndex": 1,
+    "hint": "やわらかくて かるい。"
+  },
+  {
+    "id": "jx12",
+    "subject": "japanese",
+    "skillId": "onomatopoeia",
+    "difficulty": 3,
+    "prompt": "なみが いわに あたる おとは？",
+    "choices": [
+      "チリンチリン",
+      "コトコト",
+      "ザブーン"
+    ],
+    "answerIndex": 2,
+    "hint": "おおきな みずの おと。"
+  },
+  {
+    "id": "jx13",
+    "subject": "japanese",
+    "skillId": "onomatopoeia",
+    "difficulty": 3,
+    "prompt": "なべで ゆっくり にる おとは？",
+    "choices": [
+      "コトコト",
+      "ドカーン",
+      "ピカピカ"
+    ],
+    "answerIndex": 0,
+    "hint": "よわびで じっくり。"
+  },
+  {
+    "id": "jx14",
+    "subject": "japanese",
+    "skillId": "onomatopoeia",
+    "difficulty": 3,
+    "prompt": "しんぞうが はやく うごく ようすは？",
+    "choices": [
+      "ニコニコ",
+      "ドキドキ",
+      "のろのろ"
+    ],
+    "answerIndex": 1,
+    "hint": "きんちょう すると なるね。"
+  },
+  {
+    "id": "jx15",
+    "subject": "japanese",
+    "skillId": "onomatopoeia",
+    "difficulty": 3,
+    "prompt": "うれしくて わらう ようすは？",
+    "choices": [
+      "メソメソ",
+      "イライラ",
+      "ニコニコ"
+    ],
+    "answerIndex": 2,
+    "hint": "えがおの ことば。"
+  },
+  {
+    "id": "jx16",
+    "subject": "japanese",
+    "skillId": "onomatopoeia",
+    "difficulty": 4,
+    "prompt": "「ゆっくり あるく」ようすに あう ことばは？",
+    "choices": [
+      "のろのろ",
+      "すたすた",
+      "びゅんびゅん"
+    ],
+    "answerIndex": 0,
+    "hint": "すすみかたが おそい ようす。"
+  },
+  {
+    "id": "jx17",
+    "subject": "japanese",
+    "skillId": "onomatopoeia",
+    "difficulty": 4,
+    "prompt": "「いそいで あるく」ようすに あう ことばは？",
+    "choices": [
+      "よちよち",
+      "すたすた",
+      "ごろごろ"
+    ],
+    "answerIndex": 1,
+    "hint": "まよわず はやあし。"
+  },
+  {
+    "id": "jx18",
+    "subject": "japanese",
+    "skillId": "onomatopoeia",
+    "difficulty": 4,
+    "prompt": "こまって なきそうな ようすは？",
+    "choices": [
+      "げらげら",
+      "わくわく",
+      "しくしく"
+    ],
+    "answerIndex": 2,
+    "hint": "しずかに なく ようす。"
+  },
+  {
+    "id": "jx19",
+    "subject": "japanese",
+    "skillId": "onomatopoeia",
+    "difficulty": 5,
+    "prompt": "たのしみで まちきれない きもちは？",
+    "choices": [
+      "わくわく",
+      "がっかり",
+      "ひやひや"
+    ],
+    "answerIndex": 0,
+    "hint": "あしたの えんそく まえ みたいな きもち。"
+  },
+  {
+    "id": "jx20",
+    "subject": "japanese",
+    "skillId": "onomatopoeia",
+    "difficulty": 5,
+    "prompt": "あぶなくて こわい きもちは？",
+    "choices": [
+      "るんるん",
+      "ひやひや",
+      "うとうと"
+    ],
+    "answerIndex": 1,
+    "hint": "せなかが つめたく なる かんじ。"
+  },
+  {
+    "id": "mx1",
+    "subject": "math",
+    "skillId": "shapes_basic",
+    "difficulty": 1,
+    "prompt": "かどが 3つ ある かたちは？",
+    "choices": [
+      "さんかく",
+      "しかく",
+      "まる"
+    ],
+    "answerIndex": 0,
+    "hint": "かどを かぞえよう。"
+  },
+  {
+    "id": "mx2",
+    "subject": "math",
+    "skillId": "shapes_basic",
+    "difficulty": 1,
+    "prompt": "かどが ない かたちは？",
+    "choices": [
+      "さんかく",
+      "まる",
+      "しかく"
+    ],
+    "answerIndex": 1,
+    "hint": "ころころ ころがるね。"
+  },
+  {
+    "id": "mx3",
+    "subject": "math",
+    "skillId": "shapes_basic",
+    "difficulty": 1,
+    "prompt": "かどが 4つ ある かたちは？",
+    "choices": [
+      "さんかく",
+      "まる",
+      "しかく"
+    ],
+    "answerIndex": 2,
+    "hint": "まどや ノートの かたち。"
+  },
+  {
+    "id": "mx4",
+    "subject": "math",
+    "skillId": "shapes_basic",
+    "difficulty": 1,
+    "prompt": "ボールの かたちに にているのは？",
+    "choices": [
+      "たま（きゅう）",
+      "はこ",
+      "つつ"
+    ],
+    "answerIndex": 0,
+    "hint": "どこから みても まるい。"
+  },
+  {
+    "id": "mx5",
+    "subject": "math",
+    "skillId": "shapes_basic",
+    "difficulty": 2,
+    "prompt": "さんかくの へんの かずは？",
+    "choices": [
+      "4ほん",
+      "3ぼん",
+      "2ほん"
+    ],
+    "answerIndex": 1,
+    "hint": "まっすぐな せんを かぞえよう。"
+  },
+  {
+    "id": "mx6",
+    "subject": "math",
+    "skillId": "shapes_basic",
+    "difficulty": 2,
+    "prompt": "しかくの へんの かずは？",
+    "choices": [
+      "3ぼん",
+      "5ほん",
+      "4ほん"
+    ],
+    "answerIndex": 2,
+    "hint": "まっすぐな せんを かぞえよう。"
+  },
+  {
+    "id": "mx7",
+    "subject": "math",
+    "skillId": "shapes_basic",
+    "difficulty": 2,
+    "prompt": "ころがりやすい かたちは？",
+    "choices": [
+      "つつ",
+      "はこ",
+      "さんかくの つみき"
+    ],
+    "answerIndex": 0,
+    "hint": "まるい ところが あるかな。"
+  },
+  {
+    "id": "mx8",
+    "subject": "math",
+    "skillId": "shapes_basic",
+    "difficulty": 2,
+    "prompt": "つみかさねやすい かたちは？",
+    "choices": [
+      "たま",
+      "はこ",
+      "つつを よこに した もの"
+    ],
+    "answerIndex": 1,
+    "hint": "たいらな めんが ある かたち。"
+  },
+  {
+    "id": "mx9",
+    "subject": "math",
+    "skillId": "shapes_basic",
+    "difficulty": 3,
+    "prompt": "さんかくを 2まい あわせて できる かたちは？",
+    "choices": [
+      "まる",
+      "ほし",
+      "しかく"
+    ],
+    "answerIndex": 2,
+    "hint": "ななめに きると わかるよ。"
+  },
+  {
+    "id": "mx10",
+    "subject": "math",
+    "skillId": "shapes_basic",
+    "difficulty": 3,
+    "prompt": "サイコロの めんの かずは？",
+    "choices": [
+      "6",
+      "4",
+      "8"
+    ],
+    "answerIndex": 0,
+    "hint": "1から 6まで の めが あるね。"
+  },
+  {
+    "id": "mx11",
+    "subject": "math",
+    "skillId": "shapes_basic",
+    "difficulty": 3,
+    "prompt": "ましかくの へんの ながさは？",
+    "choices": [
+      "ぜんぶ ちがう",
+      "ぜんぶ おなじ",
+      "2ほんだけ おなじ"
+    ],
+    "answerIndex": 1,
+    "hint": "「ま」しかく だから。"
+  },
+  {
+    "id": "mx12",
+    "subject": "math",
+    "skillId": "shapes_basic",
+    "difficulty": 3,
+    "prompt": "かんづめの かんの かたちは？",
+    "choices": [
+      "はこ",
+      "たま",
+      "つつ（えんちゅう）"
+    ],
+    "answerIndex": 2,
+    "hint": "うえと したが まるい。"
+  },
+  {
+    "id": "mx13",
+    "subject": "math",
+    "skillId": "shapes_basic",
+    "difficulty": 4,
+    "prompt": "はこ（ちょくほうたい）の かどの かずは？",
+    "choices": [
+      "8",
+      "6",
+      "12"
+    ],
+    "answerIndex": 0,
+    "hint": "うえに 4つ、したに 4つ。"
+  },
+  {
+    "id": "mx14",
+    "subject": "math",
+    "skillId": "shapes_basic",
+    "difficulty": 4,
+    "prompt": "さんかくの かどの かず と しかくの かどの かず、あわせると？",
+    "choices": [
+      "6",
+      "7",
+      "8"
+    ],
+    "answerIndex": 1,
+    "hint": "3＋4。"
+  },
+  {
+    "id": "mx15",
+    "subject": "math",
+    "skillId": "shapes_basic",
+    "difficulty": 4,
+    "prompt": "ろっかっけいの かどの かずは？",
+    "choices": [
+      "5",
+      "8",
+      "6"
+    ],
+    "answerIndex": 2,
+    "hint": "はちの すの かたち。"
+  },
+  {
+    "id": "mx16",
+    "subject": "math",
+    "skillId": "shapes_basic",
+    "difficulty": 4,
+    "prompt": "しかくを ななめに 1ほん きると できる かたちは？",
+    "choices": [
+      "さんかく 2つ",
+      "しかく 2つ",
+      "まる 2つ"
+    ],
+    "answerIndex": 0,
+    "hint": "かどから かどへ きる。"
+  },
+  {
+    "id": "mx17",
+    "subject": "math",
+    "skillId": "shapes_basic",
+    "difficulty": 5,
+    "prompt": "サイコロの むかいあう めを たすと いつも いくつ？",
+    "choices": [
+      "6",
+      "7",
+      "10"
+    ],
+    "answerIndex": 1,
+    "hint": "1と6、2と5、3と4。"
+  },
+  {
+    "id": "mx18",
+    "subject": "math",
+    "skillId": "shapes_basic",
+    "difficulty": 5,
+    "prompt": "はこ（ちょくほうたい）の へんの かずは？",
+    "choices": [
+      "8",
+      "6",
+      "12"
+    ],
+    "answerIndex": 2,
+    "hint": "うえ4、した4、たて4。"
+  },
+  {
+    "id": "mx19",
+    "subject": "math",
+    "skillId": "shapes_basic",
+    "difficulty": 5,
+    "prompt": "さんかくを 4まい つかって できる おおきな かたちは？",
+    "choices": [
+      "おおきな さんかく",
+      "まる",
+      "ほし"
+    ],
+    "answerIndex": 0,
+    "hint": "まんなかに さかさの さんかくを おこう。"
+  },
+  {
+    "id": "mx20",
+    "subject": "math",
+    "skillId": "shapes_basic",
+    "difficulty": 5,
+    "prompt": "まるを はんぶんに おった かたちは？",
+    "choices": [
+      "さんかく",
+      "はんえん",
+      "しかく"
+    ],
+    "answerIndex": 1,
+    "hint": "まるの はんぶん。"
   }
 ];
