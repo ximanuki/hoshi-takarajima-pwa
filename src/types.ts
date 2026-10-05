@@ -80,7 +80,6 @@ export type ThemePreference = 'system' | 'light' | 'dark';
 
 export interface Settings {
   soundEnabled: boolean;
-  bgmVolume: number;
   sfxVolume: number;
   /** もんだいを じどうで よみあげる */
   readAloud: boolean;

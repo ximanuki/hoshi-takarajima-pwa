@@ -94,7 +94,6 @@ type AppState = {
 
 const defaultSettings: Settings = {
   soundEnabled: true,
-  bgmVolume: 0.6,
   sfxVolume: 0.8,
   readAloud: false,
   largeText: false,
@@ -139,7 +138,6 @@ function normalizeSettings(value: unknown): Settings {
   const theme: ThemePreference = value.theme === 'light' || value.theme === 'dark' ? value.theme : 'system';
   return {
     soundEnabled: typeof value.soundEnabled === 'boolean' ? value.soundEnabled : defaultSettings.soundEnabled,
-    bgmVolume: Math.max(0, Math.min(1, toNumber(value.bgmVolume, defaultSettings.bgmVolume))),
     sfxVolume: Math.max(0, Math.min(1, toNumber(value.sfxVolume, defaultSettings.sfxVolume))),
     readAloud: typeof value.readAloud === 'boolean' ? value.readAloud : defaultSettings.readAloud,
     largeText: typeof value.largeText === 'boolean' ? value.largeText : defaultSettings.largeText,

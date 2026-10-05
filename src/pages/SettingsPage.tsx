@@ -39,7 +39,7 @@ export function SettingsPage() {
       <article className="card settings-group">
         <h2>🔈 おと</h2>
         <label className="field-row">
-          <span>サウンド</span>
+          <span>こうかおん</span>
           <input
             className="switch"
             checked={settings.soundEnabled}
@@ -48,20 +48,9 @@ export function SettingsPage() {
           />
         </label>
 
-        <label className="field-stack">
-          <span>BGM おんりょう: {Math.round(settings.bgmVolume * 100)}%</span>
-          <input
-            max={1}
-            min={0}
-            step={0.1}
-            type="range"
-            value={settings.bgmVolume}
-            onChange={(event) => updateSettings({ bgmVolume: Number(event.target.value) })}
-          />
-        </label>
 
         <label className="field-stack">
-          <span>こうかおん: {Math.round(settings.sfxVolume * 100)}%</span>
+          <span>おんりょう: {Math.round(settings.sfxVolume * 100)}%</span>
           <input
             max={1}
             min={0}
@@ -129,9 +118,6 @@ export function SettingsPage() {
         <div className="link-list">
           <Link className="link-row" to="/parent">
             保護者ダッシュボード <span aria-hidden="true">›</span>
-          </Link>
-          <Link className="link-row" to="/settings/audio-lab">
-            BGM比較ラボ <span aria-hidden="true">›</span>
           </Link>
           <Link className="link-row" to="/illustrations">
             SVGプレビュー <span aria-hidden="true">›</span>

@@ -1908,49 +1908,12 @@ input[type='range'] {
   background: var(--mint-soft);
 }
 
-.audio-lab-note {
-  color: var(--ink-soft);
-  font-size: 0.9rem;
-}
 
-.audio-lab-preset-grid {
-  display: grid;
-  gap: 8px;
-}
 
-.audio-lab-preset-btn {
-  border: 2px solid var(--line);
-  border-radius: 14px;
-  background: var(--surface-2);
-  color: var(--ink);
-  text-align: left;
-  padding: 10px 12px;
-  font: inherit;
-  display: grid;
-  gap: 4px;
-  cursor: pointer;
-}
 
-.audio-lab-preset-btn small {
-  color: var(--ink-soft);
-  font-size: 0.78rem;
-}
 
-.audio-lab-preset-btn.active {
-  border-color: var(--mint);
-  background: var(--mint-soft);
-}
 
-.audio-lab-sfx-grid {
-  display: grid;
-  gap: 8px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
 
-.audio-lab-grid {
-  display: grid;
-  gap: 12px;
-}
 
 .mascot h2 {
   margin-bottom: 4px;
@@ -2017,14 +1980,6 @@ input[type='range'] {
     position: absolute;
     top: 8px;
     right: 10px;
-  }
-
-  .audio-lab-preset-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .audio-lab-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

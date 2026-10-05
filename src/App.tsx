@@ -11,7 +11,6 @@ const ParentPage = lazy(() => import('./pages/ParentPage').then((module) => ({ d
 const IllustrationPreviewPage = lazy(() =>
   import('./pages/IllustrationPreviewPage').then((module) => ({ default: module.IllustrationPreviewPage })),
 );
-const AudioLabPage = lazy(() => import('./pages/AudioLabPage').then((module) => ({ default: module.AudioLabPage })));
 const SettingsPage = lazy(() => import('./pages/SettingsPage').then((module) => ({ default: module.SettingsPage })));
 
 function App() {
@@ -33,7 +32,6 @@ function App() {
             <Route element={<CollectionPage />} path="/collection" />
             <Route element={<ParentPage />} path="/parent" />
             <Route element={<IllustrationPreviewPage />} path="/illustrations" />
-            <Route element={<AudioLabPage />} path="/settings/audio-lab" />
             <Route element={<SettingsPage />} path="/settings" />
             <Route element={<Navigate to="/" replace />} path="*" />
           </Routes>
