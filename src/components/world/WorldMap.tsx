@@ -42,12 +42,21 @@ function seeded(index: number, salt: number): number {
   return value - Math.floor(value);
 }
 
-const STARS = Array.from({ length: 34 }, (_, index) => ({
+const SPARKLES = Array.from({ length: 26 }, (_, index) => ({
   x: seeded(index, 1) * VIEW_W,
   y: seeded(index, 2) * VIEW_H,
-  r: 0.8 + seeded(index, 3) * 1.6,
+  r: 3 + seeded(index, 3) * 4,
   delay: seeded(index, 4) * 3,
+  color: ['#ffffff', '#ffd45c', '#ffb3d6', '#bfe9ff'][index % 4],
 }));
+
+const SPRINKLE_COLORS = ['#ff7eb6', '#ffd45c', '#5fd0b8', '#8fd3ff', '#b9a3ff', '#ffffff'];
+
+/** 4つの とがりが ある キラキラ */
+function sparklePath(x: number, y: number, r: number): string {
+  const k = r * 0.28;
+  return `M ${x} ${y - r} Q ${x + k} ${y - k} ${x + r} ${y} Q ${x + k} ${y + k} ${x} ${y + r} Q ${x - k} ${y + k} ${x - r} ${y} Q ${x - k} ${y - k} ${x} ${y - r} Z`;
+}
 
 const WAVES = Array.from({ length: 12 }, (_, index) => ({
   x: 20 + seeded(index, 7) * (VIEW_W - 60),
@@ -90,26 +99,42 @@ export function WorldMap({ islandStars, boatAt, onSelect }: Props) {
     <div className="world">
       <svg className="world-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} role="group" aria-label="ぼうけんマップ">
         <defs>
-          <radialGradient id="moonGlow">
-            <stop offset="0%" stopColor="#fff6d6" stopOpacity="0.55" />
-            <stop offset="100%" stopColor="#fff6d6" stopOpacity="0" />
-          </radialGradient>
+          <linearGradient id="milkSea" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor="#c9f1ff" />
+            <stop offset="55%" stopColor="#e4dcff" />
+            <stop offset="100%" stopColor="#ffd9ec" />
+          </linearGradient>
         </defs>
 
-        {STARS.map((star, index) => (
-          <circle
+        <rect x={0} y={0} width={VIEW_W} height={VIEW_H} rx={36} fill="url(#milkSea)" />
+
+        {/* にじ と くも */}
+        <g aria-hidden="true">
+          {['#ffb3d6', '#ffe08a', '#bdf0d8', '#bfe2ff', '#d9c8ff'].map((color, index) => (
+            <path
+              d={`M ${236 + index * 7} 92 A ${70 - index * 7} ${70 - index * 7} 0 0 1 ${376 - index * 7} 92`}
+              fill="none"
+              key={color}
+              stroke={color}
+              strokeLinecap="round"
+              strokeWidth={8}
+            />
+          ))}
+          <g fill="#fff" stroke="#6a3d73" strokeWidth={3}>
+            <path d="M 214 98 a 16 16 0 0 1 22 -18 a 20 20 0 0 1 36 6 a 14 14 0 0 1 4 26 h -54 a 14 14 0 0 1 -8 -14 Z" />
+            <path d="M 338 100 a 14 14 0 0 1 20 -14 a 16 16 0 0 1 28 8 a 12 12 0 0 1 -2 22 h -40 a 10 10 0 0 1 -6 -16 Z" />
+          </g>
+        </g>
+
+        {SPARKLES.map((sparkle, index) => (
+          <path
             className="twinkle"
-            cx={star.x}
-            cy={star.y}
-            fill="#fff"
+            d={sparklePath(sparkle.x, sparkle.y, sparkle.r)}
+            fill={sparkle.color}
             key={index}
-            r={star.r}
-            style={{ animationDelay: `${star.delay}s` }}
+            style={{ animationDelay: `${sparkle.delay}s` }}
           />
         ))}
-
-        <circle cx={348} cy={44} r={58} fill="url(#moonGlow)" />
-        <path d="M 360 22 a 24 24 0 1 0 6 40 a 19 19 0 1 1 -6 -40 Z" fill="#ffe7a3" stroke="#2a2140" strokeWidth={3} />
 
         {WAVES.map((wave, index) => (
           <path
@@ -117,15 +142,15 @@ export function WorldMap({ islandStars, boatAt, onSelect }: Props) {
             d={`M ${wave.x} ${wave.y} q 6 -5 12 0 t 12 0`}
             fill="none"
             key={index}
-            stroke="#7fa8ff"
+            stroke="#ffffff"
             strokeLinecap="round"
-            strokeOpacity={0.45}
+            strokeOpacity={0.9}
             strokeWidth={2.5}
             style={{ animationDelay: `${wave.delay}s` }}
           />
         ))}
 
-        <path d={ROUTE} fill="none" stroke="#fff" strokeDasharray="2 12" strokeLinecap="round" strokeOpacity={0.4} strokeWidth={4} />
+        <path d={ROUTE} fill="none" stroke="#ff9fc9" strokeDasharray="2 12" strokeLinecap="round" strokeOpacity={0.8} strokeWidth={4} />
 
         {SUBJECTS.map((subject, index) => {
           const { x, y, seed } = ISLAND_POS[subject];
@@ -143,20 +168,50 @@ export function WorldMap({ islandStars, boatAt, onSelect }: Props) {
               tabIndex={0}
             >
               <g className="island-bob" style={{ animationDelay: `${index * 0.6}s` }}>
-                <path d={blobPath(x, y + 8, ISLAND_R * 1.3, seed)} fill={`hsl(${h} 80% 72%)`} fillOpacity={0.22} />
-                <path d={blobPath(x, y + 6, ISLAND_R * 1.04, seed)} fill="#f7dfa8" stroke="#2a2140" strokeWidth={3} />
-                <path d={blobPath(x, y - 2, ISLAND_R * 0.8, seed + 1)} fill={`hsl(${h} 62% 58%)`} stroke="#2a2140" strokeWidth={3} />
-                <path d={blobPath(x - 8, y - 8, ISLAND_R * 0.42, seed + 2)} fill={`hsl(${h} 70% 72%)`} />
-                {/* ちいさな き */}
-                <g transform={`translate(${x - ISLAND_R * 0.62} ${y - 6})`}>
-                  <rect x={-2} y={0} width={4} height={12} rx={2} fill="#7a4a2a" />
-                  <circle cx={0} cy={-2} r={8} fill={`hsl(${(h + 120) % 360} 45% 45%)`} stroke="#2a2140" strokeWidth={2} />
+                <path d={blobPath(x, y + 10, ISLAND_R * 1.28, seed)} fill="#ffffff" fillOpacity={0.55} />
+                {/* クッキーの だい */}
+                <path d={blobPath(x, y + 8, ISLAND_R * 1.02, seed)} fill="#f6cf94" stroke="#6a3d73" strokeWidth={3} />
+                {/* クリーム（しまの いろ） */}
+                <path d={blobPath(x, y - 2, ISLAND_R * 0.84, seed + 1)} fill={`hsl(${h} 90% 84%)`} stroke="#6a3d73" strokeWidth={3} />
+                {[-0.55, -0.15, 0.25, 0.6].map((offset, dripIndex) => (
+                  <ellipse
+                    cx={x + offset * ISLAND_R}
+                    cy={y + ISLAND_R * 0.52 + (dripIndex % 2) * 5}
+                    fill={`hsl(${h} 90% 84%)`}
+                    key={offset}
+                    rx={7}
+                    ry={9 + (dripIndex % 2) * 4}
+                    stroke="#6a3d73"
+                    strokeWidth={2.5}
+                  />
+                ))}
+                <path d={blobPath(x - 10, y - 12, ISLAND_R * 0.36, seed + 2)} fill="#ffffff" fillOpacity={0.55} />
+                {/* スプリンクル */}
+                {Array.from({ length: 9 }, (_, sprinkleIndex) => {
+                  const angle = seeded(sprinkleIndex, seed) * Math.PI * 2;
+                  const dist = 0.3 + seeded(sprinkleIndex, seed + 9) * 0.42;
+                  const sx = x + Math.cos(angle) * ISLAND_R * dist * 1.2;
+                  const sy = y - 2 + Math.sin(angle) * ISLAND_R * dist * 0.62;
+                  return (
+                    <rect
+                      fill={SPRINKLE_COLORS[(sprinkleIndex + index) % SPRINKLE_COLORS.length]}
+                      height={3.5}
+                      key={sprinkleIndex}
+                      rx={1.75}
+                      transform={`rotate(${seeded(sprinkleIndex, seed + 3) * 180} ${sx} ${sy})`}
+                      width={10}
+                      x={sx - 5}
+                      y={sy - 1.75}
+                    />
+                  );
+                })}
+                {/* ペロペロキャンディの き */}
+                <g transform={`translate(${x - ISLAND_R * 0.86} ${y - 18})`}>
+                  <rect x={-1.5} y={0} width={3} height={18} rx={1.5} fill="#fff" stroke="#6a3d73" strokeWidth={1.5} />
+                  <circle cx={0} cy={-2} r={9} fill={`hsl(${(h + 60) % 360} 90% 80%)`} stroke="#6a3d73" strokeWidth={2} />
+                  <path d="M 0 -2 m -5 0 a 5 5 0 1 1 5 5" fill="none" stroke="#fff" strokeWidth={2} />
                 </g>
-                <g transform={`translate(${x + ISLAND_R * 0.6} ${y + 2})`}>
-                  <rect x={-2} y={0} width={4} height={10} rx={2} fill="#7a4a2a" />
-                  <circle cx={0} cy={-1} r={6.5} fill={`hsl(${(h + 120) % 360} 45% 45%)`} stroke="#2a2140" strokeWidth={2} />
-                </g>
-                <text x={x} y={y + 6} fontSize={38} textAnchor="middle">
+                <text x={x + 4} y={y + 8} fontSize={40} textAnchor="middle">
                   {info.emoji}
                 </text>
               </g>
@@ -166,7 +221,7 @@ export function WorldMap({ islandStars, boatAt, onSelect }: Props) {
                 {info.island}
               </text>
               <text className="island-label-sub" x={x} y={y + ISLAND_R * 0.86 + 37}>
-                ★ {stars.earned} / {stars.max}
+                {info.label} ★ {stars.earned}/{stars.max}
               </text>
             </g>
           );
@@ -174,9 +229,10 @@ export function WorldMap({ islandStars, boatAt, onSelect }: Props) {
 
         <g transform={`translate(${boatX} ${boatY})`} aria-hidden="true">
           <g className="boat">
-          <path d="M 0 40 L 58 40 L 48 56 L 10 56 Z" fill="#b5683a" stroke="#2a2140" strokeWidth={3} strokeLinejoin="round" />
-          <rect x={27} y={2} width={4} height={38} fill="#2a2140" />
-          <path d="M 31 4 L 31 34 L 52 34 Z" fill="#fff8ec" stroke="#2a2140" strokeWidth={2.5} strokeLinejoin="round" />
+          <path d="M 0 40 L 58 40 L 48 56 L 10 56 Z" fill="#ff9fc9" stroke="#6a3d73" strokeWidth={3} strokeLinejoin="round" />
+          <rect x={27} y={2} width={3.5} height={38} fill="#6a3d73" />
+          <path d="M 31 6 C 36 -2, 50 2, 44 12 C 52 12, 54 26, 31 34 Z" fill="#fff" stroke="#6a3d73" strokeWidth={2.5} strokeLinejoin="round" />
+          <path d="M 38 14 c 2 -3 6 -2 5 1 c -1 3 -5 5 -5 5 c 0 0 -4 -2 -5 -5 c -1 -3 3 -4 5 -1 Z" fill="#ff7eb6" />
           <image href={hamcheeSrc('happy')} x={-2} y={8} width={34} height={34} />
           </g>
         </g>

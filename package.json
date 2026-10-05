@@ -12,7 +12,8 @@
     "test": "vitest run",
     "test:golden": "vitest run src/utils/mission.test.ts src/utils/diagnostics.test.ts",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "voice:build": "node scripts/generate-voice.mjs"
   },
   "dependencies": {
     "chart.js": "^4.5.1",

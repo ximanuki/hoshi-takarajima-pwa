@@ -9,7 +9,8 @@ import { hamcheeSrc } from '../utils/hamchee';
 import { getMisconceptionFeedback } from '../utils/misconceptions';
 import { badgeById, getLevelTitle, getQuestDef } from '../utils/progression';
 
-const CONFETTI_COLORS = ['#ff6b5b', '#ffc94a', '#22c29e', '#6fb6ff', '#ff7fc8', '#9b7bff'];
+const CONFETTI_COLORS = ['#ff7eb6', '#ffd45c', '#5fd0b8', '#8fd3ff', '#b9a3ff', '#ffa77f'];
+const CONFETTI_SHAPES = ['♥', '★', '✦', '♥', '●'];
 
 function accuracyStars(accuracy: number): number {
   if (accuracy >= 1) return 3;
@@ -18,25 +19,30 @@ function accuracyStars(accuracy: number): number {
 }
 
 function ChestSvg() {
+  // リボンつきの プレゼントばこ
   return (
-    <svg className="chest-svg" viewBox="0 0 160 140" aria-hidden="true">
+    <svg className="chest-svg" viewBox="0 0 160 150" aria-hidden="true">
       <g className="chest-glow">
         {Array.from({ length: 12 }, (_, index) => (
           <path
-            d="M 80 70 L 74 -10 L 86 -10 Z"
-            fill="#ffe08a"
+            d="M 80 80 L 74 0 L 86 0 Z"
+            fill={index % 2 === 0 ? '#ffd45c' : '#ffb3d6'}
             key={index}
-            opacity={0.7}
-            transform={`rotate(${index * 30} 80 70)`}
+            opacity={0.75}
+            transform={`rotate(${index * 30} 80 80)`}
           />
         ))}
       </g>
-      <rect x={20} y={62} width={120} height={66} rx={12} fill="#c8743a" stroke="#2a2140" strokeWidth={4} />
-      <rect x={20} y={84} width={120} height={12} fill="#ffc94a" stroke="#2a2140" strokeWidth={3} />
-      <rect x={70} y={78} width={20} height={26} rx={5} fill="#ffe08a" stroke="#2a2140" strokeWidth={3} />
+      <rect x={24} y={70} width={112} height={70} rx={14} fill="#ff9fc9" stroke="#6a3d73" strokeWidth={4} />
+      <rect x={70} y={70} width={20} height={70} fill="#fff4cc" stroke="#6a3d73" strokeWidth={3} />
+      <circle cx={48} cy={100} r={5} fill="#fff" opacity={0.8} />
+      <circle cx={112} cy={118} r={4} fill="#fff" opacity={0.8} />
       <g className="lid">
-        <path d="M 20 64 Q 20 26 80 26 Q 140 26 140 64 Z" fill="#d9864a" stroke="#2a2140" strokeWidth={4} strokeLinejoin="round" />
-        <rect x={20} y={54} width={120} height={10} fill="#ffc94a" stroke="#2a2140" strokeWidth={3} />
+        <rect x={16} y={50} width={128} height={26} rx={10} fill="#ffb3d6" stroke="#6a3d73" strokeWidth={4} />
+        <rect x={70} y={50} width={20} height={26} fill="#fff4cc" stroke="#6a3d73" strokeWidth={3} />
+        <path d="M 80 50 C 60 20, 34 34, 52 50 Z" fill="#fff4cc" stroke="#6a3d73" strokeWidth={3} strokeLinejoin="round" />
+        <path d="M 80 50 C 100 20, 126 34, 108 50 Z" fill="#fff4cc" stroke="#6a3d73" strokeWidth={3} strokeLinejoin="round" />
+        <circle cx={80} cy={48} r={7} fill="#ffd45c" stroke="#6a3d73" strokeWidth={3} />
       </g>
     </svg>
   );
@@ -62,6 +68,7 @@ export function ResultPage() {
         delay: ((index * 13) % 20) * 0.05,
         duration: 2.2 + (index % 6) * 0.25,
         color: CONFETTI_COLORS[index % CONFETTI_COLORS.length],
+        shape: CONFETTI_SHAPES[index % CONFETTI_SHAPES.length],
         drift: ((index % 7) - 3) * 18,
         spin: 360 + (index % 5) * 120,
       })),
@@ -94,8 +101,8 @@ export function ResultPage() {
   const title =
     kind === 'boss'
       ? result.bossDefeated
-        ? `${boss.name}を たおした！`
-        : `${boss.name}に にげられた…`
+        ? `${boss.name}と なかよしに なった！`
+        : `${boss.name}は ${boss.escape}`
       : result.accuracy >= 1
         ? 'パーフェクト！'
         : result.accuracy >= 0.6
@@ -145,14 +152,16 @@ export function ResultPage() {
               style={
                 {
                   left: `${piece.left}%`,
-                  background: piece.color,
+                  color: piece.color,
                   animationDelay: `${piece.delay}s`,
                   animationDuration: `${piece.duration}s`,
                   '--drift': `${piece.drift}px`,
                   '--spin': `${piece.spin}deg`,
                 } as CSSProperties
               }
-            />
+            >
+              {piece.shape}
+            </span>
           ))}
         </div>
       ) : null}
@@ -175,10 +184,10 @@ export function ResultPage() {
       </section>
 
       <section className="chest-stage">
-        <button className={`chest-btn ${opened ? 'open' : 'closed'}`} onClick={onOpen} aria-label="たからばこを あける">
+        <button className={`chest-btn ${opened ? 'open' : 'closed'}`} onClick={onOpen} aria-label="プレゼントを あける">
           <ChestSvg />
         </button>
-        {!opened ? <p className="chest-hint">👆 タップして たからばこを あけよう！</p> : null}
+        {!opened ? <p className="chest-hint">👆 タップして プレゼントを あけよう！</p> : null}
       </section>
 
       {opened ? (
