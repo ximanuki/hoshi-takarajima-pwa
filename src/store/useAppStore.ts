@@ -9,6 +9,8 @@ import {
 } from '../utils/mission';
 import { getGuessThresholdMs, inferErrorTag } from '../utils/diagnostics';
 import { createSubjectRecord, isSubject } from '../data/subjects';
+import { findStage, islandPaths } from '../data/islandPaths';
+import { buildSkillMission, emptyNodeStars, starsForAccuracy } from '../utils/practice';
 import {
   CHEST_REWARD_STARS,
   QUEST_REWARD_STARS,
@@ -23,8 +25,9 @@ import {
 import type {
   AnswerTrace,
   DailyQuestState,
+  MissionKind,
+  NodeStars,
   PlayerStats,
-  ThemePreference,
   MisconceptionState,
   MisconceptionTag,
   MissionResult,
@@ -77,12 +80,20 @@ type AppState = {
   /** ミッションを またいで つづく れんぞく せいかい */
   comboStreak: number;
   dailyQuest: DailyQuestState;
+  /** スキルごとの ノードの ほし */
+  nodeProgress: Record<string, NodeStars>;
+  /** ボスを たおして もらった ステッカー（skillId） */
+  stickers: string[];
+  lastIsland: Subject | null;
   mission: MissionSession | null;
   /** いまの ミッションの なかで いちばん ながい コンボ */
   missionBestCombo: number;
   latestResult: MissionResult | null;
-  startMission: (subject: Subject) => void;
+  startMission: (subject: Subject, options?: { skillId: string; kind: Exclude<MissionKind, 'adaptive'> }) => void;
   submitAnswer: (choiceIndex: number) => void;
+  /** まちがえた もんだいを さいごに もう1かい だす */
+  queueRetry: () => void;
+  completeLesson: (skillId: string, quizCorrect: boolean) => string[];
   goNextQuestion: () => void;
   finishMission: () => MissionResult | null;
   abandonMission: () => void;
@@ -94,11 +105,9 @@ type AppState = {
 
 const defaultSettings: Settings = {
   soundEnabled: true,
-  bgmVolume: 0.6,
   sfxVolume: 0.8,
-  readAloud: false,
+  readAloud: true,
   largeText: false,
-  theme: 'system',
 };
 
 const defaultStats: PlayerStats = {
@@ -111,6 +120,8 @@ const defaultStats: PlayerStats = {
   difficultyUps: 0,
   questsCompleted: 0,
   morningMissions: 0,
+  lessonsDone: 0,
+  bossWins: 0,
 };
 
 const createDefaultSubjectClears = (): SubjectCounts => createSubjectRecord(() => 0);
@@ -136,14 +147,11 @@ function normalizeSubjectClears(value: unknown): SubjectCounts {
 
 function normalizeSettings(value: unknown): Settings {
   if (!isRecord(value)) return defaultSettings;
-  const theme: ThemePreference = value.theme === 'light' || value.theme === 'dark' ? value.theme : 'system';
   return {
     soundEnabled: typeof value.soundEnabled === 'boolean' ? value.soundEnabled : defaultSettings.soundEnabled,
-    bgmVolume: Math.max(0, Math.min(1, toNumber(value.bgmVolume, defaultSettings.bgmVolume))),
     sfxVolume: Math.max(0, Math.min(1, toNumber(value.sfxVolume, defaultSettings.sfxVolume))),
     readAloud: typeof value.readAloud === 'boolean' ? value.readAloud : defaultSettings.readAloud,
     largeText: typeof value.largeText === 'boolean' ? value.largeText : defaultSettings.largeText,
-    theme,
   };
 }
 
@@ -163,6 +171,25 @@ function normalizeStats(value: unknown, legacy: { badges: unknown; streakDays: u
   return stats;
 }
 
+const MIGRATION_PRACTICE_MASTERY = 70;
+
+function normalizeNodeProgress(value: unknown, skillProgress: Record<string, SkillProgress>): Record<string, NodeStars> {
+  const result: Record<string, NodeStars> = {};
+  const source = isRecord(value) ? value : {};
+  for (const [skillId, raw] of Object.entries(source)) {
+    if (!isRecord(raw)) continue;
+    const clampStars = (input: unknown) => Math.max(0, Math.min(3, Math.round(toNumber(input, 0))));
+    result[skillId] = { lesson: clampStars(raw.lesson), practice: clampStars(raw.practice), boss: clampStars(raw.boss) };
+  }
+  // v4 いぜん: よく できている スキルは れんしゅう ★1 から スタート
+  for (const [skillId, progress] of Object.entries(skillProgress)) {
+    if (progress.mastery < MIGRATION_PRACTICE_MASTERY) continue;
+    const current = result[skillId] ?? emptyNodeStars();
+    result[skillId] = { ...current, practice: Math.max(current.practice, 1) };
+  }
+  return result;
+}
+
 function normalizeDailyQuest(value: unknown): DailyQuestState {
   const today = todayKey();
   if (!isRecord(value) || value.date !== today || !isRecord(value.counters)) return createDailyQuestState(today);
@@ -175,6 +202,8 @@ function normalizeDailyQuest(value: unknown): DailyQuestState {
       perfect: toNumber(counters.perfect, 0),
       maxCombo: toNumber(counters.maxCombo, 0),
       reviewMissions: toNumber(counters.reviewMissions, 0),
+      lessons: toNumber(counters.lessons, 0),
+      bosses: toNumber(counters.bosses, 0),
       subjects: Array.isArray(counters.subjects) ? counters.subjects.filter(isSubject) : [],
     },
     claimed: Array.isArray(value.claimed) ? value.claimed.filter((id): id is string => typeof id === 'string') : [],
@@ -288,6 +317,12 @@ function nextStreak(lastPlayedDate: string | null, today: string): number {
   return -999;
 }
 
+function nextSkillInPath(skillId: string): string | undefined {
+  const found = findStage(skillId);
+  if (!found) return undefined;
+  return islandPaths[found.subject][found.index + 1]?.skillId;
+}
+
 function badgeContext(state: Pick<AppState, 'stats' | 'subjectClears' | 'streakDays' | 'level'>) {
   return { stats: state.stats, subjectClears: state.subjectClears, streakDays: state.streakDays, level: state.level };
 }
@@ -311,20 +346,21 @@ export const useAppStore = create<AppState>()(
       stats: defaultStats,
       comboStreak: 0,
       dailyQuest: createDailyQuestState(todayKey()),
+      nodeProgress: {},
+      stickers: [],
+      lastIsland: null,
       mission: null,
       missionBestCombo: 0,
       latestResult: null,
 
-      startMission: (subject) => {
+      startMission: (subject, options) => {
         const state = get();
         const subjectState = state.adaptiveBySubject[subject];
         const startedAt = Date.now();
-        const { questions, plan } = buildAdaptiveMission(
-          subject,
-          subjectState,
-          state.skillProgress,
-          state.recentQuestionIdsBySubject[subject],
-        );
+        const recentIds = state.recentQuestionIdsBySubject[subject];
+        const { questions, plan } = options
+          ? buildSkillMission(options.skillId, options.kind, recentIds)
+          : buildAdaptiveMission(subject, subjectState, state.skillProgress, recentIds);
 
         set({
           mission: {
@@ -336,9 +372,49 @@ export const useAppStore = create<AppState>()(
             answerTraces: [],
             questionStartedAt: startedAt,
             startedAt,
+            kind: options?.kind ?? 'adaptive',
+            skillId: options?.skillId,
+            mainCount: questions.length,
           },
           missionBestCombo: 0,
+          lastIsland: subject,
         });
+      },
+
+      queueRetry: () => {
+        const mission = get().mission;
+        if (!mission) return;
+        const mainCount = mission.mainCount ?? mission.questions.length;
+        if (mission.currentIndex >= mainCount) return;
+        const question = mission.questions[mission.currentIndex];
+        if (!question) return;
+        set({ mission: { ...mission, questions: [...mission.questions, question] } });
+      },
+
+      completeLesson: (skillId, quizCorrect) => {
+        const state = get();
+        const before = state.nodeProgress[skillId] ?? emptyNodeStars();
+        const firstTime = before.lesson === 0;
+        const nodeProgress = {
+          ...state.nodeProgress,
+          [skillId]: { ...before, lesson: Math.max(before.lesson, quizCorrect ? 3 : 2) },
+        };
+        const stats = { ...state.stats, lessonsDone: state.stats.lessonsDone + (firstTime ? 1 : 0) };
+        const today = todayKey();
+        const questBefore = ensureDailyQuestState(state.dailyQuest, today);
+        const dailyQuest = { ...questBefore, counters: { ...questBefore.counters, lessons: questBefore.counters.lessons + 1 } };
+        const newBadges = findNewBadges(state.badges, badgeContext({ ...state, stats }));
+        const found = findStage(skillId);
+        set({
+          nodeProgress,
+          stats,
+          dailyQuest,
+          badges: [...state.badges, ...newBadges],
+          lastIsland: found?.subject ?? state.lastIsland,
+          xp: state.xp + (firstTime ? 10 : 0),
+          level: levelFromXp(state.xp + (firstTime ? 10 : 0)),
+        });
+        return newBadges;
       },
 
       submitAnswer: (choiceIndex) => {
@@ -407,8 +483,20 @@ export const useAppStore = create<AppState>()(
         const mission = state.mission;
         if (!mission) return null;
         const missionTraces = mission.answerTraces ?? [];
+        const mainCount = mission.mainCount ?? mission.questions.length;
+        const mainMission: MissionSession = {
+          ...mission,
+          questions: mission.questions.slice(0, mainCount),
+          answers: mission.answers.slice(0, mainCount),
+          answerTraces: missionTraces.slice(0, mainCount),
+        };
+        const kind: MissionKind = mission.kind ?? 'adaptive';
+        const totalHits = mission.questions.reduce(
+          (sum, question, index) => sum + (mission.answers[index] === question.answerIndex ? 1 : 0),
+          0,
+        );
 
-        const evaluation = evaluateMission(mission, mission.answers);
+        const evaluation = evaluateMission(mainMission, mainMission.answers);
 
         const adaptiveUpdate = updateAdaptiveProgress({
           subject: mission.subject,
@@ -475,6 +563,7 @@ export const useAppStore = create<AppState>()(
           perfectCount: state.stats.perfectCount + (perfect ? 1 : 0),
           bestStreakDays: Math.max(state.stats.bestStreakDays, newStreak),
           challengeClears: state.stats.challengeClears + (perfect && mission.plan.mode === 'challenge' ? 1 : 0),
+          bossWins: state.stats.bossWins + (kind === 'boss' && totalHits >= mainCount ? 1 : 0),
           difficultyUps:
             state.stats.difficultyUps + (adaptiveUpdate.afterDifficulty > adaptiveUpdate.beforeDifficulty ? 1 : 0),
           morningMissions: state.stats.morningMissions + (hour >= 5 && hour < 10 ? 1 : 0),
@@ -489,6 +578,7 @@ export const useAppStore = create<AppState>()(
             total: evaluation.total,
             maxCombo: state.missionBestCombo,
             mode: mission.plan.mode,
+            kind,
           }),
         };
         const doneBefore = new Set(getQuestStatuses(questBefore).filter((quest) => quest.done).map((quest) => quest.quest.id));
@@ -515,6 +605,26 @@ export const useAppStore = create<AppState>()(
           ),
         };
 
+        // みちの ノード
+        let nodeProgress = state.nodeProgress;
+        let stickers = state.stickers;
+        let nodeStars: number | undefined;
+        let newSticker: string | undefined;
+        let unlockedNextSkill: string | undefined;
+        if (kind !== 'adaptive' && mission.skillId) {
+          const before = state.nodeProgress[mission.skillId] ?? emptyNodeStars();
+          nodeStars = starsForAccuracy(evaluation.accuracy, kind);
+          const after = { ...before, [kind]: Math.max(before[kind], nodeStars) };
+          nodeProgress = { ...state.nodeProgress, [mission.skillId]: after };
+          if (kind === 'practice' && before.practice === 0 && after.practice >= 1) {
+            unlockedNextSkill = nextSkillInPath(mission.skillId);
+          }
+          if (kind === 'boss' && totalHits >= mainCount && !state.stickers.includes(mission.skillId)) {
+            stickers = [...state.stickers, mission.skillId];
+            newSticker = findStage(mission.skillId)?.stage.sticker;
+          }
+        }
+
         const newBadges = findNewBadges(
           state.badges,
           badgeContext({ stats, subjectClears, streakDays: newStreak, level: nextLevel }),
@@ -526,6 +636,12 @@ export const useAppStore = create<AppState>()(
           levelAfter: nextLevel,
           newBadges,
           completedQuests,
+          kind,
+          skillId: mission.skillId,
+          nodeStars,
+          newSticker,
+          unlockedNextSkill,
+          bossDefeated: kind === 'boss' ? totalHits >= mainCount : undefined,
         };
 
         set({
@@ -545,6 +661,8 @@ export const useAppStore = create<AppState>()(
           missionBestCombo: 0,
           stats,
           dailyQuest,
+          nodeProgress,
+          stickers,
           badges: [...state.badges, ...newBadges],
         });
         return finalResult;
@@ -604,6 +722,9 @@ export const useAppStore = create<AppState>()(
           stats: defaultStats,
           comboStreak: 0,
           dailyQuest: createDailyQuestState(todayKey()),
+          nodeProgress: {},
+          stickers: [],
+          lastIsland: null,
           mission: null,
           missionBestCombo: 0,
           latestResult: null,
@@ -612,7 +733,7 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'hoshi-takarajima-pwa',
-      version: 4,
+      version: 5,
       migrate: (persistedState, version) => {
         void version;
         if (!isRecord(persistedState)) return persistedState;
@@ -626,6 +747,14 @@ export const useAppStore = create<AppState>()(
           }),
           comboStreak: Math.max(0, toNumber(persistedState.comboStreak, 0)),
           dailyQuest: normalizeDailyQuest(persistedState.dailyQuest),
+          nodeProgress: normalizeNodeProgress(
+            persistedState.nodeProgress,
+            normalizeSkillProgressMap(persistedState.skillProgress),
+          ),
+          stickers: Array.isArray(persistedState.stickers)
+            ? persistedState.stickers.filter((id): id is string => typeof id === 'string')
+            : [],
+          lastIsland: isSubject(persistedState.lastIsland) ? persistedState.lastIsland : null,
           subjectClears: normalizeSubjectClears(persistedState.subjectClears),
           adaptiveBySubject: normalizeAdaptiveBySubject(persistedState.adaptiveBySubject),
           skillProgress: normalizeSkillProgressMap(persistedState.skillProgress),

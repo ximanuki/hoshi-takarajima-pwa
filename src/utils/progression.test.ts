@@ -24,6 +24,8 @@ const emptyStats: PlayerStats = {
   difficultyUps: 0,
   questsCompleted: 0,
   morningMissions: 0,
+  lessonsDone: 0,
+  bossWins: 0,
 };
 
 describe('levels', () => {
@@ -98,6 +100,8 @@ describe('daily quests', () => {
       maxCombo: 5,
       subjects: ['math'],
       reviewMissions: 1,
+      lessons: 0,
+      bosses: 0,
     });
   });
 
@@ -108,8 +112,9 @@ describe('daily quests', () => {
 
     let counters = state.counters;
     for (const subject of SUBJECTS) {
-      counters = applyMissionToCounters(counters, { subject, correct: 5, total: 5, maxCombo: 25, mode: 'review' });
+      counters = applyMissionToCounters(counters, { subject, correct: 5, total: 5, maxCombo: 25, mode: 'review', kind: 'boss' });
     }
+    counters = { ...counters, lessons: 2 };
     const statuses = getQuestStatuses({ ...state, counters });
     expect(statuses.every((quest) => quest.done)).toBe(true);
   });

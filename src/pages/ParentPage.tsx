@@ -8,7 +8,12 @@ import {
   PointElement,
   Tooltip,
 } from 'chart.js';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Hud } from '../components/Hud';
+import { ParentGate } from '../components/ParentGate';
+import { questionBank } from '../data/questions';
+import { createSubjectRecord } from '../data/subjects';
 import { Line } from 'react-chartjs-2';
 import { SUBJECTS, getSkillLabel, subjectInfo } from '../data/subjects';
 import { useAppStore } from '../store/useAppStore';
@@ -76,7 +81,7 @@ function getTopErrorTag(logs: AnswerTrace[]): MisconceptionTag | null {
   return top ? (top[0] as MisconceptionTag) : null;
 }
 
-export function ParentPage() {
+function ParentDashboard() {
   const recentResults = useAppStore((state) => state.recentResults);
   const diagnosticLogs = useAppStore((state) => state.diagnosticLogs);
   const skillProgress = useAppStore((state) => state.skillProgress);
@@ -107,9 +112,9 @@ export function ParentPage() {
   const durationMin = recent.map((result) => Number((result.durationSec / 60).toFixed(1)));
 
   return (
-    <section className="stack">
-      <h1>保護者ダッシュボード</h1>
-      <div className="card">
+    <>
+      <h2 className="on-night">学習のようす</h2>
+      <div className="panel">
         <p>直近7回の正答率（%）</p>
         {recent.length > 0 ? (
           <Line
@@ -119,8 +124,8 @@ export function ParentPage() {
                 {
                   label: '正答率',
                   data: accuracy,
-                  borderColor: '#0f6e6f',
-                  backgroundColor: 'rgba(15, 110, 111, 0.2)',
+                  borderColor: '#22c29e',
+                  backgroundColor: 'rgba(34, 194, 158, 0.2)',
                   tension: 0.35,
                   fill: true,
                 },
@@ -133,15 +138,15 @@ export function ParentPage() {
         )}
       </div>
 
-      <div className="card">
+      <div className="panel">
         <p>学習時間（分）: {durationMin.join(' / ') || '-'}</p>
       </div>
 
-      <div className="card stack" style={{ gap: 8 }}>
+      <div className="panel" style={{ display: 'grid', gap: 8 }}>
         <h2>教科別の正答率（直近{diagnosticLogs.length}問）</h2>
         {subjectAccuracy.map((item) => (
-          <div className="stack" key={item.subject} style={{ gap: 4 }}>
-            <div className="level-row">
+          <div key={item.subject} style={{ display: 'grid', gap: 4 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
               <span>
                 {subjectInfo[item.subject].emoji} {subjectInfo[item.subject].label}
               </span>
@@ -154,7 +159,7 @@ export function ParentPage() {
         ))}
       </div>
 
-      <div className="card stack" style={{ gap: 6 }}>
+      <div className="panel" style={{ display: 'grid', gap: 6 }}>
         <h2>伸びしろのあるスキル</h2>
         {weakSkills.length > 0 ? (
           weakSkills.map(([skillId, progress]) => (
@@ -167,11 +172,117 @@ export function ParentPage() {
         )}
       </div>
 
-      <div className="card">
+      <div className="panel">
         <p>つまずき再発率（直近ログ）: {Math.round(recurrenceRate * 100)}%</p>
         <p>再挑戦の初回成功率: {Math.round(retryFirstSuccessRate * 100)}%</p>
         <p>最多つまずき: {topErrorTag ? getMisconceptionLabel(topErrorTag) : '-'}</p>
       </div>
-    </section>
+    </>
+  );
+}
+
+// いちど ゲートを とおったら、この タブを とじるまで もう きかない
+let gatePassed = false;
+
+function ParentSettings() {
+  const settings = useAppStore((state) => state.settings);
+  const updateSettings = useAppStore((state) => state.updateSettings);
+  const clearProgress = useAppStore((state) => state.clearProgress);
+  const subjectCounts = questionBank.reduce(
+    (counts, question) => {
+      counts[question.subject] += 1;
+      return counts;
+    },
+    createSubjectRecord(() => 0),
+  );
+
+  const onReset = () => {
+    if (!window.confirm('学習記録をすべて消去します。よろしいですか？')) return;
+    clearProgress();
+  };
+
+  return (
+    <>
+      <h2 className="on-night">設定</h2>
+      <section className="panel settings-list">
+        <label className="field-row">
+          <span>効果音</span>
+          <input
+            className="switch"
+            checked={settings.soundEnabled}
+            onChange={(event) => updateSettings({ soundEnabled: event.target.checked })}
+            type="checkbox"
+          />
+        </label>
+        <label className="field-stack">
+          <span>効果音の音量: {Math.round(settings.sfxVolume * 100)}%</span>
+          <input
+            max={1}
+            min={0}
+            onChange={(event) => updateSettings({ sfxVolume: Number(event.target.value) })}
+            step={0.1}
+            type="range"
+            value={settings.sfxVolume}
+          />
+        </label>
+        <label className="field-row">
+          <span>
+            問題の自動読み上げ
+            <small>ひらがなを読むのが苦手でも一人で遊べます</small>
+          </span>
+          <input
+            className="switch"
+            checked={settings.readAloud}
+            onChange={(event) => updateSettings({ readAloud: event.target.checked })}
+            type="checkbox"
+          />
+        </label>
+        <label className="field-row">
+          <span>文字を大きくする</span>
+          <input
+            className="switch"
+            checked={settings.largeText}
+            onChange={(event) => updateSettings({ largeText: event.target.checked })}
+            type="checkbox"
+          />
+        </label>
+      </section>
+
+      <section className="panel" style={{ display: 'grid', gap: 10 }}>
+        <Link className="link-row" to="/illustrations">
+          問題イラストのプレビュー（開発用） <span aria-hidden="true">›</span>
+        </Link>
+        <p className="muted" style={{ fontSize: '0.8rem' }}>
+          問題数: {SUBJECTS.map((subject) => `${subjectInfo[subject].label} ${subjectCounts[subject]}`).join(' / ')}{' '}
+          / 合計 {questionBank.length}
+        </p>
+        <button className="btn btn-danger btn-sm" onClick={onReset}>
+          学習データをリセット
+        </button>
+      </section>
+    </>
+  );
+}
+
+export function ParentPage() {
+  const [passed, setPassed] = useState(gatePassed);
+
+  return (
+    <div className="screen">
+      <Hud backTo="/" title="おとなの へや" showStats={false} />
+      {passed ? (
+        <>
+          <ParentDashboard />
+          <ParentSettings />
+        </>
+      ) : (
+        <ParentGate
+          onPass={() => {
+            gatePassed = true;
+            setPassed(true);
+          }}
+        />
+      )}
+    </div>
   );
 }

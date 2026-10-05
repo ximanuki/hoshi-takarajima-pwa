@@ -1,27 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { QuestionIllustration } from '../components/QuestionIllustration';
-import { hamcheeSrc } from '../utils/hamchee';
+import { bosses } from '../data/bosses';
 import { questionMetaById } from '../data/question_meta';
 import { getSkillLabel, subjectInfo } from '../data/subjects';
 import { useAppStore } from '../store/useAppStore';
-import { getMisconceptionFeedback } from '../utils/misconceptions';
 import { audioManager } from '../utils/audioManager';
+import { hamcheeSrc } from '../utils/hamchee';
+import { getMisconceptionFeedback } from '../utils/misconceptions';
 import { isSpeechSupported, speak, stopSpeaking } from '../utils/speech';
 
-const modeLabel = {
-  learn: 'まなび',
-  review: 'ふくしゅう',
-  challenge: 'チャレンジ',
-} as const;
+const ANSWER_KEYS = ['あ', 'い', 'う', 'え'];
+const PRAISE = ['せいかい！', 'すごい！', 'やったね！', 'ばっちり！', 'さすが！'];
 
-const CHOICE_MARKERS = ['あ', 'い', 'う', 'え'];
-
-const correctMessages = ['せいかい！ そのちょうし！', 'すごい！ ばっちり！', 'やったね！ さすが！', 'おみごと！', 'ナイス！ いいね！'];
-
-function isComboMilestone(streak: number): boolean {
-  return streak >= 3 && (streak - 3) % 2 === 0;
-}
+type Feedback = { correct: boolean; title: string; message: string };
 
 export function PlayPage() {
   const navigate = useNavigate();
@@ -29,91 +21,93 @@ export function PlayPage() {
   const comboStreak = useAppStore((state) => state.comboStreak);
   const readAloud = useAppStore((state) => state.settings.readAloud);
   const submitAnswer = useAppStore((state) => state.submitAnswer);
+  const queueRetry = useAppStore((state) => state.queueRetry);
   const goNextQuestion = useAppStore((state) => state.goNextQuestion);
   const finishMission = useAppStore((state) => state.finishMission);
   const abandonMission = useAppStore((state) => state.abandonMission);
   const [selected, setSelected] = useState<number | null>(null);
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [showHint, setShowHint] = useState(false);
-  const [feedback, setFeedback] = useState<{ correct: boolean; title: string; message: string } | null>(null);
-  const [comboBurst, setComboBurst] = useState(false);
-  const comboTimerRef = useRef<number | null>(null);
-  const feedbackRef = useRef<HTMLDivElement | null>(null);
+  const [bossAnim, setBossAnim] = useState<'hit' | 'taunt' | null>(null);
+  const [poppedSlot, setPoppedSlot] = useState<number | null>(null);
+  const animTimer = useRef<number | null>(null);
 
   const question = mission?.questions[mission.currentIndex];
 
   useEffect(
     () => () => {
-      if (comboTimerRef.current !== null) window.clearTimeout(comboTimerRef.current);
+      if (animTimer.current !== null) window.clearTimeout(animTimer.current);
       stopSpeaking();
     },
     [],
   );
 
   useEffect(() => {
-    if (!question || !readAloud) return;
-    speak(question.prompt);
+    if (question && readAloud) speak(question.prompt);
   }, [question, readAloud]);
 
-  useEffect(() => {
-    if (feedback) feedbackRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }, [feedback]);
+  const flash = (anim: 'hit' | 'taunt') => {
+    setBossAnim(anim);
+    if (animTimer.current !== null) window.clearTimeout(animTimer.current);
+    animTimer.current = window.setTimeout(() => setBossAnim(null), 650);
+  };
 
   const onSubmitOrNext = useCallback(() => {
     if (!mission || !question || selected === null) return;
+    const mainCount = mission.mainCount ?? mission.questions.length;
+    const isRetry = mission.currentIndex >= mainCount;
 
     if (!feedback) {
       submitAnswer(selected);
       const correct = selected === question.answerIndex;
-      const errorTag = questionMetaById[question.id]?.wrongChoiceTags?.[selected];
       audioManager.playSfx(correct ? 'correct' : 'wrong');
 
       if (correct) {
         const streak = useAppStore.getState().comboStreak;
-        if (isComboMilestone(streak)) {
-          audioManager.playSfx('combo');
-          setComboBurst(true);
-          if (comboTimerRef.current !== null) window.clearTimeout(comboTimerRef.current);
-          comboTimerRef.current = window.setTimeout(() => {
-            setComboBurst(false);
-            comboTimerRef.current = null;
-          }, 650);
-        }
-        const title = correctMessages[(mission.currentIndex + streak) % correctMessages.length];
-        setFeedback({ correct: true, title, message: streak >= 3 ? `${streak}もん れんぞく せいかい！` : 'つぎも この ちょうしで いこう！' });
+        if (streak >= 3 && (streak - 3) % 2 === 0) audioManager.playSfx('combo');
+        if (mission.kind === 'boss') flash('hit');
+        if (!isRetry) setPoppedSlot(mission.currentIndex);
+        const title = PRAISE[(mission.currentIndex + streak) % PRAISE.length];
+        setFeedback({
+          correct: true,
+          title: `🎉 ${title}`,
+          message: streak >= 3 ? `🔥 ${streak}もん れんぞく せいかい！` : isRetry ? 'こんどは できたね！' : 'その ちょうし！',
+        });
         if (readAloud) speak(title);
       } else {
-        setComboBurst(false);
+        if (!isRetry) queueRetry();
+        if (mission.kind === 'boss') flash('taunt');
         const answer = question.choices[question.answerIndex];
+        const errorTag = questionMetaById[question.id]?.wrongChoiceTags?.[selected];
         setFeedback({
           correct: false,
           title: `こたえは「${answer}」`,
-          message: errorTag ? getMisconceptionFeedback(errorTag) : 'もういちど みてみよう',
+          message: `${errorTag ? getMisconceptionFeedback(errorTag) : 'もういちど みてみよう'}${isRetry ? '' : '。あとで もう1かい でるよ！'}`,
         });
-        if (readAloud) speak(`こたえは ${answer}`);
+        if (readAloud) speak(`おしい！ こたえは ${answer}`);
       }
       return;
     }
 
     audioManager.playSfx('tap');
-    const isLast = mission.currentIndex >= mission.questions.length - 1;
-    setShowHint(false);
     setSelected(null);
     setFeedback(null);
-    if (isLast) {
+    setShowHint(false);
+    setPoppedSlot(null);
+    const latest = useAppStore.getState().mission;
+    if (!latest || latest.currentIndex >= latest.questions.length - 1) {
       stopSpeaking();
       finishMission();
       navigate('/result');
       return;
     }
-
     goNextQuestion();
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [feedback, finishMission, goNextQuestion, mission, navigate, question, readAloud, selected, submitAnswer]);
+  }, [feedback, finishMission, goNextQuestion, mission, navigate, question, queueRetry, readAloud, selected, submitAnswer]);
 
   useEffect(() => {
     if (!question) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.target instanceof HTMLElement && ['INPUT', 'TEXTAREA', 'SELECT'].includes(event.target.tagName)) return;
       const index = Number(event.key) - 1;
       if (!feedback && Number.isInteger(index) && index >= 0 && index < question.choices.length) {
         audioManager.playSfx('tap');
@@ -131,31 +125,38 @@ export function PlayPage() {
 
   if (!mission || !question) {
     return (
-      <section className="card stack">
-        <h1>ミッションが ありません</h1>
-        <p className="muted">しまを えらんでから はじめよう！</p>
-        <Link className="primary-btn" to="/mission">
-          ぼうけんマップへ
-        </Link>
-      </section>
+      <div className="screen">
+        <div className="panel" style={{ display: 'grid', gap: 12 }}>
+          <h1>ミッションが ないよ</h1>
+          <Link className="btn btn-primary" to="/">
+            マップへ もどる
+          </Link>
+        </div>
+      </div>
     );
   }
 
-  const onQuit = () => {
-    if (!window.confirm('ミッションを やめる？ ここまでの きろくは のこらないよ。')) return;
-    stopSpeaking();
-    abandonMission();
-    navigate('/mission');
-  };
-
   const info = subjectInfo[mission.subject];
-  const answeredCorrect = (index: number) => {
-    const answer = mission.answers[index];
-    if (answer === undefined) return null;
-    return answer === mission.questions[index].answerIndex;
+  const kind = mission.kind ?? 'adaptive';
+  const mainCount = mission.mainCount ?? mission.questions.length;
+  const isRetry = mission.currentIndex >= mainCount;
+  const answeredCount = mission.answers.filter((answer) => answer !== undefined).length;
+  const hits = mission.questions.reduce((sum, item, index) => sum + (mission.answers[index] === item.answerIndex ? 1 : 0), 0);
+  const mainCorrect = (index: number) => mission.answers[index] !== undefined && mission.answers[index] === mission.questions[index].answerIndex;
+  const boss = bosses[mission.subject];
+  const hp = Math.max(0, mainCount - hits);
+  const progress = Math.min(1, answeredCount / mission.questions.length);
+  const tiles = question.choices.length === 3 && question.choices.every((choice) => [...choice].length <= 6);
+
+  const onQuit = () => {
+    if (!window.confirm('ぼうけんを やめる？ ここまでの きろくは のこらないよ。')) return;
+    stopSpeaking();
+    const back = mission.skillId ? `/island/${mission.subject}` : '/';
+    abandonMission();
+    navigate(back);
   };
 
-  const choiceState = (index: number): string => {
+  const answerState = (index: number): string => {
     if (!feedback) return selected === index ? 'selected' : '';
     if (index === question.answerIndex) return 'correct';
     if (index === selected) return 'wrong';
@@ -163,112 +164,124 @@ export function PlayPage() {
   };
 
   return (
-    <section className="stack">
-      <div className="play-header">
-        <button className="icon-btn" onClick={onQuit} aria-label="ミッションを やめる">
+    <div className="screen">
+      <div className="play-top">
+        <button className="round-btn ghost" onClick={onQuit} aria-label="やめる">
           ✕
         </button>
         <div
-          className="play-progress"
+          className="play-bar"
           role="progressbar"
-          aria-label="しんこう"
           aria-valuemin={0}
           aria-valuemax={mission.questions.length}
-          aria-valuenow={mission.currentIndex + 1}
+          aria-valuenow={answeredCount}
+          aria-label="すすみぐあい"
         >
-          {mission.questions.map((item, index) => {
-            const result = answeredCorrect(index);
-            const state = result === null ? (index === mission.currentIndex ? 'current' : '') : result ? 'correct' : 'wrong';
-            return <span className={`play-progress-dot ${state}`} key={item.id} />;
-          })}
+          <div className={`play-bar-fill ${isRetry ? 'retry' : ''}`} style={{ width: `${progress * 100}%` }} />
         </div>
+        {comboStreak >= 3 ? <span className="pill">🔥{comboStreak}</span> : null}
       </div>
 
-      <div className="play-meta">
-        <span className="tag" style={{ background: 'var(--surface)', border: '1px solid var(--line)' }}>
-          {info.emoji} {getSkillLabel(question.skillId)} ・ {modeLabel[mission.plan.mode]}
-        </span>
-        <span className={`combo-chip ${comboStreak >= 3 ? 'hot' : ''} ${comboBurst ? 'burst' : ''}`} aria-live="polite">
-          {comboStreak >= 3 ? '🔥' : '⚡'} コンボ {comboStreak}
-        </span>
-      </div>
+      {kind === 'boss' ? (
+        <div className="boss-arena" aria-live="polite">
+          <span className={`boss-sprite ${hp === 0 ? 'down' : bossAnim ?? ''}`} aria-hidden="true">
+            {boss.sprite}
+            {bossAnim === 'hit' ? <span className="boss-damage">−1</span> : null}
+          </span>
+          <div className="boss-info">
+            <span className="boss-name">
+              {boss.name}
+              {bossAnim === 'taunt' ? ` 「${boss.taunt}」` : hp === 0 ? ` 「${boss.defeat}」` : ''}
+            </span>
+            <div className="hp-bar" aria-label={`ボスの HP ${hp} / ${mainCount}`}>
+              <div className="hp-fill" style={{ width: `${(hp / mainCount) * 100}%` }} />
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="star-meter">
+          <span style={{ fontSize: '0.9rem' }}>
+            {info.emoji} {mission.skillId ? getSkillLabel(mission.skillId) : `${info.label} おまかせ`}
+          </span>
+          <span className="star-slots" aria-label="あつめた ほし">
+            {Array.from({ length: mainCount }, (_, index) => (
+              <span className={`${mainCorrect(index) ? '' : 'off'} ${poppedSlot === index ? 'pop' : ''}`} key={index}>
+                ⭐
+              </span>
+            ))}
+          </span>
+        </div>
+      )}
 
-      <article className="card question-card">
-        <div className="question-top">
-          <h1 className="question-prompt">{question.prompt}</h1>
+      <article className="panel question-panel">
+        {isRetry ? <span className="retry-tag">🔁 もういちど チャレンジ</span> : null}
+        <div className="question-head">
+          <h1 className="question-text">{question.prompt}</h1>
           {isSpeechSupported() ? (
-            <button className="icon-btn" onClick={() => speak(question.prompt)} aria-label="もんだいを よみあげる">
+            <button className="round-btn" onClick={() => speak(question.prompt)} aria-label="もんだいを よみあげる">
               🔊
             </button>
           ) : null}
         </div>
-        <p className="difficulty-dots" aria-label={`むずかしさ ${question.difficulty}`}>
-          {'★'.repeat(question.difficulty)}
-          <span style={{ opacity: 0.25 }}>{'★'.repeat(Math.max(0, 5 - question.difficulty))}</span>
-        </p>
-
         <QuestionIllustration question={question} />
-
-        <div className={`choices ${question.choices.every((choice) => choice.length <= 8) ? 'three' : ''}`} role="group" aria-label="こたえの せんたくし">
-          {question.choices.map((choice, index) => {
-            const state = choiceState(index);
-            return (
-              <button
-                className={`choice-btn ${state}`}
-                key={`${question.id}-${index}`}
-                disabled={Boolean(feedback)}
-                aria-pressed={selected === index}
-                onClick={() => {
-                  audioManager.playSfx('tap');
-                  setSelected(index);
-                }}
-                style={{ position: 'relative' }}
-              >
-                <span className="choice-marker" aria-hidden="true">
-                  {CHOICE_MARKERS[index]}
-                </span>
-                <span>{choice}</span>
-                <span className="choice-result" aria-hidden="true">
-                  {state === 'correct' ? '⭕' : state === 'wrong' ? '❌' : ''}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        {feedback ? (
-          <div className={`feedback-panel ${feedback.correct ? 'correct' : 'wrong'}`} ref={feedbackRef} role="status">
-            <img src={hamcheeSrc(feedback.correct ? 'cheer' : 'normal')} alt="" width={64} height={64} />
-            <div>
-              <p className="feedback-title">
-                {feedback.correct ? '🎉 ' : '📝 '}
-                {feedback.title}
-              </p>
-              <p className="feedback-text">{feedback.message}</p>
-            </div>
-          </div>
-        ) : null}
-
-        {showHint || (feedback && !feedback.correct) ? <p className="hint">💡 {question.hint}</p> : null}
       </article>
 
-      <div className="play-footer">
-        <button
-          className="ghost-btn"
-          onClick={() => {
-            audioManager.playSfx('tap');
-            setShowHint((value) => !value);
-          }}
-          disabled={Boolean(feedback)}
-          aria-pressed={showHint}
-        >
-          💡 ヒント
-        </button>
-        <button className={feedback ? 'gold-btn' : 'primary-btn'} onClick={onSubmitOrNext} disabled={selected === null}>
-          {!feedback ? 'こたえる' : mission.currentIndex + 1 === mission.questions.length ? 'けっかを みる' : 'つぎへ ›'}
-        </button>
+      <div className={`answers ${tiles ? 'tiles' : ''}`} role="group" aria-label="こたえ">
+        {question.choices.map((choice, index) => (
+          <button
+            aria-pressed={selected === index}
+            className={`answer ${answerState(index)}`}
+            disabled={Boolean(feedback)}
+            key={`${mission.currentIndex}-${index}`}
+            onClick={() => {
+              audioManager.playSfx('tap');
+              setSelected(index);
+            }}
+          >
+            <span className="answer-key" aria-hidden="true">
+              {ANSWER_KEYS[index]}
+            </span>
+            <span>{choice}</span>
+          </button>
+        ))}
       </div>
-      <p className="visually-hidden">{info.island}</p>
-    </section>
+
+      {showHint && !feedback ? <p className="hint-box">💡 {question.hint}</p> : null}
+
+      {feedback ? (
+        <>
+          <div className="sheet-spacer" />
+          <div className={`feedback-sheet ${feedback.correct ? 'good' : 'bad'}`} role="status">
+            <div className="feedback-head">
+              <img src={hamcheeSrc(feedback.correct ? 'cheer' : 'normal')} alt="" width={72} height={72} />
+              <div>
+                <p className="feedback-title">{feedback.title}</p>
+                <p className="feedback-text">{feedback.message}</p>
+                {!feedback.correct ? <p className="feedback-text">💡 {question.hint}</p> : null}
+              </div>
+            </div>
+            <button className={`btn btn-xl btn-block ${feedback.correct ? 'btn-mint' : 'btn-star'}`} onClick={onSubmitOrNext} autoFocus>
+              つぎへ ›
+            </button>
+          </div>
+        </>
+      ) : (
+        <div className="play-actions">
+          <button
+            className="btn btn-cream"
+            onClick={() => {
+              audioManager.playSfx('tap');
+              setShowHint((value) => !value);
+            }}
+            aria-pressed={showHint}
+          >
+            💡
+          </button>
+          <button className="btn btn-primary btn-xl" onClick={onSubmitOrNext} disabled={selected === null}>
+            こたえる
+          </button>
+        </div>
+      )}
+    </div>
   );
 }

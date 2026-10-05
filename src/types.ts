@@ -1,5 +1,15 @@
 export type Subject = 'math' | 'japanese' | 'life' | 'insight' | 'nature';
 export type MissionMode = 'learn' | 'review' | 'challenge';
+/** しまの みちの ノード */
+export type NodeKind = 'lesson' | 'practice' | 'boss';
+/** ミッションの しゅるい: おまかせ（てきおう しゅつだい） or みちの ノード */
+export type MissionKind = 'adaptive' | 'practice' | 'boss';
+
+export interface NodeStars {
+  lesson: number;
+  practice: number;
+  boss: number;
+}
 export type MisconceptionTag =
   | 'unknown_guess'
   | 'attention_slip'
@@ -52,6 +62,10 @@ export interface MissionSession {
   answerTraces: AnswerTrace[];
   questionStartedAt: number;
   startedAt: number;
+  kind?: MissionKind;
+  skillId?: string;
+  /** さいしょの もんだいの かず。これより うしろは まちがえた もんだいの だしなおし */
+  mainCount?: number;
 }
 
 export interface MissionResult {
@@ -74,19 +88,21 @@ export interface MissionResult {
   levelAfter?: number;
   newBadges?: string[];
   completedQuests?: string[];
+  kind?: MissionKind;
+  skillId?: string;
+  nodeStars?: number;
+  newSticker?: string;
+  bossDefeated?: boolean;
+  unlockedNextSkill?: string;
 }
-
-export type ThemePreference = 'system' | 'light' | 'dark';
 
 export interface Settings {
   soundEnabled: boolean;
-  bgmVolume: number;
   sfxVolume: number;
   /** もんだいを じどうで よみあげる */
   readAloud: boolean;
   /** もじを おおきく する */
   largeText: boolean;
-  theme: ThemePreference;
 }
 
 export interface PlayerStats {
@@ -99,6 +115,8 @@ export interface PlayerStats {
   difficultyUps: number;
   questsCompleted: number;
   morningMissions: number;
+  lessonsDone: number;
+  bossWins: number;
 }
 
 export interface DailyQuestCounters {
@@ -108,6 +126,8 @@ export interface DailyQuestCounters {
   maxCombo: number;
   subjects: Subject[];
   reviewMissions: number;
+  lessons: number;
+  bosses: number;
 }
 
 export interface DailyQuestState {

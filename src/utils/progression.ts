@@ -151,6 +151,14 @@ export const badgeMaster: BadgeDef[] = [
     progress: (ctx) => count(ctx.stats.perfectCount, 1),
   },
   {
+    id: 'lesson_first',
+    name: 'まなびの はじまり',
+    description: 'レッスンを 1つ よんだ',
+    icon: '📖',
+    category: 'start',
+    progress: (ctx) => count(ctx.stats.lessonsDone, 1),
+  },
+  {
     id: 'quest_first',
     name: 'クエストデビュー',
     description: 'きょうの クエストを 1つ たっせい',
@@ -194,6 +202,30 @@ export const badgeMaster: BadgeDef[] = [
     icon: '🏆',
     category: 'skill',
     progress: (ctx) => count(ctx.stats.challengeClears, 1),
+  },
+  {
+    id: 'boss_first',
+    name: 'ボス たいじ',
+    description: 'はじめて ボスを たおした',
+    icon: '⚔️',
+    category: 'skill',
+    progress: (ctx) => count(ctx.stats.bossWins, 1),
+  },
+  {
+    id: 'boss_10',
+    name: 'ボスハンター',
+    description: 'ボスを 10たい たおした',
+    icon: '🐉',
+    category: 'legend',
+    progress: (ctx) => count(ctx.stats.bossWins, 10),
+  },
+  {
+    id: 'lesson_20',
+    name: 'ものしり はかせ',
+    description: 'レッスンを 20 よんだ',
+    icon: '🎓',
+    category: 'habit',
+    progress: (ctx) => count(ctx.stats.lessonsDone, 20),
   },
   {
     id: 'combo_10',
@@ -354,6 +386,9 @@ const questPool: QuestDef[] = [
   { id: 'combo_6', title: '6もん れんぞく せいかい', icon: '⚡', target: 6, progress: (c) => c.maxCombo },
   { id: 'two_islands', title: '2つの しまを クリア', icon: '🗺️', target: 2, progress: (c) => c.subjects.length },
   { id: 'review_1', title: 'ふくしゅうミッションを 1かい', icon: '🔁', target: 1, progress: (c) => c.reviewMissions },
+  { id: 'lesson_1', title: 'レッスンを 1つ よむ', icon: '📖', target: 1, progress: (c) => c.lessons },
+  { id: 'lesson_2', title: 'レッスンを 2つ よむ', icon: '📖', target: 2, progress: (c) => c.lessons },
+  { id: 'boss_1', title: 'ボスに 1かい いどむ', icon: '👑', target: 1, progress: (c) => c.bosses },
   ...SUBJECTS.map(islandQuest),
 ];
 
@@ -393,7 +428,7 @@ export function getDailyQuests(date: string): QuestDef[] {
 }
 
 export function createEmptyCounters(): DailyQuestCounters {
-  return { missions: 0, correct: 0, perfect: 0, maxCombo: 0, subjects: [], reviewMissions: 0 };
+  return { missions: 0, correct: 0, perfect: 0, maxCombo: 0, subjects: [], reviewMissions: 0, lessons: 0, bosses: 0 };
 }
 
 export function createDailyQuestState(date: string): DailyQuestState {
@@ -407,15 +442,24 @@ export function ensureDailyQuestState(state: DailyQuestState | null | undefined,
 
 export function applyMissionToCounters(
   counters: DailyQuestCounters,
-  mission: { subject: Subject; correct: number; total: number; maxCombo: number; mode: 'learn' | 'review' | 'challenge' },
+  mission: {
+    subject: Subject;
+    correct: number;
+    total: number;
+    maxCombo: number;
+    mode: 'learn' | 'review' | 'challenge';
+    kind?: 'adaptive' | 'practice' | 'boss';
+  },
 ): DailyQuestCounters {
   return {
+    ...counters,
     missions: counters.missions + 1,
     correct: counters.correct + mission.correct,
     perfect: counters.perfect + (mission.total > 0 && mission.correct === mission.total ? 1 : 0),
     maxCombo: Math.max(counters.maxCombo, mission.maxCombo),
     subjects: counters.subjects.includes(mission.subject) ? counters.subjects : [...counters.subjects, mission.subject],
     reviewMissions: counters.reviewMissions + (mission.mode === 'review' ? 1 : 0),
+    bosses: counters.bosses + (mission.kind === 'boss' ? 1 : 0),
   };
 }
 

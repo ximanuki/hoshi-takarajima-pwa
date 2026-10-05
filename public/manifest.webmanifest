@@ -8,8 +8,8 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#d5f6ff",
-  "theme_color": "#56c7b4",
+  "background_color": "#0b1633",
+  "theme_color": "#0b1633",
   "categories": ["education", "kids", "games"],
   "icons": [
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
@@ -18,7 +18,7 @@
     { "src": "icons/icon-512.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
   ],
   "shortcuts": [
-    { "name": "ぼうけんに でる", "short_name": "ぼうけん", "url": "./#/mission", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
-    { "name": "コレクション", "short_name": "コレクション", "url": "./#/collection", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+    { "name": "ぼうけんに でる", "short_name": "ぼうけん", "url": "./#/", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "たからべや", "short_name": "たからべや", "url": "./#/treasure", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
   ]
 }
