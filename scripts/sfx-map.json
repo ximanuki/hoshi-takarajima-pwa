@@ -1,0 +1,12 @@
+{
+  "_comment": "sfx-src/ に おいた こうかおん（OtoLogic の zip / mp3）から、どの おとを どの ばめんに つかうか。file は sfx-src の なかの ファイルめい（zip の なかでも よい）。maxSeconds で ながさを きり、gainDb で おおきさを ちょうせい する。node scripts/import-sfx.mjs --list で こうほを みられる。",
+  "credit": "OtoLogic（CC BY 4.0）",
+  "effects": {
+    "tap": { "file": "", "maxSeconds": 0.35, "gainDb": -4 },
+    "correct": { "file": "", "maxSeconds": 1.2, "gainDb": 0 },
+    "wrong": { "file": "", "maxSeconds": 1.0, "gainDb": -2 },
+    "combo": { "file": "", "maxSeconds": 1.4, "gainDb": 0 },
+    "clear": { "file": "", "maxSeconds": 2.5, "gainDb": 0 },
+    "gift": { "file": "", "maxSeconds": 2.0, "gainDb": 0 }
+  }
+}

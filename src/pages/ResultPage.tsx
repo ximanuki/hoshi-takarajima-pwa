@@ -115,7 +115,7 @@ export function ResultPage() {
 
   const onOpen = () => {
     if (opened) return;
-    audioManager.playSfx('combo');
+    audioManager.playSfx('gift');
     setOpenedFor(result.date);
   };
 

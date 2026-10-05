@@ -65,6 +65,15 @@ npm run questions:build
 - 音声がない文はブラウザの音声合成で読み上げます
 - クレジット（もち子さんは「VOICEVOX:もち子(cv 明日葉よもぎ)」）は manifest に記録され、アプリ内（ホーム下部・おとなのへや）に表示されます。利用時は [VOICEVOX の利用規約](https://voicevox.hiroshiba.jp/term/) と各キャラクターの規約を守ってください
 
+## 効果音（OtoLogic）
+
+効果音は `public/sfx/` の mp3 を鳴らします（`manifest.json` に載っていない場面は、これまでどおりシンセで鳴らします）。素材は [OtoLogic](https://otologic.jp/)（CC BY 4.0、クレジット表記「OtoLogic」）を使い、クレジットはマップ下とおとなの へやに表示されます。
+
+1. OtoLogic から使いたい効果音の zip / mp3 をダウンロードし、`sfx-src/` に置く
+2. `node scripts/import-sfx.mjs --list` で候補のファイル名と長さを確認
+3. `scripts/sfx-map.json` の各場面（tap / correct / wrong / combo / clear / gift）の `file` にファイル名を書く。`maxSeconds` で長さ、`gainDb` で音量を調整
+4. `node scripts/import-sfx.mjs` を実行すると、無音カット・長さ調整・音量そろえをした `public/sfx/*.mp3` と `manifest.json` ができる（ffmpeg が必要）
+
 ## ビルド
 ```bash
 npm run build

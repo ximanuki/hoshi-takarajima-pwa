@@ -35,7 +35,7 @@ export function DailyQuestCard() {
 
   const onChest = () => {
     if (!claimQuestChest()) return;
-    audioManager.playSfx('clear');
+    audioManager.playSfx('gift');
     showToast(`🎁 たからばこから ⭐${CHEST_REWARD_STARS}こ！`);
   };
 
