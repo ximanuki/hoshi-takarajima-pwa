@@ -1,4 +1,4 @@
-// よみあげ。まえもって つくった ずんだもん（VOICEVOX）の おんせいが あれば それを ならし、
+// よみあげ。まえもって つくった VOICEVOX（もち子さん）の おんせいが あれば それを ならし、
 // なければ ブラウザの おんせいごうせい（Web Speech API）で よむ。
 import { toSpeakableText, voiceKey } from './voiceKey';
 
@@ -11,6 +11,7 @@ const SILENT_WAV =
 
 let manifestPromise: Promise<Set<string>> | null = null;
 let voiceCount = 0;
+let voiceCredit: string | null = null;
 let audio: HTMLAudioElement | null = null;
 let requestId = 0;
 let cachedVoice: SpeechSynthesisVoice | null | undefined;
@@ -28,9 +29,10 @@ export function loadVoiceManifest(): Promise<Set<string>> {
   if (!manifestPromise) {
     manifestPromise = fetch(`${VOICE_BASE}manifest.json`)
       .then((response) => (response.ok ? response.json() : { keys: [] }))
-      .then((data: { keys?: unknown }) => {
+      .then((data: { keys?: unknown; credit?: unknown }) => {
         const keys = Array.isArray(data.keys) ? data.keys.filter((key): key is string => typeof key === 'string') : [];
         voiceCount = keys.length;
+        voiceCredit = typeof data.credit === 'string' ? data.credit : null;
         return new Set(keys);
       })
       .catch(() => new Set<string>());
@@ -38,9 +40,14 @@ export function loadVoiceManifest(): Promise<Set<string>> {
   return manifestPromise;
 }
 
-/** ずんだもんの おんせいが いくつ あるか（クレジット ひょうじ よう） */
+/** よみあげ おんせいが いくつ あるか */
 export function getVoiceCount(): number {
   return voiceCount;
+}
+
+/** おんせいの クレジット（VOICEVOX の りようきやくで ひょうじが ひつよう） */
+export function getVoiceCredit(): string | null {
+  return voiceCount > 0 ? voiceCredit : null;
 }
 
 function getAudio(): HTMLAudioElement | null {

@@ -1,18 +1,21 @@
-// ずんだもん（VOICEVOX）の よみあげ おんせいを まえもって つくる スクリプト。
+// VOICEVOX の よみあげ おんせいを まえもって つくる スクリプト（きほんは もち子さん）。
 //
 // つかいかた（PC で）:
 //   1. VOICEVOX（https://voicevox.hiroshiba.jp/）を きどうする（エンジンが http://127.0.0.1:50021 で うごく）
 //   2. ffmpeg を インストールしておく
 //   3. npm run voice:build
-//      オプション: --engine http://127.0.0.1:50021  --speaker 3（ずんだもん ノーマル）
+//      オプション: --character もち子さん --style ノーマル（なまえで えらぶ）
+//                  --speaker 20（スタイル ID を ちょくせつ してい）
+//                  --engine http://127.0.0.1:50021
 //                  --limit 20（ためしに 20こだけ） --dry-run（かずを かぞえるだけ） --concurrency 2
+//                  --force（いまの ファイルを けして ぜんぶ つくりなおす。こえを かえた ときに）
 //
 // できた ファイル: public/voice/<key>.mp3 と public/voice/manifest.json
 // すでに ある ファイルは スキップするので、もんだいを ふやしたら もう1かい うごかせば OK。
-// クレジット「VOICEVOX:ずんだもん」は アプリの おとなの へや と README に ひょうじしている。
+// manifest の credit が アプリに ひょうじ される（VOICEVOX の りようきやくで ひつよう）。
 
 import { spawn } from 'node:child_process';
-import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { questionBank } from '../src/data/questions.generated.ts';
@@ -31,7 +34,22 @@ function arg(name, fallback) {
 }
 
 const engine = String(arg('engine', 'http://127.0.0.1:50021')).replace(/\/$/, '');
-const speaker = Number(arg('speaker', 3));
+const characterName = String(arg('character', 'もち子さん'));
+const styleName = String(arg('style', 'ノーマル'));
+const speakerOverride = arg('speaker', undefined);
+const force = Boolean(arg('force', false));
+
+// クレジットの かきかた（キャラクターごとの りようきやくに あわせる）
+const CREDITS = {
+  もち子さん: 'VOICEVOX:もち子(cv 明日葉よもぎ)',
+  ずんだもん: 'VOICEVOX:ずんだもん',
+};
+
+function creditFor(name) {
+  return CREDITS[name] ?? `VOICEVOX:${name.replace(/さん$/, '')}`;
+}
+
+let speaker = speakerOverride === undefined ? undefined : Number(speakerOverride);
 const limit = Number(arg('limit', Infinity));
 const concurrency = Math.max(1, Number(arg('concurrency', 2)));
 const dryRun = Boolean(arg('dry-run', false));
@@ -96,7 +114,30 @@ function encodeMp3(wav, outPath) {
   });
 }
 
-function writeManifest() {
+async function resolveSpeaker() {
+  if (speaker !== undefined) return speaker;
+  const response = await fetch(`${engine}/speakers`);
+  if (!response.ok) throw new Error(`speakers ${response.status}`);
+  const speakers = await response.json();
+  const character = speakers.find((entry) => entry.name === characterName);
+  if (!character) {
+    throw new Error(
+      `「${characterName}」が みつかりません。つかえる なまえ: ${speakers.map((entry) => entry.name).join('、')}`,
+    );
+  }
+  const style = character.styles.find((entry) => entry.name === styleName) ?? character.styles[0];
+  return style.id;
+}
+
+function readManifestCredit() {
+  try {
+    return JSON.parse(readFileSync(join(outDir, 'manifest.json'), 'utf8')).credit;
+  } catch {
+    return undefined;
+  }
+}
+
+function writeManifest(credit) {
   const keys = existsSync(outDir)
     ? readdirSync(outDir)
         .filter((file) => file.endsWith('.mp3'))
@@ -104,25 +145,63 @@ function writeManifest() {
         .sort()
     : [];
   mkdirSync(outDir, { recursive: true });
-  writeFileSync(join(outDir, 'manifest.json'), `${JSON.stringify({ voice: 'VOICEVOX:ずんだもん', keys })}\n`);
+  writeFileSync(
+    join(outDir, 'manifest.json'),
+    `${JSON.stringify({ credit: keys.length > 0 ? credit : null, keys })}\n`,
+  );
   return keys.length;
 }
 
+async function connect() {
+  const version = await fetch(`${engine}/version`).catch(() => null);
+  if (!version?.ok) {
+    console.error(`VOICEVOX エンジンに つながりません: ${engine}\nVOICEVOX を きどうしてから もう いちど ためしてください。`);
+    return false;
+  }
+  try {
+    speaker = await resolveSpeaker();
+  } catch (error) {
+    console.error(error.message);
+    return false;
+  }
+  console.info(`VOICEVOX ${await version.json()} / ${characterName} ${styleName}（speaker ${speaker}）`);
+  return true;
+}
+
 async function main() {
+  const credit = creditFor(characterName);
+  const previousCredit = readManifestCredit();
   const texts = collectVoiceTexts();
+
+  if (dryRun) {
+    const pendingCount = [...texts.keys()].filter((key) => force || !existsSync(join(outDir, `${key}.mp3`))).length;
+    console.info(`よみあげ テキスト: ${texts.size}こ / これから つくる: ${Math.min(pendingCount, limit)}こ`);
+    return;
+  }
+
+  if (previousCredit && previousCredit !== credit && !force) {
+    console.error(
+      `いまの おんせいは「${previousCredit}」です。こえを「${credit}」に かえるときは --force を つけて ぜんぶ つくりなおしてください。`,
+    );
+    process.exitCode = 1;
+    return;
+  }
+
+  // けす まえに、エンジンと こえが つかえるか たしかめる
+  if (!(await connect())) {
+    process.exitCode = 1;
+    return;
+  }
+
+  if (force && existsSync(outDir)) {
+    for (const file of readdirSync(outDir)) {
+      if (file.endsWith('.mp3')) rmSync(join(outDir, file));
+    }
+    console.info('いまの おんせいファイルを けしました（--force）');
+  }
+
   const pending = [...texts].filter(([key]) => !existsSync(join(outDir, `${key}.mp3`))).slice(0, limit);
   console.info(`よみあげ テキスト: ${texts.size}こ / これから つくる: ${pending.length}こ`);
-  if (dryRun) return;
-
-  if (pending.length > 0) {
-    const version = await fetch(`${engine}/version`).catch(() => null);
-    if (!version?.ok) {
-      console.error(`VOICEVOX エンジンに つながりません: ${engine}\nVOICEVOX を きどうしてから もう いちど ためしてください。`);
-      process.exitCode = 1;
-      return;
-    }
-    console.info(`VOICEVOX ${await version.json()} / speaker ${speaker}`);
-  }
 
   mkdirSync(outDir, { recursive: true });
   let done = 0;
@@ -144,9 +223,9 @@ async function main() {
   };
   await Promise.all(Array.from({ length: concurrency }, worker));
 
-  const total = writeManifest();
+  const total = writeManifest(credit);
   console.info(`できあがり: ${done}こ つくった / しっぱい ${failed}こ / ぜんぶで ${total}こ`);
-  console.info('クレジット: VOICEVOX:ずんだもん');
+  console.info(`クレジット: ${credit}`);
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
