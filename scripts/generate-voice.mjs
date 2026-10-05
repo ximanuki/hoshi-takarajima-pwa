@@ -8,7 +8,15 @@
 //                  --speaker 20（スタイル ID を ちょくせつ してい）
 //                  --engine http://127.0.0.1:50021
 //                  --limit 20（ためしに 20こだけ） --dry-run（かずを かぞえるだけ） --concurrency 2
-//                  --force（いまの ファイルを けして ぜんぶ つくりなおす。こえを かえた ときに）
+//                  --force（いまの ファイルを けして ぜんぶ つくりなおす。こえや チューニングを かえた ときに）
+//                  --speed 1.0 --intonation 1.0 --pause 1.0（ぜんたいの ばいりつ）--pitch 0（たかさを たす）
+//                  --preview "テキスト" [--kind question|answer|lesson|praise|talk]
+//                      → 1ぶんだけ voice-preview.mp3 に つくって ならす（チューニングの ためしぎき）
+//
+// よみかたの くふう（scripts/voice-reading.mjs / scripts/voice-dict.json）:
+//   - ひょうじは ひらがなの わかちがき。VOICEVOX には くうはくを とって、よく でる ことばを かんじに して わたす
+//   - ぶんの しゅるい（もんだい・こたえ・レッスン・ほめことば・セリフ）ごとに はやさ・よくよう・ま を かえる
+//   - voice-dict.json の accent を VOICEVOX の ユーザーじしょに とうろくして アクセントを してい
 //
 // できた ファイル: public/voice/<key>.mp3 と public/voice/manifest.json
 // すでに ある ファイルは スキップするので、もんだいを ふやしたら もう1かい うごかせば OK。
@@ -20,8 +28,9 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { questionBank } from '../src/data/questions.generated.ts';
 import { allLessons } from '../src/data/lessons.ts';
-import { FIXED_LINES, answerLine, lessonSpeech, quizLine } from '../src/data/voiceLines.ts';
+import { FIXED_LINES, PRAISE_LINES, answerLine, lessonSpeech, quizLine } from '../src/data/voiceLines.ts';
 import { toSpeakableText, voiceKey } from '../src/utils/voiceKey.ts';
+import { applyProfile, toReadingText, VOICE_PROFILES } from './voice-reading.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const outDir = join(root, 'public/voice');
@@ -50,17 +59,30 @@ function creditFor(name) {
 }
 
 let speaker = speakerOverride === undefined ? undefined : Number(speakerOverride);
+const scale = {
+  speed: Number(arg('speed', 1)),
+  intonation: Number(arg('intonation', 1)),
+  pause: Number(arg('pause', 1)),
+  pitch: Number(arg('pitch', 0)),
+};
+const previewText = arg('preview', undefined);
+const previewKind = String(arg('kind', 'question'));
+const dict = JSON.parse(readFileSync(join(root, 'scripts/voice-dict.json'), 'utf8'));
 const limit = Number(arg('limit', Infinity));
 const concurrency = Math.max(1, Number(arg('concurrency', 2)));
 const dryRun = Boolean(arg('dry-run', false));
 
-/** アプリが よみあげる テキストを ぜんぶ あつめる */
+/** アプリが よみあげる テキストを ぜんぶ あつめる（key → { text, kind }） */
 export function collectVoiceTexts() {
-  const texts = [...FIXED_LINES];
+  const entries = [];
+  const add = (text, kind) => entries.push({ text, kind });
+
+  for (const line of PRAISE_LINES) add(line, 'praise');
+  for (const line of FIXED_LINES) add(line, 'talk');
 
   for (const question of questionBank) {
-    texts.push(question.prompt);
-    texts.push(answerLine(question.choices[question.answerIndex]));
+    add(question.prompt, 'question');
+    add(answerLine(question.choices[question.answerIndex]), 'answer');
   }
 
   // レッスンの ミニクイズは スキルの いちばん やさしい もんだいから でる
@@ -70,31 +92,31 @@ export function collectVoiceTexts() {
     if (current === undefined || question.difficulty < current) easiestBySkill.set(question.skillId, question.difficulty);
   }
   for (const question of questionBank) {
-    if (question.difficulty === easiestBySkill.get(question.skillId)) texts.push(quizLine(question.prompt));
+    if (question.difficulty === easiestBySkill.get(question.skillId)) add(quizLine(question.prompt), 'question');
   }
 
   for (const lesson of allLessons) {
     const lines = lessonSpeech(lesson);
-    texts.push(lines.goal, ...lines.steps, lines.example, lines.exampleAnswer, lines.tip);
+    for (const line of [lines.goal, ...lines.steps, lines.example, lines.tip]) add(line, 'lesson');
+    add(lines.exampleAnswer, 'answer');
   }
 
   const unique = new Map();
-  for (const text of texts) {
+  for (const { text, kind } of entries) {
     const spoken = toSpeakableText(text);
     if (!spoken) continue;
-    unique.set(voiceKey(text), spoken);
+    const key = voiceKey(text);
+    // おなじ ぶんが なんども でる ときは さいしょの しゅるい（ほめことば > セリフ > もんだい …）を つかう
+    if (!unique.has(key)) unique.set(key, { text: spoken, kind });
   }
   return unique;
 }
 
-async function synthesize(text) {
-  const query = await fetch(`${engine}/audio_query?text=${encodeURIComponent(text)}&speaker=${speaker}`, { method: 'POST' });
+async function synthesize(text, kind) {
+  const reading = toReadingText(text, dict);
+  const query = await fetch(`${engine}/audio_query?text=${encodeURIComponent(reading)}&speaker=${speaker}`, { method: 'POST' });
   if (!query.ok) throw new Error(`audio_query ${query.status}`);
-  const params = await query.json();
-  params.speedScale = 0.95;
-  params.intonationScale = 1.15;
-  params.prePhonemeLength = 0.05;
-  params.postPhonemeLength = 0.1;
+  const params = applyProfile(await query.json(), kind, scale);
 
   const synthesis = await fetch(`${engine}/synthesis?speaker=${speaker}`, {
     method: 'POST',
@@ -129,6 +151,52 @@ async function resolveSpeaker() {
   return style.id;
 }
 
+/** voice-dict.json の accent を VOICEVOX の ユーザーじしょに とうろく（おなじ ことばが あれば うわがき） */
+async function registerAccents() {
+  const words = dict.accent ?? [];
+  if (words.length === 0) return;
+  const listResponse = await fetch(`${engine}/user_dict`);
+  const existing = listResponse.ok ? await listResponse.json() : {};
+  let registered = 0;
+  for (const word of words) {
+    const params = new URLSearchParams({
+      surface: word.surface,
+      pronunciation: word.pronunciation,
+      accent_type: String(word.accentType),
+      word_type: 'PROPER_NOUN',
+    });
+    const found = Object.entries(existing).find(([, entry]) => entry.surface === word.surface || entry.surface === toFullWidth(word.surface));
+    const url = found ? `${engine}/user_dict_word/${found[0]}?${params}` : `${engine}/user_dict_word?${params}`;
+    const response = await fetch(url, { method: found ? 'PUT' : 'POST' });
+    if (response.ok) registered += 1;
+    else console.warn(`アクセントの とうろくに しっぱい: ${word.surface} (${response.status})`);
+  }
+  console.info(`アクセント じしょ: ${registered}こ とうろく`);
+}
+
+function toFullWidth(text) {
+  return text.replace(/[!-~]/g, (char) => String.fromCharCode(char.charCodeAt(0) + 0xfee0));
+}
+
+async function preview() {
+  if (!VOICE_PROFILES[previewKind]) {
+    console.error(`--kind は ${Object.keys(VOICE_PROFILES).join(' / ')} の どれか`);
+    process.exitCode = 1;
+    return;
+  }
+  if (!(await connect())) {
+    process.exitCode = 1;
+    return;
+  }
+  const spoken = toSpeakableText(String(previewText));
+  console.info(`ひょうじ: ${previewText}\nVOICEVOX: ${toReadingText(spoken, dict)}\nしゅるい: ${previewKind} ${JSON.stringify(applyProfile({}, previewKind, scale))}`);
+  const out = join(process.cwd(), 'voice-preview.mp3');
+  await encodeMp3(await synthesize(spoken, previewKind), out);
+  console.info(`→ ${out}`);
+  const player = process.platform === 'darwin' ? 'afplay' : null;
+  if (player) spawn(player, [out], { stdio: 'ignore' });
+}
+
 function readManifestCredit() {
   try {
     return JSON.parse(readFileSync(join(outDir, 'manifest.json'), 'utf8')).credit;
@@ -160,6 +228,7 @@ async function connect() {
   }
   try {
     speaker = await resolveSpeaker();
+    await registerAccents();
   } catch (error) {
     console.error(error.message);
     return false;
@@ -169,6 +238,10 @@ async function connect() {
 }
 
 async function main() {
+  if (previewText !== undefined) {
+    await preview();
+    return;
+  }
   const credit = creditFor(characterName);
   const previousCredit = readManifestCredit();
   const texts = collectVoiceTexts();
@@ -209,9 +282,9 @@ async function main() {
   const queue = [...pending];
   const worker = async () => {
     while (queue.length > 0) {
-      const [key, text] = queue.shift();
+      const [key, { text, kind }] = queue.shift();
       try {
-        const wav = await synthesize(text);
+        const wav = await synthesize(text, kind);
         await encodeMp3(wav, join(outDir, `${key}.mp3`));
         done += 1;
       } catch (error) {
