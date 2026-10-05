@@ -35,8 +35,16 @@ npm run questions:build
 - はむちー: `public/assets/hamchee/*.webp`（512px）。元絵は `design/hamchee/*.png`。
 
 ## 読み上げ音声（VOICEVOX：もち子さん）
-読み上げる文（問題・答え・レッスン・セリフ 約2,500文）を事前に音声ファイル化して同梱します。PCで1回実行してください。
+読み上げる文（問題・答え・レッスン・セリフ 約2,500文）を事前に音声ファイル化して同梱します。
 
+### GitHub Actions で作る（おすすめ）
+- GitHub の **Actions** タブ →「Generate read-aloud voice (VOICEVOX)」→ **Run workflow**
+  - キャラクター名・スタイル名・全部作り直す（force）・お試し件数（limit）を指定可能
+- 問題・レッスン・セリフ・読み辞書を変えて main に入れると自動で実行され、増えた文だけ作ります
+- 生成した `public/voice/` を main にコミットし、GitHub Pages のデプロイも自動で起動します
+- 初回は全件生成のため数十分〜1時間ほどかかります
+
+### 手元の PC で作る
 1. [VOICEVOX](https://voicevox.hiroshiba.jp/) を起動（エンジンが `http://127.0.0.1:50021` で待ち受け）
 2. `ffmpeg` をインストール
 3. `npm run voice:build`（`-- --limit 20` でお試し、`-- --dry-run` で件数だけ確認）
