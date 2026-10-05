@@ -20,6 +20,7 @@ export function DailyQuestCard() {
   const statuses = useMemo(() => getQuestStatuses(dailyQuest), [dailyQuest]);
   const allClaimed = statuses.every((quest) => quest.claimed);
   const doneCount = statuses.filter((quest) => quest.done).length;
+  const claimable = statuses.some((quest) => quest.done && !quest.claimed) || (allClaimed && !dailyQuest.chestClaimed);
 
   const showToast = (message: string) => {
     setToast(message);
@@ -39,15 +40,15 @@ export function DailyQuestCard() {
   };
 
   return (
-    <section className="card" aria-labelledby="daily-quest-title">
-      <div className="section-title">
-        <h2 id="daily-quest-title">📜 きょうの クエスト</h2>
+    <details className="panel quest-strip" open={claimable || undefined}>
+      <summary className="panel-title">
+        <span>📜 きょうの クエスト {claimable ? '❗' : ''}</span>
         <small>
-          {doneCount}/{statuses.length} たっせい
+          {doneCount}/{statuses.length} ▾
         </small>
-      </div>
+      </summary>
 
-      <ul className="quest-list" style={{ listStyle: 'none', padding: 0, margin: '10px 0 0' }}>
+      <ul className="quest-list">
         {statuses.map(({ quest, value, done, claimed }) => (
           <li className={`quest-item ${done ? 'done' : ''} ${claimed ? 'claimed' : ''}`} key={quest.id}>
             <span className="quest-icon" aria-hidden="true">
@@ -56,19 +57,17 @@ export function DailyQuestCard() {
             <div className="quest-body">
               <span className="quest-title">{quest.title}</span>
               <div className="meter thin" aria-hidden="true">
-                <div className="meter-fill gold" style={{ width: `${(value / quest.target) * 100}%` }} />
+                <div className="meter-fill star" style={{ width: `${(value / quest.target) * 100}%` }} />
               </div>
               <span className="quest-count">
                 {value}/{quest.target}
               </span>
             </div>
             {claimed ? (
-              <span className="quest-check" aria-label="うけとりずみ">
-                ✅
-              </span>
+              <span aria-label="うけとりずみ">✅</span>
             ) : done ? (
-              <button className="gold-btn quest-claim" onClick={() => onClaim(quest.id)}>
-                ⭐{QUEST_REWARD_STARS} もらう
+              <button className="btn btn-star btn-sm" onClick={() => onClaim(quest.id)}>
+                ⭐{QUEST_REWARD_STARS}
               </button>
             ) : (
               <span className="quest-count">⭐{QUEST_REWARD_STARS}</span>
@@ -77,16 +76,15 @@ export function DailyQuestCard() {
         ))}
       </ul>
 
-      <div className={`chest ${allClaimed && !dailyQuest.chestClaimed ? 'ready' : ''}`}>
+      <div className={`chest-row ${allClaimed && !dailyQuest.chestClaimed ? 'ready' : ''}`}>
         <span className="chest-icon" aria-hidden="true">
           {dailyQuest.chestClaimed ? '🎉' : '🎁'}
         </span>
-        <div className="chest-body">
-          <span>{dailyQuest.chestClaimed ? 'きょうの たからばこ ゲットずみ！' : 'ぜんぶ たっせいで たからばこ'}</span>
-          <span className="muted">ボーナス ⭐{CHEST_REWARD_STARS}</span>
-        </div>
+        <span style={{ flex: 1 }}>
+          {dailyQuest.chestClaimed ? 'たからばこ ゲットずみ！' : `ぜんぶで たからばこ ⭐${CHEST_REWARD_STARS}`}
+        </span>
         {allClaimed && !dailyQuest.chestClaimed ? (
-          <button className="gold-btn quest-claim" onClick={onChest}>
+          <button className="btn btn-star btn-sm" onClick={onChest}>
             あける
           </button>
         ) : null}
@@ -97,6 +95,6 @@ export function DailyQuestCard() {
           {toast}
         </div>
       ) : null}
-    </section>
+    </details>
   );
 }

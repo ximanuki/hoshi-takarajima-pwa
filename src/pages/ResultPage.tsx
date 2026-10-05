@@ -1,32 +1,45 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { hamcheeSrc } from '../utils/hamchee';
-import { subjectInfo } from '../data/subjects';
+import { bosses } from '../data/bosses';
+import { getSkillLabel, subjectInfo } from '../data/subjects';
 import { useAppStore } from '../store/useAppStore';
-import { getMisconceptionFeedback, getMisconceptionLabel } from '../utils/misconceptions';
 import { audioManager } from '../utils/audioManager';
+import { hamcheeSrc } from '../utils/hamchee';
+import { getMisconceptionFeedback } from '../utils/misconceptions';
 import { badgeById, getLevelTitle, getQuestDef } from '../utils/progression';
 
-const modeLabel = {
-  learn: 'まなびミッション',
-  review: 'ふくしゅうミッション',
-  challenge: 'チャレンジミッション',
-} as const;
+const CONFETTI_COLORS = ['#ff6b5b', '#ffc94a', '#22c29e', '#6fb6ff', '#ff7fc8', '#9b7bff'];
 
-const CONFETTI_COLORS = ['#ff7a45', '#f6b81f', '#22ad97', '#6aa8ff', '#ff6fb1', '#8fdc6e'];
-
-function starCount(accuracy: number): number {
+function accuracyStars(accuracy: number): number {
   if (accuracy >= 1) return 3;
   if (accuracy >= 0.6) return 2;
   return 1;
 }
 
-function headline(accuracy: number): string {
-  if (accuracy >= 1) return 'パーフェクト！';
-  if (accuracy >= 0.8) return 'すばらしい！';
-  if (accuracy >= 0.6) return 'よく がんばったね！';
-  return 'ナイスチャレンジ！';
+function ChestSvg() {
+  return (
+    <svg className="chest-svg" viewBox="0 0 160 140" aria-hidden="true">
+      <g className="chest-glow">
+        {Array.from({ length: 12 }, (_, index) => (
+          <path
+            d="M 80 70 L 74 -10 L 86 -10 Z"
+            fill="#ffe08a"
+            key={index}
+            opacity={0.7}
+            transform={`rotate(${index * 30} 80 70)`}
+          />
+        ))}
+      </g>
+      <rect x={20} y={62} width={120} height={66} rx={12} fill="#c8743a" stroke="#2a2140" strokeWidth={4} />
+      <rect x={20} y={84} width={120} height={12} fill="#ffc94a" stroke="#2a2140" strokeWidth={3} />
+      <rect x={70} y={78} width={20} height={26} rx={5} fill="#ffe08a" stroke="#2a2140" strokeWidth={3} />
+      <g className="lid">
+        <path d="M 20 64 Q 20 26 80 26 Q 140 26 140 64 Z" fill="#d9864a" stroke="#2a2140" strokeWidth={4} strokeLinejoin="round" />
+        <rect x={20} y={54} width={120} height={10} fill="#ffc94a" stroke="#2a2140" strokeWidth={3} />
+      </g>
+    </svg>
+  );
 }
 
 export function ResultPage() {
@@ -34,58 +47,96 @@ export function ResultPage() {
   const result = useAppStore((state) => state.latestResult);
   const startMission = useAppStore((state) => state.startMission);
   const playedFor = useRef<string | null>(null);
+  const [openedFor, setOpenedFor] = useState<string | null>(null);
   const [dismissedLevelUpFor, setDismissedLevelUpFor] = useState<string | null>(null);
 
-  const leveledUp = Boolean(result && result.levelAfter && result.levelBefore && result.levelAfter > result.levelBefore);
-  const levelUpOpen = Boolean(result && leveledUp && dismissedLevelUpFor !== result.date);
-  const closeLevelUp = () => setDismissedLevelUpFor(result?.date ?? null);
-  const celebrate = Boolean(result && result.accuracy >= 0.8);
+  const opened = Boolean(result && openedFor === result.date);
+  const leveledUp = Boolean(result?.levelAfter && result.levelBefore && result.levelAfter > result.levelBefore);
+  const levelUpOpen = Boolean(result && opened && leveledUp && dismissedLevelUpFor !== result.date);
 
-  const confetti = useMemo(() => {
-    if (!celebrate) return [];
-    return Array.from({ length: 36 }, (_, index) => ({
-      id: index,
-      left: (index * 37 + 7) % 100,
-      delay: ((index * 13) % 20) * 0.06,
-      duration: 2.2 + (index % 6) * 0.25,
-      color: CONFETTI_COLORS[index % CONFETTI_COLORS.length],
-      drift: ((index % 7) - 3) * 18,
-      spin: 360 + (index % 5) * 120,
-    }));
-  }, [celebrate]);
+  const confetti = useMemo(
+    () =>
+      Array.from({ length: 40 }, (_, index) => ({
+        id: index,
+        left: (index * 37 + 7) % 100,
+        delay: ((index * 13) % 20) * 0.05,
+        duration: 2.2 + (index % 6) * 0.25,
+        color: CONFETTI_COLORS[index % CONFETTI_COLORS.length],
+        drift: ((index % 7) - 3) * 18,
+        spin: 360 + (index % 5) * 120,
+      })),
+    [],
+  );
 
   useEffect(() => {
-    if (!result) return;
-    if (playedFor.current === result.date) return;
+    if (!result || playedFor.current === result.date) return;
     playedFor.current = result.date;
     audioManager.playSfx('clear');
   }, [result]);
 
   if (!result) {
     return (
-      <section className="card stack">
-        <h1>けっかが ありません</h1>
-        <Link className="primary-btn" to="/mission" onClick={() => audioManager.playSfx('tap')}>
-          ぼうけんマップへ
-        </Link>
-      </section>
+      <div className="screen">
+        <div className="panel" style={{ display: 'grid', gap: 12 }}>
+          <h1>けっかが ないよ</h1>
+          <Link className="btn btn-primary" to="/">
+            マップへ
+          </Link>
+        </div>
+      </div>
     );
   }
 
   const info = subjectInfo[result.subject];
-  const stars = starCount(result.accuracy);
+  const kind = result.kind ?? 'adaptive';
+  const stars = kind === 'adaptive' ? accuracyStars(result.accuracy) : result.nodeStars ?? 0;
+  const boss = bosses[result.subject];
+  const title =
+    kind === 'boss'
+      ? result.bossDefeated
+        ? `${boss.name}を たおした！`
+        : `${boss.name}に にげられた…`
+      : result.accuracy >= 1
+        ? 'パーフェクト！'
+        : result.accuracy >= 0.6
+          ? 'よく できました！'
+          : 'ナイス チャレンジ！';
+  const celebrate = result.accuracy >= 0.8 || Boolean(result.bossDefeated);
   const newBadges = (result.newBadges ?? []).map((id) => badgeById[id]).filter(Boolean);
-  const completedQuests = (result.completedQuests ?? []).map((id) => getQuestDef(id)).filter(Boolean);
+  const quests = (result.completedQuests ?? []).map((id) => getQuestDef(id)).filter((quest) => quest !== undefined);
+  const backTo = result.skillId ? `/island/${result.subject}` : '/';
+
+  const onOpen = () => {
+    if (opened) return;
+    audioManager.playSfx('combo');
+    setOpenedFor(result.date);
+  };
 
   const onRetry = () => {
     audioManager.playSfx('tap');
-    startMission(result.subject);
+    if (result.skillId && kind !== 'adaptive') startMission(result.subject, { skillId: result.skillId, kind });
+    else startMission(result.subject);
     navigate('/play');
   };
 
+  const rewards: Array<{ key: string; icon: string; text: string; sticker?: boolean }> = [
+    { key: 'stars', icon: '⭐', text: `ほし +${result.earnedStars} ・ XP +${result.earnedXp}` },
+    ...(result.newSticker
+      ? [{ key: 'sticker', icon: result.newSticker, text: 'あたらしい ステッカー！ たからべやに かざったよ', sticker: true }]
+      : []),
+    ...(result.unlockedNextSkill
+      ? [{ key: 'unlock', icon: '🔓', text: `つぎの ステージ「${getSkillLabel(result.unlockedNextSkill)}」が ひらいた！` }]
+      : []),
+    ...newBadges.map((badge) => ({ key: `badge-${badge.id}`, icon: badge.icon, text: `バッジ「${badge.name}」` })),
+    ...quests.map((quest) => ({ key: `quest-${quest.id}`, icon: '📜', text: `クエスト たっせい「${quest.title}」` })),
+    ...(result.recommendedFocusTag
+      ? [{ key: 'focus', icon: '💡', text: `つぎは: ${getMisconceptionFeedback(result.recommendedFocusTag)}` }]
+      : []),
+  ];
+
   return (
-    <section className="stack">
-      {confetti.length > 0 ? (
+    <div className="screen">
+      {celebrate && opened ? (
         <div className="confetti" aria-hidden="true">
           {confetti.map((piece) => (
             <span
@@ -106,110 +157,85 @@ export function ResultPage() {
         </div>
       ) : null}
 
-      <article className="hero-card result-hero">
-        <p className="eyebrow">
-          {info.emoji} {info.island} ・ {modeLabel[result.mode]}
+      <section className="result-stage">
+        <p className="muted on-night">
+          {info.emoji} {result.skillId ? getSkillLabel(result.skillId) : `${info.label} おまかせ`}
         </p>
-        <div className="result-stars" aria-label={`ほし ${stars}つ`}>
+        <div className="result-big-stars" aria-label={`ほし ${stars}つ`}>
           {[0, 1, 2].map((index) => (
-            <span className={index < stars ? '' : 'off'} key={index} style={{ animationDelay: `${0.2 + index * 0.18}s` }}>
+            <span className={index < stars ? '' : 'off'} key={index} style={{ animationDelay: `${0.2 + index * 0.2}s` }}>
               ⭐
             </span>
           ))}
         </div>
-        <h1>{headline(result.accuracy)}</h1>
+        <h1 className="result-title">{title}</h1>
         <p className="result-score">
-          {result.correct}
-          <span style={{ fontSize: '0.5em', opacity: 0.6 }}> / {result.total}</span>
+          {result.correct} / {result.total} もん せいかい
         </p>
-        <div className="reward-row">
-          <span className="reward-pill gold">⭐ +{result.earnedStars}</span>
-          <span className="reward-pill mint">XP +{result.earnedXp}</span>
-          {result.bestComboInMission && result.bestComboInMission >= 3 ? (
-            <span className="reward-pill">🔥 コンボ {result.bestComboInMission}</span>
-          ) : null}
-        </div>
-        {result.afterDifficulty !== result.beforeDifficulty ? (
-          <p className="muted">
-            おすすめレベル {result.beforeDifficulty} → {result.afterDifficulty}
-            {result.afterDifficulty > result.beforeDifficulty ? ' 📈' : ''}
-          </p>
-        ) : null}
-      </article>
+      </section>
 
-      {newBadges.length > 0 || completedQuests.length > 0 ? (
-        <section className="card">
-          <h2>🎁 ゲットしたもの</h2>
-          <div className="unlock-list">
-            {newBadges.map((badge, index) => (
-              <div className="unlock-item" key={badge.id} style={{ animationDelay: `${0.3 + index * 0.15}s` }}>
-                <span className="unlock-icon" aria-hidden="true">
-                  {badge.icon}
-                </span>
-                <div>
-                  <p>あたらしい バッジ「{badge.name}」</p>
-                  <p className="muted" style={{ fontSize: '0.8rem' }}>
-                    {badge.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-            {completedQuests.map((quest, index) =>
-              quest ? (
-                <div className="unlock-item" key={quest.id} style={{ animationDelay: `${0.4 + index * 0.15}s` }}>
-                  <span className="unlock-icon" aria-hidden="true">
-                    📜
-                  </span>
-                  <div>
-                    <p>クエスト たっせい！「{quest.title}」</p>
-                    <p className="muted" style={{ fontSize: '0.8rem' }}>
-                      ホームで ほしを うけとろう
-                    </p>
-                  </div>
-                </div>
-              ) : null,
-            )}
-          </div>
-        </section>
-      ) : null}
-
-      {result.topMisconceptions && result.topMisconceptions.length > 0 ? (
-        <section className="card result-detail">
-          <h2>🔍 つぎに きを つけること</h2>
-          <p className="muted">{result.topMisconceptions.map((item) => `${getMisconceptionLabel(item.tag)}（${item.count}）`).join(' / ')}</p>
-          {result.recommendedFocusTag ? <p>👉 {getMisconceptionFeedback(result.recommendedFocusTag)}</p> : null}
-        </section>
-      ) : null}
-
-      <div className="stack">
-        <button className="primary-btn btn-lg btn-block" onClick={onRetry}>
-          {info.emoji} もういちど {info.label}
+      <section className="chest-stage">
+        <button className={`chest-btn ${opened ? 'open' : 'closed'}`} onClick={onOpen} aria-label="たからばこを あける">
+          <ChestSvg />
         </button>
-        <div className="inline-actions">
-          <Link className="ghost-btn" to="/mission" onClick={() => audioManager.playSfx('tap')}>
-            🧭 マップへ
-          </Link>
-          <Link className="ghost-btn" to="/" onClick={() => audioManager.playSfx('tap')}>
-            🏝️ ホームへ
-          </Link>
+        {!opened ? <p className="chest-hint">👆 タップして たからばこを あけよう！</p> : null}
+      </section>
+
+      {opened ? (
+        <div className="reward-list">
+          {rewards.map((reward, index) => (
+            <div
+              className={`reward-item ${reward.sticker ? 'reward-sticker' : ''}`}
+              key={reward.key}
+              style={{ animationDelay: `${0.3 + index * 0.15}s` }}
+            >
+              <span className="ri-icon">{reward.icon}</span>
+              <span>{reward.text}</span>
+            </div>
+          ))}
         </div>
+      ) : null}
+
+      <div style={{ display: 'grid', gap: 10 }}>
+        <button
+          className="btn btn-primary btn-xl btn-block"
+          onClick={() => {
+            if (!opened) {
+              onOpen();
+              return;
+            }
+            audioManager.playSfx('tap');
+            navigate(backTo);
+          }}
+        >
+          {opened ? (result.skillId ? 'みちに もどる ›' : 'マップに もどる ›') : '🎁 あける'}
+        </button>
+        {opened ? (
+          <button className="btn btn-cream btn-block" onClick={onRetry}>
+            🔁 もういちど
+          </button>
+        ) : null}
       </div>
 
       {levelUpOpen && result.levelAfter ? (
-        <div className="overlay" role="dialog" aria-modal="true" aria-labelledby="levelup-title" onClick={closeLevelUp}>
+        <div
+          className="overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="levelup-title"
+          onClick={() => setDismissedLevelUpFor(result.date)}
+        >
           <div className="overlay-card" onClick={(event) => event.stopPropagation()}>
             <img src={hamcheeSrc('cheer')} alt="" width={140} height={140} />
-            <p className="eyebrow" id="levelup-title">
-              レベルアップ！
-            </p>
+            <p id="levelup-title">レベルアップ！</p>
             <p className="overlay-level">Lv.{result.levelAfter}</p>
             <p>{getLevelTitle(result.levelAfter)}</p>
-            <button className="primary-btn btn-block" onClick={closeLevelUp} autoFocus>
+            <button className="btn btn-primary btn-block" onClick={() => setDismissedLevelUpFor(result.date)} autoFocus>
               やったー！
             </button>
           </div>
         </div>
       ) : null}
-    </section>
+    </div>
   );
 }

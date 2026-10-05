@@ -21,7 +21,7 @@ export function SoundController() {
       audioManager.setScene('result');
       return;
     }
-    if (pathname === '/mission') {
+    if (pathname.startsWith('/island') || pathname.startsWith('/lesson')) {
       audioManager.setScene('mission');
       return;
     }
