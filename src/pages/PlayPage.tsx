@@ -8,10 +8,10 @@ import { useAppStore } from '../store/useAppStore';
 import { audioManager } from '../utils/audioManager';
 import { hamcheeSrc } from '../utils/hamchee';
 import { getMisconceptionFeedback } from '../utils/misconceptions';
+import { answerLine, PRAISE_LINES } from '../data/voiceLines';
 import { isSpeechSupported, speak, stopSpeaking } from '../utils/speech';
 
 const ANSWER_KEYS = ['あ', 'い', 'う', 'え'];
-const PRAISE = ['せいかい！', 'すごい！', 'やったね！', 'ばっちり！', 'さすが！'];
 
 type Feedback = { correct: boolean; title: string; message: string };
 
@@ -67,7 +67,7 @@ export function PlayPage() {
         if (streak >= 3 && (streak - 3) % 2 === 0) audioManager.playSfx('combo');
         if (mission.kind === 'boss') flash('hit');
         if (!isRetry) setPoppedSlot(mission.currentIndex);
-        const title = PRAISE[(mission.currentIndex + streak) % PRAISE.length];
+        const title = PRAISE_LINES[(mission.currentIndex + streak) % PRAISE_LINES.length];
         setFeedback({
           correct: true,
           title: `🎉 ${title}`,
@@ -84,7 +84,7 @@ export function PlayPage() {
           title: `こたえは「${answer}」`,
           message: `${errorTag ? getMisconceptionFeedback(errorTag) : 'もういちど みてみよう'}${isRetry ? '' : '。あとで もう1かい でるよ！'}`,
         });
-        if (readAloud) speak(`おしい！ こたえは ${answer}`);
+        if (readAloud) speak(answerLine(answer));
       }
       return;
     }
@@ -146,7 +146,7 @@ export function PlayPage() {
   const boss = bosses[mission.subject];
   const hp = Math.max(0, mainCount - hits);
   const progress = Math.min(1, answeredCount / mission.questions.length);
-  const tiles = question.choices.length === 3 && question.choices.every((choice) => [...choice].length <= 6);
+  const tiles = question.choices.length === 3 && question.choices.every((choice) => [...choice].length <= 4);
 
   const onQuit = () => {
     if (!window.confirm('ぼうけんを やめる？ ここまでの きろくは のこらないよ。')) return;
@@ -186,16 +186,20 @@ export function PlayPage() {
         <div className="boss-arena" aria-live="polite">
           <span className={`boss-sprite ${hp === 0 ? 'down' : bossAnim ?? ''}`} aria-hidden="true">
             {boss.sprite}
-            {bossAnim === 'hit' ? <span className="boss-damage">−1</span> : null}
+            {bossAnim === 'hit' ? <span className="boss-damage">💗</span> : null}
           </span>
           <div className="boss-info">
             <span className="boss-name">
               {boss.name}
-              {bossAnim === 'taunt' ? ` 「${boss.taunt}」` : hp === 0 ? ` 「${boss.defeat}」` : ''}
+              {bossAnim === 'taunt' ? ` 「${boss.taunt}」` : hp === 0 ? ` 「${boss.befriend}」` : ''}
             </span>
-            <div className="hp-bar" aria-label={`ボスの HP ${hp} / ${mainCount}`}>
-              <div className="hp-fill" style={{ width: `${(hp / mainCount) * 100}%` }} />
-            </div>
+            <span className="friend-hearts" aria-label={`なかよし ハート ${mainCount - hp} / ${mainCount}`}>
+              {Array.from({ length: mainCount }, (_, index) => (
+                <span className={index < mainCount - hp ? '' : 'off'} key={index}>
+                  💗
+                </span>
+              ))}
+            </span>
           </div>
         </div>
       ) : (

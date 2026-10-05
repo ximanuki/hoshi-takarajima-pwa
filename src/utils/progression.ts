@@ -205,17 +205,17 @@ export const badgeMaster: BadgeDef[] = [
   },
   {
     id: 'boss_first',
-    name: 'ボス たいじ',
-    description: 'はじめて ボスを たおした',
-    icon: '⚔️',
+    name: 'はじめての なかよし',
+    description: 'はじめて なかよしチャレンジを クリア',
+    icon: '💞',
     category: 'skill',
     progress: (ctx) => count(ctx.stats.bossWins, 1),
   },
   {
     id: 'boss_10',
-    name: 'ボスハンター',
-    description: 'ボスを 10たい たおした',
-    icon: '🐉',
+    name: 'なかよしマスター',
+    description: 'なかよしチャレンジを 10かい クリア',
+    icon: '👑',
     category: 'legend',
     progress: (ctx) => count(ctx.stats.bossWins, 10),
   },
@@ -388,7 +388,7 @@ const questPool: QuestDef[] = [
   { id: 'review_1', title: 'ふくしゅうミッションを 1かい', icon: '🔁', target: 1, progress: (c) => c.reviewMissions },
   { id: 'lesson_1', title: 'レッスンを 1つ よむ', icon: '📖', target: 1, progress: (c) => c.lessons },
   { id: 'lesson_2', title: 'レッスンを 2つ よむ', icon: '📖', target: 2, progress: (c) => c.lessons },
-  { id: 'boss_1', title: 'ボスに 1かい いどむ', icon: '👑', target: 1, progress: (c) => c.bosses },
+  { id: 'boss_1', title: 'なかよしチャレンジを 1かい', icon: '💗', target: 1, progress: (c) => c.bosses },
   ...SUBJECTS.map(islandQuest),
 ];
 

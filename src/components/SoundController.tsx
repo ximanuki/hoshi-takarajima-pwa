@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 import { audioManager } from '../utils/audioManager';
+import { unlockVoice } from '../utils/speech';
 
 export function SoundController() {
   const settings = useAppStore((state) => state.settings);
@@ -31,6 +32,7 @@ export function SoundController() {
   useEffect(() => {
     const unlockAudio = () => {
       void audioManager.unlock();
+      unlockVoice();
     };
 
     window.addEventListener('pointerdown', unlockAudio, { passive: true });

@@ -158,7 +158,7 @@ export function IslandPage() {
 
             <button className="node-action practice" onClick={() => onNode('practice', sheetStage.skillId)}>
               <span className="na-icon" aria-hidden="true">
-                ⚔️
+                ⭐
               </span>
               <span>
                 <span className="na-title">れんしゅう</span>
@@ -176,9 +176,9 @@ export function IslandPage() {
                 {sheetStars.practice < 1 ? '🔒' : boss.sprite}
               </span>
               <span>
-                <span className="na-title">ボス: {boss.name}</span>
+                <span className="na-title">なかよしチャレンジ</span>
                 <span className="na-sub">
-                  {sheetStars.practice < 1 ? 'れんしゅうで ★1 とると ひらくよ' : 'たおして ステッカーを ゲット！'}
+                  {sheetStars.practice < 1 ? 'れんしゅうで ★1 とると ひらくよ' : `${boss.name}と なかよしに なって ステッカーを ゲット！`}
                 </span>
               </span>
               <Stars count={sheetStars.boss} />

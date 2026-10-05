@@ -3,6 +3,7 @@ import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { QuestionIllustration } from '../components/QuestionIllustration';
 import { findStage } from '../data/islandPaths';
 import { getLesson } from '../data/lessons';
+import { answerLine, lessonSpeech, PRAISE_LINES, quizLine } from '../data/voiceLines';
 import { getSkillLabel, subjectInfo } from '../data/subjects';
 import { useAppStore } from '../store/useAppStore';
 import { audioManager } from '../utils/audioManager';
@@ -58,17 +59,18 @@ export function LessonPage() {
 
   const speechFor = (target: Card | undefined): string => {
     if (!lesson || !target) return '';
+    const lines = lessonSpeech(lesson);
     switch (target.type) {
       case 'goal':
-        return `きょうの めあて。${lesson.goal}`;
+        return lines.goal;
       case 'step':
         return target.text;
       case 'example':
-        return `れいだい。${lesson.example.question}`;
+        return lines.example;
       case 'tip':
-        return `コツ。${lesson.tip}`;
+        return lines.tip;
       case 'quiz':
-        return quiz ? `ミニクイズ。${quiz.prompt}` : '';
+        return quiz ? quizLine(quiz.prompt) : '';
       case 'done':
         return 'レッスン クリア！ よく がんばったね！';
     }
@@ -161,7 +163,7 @@ export function LessonPage() {
                 onClick={() => {
                   audioManager.playSfx('tap');
                   setRevealed(true);
-                  if (readAloud) speak(`こたえは ${lesson.example.answer}。${lesson.example.why}`);
+                  if (readAloud) speak(lessonSpeech(lesson).exampleAnswer);
                 }}
               >
                 👀 こたえを みる
@@ -196,7 +198,7 @@ export function LessonPage() {
                       setQuizPick(choiceIndex);
                       const ok = choiceIndex === quiz.answerIndex;
                       audioManager.playSfx(ok ? 'correct' : 'wrong');
-                      if (readAloud) speak(ok ? 'せいかい！' : `おしい！ こたえは ${quiz.choices[quiz.answerIndex]}`);
+                      if (readAloud) speak(ok ? PRAISE_LINES[0] : answerLine(quiz.choices[quiz.answerIndex]));
                     }}
                   >
                     <span className="answer-key">{ANSWER_KEYS[choiceIndex]}</span>
@@ -223,7 +225,7 @@ export function LessonPage() {
       {card.type === 'done' ? (
         <div className="stack" style={{ display: 'grid', gap: 10 }}>
           <button className="btn btn-primary btn-xl btn-block" onClick={onPractice}>
-            ⚔️ れんしゅうへ
+            ⭐ れんしゅうへ
           </button>
           <button className="btn btn-cream btn-block" onClick={onClose}>
             みちに もどる

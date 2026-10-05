@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { DailyQuestCard } from '../components/DailyQuestCard';
 import { Hud } from '../components/Hud';
+import { VoiceCredit } from '../components/VoiceCredit';
 import { WorldMap } from '../components/world/WorldMap';
 import { getSkillLabel, SUBJECTS, subjectInfo } from '../data/subjects';
 import { useAppStore } from '../store/useAppStore';
@@ -9,13 +10,8 @@ import type { Subject } from '../types';
 import { audioManager } from '../utils/audioManager';
 import { hamcheeSrc, type PokoMood } from '../utils/hamchee';
 import { getIslandStars, getNextStep } from '../utils/practice';
+import { GREETING_LINES as GREETINGS } from '../data/voiceLines';
 import { speak } from '../utils/speech';
-
-const GREETINGS: Record<'morning' | 'day' | 'night', string[]> = {
-  morning: ['おはよう！ きょうも ぼうけんに いこう！', 'あさの うみは きもちいいね！', 'おはよう！ ほしを あつめに いこう！'],
-  day: ['こんにちは！ どの しまに いく？', 'いい てんき！ ぼうけん びより！', 'こんにちは！ たからを さがそう！'],
-  night: ['こんばんは！ ほしが きれいだね。', 'よるの うみを わたろう！', 'こんばんは！ すこしだけ ぼうけんしよう。'],
-};
 
 function dayPart(date: Date): 'morning' | 'day' | 'night' {
   const hour = date.getHours();
@@ -24,7 +20,7 @@ function dayPart(date: Date): 'morning' | 'day' | 'night' {
   return 'night';
 }
 
-const KIND_LABEL = { lesson: '📖 まなぶ', practice: '⚔️ れんしゅう', boss: '👑 ボス' } as const;
+const KIND_LABEL = { lesson: '📖 まなぶ', practice: '⭐ れんしゅう', boss: '💗 なかよしチャレンジ' } as const;
 
 export function WorldPage() {
   const navigate = useNavigate();
@@ -63,7 +59,7 @@ export function WorldPage() {
 
   return (
     <div className="screen">
-      <Hud title={<span>⭐ ほしのたからじま</span>} />
+      <Hud title={<span>🎀 ほしのたからじま</span>} />
 
       <div className="world-greeting">
         <div className="mascot-badge">
@@ -78,7 +74,7 @@ export function WorldPage() {
 
       <div className="world-actions">
         <button className="btn btn-primary btn-xl btn-block" onClick={onContinue}>
-          ⛵ つづきから ぼうけん
+          🎀 つづきから ぼうけん
         </button>
         <p className="muted on-night" style={{ textAlign: 'center', fontSize: '0.85rem' }}>
           {subjectInfo[next.subject].emoji} {getSkillLabel(next.skillId)} の {KIND_LABEL[next.kind]}
@@ -94,6 +90,7 @@ export function WorldPage() {
             👪 おとなの へや
           </Link>
         </div>
+        <VoiceCredit />
       </div>
     </div>
   );

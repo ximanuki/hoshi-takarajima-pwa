@@ -12,6 +12,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Hud } from '../components/Hud';
 import { ParentGate } from '../components/ParentGate';
+import { VoiceCredit } from '../components/VoiceCredit';
 import { questionBank } from '../data/questions';
 import { createSubjectRecord } from '../data/subjects';
 import { Line } from 'react-chartjs-2';
@@ -228,7 +229,7 @@ function ParentSettings() {
         <label className="field-row">
           <span>
             問題の自動読み上げ
-            <small>ひらがなを読むのが苦手でも一人で遊べます</small>
+            <small>ずんだもんの音声（未生成の文はブラウザの音声）で読み上げます</small>
           </span>
           <input
             className="switch"
@@ -260,6 +261,7 @@ function ParentSettings() {
           学習データをリセット
         </button>
       </section>
+      <VoiceCredit />
     </>
   );
 }

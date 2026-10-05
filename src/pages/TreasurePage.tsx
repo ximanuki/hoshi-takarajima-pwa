@@ -51,7 +51,7 @@ export function TreasurePage() {
       {tab === 'stickers' ? (
         <>
           <p className="muted on-night" style={{ textAlign: 'center' }}>
-            ボスを たおすと ステッカーが もらえるよ（{stickers.length} / {totalStickers}）
+            なかよしチャレンジで ステッカーが もらえるよ（{stickers.length} / {totalStickers}）
           </p>
           {SUBJECTS.map((subject) => {
             const info = subjectInfo[subject];
@@ -124,7 +124,7 @@ export function TreasurePage() {
               { label: 'せいとうりつ', value: `${accuracy}%` },
               { label: 'さいこう コンボ', value: `🔥${stats.bestCombo}` },
               { label: 'よんだ レッスン', value: stats.lessonsDone },
-              { label: 'たおした ボス', value: stats.bossWins },
+              { label: 'なかよしに なった', value: stats.bossWins },
               { label: 'さいちょう れんぞく', value: `${Math.max(stats.bestStreakDays, streakDays)}にち` },
               { label: 'たっせい クエスト', value: stats.questsCompleted },
             ].map((tile) => (
