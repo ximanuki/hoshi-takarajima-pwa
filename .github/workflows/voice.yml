@@ -1,0 +1,120 @@
+name: Generate read-aloud voice (VOICEVOX)
+
+# GitHub の サーバーで VOICEVOX エンジンを うごかして、よみあげ おんせい（public/voice/）を つくる。
+# - てどうで: Actions タブ →「Generate read-aloud voice (VOICEVOX)」→ Run workflow
+# - じどうで: もんだい・レッスン・セリフ・よみの じしょが main で かわったとき（ふえた ぶんだけ つくる）
+# できた おんせいを main に コミットして、GitHub Pages の デプロイも うごかす。
+
+on:
+  workflow_dispatch:
+    inputs:
+      character:
+        description: 'VOICEVOX のキャラクター名'
+        default: 'もち子さん'
+        required: true
+      style:
+        description: 'スタイル名'
+        default: 'ノーマル'
+        required: true
+      force:
+        description: 'いまの音声を消して全部作り直す（声やチューニングを変えたとき）'
+        type: boolean
+        default: false
+      limit:
+        description: 'ためしに作る数（空なら全部）'
+        default: ''
+        required: false
+  push:
+    branches: [main]
+    paths:
+      - 'docs/question_bank_master.md'
+      - 'src/data/lessons.ts'
+      - 'src/data/voiceLines.ts'
+      - 'src/utils/voiceKey.ts'
+      - 'scripts/voice-dict.json'
+      - 'scripts/voice-reading.mjs'
+      - 'scripts/generate-voice.mjs'
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: voice
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    services:
+      voicevox:
+        image: voicevox/voicevox_engine:cpu-latest
+        ports:
+          - 50021:50021
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install ffmpeg
+        run: |
+          if ! command -v ffmpeg >/dev/null; then
+            sudo apt-get update -q
+            sudo apt-get install -y -q ffmpeg
+          fi
+          ffmpeg -version | head -1
+
+      - name: Wait for VOICEVOX engine
+        run: |
+          for i in $(seq 1 90); do
+            if curl -sf http://127.0.0.1:50021/version; then echo; exit 0; fi
+            sleep 2
+          done
+          echo "VOICEVOX engine did not start" >&2
+          exit 1
+
+      - name: Generate voice
+        env:
+          CHARACTER: ${{ github.event.inputs.character || 'もち子さん' }}
+          STYLE: ${{ github.event.inputs.style || 'ノーマル' }}
+          FORCE: ${{ github.event.inputs.force || 'false' }}
+          LIMIT: ${{ github.event.inputs.limit || '' }}
+        run: |
+          args=(--engine http://127.0.0.1:50021 --character "$CHARACTER" --style "$STYLE" --concurrency 3)
+          if [ "$FORCE" = "true" ]; then args+=(--force); fi
+          if [ -n "$LIMIT" ]; then args+=(--limit "$LIMIT"); fi
+          node scripts/generate-voice.mjs "${args[@]}"
+          du -sh public/voice
+
+      - name: Commit voice files
+        id: commit
+        run: |
+          git add -A public/voice
+          if git diff --cached --quiet; then
+            echo "変更なし"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          count=$(git diff --cached --name-only -- 'public/voice/*.mp3' | wc -l)
+          git commit -m "Update read-aloud voice (${count} clips)"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      # GITHUB_TOKEN の push では ほかの ワークフローが うごかないので、デプロイを てどうで よぶ
+      - name: Trigger Pages deploy
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref "${GITHUB_REF_NAME}"
