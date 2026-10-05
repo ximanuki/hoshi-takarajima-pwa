@@ -30,6 +30,8 @@ function tagBySkill(question: Question): MisconceptionTag {
     return 'attention_slip';
   }
 
+  if (question.subject === 'nature') return 'attention_slip';
+
   if (question.skillId === 'opposite_words') return 'jp_antonym_confusion';
   if (question.skillId === 'character_recognition' || question.skillId === 'hiragana_order') return 'jp_sound_confusion';
   if (question.skillId === 'sentence_context') return 'jp_particle_confusion';

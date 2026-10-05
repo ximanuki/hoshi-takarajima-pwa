@@ -1,31 +1,28 @@
 import { useMemo } from 'react';
+import type { CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { SUBJECTS, subjectInfo } from '../data/subjects';
 import { useAppStore } from '../store/useAppStore';
 import type { Subject } from '../types';
 import { getDueReviewCount, getSubjectMastery } from '../utils/mission';
+import { MAX_ISLAND_RANK, getIslandRank } from '../utils/progression';
 import { audioManager } from '../utils/audioManager';
-
-const missionCards: Array<{ subject: Subject; title: string; desc: string }> = [
-  { subject: 'math', title: 'さんすうのしま', desc: 'たしざん・ひきざんをクリアしよう' },
-  { subject: 'japanese', title: 'こくごのしま', desc: 'ことば・よみとりクイズにちょうせん' },
-  { subject: 'life', title: 'くらしのしま', desc: 'とけい・おかね・あんぜんを まなぼう' },
-  { subject: 'insight', title: 'ひらめきのしま', desc: 'はっけん・すいり・なぞに ちょうせん' },
-];
 
 export function MissionPage() {
   const navigate = useNavigate();
   const startMission = useAppStore((state) => state.startMission);
   const adaptiveBySubject = useAppStore((state) => state.adaptiveBySubject);
   const skillProgress = useAppStore((state) => state.skillProgress);
+  const subjectClears = useAppStore((state) => state.subjectClears);
 
   const stats = useMemo(
     () =>
       Object.fromEntries(
-        missionCards.map((mission) => [
-          mission.subject,
+        SUBJECTS.map((subject) => [
+          subject,
           {
-            dueReview: getDueReviewCount(mission.subject, skillProgress),
-            mastery: getSubjectMastery(mission.subject, skillProgress),
+            dueReview: getDueReviewCount(subject, skillProgress),
+            mastery: getSubjectMastery(subject, skillProgress),
           },
         ]),
       ) as Record<Subject, { dueReview: number; mastery: number }>,
@@ -38,28 +35,69 @@ export function MissionPage() {
     navigate('/play');
   };
 
-  const difficultyBySubject = useMemo(
-    () =>
-      Object.fromEntries(
-        missionCards.map((mission) => [mission.subject, adaptiveBySubject[mission.subject].targetDifficulty]),
-      ) as Record<Subject, number>,
-    [adaptiveBySubject],
-  );
-
   return (
     <section className="stack">
-      <h1>どのしまに いく？</h1>
-      {missionCards.map((mission) => (
-        <article className="card mission-card" key={mission.subject}>
-          <h2>{mission.title}</h2>
-          <p>{mission.desc}</p>
-          <p>おすすめレベル: {difficultyBySubject[mission.subject]}</p>
-          <p>ふくしゅう: {stats[mission.subject].dueReview} / しゅうじゅくど: {stats[mission.subject].mastery}%</p>
-          <button className="primary-btn" onClick={() => onStart(mission.subject)}>
-            このミッションであそぶ
-          </button>
-        </article>
-      ))}
+      <div>
+        <p className="eyebrow">ぼうけんマップ</p>
+        <h1>どの しまに いく？</h1>
+      </div>
+
+      <div className="island-map">
+        {SUBJECTS.map((subject) => {
+          const info = subjectInfo[subject];
+          const clears = subjectClears[subject] ?? 0;
+          const rank = getIslandRank(clears);
+          const { dueReview, mastery } = stats[subject];
+
+          return (
+            <article
+              className={`island-card ${clears === 0 && subject === 'nature' ? 'new-island' : ''}`}
+              data-emoji={info.emoji}
+              key={subject}
+              style={{ '--h': info.hue } as CSSProperties}
+            >
+              <div className="island-head">
+                <span className="island-emoji" aria-hidden="true">
+                  {info.emoji}
+                </span>
+                <div className="island-title">
+                  <h2>{info.island}</h2>
+                  <p>{info.desc}</p>
+                </div>
+              </div>
+
+              <div className="island-rank">
+                <span className="rank-stars" aria-label={`ランク ${rank.rank} / ${MAX_ISLAND_RANK}`}>
+                  {Array.from({ length: MAX_ISLAND_RANK }, (_, index) => (
+                    <span className={index < rank.rank ? '' : 'off'} key={index}>
+                      ⭐
+                    </span>
+                  ))}
+                </span>
+                <span>
+                  ランク「{rank.name}」
+                  {rank.nextAt !== null ? `・あと ${rank.nextAt - clears}かい` : ''}
+                </span>
+              </div>
+
+              <div className="meter thin" aria-label={`しゅうじゅくど ${mastery}%`}>
+                <div className="meter-fill" style={{ width: `${mastery}%` }} />
+              </div>
+
+              <div className="island-stats">
+                <span className="tag">🎯 しゅうじゅくど {mastery}%</span>
+                <span className="tag">📈 おすすめ Lv.{adaptiveBySubject[subject].targetDifficulty}</span>
+                <span className="tag">🚩 クリア {clears}</span>
+                {dueReview > 0 ? <span className="tag alert">🔁 ふくしゅう {dueReview}</span> : null}
+              </div>
+
+              <button className="primary-btn btn-block" onClick={() => onStart(subject)}>
+                この しまで あそぶ
+              </button>
+            </article>
+          );
+        })}
+      </div>
     </section>
   );
 }

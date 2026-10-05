@@ -3,21 +3,22 @@
   "short_name": "たからじま",
   "description": "小学1〜2年生向け ゲーミフィケーション学習PWA",
   "lang": "ja",
-  "start_url": ".",
-  "scope": ".",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#d5f6ff",
   "theme_color": "#56c7b4",
+  "categories": ["education", "kids", "games"],
   "icons": [
-    {
-      "src": "icons/icon-192.svg",
-      "sizes": "192x192",
-      "type": "image/svg+xml"
-    },
-    {
-      "src": "icons/icon-512.svg",
-      "sizes": "512x512",
-      "type": "image/svg+xml"
-    }
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon-512.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "ぼうけんに でる", "short_name": "ぼうけん", "url": "./#/mission", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "コレクション", "short_name": "コレクション", "url": "./#/collection", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
   ]
 }

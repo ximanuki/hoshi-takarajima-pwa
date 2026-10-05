@@ -5,12 +5,18 @@ import './index.css';
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
+    if (import.meta.env.PROD) {
+      navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch((error) => {
+        console.error('Service worker registration failed:', error);
+      });
+      return;
+    }
+
+    // かいはつちゅうは キャッシュが じゃまに ならないように かいじょする
     navigator.serviceWorker.getRegistrations().then((registrations) => {
-      registrations
-        .filter((registration) => registration.scope.includes('/hoshi-takarajima-pwa/'))
-        .forEach((registration) => {
-          registration.unregister();
-        });
+      registrations.forEach((registration) => {
+        void registration.unregister();
+      });
     });
   });
 }

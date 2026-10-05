@@ -10,6 +10,7 @@ import {
 } from 'chart.js';
 import { useMemo } from 'react';
 import { Line } from 'react-chartjs-2';
+import { SUBJECTS, getSkillLabel, subjectInfo } from '../data/subjects';
 import { useAppStore } from '../store/useAppStore';
 import type { AnswerTrace, MisconceptionTag } from '../types';
 import { getMisconceptionLabel } from '../utils/misconceptions';
@@ -78,6 +79,24 @@ function getTopErrorTag(logs: AnswerTrace[]): MisconceptionTag | null {
 export function ParentPage() {
   const recentResults = useAppStore((state) => state.recentResults);
   const diagnosticLogs = useAppStore((state) => state.diagnosticLogs);
+  const skillProgress = useAppStore((state) => state.skillProgress);
+  const subjectAccuracy = useMemo(
+    () =>
+      SUBJECTS.map((subject) => {
+        const logs = diagnosticLogs.filter((trace) => trace.subject === subject);
+        const correct = logs.filter((trace) => trace.correct).length;
+        return { subject, total: logs.length, rate: logs.length > 0 ? Math.round((correct / logs.length) * 100) : null };
+      }),
+    [diagnosticLogs],
+  );
+  const weakSkills = useMemo(
+    () =>
+      Object.entries(skillProgress)
+        .filter(([, progress]) => progress.seenCount >= 3)
+        .sort((a, b) => a[1].mastery - b[1].mastery)
+        .slice(0, 3),
+    [skillProgress],
+  );
   const recent = useMemo(() => recentResults.slice(0, 7).reverse(), [recentResults]);
   const recurrenceRate = useMemo(() => calcRecurrenceRate(diagnosticLogs), [diagnosticLogs]);
   const retryFirstSuccessRate = useMemo(() => calcRetryFirstSuccessRate(diagnosticLogs), [diagnosticLogs]);
@@ -116,6 +135,36 @@ export function ParentPage() {
 
       <div className="card">
         <p>学習時間（分）: {durationMin.join(' / ') || '-'}</p>
+      </div>
+
+      <div className="card stack" style={{ gap: 8 }}>
+        <h2>教科別の正答率（直近{diagnosticLogs.length}問）</h2>
+        {subjectAccuracy.map((item) => (
+          <div className="stack" key={item.subject} style={{ gap: 4 }}>
+            <div className="level-row">
+              <span>
+                {subjectInfo[item.subject].emoji} {subjectInfo[item.subject].label}
+              </span>
+              <span className="muted">{item.rate === null ? '未学習' : `${item.rate}%（${item.total}問）`}</span>
+            </div>
+            <div className="meter thin" aria-hidden="true">
+              <div className="meter-fill" style={{ width: `${item.rate ?? 0}%` }} />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="card stack" style={{ gap: 6 }}>
+        <h2>伸びしろのあるスキル</h2>
+        {weakSkills.length > 0 ? (
+          weakSkills.map(([skillId, progress]) => (
+            <p key={skillId}>
+              {getSkillLabel(skillId)}: 習熟度 {Math.round(progress.mastery)}%
+            </p>
+          ))
+        ) : (
+          <p className="muted">各スキルを3問以上解くと表示されます。</p>
+        )}
       </div>
 
       <div className="card">

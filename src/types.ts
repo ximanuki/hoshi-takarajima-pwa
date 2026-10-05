@@ -1,4 +1,4 @@
-export type Subject = 'math' | 'japanese' | 'life' | 'insight';
+export type Subject = 'math' | 'japanese' | 'life' | 'insight' | 'nature';
 export type MissionMode = 'learn' | 'review' | 'challenge';
 export type MisconceptionTag =
   | 'unknown_guess'
@@ -69,12 +69,52 @@ export interface MissionResult {
   earnedStars: number;
   topMisconceptions?: MisconceptionSummary[];
   recommendedFocusTag?: MisconceptionTag;
+  bestComboInMission?: number;
+  levelBefore?: number;
+  levelAfter?: number;
+  newBadges?: string[];
+  completedQuests?: string[];
 }
+
+export type ThemePreference = 'system' | 'light' | 'dark';
 
 export interface Settings {
   soundEnabled: boolean;
   bgmVolume: number;
   sfxVolume: number;
+  /** もんだいを じどうで よみあげる */
+  readAloud: boolean;
+  /** もじを おおきく する */
+  largeText: boolean;
+  theme: ThemePreference;
+}
+
+export interface PlayerStats {
+  totalAnswered: number;
+  totalCorrect: number;
+  perfectCount: number;
+  bestCombo: number;
+  bestStreakDays: number;
+  challengeClears: number;
+  difficultyUps: number;
+  questsCompleted: number;
+  morningMissions: number;
+}
+
+export interface DailyQuestCounters {
+  missions: number;
+  correct: number;
+  perfect: number;
+  maxCombo: number;
+  subjects: Subject[];
+  reviewMissions: number;
+}
+
+export interface DailyQuestState {
+  date: string;
+  counters: DailyQuestCounters;
+  claimed: string[];
+  chestClaimed: boolean;
 }
 
 export interface ParentDailyStat {

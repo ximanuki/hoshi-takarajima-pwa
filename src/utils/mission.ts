@@ -1,5 +1,6 @@
 import { questionBank } from '../data/questions';
 import { questionMetaById } from '../data/question_meta';
+import { createSubjectRecord } from '../data/subjects';
 import type {
   MisconceptionState,
   MisconceptionTag,
@@ -41,12 +42,7 @@ const REVIEW_INTERVALS_MS = [
 ];
 
 export function createDefaultAdaptiveMap(): SubjectAdaptiveMap {
-  return {
-    math: { targetDifficulty: 1, missionCount: 0 },
-    japanese: { targetDifficulty: 1, missionCount: 0 },
-    life: { targetDifficulty: 1, missionCount: 0 },
-    insight: { targetDifficulty: 1, missionCount: 0 },
-  };
+  return createSubjectRecord(() => ({ targetDifficulty: 1, missionCount: 0 }));
 }
 
 function clamp(value: number, min: number, max: number): number {

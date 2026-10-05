@@ -8,8 +8,23 @@ import {
   updateAdaptiveProgress,
 } from '../utils/mission';
 import { getGuessThresholdMs, inferErrorTag } from '../utils/diagnostics';
+import { createSubjectRecord, isSubject } from '../data/subjects';
+import {
+  CHEST_REWARD_STARS,
+  QUEST_REWARD_STARS,
+  applyMissionToCounters,
+  createDailyQuestState,
+  ensureDailyQuestState,
+  findNewBadges,
+  getQuestStatuses,
+  levelFromXp,
+  todayKey,
+} from '../utils/progression';
 import type {
   AnswerTrace,
+  DailyQuestState,
+  PlayerStats,
+  ThemePreference,
   MisconceptionState,
   MisconceptionTag,
   MissionResult,
@@ -58,12 +73,21 @@ type AppState = {
   adaptiveBySubject: SubjectAdaptiveMap;
   skillProgress: Record<string, SkillProgress>;
   recentQuestionIdsBySubject: SubjectRecentQuestions;
+  stats: PlayerStats;
+  /** ミッションを またいで つづく れんぞく せいかい */
+  comboStreak: number;
+  dailyQuest: DailyQuestState;
   mission: MissionSession | null;
+  /** いまの ミッションの なかで いちばん ながい コンボ */
+  missionBestCombo: number;
   latestResult: MissionResult | null;
   startMission: (subject: Subject) => void;
   submitAnswer: (choiceIndex: number) => void;
   goNextQuestion: () => void;
   finishMission: () => MissionResult | null;
+  abandonMission: () => void;
+  claimQuest: (questId: string) => boolean;
+  claimQuestChest: () => boolean;
   updateSettings: (patch: Partial<Settings>) => void;
   clearProgress: () => void;
 };
@@ -72,32 +96,28 @@ const defaultSettings: Settings = {
   soundEnabled: true,
   bgmVolume: 0.6,
   sfxVolume: 0.8,
+  readAloud: false,
+  largeText: false,
+  theme: 'system',
 };
 
-const defaultSubjectClears: SubjectCounts = {
-  math: 0,
-  japanese: 0,
-  life: 0,
-  insight: 0,
+const defaultStats: PlayerStats = {
+  totalAnswered: 0,
+  totalCorrect: 0,
+  perfectCount: 0,
+  bestCombo: 0,
+  bestStreakDays: 0,
+  challengeClears: 0,
+  difficultyUps: 0,
+  questsCompleted: 0,
+  morningMissions: 0,
 };
 
-const defaultRecentQuestionIdsBySubject: SubjectRecentQuestions = {
-  math: [],
-  japanese: [],
-  life: [],
-  insight: [],
-};
-
-function normalizeDate(date: Date): string {
-  return date.toISOString().slice(0, 10);
-}
+const createDefaultSubjectClears = (): SubjectCounts => createSubjectRecord(() => 0);
+const createDefaultRecentQuestionIds = (): SubjectRecentQuestions => createSubjectRecord(() => []);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-function isSubject(value: unknown): value is Subject {
-  return value === 'math' || value === 'japanese' || value === 'life' || value === 'insight';
 }
 
 function isMisconceptionTag(value: unknown): value is MisconceptionTag {
@@ -110,13 +130,55 @@ function toNumber(value: unknown, fallback: number): number {
 }
 
 function normalizeSubjectClears(value: unknown): SubjectCounts {
-  if (!isRecord(value)) return defaultSubjectClears;
+  const source = isRecord(value) ? value : {};
+  return createSubjectRecord((subject) => toNumber(source[subject], 0));
+}
 
+function normalizeSettings(value: unknown): Settings {
+  if (!isRecord(value)) return defaultSettings;
+  const theme: ThemePreference = value.theme === 'light' || value.theme === 'dark' ? value.theme : 'system';
   return {
-    math: toNumber(value.math, 0),
-    japanese: toNumber(value.japanese, 0),
-    life: toNumber(value.life, 0),
-    insight: toNumber(value.insight, 0),
+    soundEnabled: typeof value.soundEnabled === 'boolean' ? value.soundEnabled : defaultSettings.soundEnabled,
+    bgmVolume: Math.max(0, Math.min(1, toNumber(value.bgmVolume, defaultSettings.bgmVolume))),
+    sfxVolume: Math.max(0, Math.min(1, toNumber(value.sfxVolume, defaultSettings.sfxVolume))),
+    readAloud: typeof value.readAloud === 'boolean' ? value.readAloud : defaultSettings.readAloud,
+    largeText: typeof value.largeText === 'boolean' ? value.largeText : defaultSettings.largeText,
+    theme,
+  };
+}
+
+function normalizeStats(value: unknown, legacy: { badges: unknown; streakDays: unknown }): PlayerStats {
+  const source = isRecord(value) ? value : {};
+  const stats = Object.fromEntries(
+    (Object.keys(defaultStats) as Array<keyof PlayerStats>).map((key) => [key, Math.max(0, toNumber(source[key], 0))]),
+  ) as unknown as PlayerStats;
+
+  // v3 いぜんの データ: もっている バッジから さいていげんの きろくを ふくげんする
+  const badges = Array.isArray(legacy.badges) ? legacy.badges : [];
+  if (badges.includes('perfect_mission')) stats.perfectCount = Math.max(stats.perfectCount, 1);
+  if (badges.includes('challenge_clear')) stats.challengeClears = Math.max(stats.challengeClears, 1);
+  if (badges.includes('difficulty_climber')) stats.difficultyUps = Math.max(stats.difficultyUps, 1);
+  if (badges.includes('three_day_streak')) stats.bestStreakDays = Math.max(stats.bestStreakDays, 3);
+  stats.bestStreakDays = Math.max(stats.bestStreakDays, toNumber(legacy.streakDays, 0));
+  return stats;
+}
+
+function normalizeDailyQuest(value: unknown): DailyQuestState {
+  const today = todayKey();
+  if (!isRecord(value) || value.date !== today || !isRecord(value.counters)) return createDailyQuestState(today);
+  const counters = value.counters;
+  return {
+    date: today,
+    counters: {
+      missions: toNumber(counters.missions, 0),
+      correct: toNumber(counters.correct, 0),
+      perfect: toNumber(counters.perfect, 0),
+      maxCombo: toNumber(counters.maxCombo, 0),
+      reviewMissions: toNumber(counters.reviewMissions, 0),
+      subjects: Array.isArray(counters.subjects) ? counters.subjects.filter(isSubject) : [],
+    },
+    claimed: Array.isArray(value.claimed) ? value.claimed.filter((id): id is string => typeof id === 'string') : [],
+    chestClaimed: Boolean(value.chestClaimed),
   };
 }
 
@@ -132,12 +194,7 @@ function normalizeAdaptiveBySubject(value: unknown): SubjectAdaptiveMap {
     };
   };
 
-  return {
-    math: normalizeOne(value.math, defaults.math),
-    japanese: normalizeOne(value.japanese, defaults.japanese),
-    life: normalizeOne(value.life, defaults.life),
-    insight: normalizeOne(value.insight, defaults.insight),
-  };
+  return createSubjectRecord((subject) => normalizeOne(value[subject], defaults[subject]));
 }
 
 function normalizeMisconceptions(value: unknown, now: number): Partial<Record<MisconceptionTag, MisconceptionState>> {
@@ -181,18 +238,11 @@ function normalizeSkillProgressMap(value: unknown): Record<string, SkillProgress
 }
 
 function normalizeRecentQuestionIdsBySubject(value: unknown): SubjectRecentQuestions {
-  if (!isRecord(value)) return { math: [], japanese: [], life: [], insight: [] };
-
-  const math = Array.isArray(value.math) ? value.math.filter((id): id is string => typeof id === 'string') : [];
-  const japanese = Array.isArray(value.japanese)
-    ? value.japanese.filter((id): id is string => typeof id === 'string')
-    : [];
-  const life = Array.isArray(value.life) ? value.life.filter((id): id is string => typeof id === 'string') : [];
-  const insight = Array.isArray(value.insight)
-    ? value.insight.filter((id): id is string => typeof id === 'string')
-    : [];
-
-  return { math, japanese, life, insight };
+  const source = isRecord(value) ? value : {};
+  return createSubjectRecord((subject) => {
+    const ids = source[subject];
+    return Array.isArray(ids) ? ids.filter((id): id is string => typeof id === 'string') : [];
+  });
 }
 
 function normalizeDiagnosticLogs(value: unknown): AnswerTrace[] {
@@ -227,30 +277,19 @@ function mergeRecentQuestionIds(current: string[], latest: string[], limit: numb
   return Array.from(new Set(merged)).slice(0, limit);
 }
 
-function nextStreak(lastPlayedDate: string | null): number {
+function nextStreak(lastPlayedDate: string | null, today: string): number {
   if (!lastPlayedDate) return 1;
-  const now = new Date();
   const last = new Date(`${lastPlayedDate}T00:00:00`);
-  const today = new Date(`${normalizeDate(now)}T00:00:00`);
-  const diffDays = Math.floor((today.getTime() - last.getTime()) / DAY_MS);
+  const current = new Date(`${today}T00:00:00`);
+  const diffDays = Math.round((current.getTime() - last.getTime()) / DAY_MS);
 
   if (diffDays <= 0) return 0;
   if (diffDays === 1) return 1;
   return -999;
 }
 
-function grantBadge(state: AppState, result: MissionResult): string[] {
-  const unlocked = new Set(state.badges);
-
-  if (!unlocked.has('first_clear')) unlocked.add('first_clear');
-  if (result.correct === result.total) unlocked.add('perfect_mission');
-  if (state.streakDays >= 3) unlocked.add('three_day_streak');
-  if (state.subjectClears.math >= 3) unlocked.add('math_explorer');
-  if (state.subjectClears.japanese >= 3) unlocked.add('word_adventurer');
-  if (result.afterDifficulty > result.beforeDifficulty) unlocked.add('difficulty_climber');
-  if (result.mode === 'challenge' && result.correct === result.total) unlocked.add('challenge_clear');
-
-  return Array.from(unlocked);
+function badgeContext(state: Pick<AppState, 'stats' | 'subjectClears' | 'streakDays' | 'level'>) {
+  return { stats: state.stats, subjectClears: state.subjectClears, streakDays: state.streakDays, level: state.level };
 }
 
 export const useAppStore = create<AppState>()(
@@ -262,14 +301,18 @@ export const useAppStore = create<AppState>()(
       streakDays: 0,
       lastPlayedDate: null,
       badges: [],
-      subjectClears: defaultSubjectClears,
+      subjectClears: createDefaultSubjectClears(),
       recentResults: [],
       diagnosticLogs: [],
       settings: defaultSettings,
       adaptiveBySubject: createDefaultAdaptiveMap(),
       skillProgress: {},
-      recentQuestionIdsBySubject: defaultRecentQuestionIdsBySubject,
+      recentQuestionIdsBySubject: createDefaultRecentQuestionIds(),
+      stats: defaultStats,
+      comboStreak: 0,
+      dailyQuest: createDailyQuestState(todayKey()),
       mission: null,
+      missionBestCombo: 0,
       latestResult: null,
 
       startMission: (subject) => {
@@ -294,6 +337,7 @@ export const useAppStore = create<AppState>()(
             questionStartedAt: startedAt,
             startedAt,
           },
+          missionBestCombo: 0,
         });
       },
 
@@ -335,7 +379,13 @@ export const useAppStore = create<AppState>()(
         const nextAnswers = [...mission.answers];
         nextAnswers[mission.currentIndex] = choiceIndex;
         const nextTraces = [...(mission.answerTraces ?? []), trace];
-        set({ mission: { ...mission, answers: nextAnswers, answerTraces: nextTraces } });
+        const comboStreak = correct ? state.comboStreak + 1 : 0;
+        set({
+          mission: { ...mission, answers: nextAnswers, answerTraces: nextTraces },
+          comboStreak,
+          missionBestCombo: Math.max(state.missionBestCombo, comboStreak),
+          stats: { ...state.stats, bestCombo: Math.max(state.stats.bestCombo, comboStreak) },
+        });
       },
 
       goNextQuestion: () => {
@@ -409,13 +459,43 @@ export const useAppStore = create<AppState>()(
           recommendedFocusTag: topMisconceptions[0]?.tag,
         };
 
-        const streakChange = nextStreak(state.lastPlayedDate);
-        const today = normalizeDate(new Date());
+        const today = todayKey();
+        const streakChange = nextStreak(state.lastPlayedDate, today);
         const newStreak =
-          streakChange === 1 ? state.streakDays + 1 : streakChange === -999 ? 1 : state.streakDays;
+          streakChange === 1 ? state.streakDays + 1 : streakChange === -999 ? 1 : Math.max(1, state.streakDays);
 
         const nextXp = state.xp + earnedXp;
-        const nextLevel = Math.floor(nextXp / 100) + 1;
+        const nextLevel = levelFromXp(nextXp);
+        const perfect = evaluation.total > 0 && evaluation.correct === evaluation.total;
+        const hour = new Date().getHours();
+        const stats: PlayerStats = {
+          ...state.stats,
+          totalAnswered: state.stats.totalAnswered + evaluation.total,
+          totalCorrect: state.stats.totalCorrect + evaluation.correct,
+          perfectCount: state.stats.perfectCount + (perfect ? 1 : 0),
+          bestStreakDays: Math.max(state.stats.bestStreakDays, newStreak),
+          challengeClears: state.stats.challengeClears + (perfect && mission.plan.mode === 'challenge' ? 1 : 0),
+          difficultyUps:
+            state.stats.difficultyUps + (adaptiveUpdate.afterDifficulty > adaptiveUpdate.beforeDifficulty ? 1 : 0),
+          morningMissions: state.stats.morningMissions + (hour >= 5 && hour < 10 ? 1 : 0),
+        };
+
+        const questBefore = ensureDailyQuestState(state.dailyQuest, today);
+        const dailyQuest: DailyQuestState = {
+          ...questBefore,
+          counters: applyMissionToCounters(questBefore.counters, {
+            subject: mission.subject,
+            correct: evaluation.correct,
+            total: evaluation.total,
+            maxCombo: state.missionBestCombo,
+            mode: mission.plan.mode,
+          }),
+        };
+        const doneBefore = new Set(getQuestStatuses(questBefore).filter((quest) => quest.done).map((quest) => quest.quest.id));
+        const completedQuests = getQuestStatuses(dailyQuest)
+          .filter((quest) => quest.done && !doneBefore.has(quest.quest.id))
+          .map((quest) => quest.quest.id);
+
         const subjectClears: SubjectCounts = {
           ...state.subjectClears,
           [mission.subject]: state.subjectClears[mission.subject] + 1,
@@ -435,8 +515,20 @@ export const useAppStore = create<AppState>()(
           ),
         };
 
-        const nextState: AppState = {
-          ...state,
+        const newBadges = findNewBadges(
+          state.badges,
+          badgeContext({ stats, subjectClears, streakDays: newStreak, level: nextLevel }),
+        );
+        const finalResult: MissionResult = {
+          ...result,
+          bestComboInMission: state.missionBestCombo,
+          levelBefore: state.level,
+          levelAfter: nextLevel,
+          newBadges,
+          completedQuests,
+        };
+
+        set({
           xp: nextXp,
           level: nextLevel,
           stars: state.stars + earnedStars,
@@ -446,16 +538,49 @@ export const useAppStore = create<AppState>()(
           adaptiveBySubject,
           skillProgress: adaptiveUpdate.skillProgress,
           recentQuestionIdsBySubject,
-          recentResults: [result, ...state.recentResults].slice(0, 30),
+          recentResults: [finalResult, ...state.recentResults].slice(0, 30),
           diagnosticLogs: [...state.diagnosticLogs, ...missionTraces].slice(-MAX_DIAGNOSTIC_LOGS),
-          latestResult: result,
+          latestResult: finalResult,
           mission: null,
-          badges: state.badges,
-        };
+          missionBestCombo: 0,
+          stats,
+          dailyQuest,
+          badges: [...state.badges, ...newBadges],
+        });
+        return finalResult;
+      },
 
-        nextState.badges = grantBadge(nextState, result);
-        set(nextState);
-        return result;
+      abandonMission: () => {
+        set({ mission: null, missionBestCombo: 0 });
+      },
+
+      claimQuest: (questId) => {
+        const state = get();
+        const dailyQuest = ensureDailyQuestState(state.dailyQuest, todayKey());
+        const status = getQuestStatuses(dailyQuest).find((quest) => quest.quest.id === questId);
+        if (!status || !status.done || status.claimed) return false;
+
+        const stats = { ...state.stats, questsCompleted: state.stats.questsCompleted + 1 };
+        const newBadges = findNewBadges(state.badges, badgeContext({ ...state, stats }));
+        set({
+          stars: state.stars + QUEST_REWARD_STARS,
+          stats,
+          dailyQuest: { ...dailyQuest, claimed: [...dailyQuest.claimed, questId] },
+          badges: [...state.badges, ...newBadges],
+        });
+        return true;
+      },
+
+      claimQuestChest: () => {
+        const state = get();
+        const dailyQuest = ensureDailyQuestState(state.dailyQuest, todayKey());
+        const statuses = getQuestStatuses(dailyQuest);
+        if (dailyQuest.chestClaimed || !statuses.every((quest) => quest.claimed)) return false;
+        set({
+          stars: state.stars + CHEST_REWARD_STARS,
+          dailyQuest: { ...dailyQuest, chestClaimed: true },
+        });
+        return true;
       },
 
       updateSettings: (patch) => {
@@ -470,26 +595,37 @@ export const useAppStore = create<AppState>()(
           streakDays: 0,
           lastPlayedDate: null,
           badges: [],
-          subjectClears: defaultSubjectClears,
+          subjectClears: createDefaultSubjectClears(),
           recentResults: [],
           diagnosticLogs: [],
           adaptiveBySubject: createDefaultAdaptiveMap(),
           skillProgress: {},
-          recentQuestionIdsBySubject: defaultRecentQuestionIdsBySubject,
+          recentQuestionIdsBySubject: createDefaultRecentQuestionIds(),
+          stats: defaultStats,
+          comboStreak: 0,
+          dailyQuest: createDailyQuestState(todayKey()),
           mission: null,
+          missionBestCombo: 0,
           latestResult: null,
         });
       },
     }),
     {
       name: 'hoshi-takarajima-pwa',
-      version: 3,
+      version: 4,
       migrate: (persistedState, version) => {
         void version;
         if (!isRecord(persistedState)) return persistedState;
 
         return {
           ...persistedState,
+          settings: normalizeSettings(persistedState.settings),
+          stats: normalizeStats(persistedState.stats, {
+            badges: persistedState.badges,
+            streakDays: persistedState.streakDays,
+          }),
+          comboStreak: Math.max(0, toNumber(persistedState.comboStreak, 0)),
+          dailyQuest: normalizeDailyQuest(persistedState.dailyQuest),
           subjectClears: normalizeSubjectClears(persistedState.subjectClears),
           adaptiveBySubject: normalizeAdaptiveBySubject(persistedState.adaptiveBySubject),
           skillProgress: normalizeSkillProgressMap(persistedState.skillProgress),

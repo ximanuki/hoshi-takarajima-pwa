@@ -1,4 +1,6 @@
-export type PokoMood = 'normal' | 'happy' | 'cheer' | 'sleepy';
+import { hamcheeSrc, type PokoMood } from '../utils/hamchee';
+
+export type { PokoMood };
 export type PokoPose = 'stand' | 'jump';
 
 type Props = {
@@ -8,18 +10,8 @@ type Props = {
   showCaption?: boolean;
 };
 
-const HAMCHEE_IMAGE_BY_MOOD: Record<PokoMood, string> = {
-  normal: 'hamchee_idle.png',
-  happy: 'hamchee_happy.png',
-  cheer: 'hamchee_cheer.png',
-  sleepy: 'hamchee_sleepy.png',
-};
-
 export function PokoIllustration({ mood = 'normal', pose = 'stand', comment, showCaption = true }: Props) {
   const jumping = pose === 'jump';
-  const baseUrl = import.meta.env.BASE_URL;
-  const imageName = HAMCHEE_IMAGE_BY_MOOD[mood];
-  const src = `${baseUrl}assets/hamchee/${imageName}`;
 
   return (
     <div className="poko-wrap" aria-live="polite">
@@ -27,8 +19,10 @@ export function PokoIllustration({ mood = 'normal', pose = 'stand', comment, sho
       <div className={`poko-stage ${jumping ? 'jump' : ''}`}>
         <img
           className={`poko-image ${jumping ? 'jump' : ''}`}
-          src={src}
+          src={hamcheeSrc(mood)}
           alt={`あいぼう はむちー ${mood}`}
+          width={512}
+          height={512}
           loading="lazy"
           decoding="async"
           draggable={false}

@@ -9,7 +9,9 @@ type ToneSfxId = import('./audioLabPlayer').ToneSfxId;
 export type AudioScene = 'home' | 'mission' | 'play' | 'result';
 export type SoundEffect = 'tap' | 'correct' | 'wrong' | 'combo' | 'clear';
 
-const DEFAULT_SETTINGS: Settings = {
+type AudioSettings = Pick<Settings, 'soundEnabled' | 'bgmVolume' | 'sfxVolume'>;
+
+const DEFAULT_SETTINGS: AudioSettings = {
   soundEnabled: true,
   bgmVolume: 0.6,
   sfxVolume: 0.8,
@@ -71,7 +73,7 @@ class AudioManager {
   private tonePrewarmed = false;
   private unlocked = false;
   private bgmSuppressed = false;
-  private settings: Settings = DEFAULT_SETTINGS;
+  private settings: AudioSettings = DEFAULT_SETTINGS;
   private scene: AudioScene = 'home';
   private sceneGeneration = 0;
   private lastEffectAt: Partial<Record<SoundEffect, number>> = {};
@@ -93,7 +95,7 @@ class AudioManager {
     void this.startSceneIfReady();
   }
 
-  setSettings(next: Settings) {
+  setSettings(next: AudioSettings) {
     this.settings = {
       soundEnabled: Boolean(next.soundEnabled),
       bgmVolume: clamp01(next.bgmVolume),
