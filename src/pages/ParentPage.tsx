@@ -229,7 +229,7 @@ function ParentSettings() {
         <label className="field-row">
           <span>
             問題の自動読み上げ
-            <small>ずんだもんの音声（未生成の文はブラウザの音声）で読み上げます</small>
+            <small>もち子さんの音声（未生成の文はブラウザの音声）で読み上げます</small>
           </span>
           <input
             className="switch"

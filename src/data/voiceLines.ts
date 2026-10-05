@@ -1,4 +1,4 @@
-// よみあげる きまった セリフ。ずんだもんの おんせいを まえもって つくる たいしょう。
+// よみあげる きまった セリフ。VOICEVOX の おんせいを まえもって つくる たいしょう。
 // scripts/generate-voice.mjs からも import するので、type いがいの import は しないこと。
 import type { Lesson } from './lessons';
 

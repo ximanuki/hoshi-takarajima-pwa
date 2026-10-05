@@ -8,7 +8,7 @@ const repoName = 'hoshi-takarajima-pwa';
 
 // オフラインで うごかすために さきに キャッシュする ファイル（おおきい BGM などは のぞく）
 const PRECACHE_PATTERN = /\.(html|js|css|webmanifest|svg|png|webp)$/;
-// ずんだもんの こえ（voice/）は たくさん あるので、よまれた ものだけ じっこうじに キャッシュする
+// よみあげの こえ（voice/）は たくさん あるので、よまれた ものだけ じっこうじに キャッシュする
 const PRECACHE_EXCLUDE = [/^assets\/audio\//, /^voice\//];
 
 function listFiles(dir: string): string[] {
