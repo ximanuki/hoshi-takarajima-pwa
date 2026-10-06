@@ -1,0 +1,76 @@
+{
+  "name": "chiriin-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for Japan's GSI (国土地理院) open APIs: address geocoding, hazard-map lookup (flood, storm surge, tsunami, landslide), elevation, geodesic distance, plane rectangular coordinates and geoid height. No API key required.",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "gsi",
+    "国土地理院",
+    "hazard-map",
+    "ハザードマップ",
+    "geocoding",
+    "elevation",
+    "japan",
+    "claude"
+  ],
+  "license": "MIT",
+  "author": "ximanuki",
+  "homepage": "https://github.com/ximanuki/chiriin-mcp#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ximanuki/chiriin-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ximanuki/chiriin-mcp/issues"
+  },
+  "type": "module",
+  "bin": {
+    "chiriin-mcp": "dist/index.js"
+  },
+  "main": "dist/server.js",
+  "types": "dist/server.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/server.d.ts",
+      "default": "./dist/server.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist/**/*.js",
+    "dist/**/*.d.ts",
+    "README.md",
+    "README.en.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "prebuild": "npm run clean",
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "smoke": "node scripts/smoke.mjs",
+    "record-fixtures": "node scripts/record-fixtures.mjs",
+    "start": "node dist/index.js",
+    "start:http": "node dist/index.js --http",
+    "prepublishOnly": "npm run lint && npm run typecheck && npm test && npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.15",
+    "@types/node": "^22.20.5",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.3"
+  }
+}
