@@ -1,0 +1,16 @@
+{
+  "mhlw_model_shugyo_kisoku_r0712.pdf": {
+    "doc_id": "mhlw-model-rules",
+    "title": "モデル就業規則（令和7年12月版）",
+    "source_url": "https://www.mhlw.go.jp/content/001620507.pdf",
+    "license": "公共データ利用規約（第1.0版）(PDL1.0) — CC BY 4.0 互換",
+    "attribution": "出典：厚生労働省「モデル就業規則」（令和7年12月版）（https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/roudoukijun/zigyonushi/model/index.html）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）。本アプリはこれを加工（テキスト抽出・分割）して利用しています。"
+  },
+  "sample_keihi_kitei.md": {
+    "doc_id": "sample-expense-rules",
+    "title": "経費精算・出張旅費規程（架空のサンプル）",
+    "source_url": null,
+    "license": "本リポジトリと同じ条件（作者が作成した架空の文書）",
+    "attribution": "デモ用に作成した架空の社内規程"
+  }
+}

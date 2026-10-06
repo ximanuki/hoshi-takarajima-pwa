@@ -9,6 +9,7 @@
 | [gas-inquiry-notify](gas-inquiry-notify/) | 問い合わせ・予約フォームの自動返信、Slack / Discord / Chatwork への通知、対応状況の管理と未対応リマインド、スパム判定。販売用テンプレートとしても使える | Google Apps Script |
 | [chiriin-mcp](chiriin-mcp/) | AIエージェントから国土地理院のAPIとハザードマップを使うためのMCPサーバー（OSS）。住所→座標、標高、11種類の災害リスク判定、距離・方位、平面直角座標、ジオイド高 | TypeScript / MCP SDK |
 | [scraper-books](scraper-books/) | 書籍一覧サイトを巡回して収集し、一覧と集計の Excel を出力 | Python / requests / BeautifulSoup / openpyxl |
+| [knowledge-ai](knowledge-ai/) | 「AI総務さん」: 社内規程に出典（資料・ページ・引用箇所）つきで答え、資料にないことは答えない RAG。評価セットで精度を実測 | Python / FastAPI / BM25 + multilingual-e5 / Claude API |
 
 あわせて、本リポジトリの「ほしのたからじま PWA」（オフライン対応の学習アプリ）を Webアプリの実績として使います。
 
