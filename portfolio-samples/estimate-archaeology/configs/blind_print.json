@@ -1,0 +1,44 @@
+{
+  "name": "blind-print",
+  "notes": "Written from blind/print/SCHEMA.md only (column meanings); no value of quotes.csv was looked at. Domain hints: plates = front + back colours; cards are priced per person (kinds) x cards per person; booklets have a page count; a due date gives the lead time (rush).",
+  "columns": {
+    "id": "quote_id",
+    "date": "quote_date",
+    "customer": "customer_code",
+    "rep": "rep",
+    "amount": "amount",
+    "tax_label": "tax_label",
+    "tax_amount": "tax_amount"
+  },
+  "segment": "product",
+  "customer_class": "regex(customer_code, '^(一般|[A-Za-z]+)', 1, 'その他')",
+  "revision_id_pattern": "-R\\d+$",
+  "derived": {
+    "total_qty": "quantity * kinds",
+    "plates": "num(split(colors, '/', 0, '0')) + num(split(colors, '/', 1, '0'))",
+    "lead_days": "days_between(quote_date, due_date)"
+  },
+  "categorical": [
+    "size",
+    "paper",
+    "colors",
+    "delivery"
+  ],
+  "numeric": [
+    "quantity",
+    "kinds",
+    "pages",
+    "total_qty"
+  ],
+  "text": [
+    "notes",
+    "finishing"
+  ],
+  "thresholds": [
+    "lead_days"
+  ],
+  "features": [
+    "pages * quantity * kinds",
+    "plates * kinds"
+  ]
+}

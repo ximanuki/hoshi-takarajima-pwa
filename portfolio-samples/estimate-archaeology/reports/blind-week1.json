@@ -1,0 +1,2804 @@
+{
+ "integrity": {
+  "commit": "447a2ae48985a932901ab8dcc7ca1a5fd59bbce1 2026-10-06T22:31:47+00:00 Commit blind quote datasets and sealed-answer hashes for estimate archaeology",
+  "domains": {
+   "print": {
+    "dir": "/home/user/hoshi-takarajima-pwa/portfolio-samples/estimate-archaeology/blind/print/revealed",
+    "files": [
+     {
+      "file": "generator.py",
+      "committed": "f8d3e34344edcac653ada47a3b4840075e95a04c7f985badaef2c677429e0fc9",
+      "now": "f8d3e34344edcac653ada47a3b4840075e95a04c7f985badaef2c677429e0fc9",
+      "ok": true
+     },
+     {
+      "file": "RULES.md",
+      "committed": "8661622579060b7a3e79a92c1d9fd2fbd52947b551e902730021ea0349d5d8a5",
+      "now": "8661622579060b7a3e79a92c1d9fd2fbd52947b551e902730021ea0349d5d8a5",
+      "ok": true
+     },
+     {
+      "file": "truth.csv",
+      "committed": "abca824436caa21d914a7493e9284d9c88e1bb74a77563f0d9db77be9f62b4d8",
+      "now": "abca824436caa21d914a7493e9284d9c88e1bb74a77563f0d9db77be9f62b4d8",
+      "ok": true
+     }
+    ],
+    "ok": true
+   },
+   "sign": {
+    "dir": "/home/user/hoshi-takarajima-pwa/portfolio-samples/estimate-archaeology/blind/sign/revealed",
+    "files": [
+     {
+      "file": "generator.py",
+      "committed": "4b01a47d8911effe5dbad9193ee1a947ff70b1f277bc3ebe209796c468155fe4",
+      "now": "4b01a47d8911effe5dbad9193ee1a947ff70b1f277bc3ebe209796c468155fe4",
+      "ok": true
+     },
+     {
+      "file": "RULES.md",
+      "committed": "d846583303e661d6b1a1ca1cc2beb082a0493b2a32abf7b6ae082753ab76c31c",
+      "now": "d846583303e661d6b1a1ca1cc2beb082a0493b2a32abf7b6ae082753ab76c31c",
+      "ok": true
+     },
+     {
+      "file": "truth.csv",
+      "committed": "1b4ef484a1bef222f16aefea552bc45f887d7443e306df82721ea6d9603edd52",
+      "now": "1b4ef484a1bef222f16aefea552bc45f887d7443e306df82721ea6d9603edd52",
+      "ok": true
+     },
+     {
+      "file": "messy_map.csv",
+      "committed": "056aff17d97a967c7267f84955f76209dc707833be5156c0f0e15a87083bf08e",
+      "now": "056aff17d97a967c7267f84955f76209dc707833be5156c0f0e15a87083bf08e",
+      "ok": true
+     }
+    ],
+    "ok": true
+   }
+  },
+  "history_of_folder": [
+   "fbcb22d 2026-10-07T00:25:46+00:00 Add encrypted backup of sealed blind-test answers",
+   "447a2ae 2026-10-06T22:31:47+00:00 Commit blind quote datasets and sealed-answer hashes for estimate archaeology"
+  ],
+  "solver_files_tracked": [],
+  "solver_first_file_mtime_utc": "2026-10-06T22:43:42+00:00",
+  "ok": true
+ },
+ "mapping": {
+  "print": {
+   "stale_price_table": [
+    "stale_table",
+    []
+   ],
+   "stale_customer_rate": [
+    "stale_table",
+    [
+     "copied_rate"
+    ]
+   ],
+   "copied_customer_rate": [
+    "copied_rate",
+    []
+   ],
+   "undocumented_discount": [
+    "undocumented_discount",
+    []
+   ],
+   "unrecorded_rush": [
+    "unrecorded_surcharge",
+    []
+   ],
+   "rounding_inconsistency": [
+    "rounding_inconsistency",
+    []
+   ],
+   "omitted_delivery_fee": [
+    "undocumented_discount",
+    [
+     "unexplained"
+    ]
+   ],
+   "tax_label_error": [
+    "unexplained",
+    []
+   ],
+   "quantity_entry_error": [
+    "typo",
+    [
+     "unexplained"
+    ]
+   ],
+   "digit_typo": [
+    "typo",
+    []
+   ],
+   "duplicate_entry": [
+    "revision_or_duplicate",
+    []
+   ],
+   "superseded_by_revision": [
+    "revision_or_duplicate",
+    []
+   ],
+   "negotiated_revision": [
+    "revision_or_duplicate",
+    [
+     "undocumented_discount"
+    ]
+   ],
+   "unreconcilable": [
+    "unexplained",
+    []
+   ]
+  },
+  "sign": {
+   "stale_table": [
+    "stale_table",
+    [
+     "copied_rate"
+    ]
+   ],
+   "multiplier_copy": [
+    "copied_rate",
+    []
+   ],
+   "manager_discount": [
+    "undocumented_discount",
+    []
+   ],
+   "rush_unrecorded": [
+    "unrecorded_surcharge",
+    []
+   ],
+   "rounding_inconsistent": [
+    "rounding_inconsistency",
+    []
+   ],
+   "travel_omitted": [
+    "undocumented_discount",
+    [
+     "unexplained"
+    ]
+   ],
+   "tax_label_error": [
+    "unexplained",
+    []
+   ],
+   "digit_typo": [
+    "typo",
+    []
+   ],
+   "revision_v1": [
+    "revision_or_duplicate",
+    [
+     "undocumented_discount"
+    ]
+   ],
+   "revision_v2": [
+    "revision_or_duplicate",
+    [
+     "undocumented_discount"
+    ]
+   ],
+   "duplicate": [
+    "revision_or_duplicate",
+    []
+   ],
+   "impossible": [
+    "unexplained",
+    []
+   ]
+  }
+ },
+ "official": {
+  "print": {
+   "frozen": {
+    "n": 2400,
+    "n_clean": 2245,
+    "missing_predictions": 0,
+    "accuracy": {
+     "rule_net/all": {
+      "exact": 226,
+      "100": 285,
+      "1pct": 299,
+      "n": 2400
+     },
+     "rule_net/clean": {
+      "exact": 217,
+      "100": 275,
+      "1pct": 283,
+      "n": 2245
+     },
+     "true_net/all": {
+      "exact": 230,
+      "100": 289,
+      "1pct": 302,
+      "n": 2400
+     },
+     "true_net/clean": {
+      "exact": 217,
+      "100": 275,
+      "1pct": 283,
+      "n": 2245
+     }
+    },
+    "by_segment_clean": {
+     "チラシ": {
+      "n": 782,
+      "exact": 34,
+      "1pct": 49,
+      "10pct": 274
+     },
+     "リーフレット": {
+      "n": 312,
+      "exact": 23,
+      "1pct": 34,
+      "10pct": 164
+     },
+     "冊子": {
+      "n": 242,
+      "exact": 55,
+      "1pct": 65,
+      "10pct": 106
+     },
+     "名刺": {
+      "n": 583,
+      "exact": 64,
+      "1pct": 81,
+      "10pct": 273
+     },
+     "封筒": {
+      "n": 326,
+      "exact": 41,
+      "1pct": 54,
+      "10pct": 198
+     }
+    },
+    "status": {
+     "abstained": 2169,
+     "reproduced": 231
+    },
+    "reproduced": {
+     "n": 231,
+     "clean": 217,
+     "nonclean_conforming": 6,
+     "nonclean_deviating": 8,
+     "pred_equals_rule_net": 223,
+     "examples_absorbed": [
+      [
+       "Q2305-002",
+       "stale_price_table",
+       "priced with period-0 tables after revision",
+       45500,
+       46500
+      ],
+      [
+       "Q2402-026",
+       "stale_customer_rate",
+       "old customer rate 1.00 used",
+       14000,
+       13500
+      ],
+      [
+       "Q2404-001",
+       "stale_customer_rate",
+       "old customer rate 1.00 used",
+       124000,
+       117500
+      ],
+      [
+       "Q2408-010",
+       "stale_price_table",
+       "priced with period-1 tables after revision",
+       69870,
+       76100
+      ],
+      [
+       "Q2409-019",
+       "stale_customer_rate",
+       "old customer rate 0.80 used",
+       43500,
+       46000
+      ],
+      [
+       "Q2411-020",
+       "undocumented_discount",
+       "minus_5pct: 29000 -> 27500",
+       27500,
+       29000
+      ],
+      [
+       "Q2412-002",
+       "tax_label_error",
+       "double_tax",
+       13200,
+       12000
+      ],
+      [
+       "Q2509-010",
+       "undocumented_discount",
+       "floor_1000: 18500 -> 18000",
+       18000,
+       18500
+      ]
+     ]
+    },
+    "detection": {
+     "nonclean_all": {
+      "positives": 155,
+      "flagged": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 155,
+      "precision": null,
+      "recall": 0.0
+     },
+     "nonclean_deviating": {
+      "positives": 128,
+      "flagged": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 128,
+      "precision": null,
+      "recall": 0.0
+     }
+    },
+    "class_accuracy": {
+     "flagged_true": 0,
+     "strict": 0,
+     "lenient": 0,
+     "deviation_only_n": 0,
+     "deviation_only_strict": 0,
+     "confusion": {}
+    },
+    "false_accusations": {
+     "n": 0,
+     "by_class": {},
+     "clean_unexplained": 0,
+     "examples": []
+    },
+    "abstentions": {
+     "n": 2169,
+     "clean": 2028,
+     "nonclean": 141,
+     "reasons": {
+      "規則不足のため判定停止（全体の再現率 # < #）": 2169
+     }
+    },
+    "reading_clean": {
+     "n": 2245,
+     "obs_equals_true_net": 2117
+    }
+   },
+   "assisted": {
+    "n": 2400,
+    "n_clean": 2245,
+    "missing_predictions": 0,
+    "accuracy": {
+     "rule_net/all": {
+      "exact": 469,
+      "100": 537,
+      "1pct": 583,
+      "n": 2400
+     },
+     "rule_net/clean": {
+      "exact": 455,
+      "100": 520,
+      "1pct": 563,
+      "n": 2245
+     },
+     "true_net/all": {
+      "exact": 470,
+      "100": 536,
+      "1pct": 582,
+      "n": 2400
+     },
+     "true_net/clean": {
+      "exact": 455,
+      "100": 520,
+      "1pct": 563,
+      "n": 2245
+     }
+    },
+    "by_segment_clean": {
+     "チラシ": {
+      "n": 782,
+      "exact": 120,
+      "1pct": 167,
+      "10pct": 392
+     },
+     "リーフレット": {
+      "n": 312,
+      "exact": 57,
+      "1pct": 82,
+      "10pct": 219
+     },
+     "冊子": {
+      "n": 242,
+      "exact": 51,
+      "1pct": 61,
+      "10pct": 133
+     },
+     "名刺": {
+      "n": 583,
+      "exact": 169,
+      "1pct": 181,
+      "10pct": 335
+     },
+     "封筒": {
+      "n": 326,
+      "exact": 58,
+      "1pct": 72,
+      "10pct": 216
+     }
+    },
+    "status": {
+     "abstained": 1933,
+     "reproduced": 467
+    },
+    "reproduced": {
+     "n": 467,
+     "clean": 455,
+     "nonclean_conforming": 4,
+     "nonclean_deviating": 8,
+     "pred_equals_rule_net": 459,
+     "examples_absorbed": [
+      [
+       "Q2303-005",
+       "rounding_inconsistency",
+       "rounded with half_up_100 instead of floor-10",
+       27200,
+       27180
+      ],
+      [
+       "Q2308-002",
+       "omitted_delivery_fee",
+       "delivery fee 1300 not added",
+       49500,
+       51000
+      ],
+      [
+       "Q2312-022",
+       "copied_customer_rate",
+       "rate 0.80 copied from previous quote for D01",
+       14500,
+       18000
+      ],
+      [
+       "Q2401-022",
+       "omitted_delivery_fee",
+       "delivery fee 1500 not added",
+       5000,
+       6500
+      ],
+      [
+       "Q2402-026",
+       "stale_customer_rate",
+       "old customer rate 1.00 used",
+       14000,
+       13500
+      ],
+      [
+       "Q2404-001",
+       "stale_customer_rate",
+       "old customer rate 1.00 used",
+       124000,
+       117500
+      ],
+      [
+       "Q2405-001",
+       "stale_customer_rate",
+       "old customer rate 1.00 used",
+       155000,
+       147000
+      ],
+      [
+       "Q2503-044-R2",
+       "negotiated_revision",
+       "price cut on re-issue: 56000 -> 53000",
+       53000,
+       56000
+      ]
+     ]
+    },
+    "detection": {
+     "nonclean_all": {
+      "positives": 155,
+      "flagged": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 155,
+      "precision": null,
+      "recall": 0.0
+     },
+     "nonclean_deviating": {
+      "positives": 128,
+      "flagged": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 128,
+      "precision": null,
+      "recall": 0.0
+     }
+    },
+    "class_accuracy": {
+     "flagged_true": 0,
+     "strict": 0,
+     "lenient": 0,
+     "deviation_only_n": 0,
+     "deviation_only_strict": 0,
+     "confusion": {}
+    },
+    "false_accusations": {
+     "n": 0,
+     "by_class": {},
+     "clean_unexplained": 0,
+     "examples": []
+    },
+    "abstentions": {
+     "n": 1933,
+     "clean": 1790,
+     "nonclean": 143,
+     "reasons": {
+      "規則不足のため判定停止（全体の再現率 # < #）": 1933
+     }
+    },
+    "reading_clean": {
+     "n": 2245,
+     "obs_equals_true_net": 2242
+    }
+   }
+  },
+  "sign": {
+   "frozen": {
+    "n": 2378,
+    "n_clean": 2225,
+    "missing_predictions": 0,
+    "accuracy": {
+     "rule_net/all": {
+      "exact": 110,
+      "100": 115,
+      "1pct": 129,
+      "n": 2378
+     },
+     "rule_net/clean": {
+      "exact": 108,
+      "100": 113,
+      "1pct": 124,
+      "n": 2225
+     },
+     "true_net/all": {
+      "exact": 110,
+      "100": 116,
+      "1pct": 128,
+      "n": 2378
+     },
+     "true_net/clean": {
+      "exact": 108,
+      "100": 113,
+      "1pct": 124,
+      "n": 2225
+     }
+    },
+    "by_segment_clean": {
+     "アルミ複合板看板": {
+      "n": 825,
+      "exact": 12,
+      "1pct": 19,
+      "10pct": 136
+     },
+     "インクジェット出力": {
+      "n": 775,
+      "exact": 71,
+      "1pct": 75,
+      "10pct": 154
+     },
+     "カルプ文字": {
+      "n": 393,
+      "exact": 16,
+      "1pct": 18,
+      "10pct": 87
+     },
+     "袖看板": {
+      "n": 232,
+      "exact": 9,
+      "1pct": 12,
+      "10pct": 55
+     }
+    },
+    "status": {
+     "abstained": 2268,
+     "reproduced": 110
+    },
+    "reproduced": {
+     "n": 110,
+     "clean": 108,
+     "nonclean_conforming": 1,
+     "nonclean_deviating": 1,
+     "pred_equals_rule_net": 109,
+     "examples_absorbed": [
+      [
+       "2507-032",
+       "stale_table",
+       "priced with table v2 instead of v3; diff=-1000",
+       14000,
+       15000
+      ]
+     ]
+    },
+    "detection": {
+     "nonclean_all": {
+      "positives": 153,
+      "flagged": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 153,
+      "precision": null,
+      "recall": 0.0
+     },
+     "nonclean_deviating": {
+      "positives": 128,
+      "flagged": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 128,
+      "precision": null,
+      "recall": 0.0
+     }
+    },
+    "class_accuracy": {
+     "flagged_true": 0,
+     "strict": 0,
+     "lenient": 0,
+     "deviation_only_n": 0,
+     "deviation_only_strict": 0,
+     "confusion": {}
+    },
+    "false_accusations": {
+     "n": 0,
+     "by_class": {},
+     "clean_unexplained": 0,
+     "examples": []
+    },
+    "abstentions": {
+     "n": 2268,
+     "clean": 2117,
+     "nonclean": 151,
+     "reasons": {
+      "規則不足のため判定停止（全体の再現率 # < #）": 2267,
+      "金額を読めない": 1
+     }
+    },
+    "reading_clean": {
+     "n": 2225,
+     "obs_equals_true_net": 2051
+    }
+   },
+   "assisted": {
+    "n": 2378,
+    "n_clean": 2225,
+    "missing_predictions": 0,
+    "accuracy": {
+     "rule_net/all": {
+      "exact": 131,
+      "100": 147,
+      "1pct": 183,
+      "n": 2378
+     },
+     "rule_net/clean": {
+      "exact": 124,
+      "100": 140,
+      "1pct": 173,
+      "n": 2225
+     },
+     "true_net/all": {
+      "exact": 135,
+      "100": 151,
+      "1pct": 186,
+      "n": 2378
+     },
+     "true_net/clean": {
+      "exact": 124,
+      "100": 140,
+      "1pct": 173,
+      "n": 2225
+     }
+    },
+    "by_segment_clean": {
+     "アルミ複合板看板": {
+      "n": 825,
+      "exact": 25,
+      "1pct": 57,
+      "10pct": 349
+     },
+     "インクジェット出力": {
+      "n": 775,
+      "exact": 75,
+      "1pct": 79,
+      "10pct": 180
+     },
+     "カルプ文字": {
+      "n": 393,
+      "exact": 10,
+      "1pct": 14,
+      "10pct": 76
+     },
+     "袖看板": {
+      "n": 232,
+      "exact": 14,
+      "1pct": 23,
+      "10pct": 132
+     }
+    },
+    "status": {
+     "abstained": 2243,
+     "reproduced": 135
+    },
+    "reproduced": {
+     "n": 135,
+     "clean": 124,
+     "nonclean_conforming": 3,
+     "nonclean_deviating": 8,
+     "pred_equals_rule_net": 127,
+     "examples_absorbed": [
+      [
+       "2304-009",
+       "manager_discount",
+       "undocumented discount 8800 (7.1%) from rule_net 123800",
+       115000,
+       123800
+      ],
+      [
+       "2310-006",
+       "multiplier_copy",
+       "multiplier 950 per mille used instead of 880; diff=13000",
+       177000,
+       164000
+      ],
+      [
+       "2402-054",
+       "revision_v1",
+       "travel fee 4000 omitted in v1; corrected in re-issued quote",
+       53000,
+       57000
+      ],
+      [
+       "2406-028",
+       "rounding_inconsistent",
+       "rounded 'halfup1000' instead of 'floor100' (pre-round 59500)",
+       60000,
+       59500
+      ],
+      [
+       "2411-028",
+       "stale_table",
+       "previous contract multiplier 880 per mille used after 2024-1",
+       27800,
+       27500
+      ],
+      [
+       "2507-032",
+       "stale_table",
+       "priced with table v2 instead of v3; diff=-1000",
+       14000,
+       15000
+      ],
+      [
+       "2509-006",
+       "manager_discount",
+       "undocumented discount 3400 (6.7%) from rule_net 50400",
+       47000,
+       50400
+      ],
+      [
+       "2509-047",
+       "rounding_inconsistent",
+       "rounded 'floor1000' instead of 'floor100' (pre-round 42800);",
+       42000,
+       42800
+      ]
+     ]
+    },
+    "detection": {
+     "nonclean_all": {
+      "positives": 153,
+      "flagged": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 153,
+      "precision": null,
+      "recall": 0.0
+     },
+     "nonclean_deviating": {
+      "positives": 128,
+      "flagged": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 128,
+      "precision": null,
+      "recall": 0.0
+     }
+    },
+    "class_accuracy": {
+     "flagged_true": 0,
+     "strict": 0,
+     "lenient": 0,
+     "deviation_only_n": 0,
+     "deviation_only_strict": 0,
+     "confusion": {}
+    },
+    "false_accusations": {
+     "n": 0,
+     "by_class": {},
+     "clean_unexplained": 0,
+     "examples": []
+    },
+    "abstentions": {
+     "n": 2243,
+     "clean": 2101,
+     "nonclean": 142,
+     "reasons": {
+      "規則不足のため判定停止（全体の再現率 # < #）": 2242,
+      "金額を読めない": 1
+     }
+    },
+    "reading_clean": {
+     "n": 2225,
+     "obs_equals_true_net": 2063
+    }
+   }
+  }
+ },
+ "rule_checks": {
+  "print": {
+   "frozen": {
+    "customer_rates": {
+     "customers": 70,
+     "ok": 26,
+     "true_not_1": 30,
+     "true_not_1_ok": 6,
+     "true_1": 40,
+     "true_1_ok": 20,
+     "mismatch_examples": [
+      [
+       "C001",
+       0.9,
+       1.0
+      ],
+      [
+       "C004",
+       1.05,
+       1.0
+      ],
+      [
+       "C006",
+       0.95,
+       1.0
+      ],
+      [
+       "C007",
+       0.95,
+       1.0
+      ],
+      [
+       "C008",
+       0.95,
+       1.0
+      ],
+      [
+       "C009",
+       0.95,
+       1.0
+      ],
+      [
+       "C012",
+       0.9,
+       1.0
+      ],
+      [
+       "C014",
+       0.9,
+       0.875
+      ],
+      [
+       "C017",
+       0.9,
+       0.995
+      ],
+      [
+       "C020",
+       1.0,
+       1.17
+      ],
+      [
+       "C021",
+       1.1,
+       1.43
+      ],
+      [
+       "C022",
+       0.95,
+       0.79
+      ]
+     ]
+    },
+    "rounding": {
+     "unit": 10,
+     "mode": "round",
+     "group_column": "rep",
+     "groups": {
+      "高橋": {
+       "unit": 500,
+       "mode": "round"
+      }
+     }
+    },
+    "min_charge": {
+     "チラシ": "要聞き取り ≤5530.0",
+     "リーフレット": "要聞き取り ≤-82485.0",
+     "冊子": "要聞き取り ≤-2511312.4",
+     "名刺": "要聞き取り ≤1192.0",
+     "封筒": "要聞き取り ≤6900.0"
+    },
+    "multipliers": {
+     "m:kw:finishing:片面PP": {
+      "0": 1.0,
+      "1": 1.1
+     },
+     "m:kw:notes:特急": {
+      "0": 1.0,
+      "1": 1.2
+     }
+    },
+    "revisions_engine": [],
+    "term_versions": [],
+    "dates_in_extension_columns": [],
+    "n_terms": 37,
+    "n_params": 125,
+    "extensions": []
+   },
+   "assisted": {
+    "customer_rates": {
+     "customers": 70,
+     "ok": 40,
+     "true_not_1": 30,
+     "true_not_1_ok": 2,
+     "true_1": 40,
+     "true_1_ok": 38,
+     "mismatch_examples": [
+      [
+       "C001",
+       0.9,
+       1.0
+      ],
+      [
+       "C004",
+       1.05,
+       1.0
+      ],
+      [
+       "C006",
+       0.95,
+       1.0
+      ],
+      [
+       "C007",
+       0.95,
+       1.0
+      ],
+      [
+       "C008",
+       0.95,
+       1.0
+      ],
+      [
+       "C009",
+       0.95,
+       1.0
+      ],
+      [
+       "C010",
+       1.0,
+       0.565
+      ],
+      [
+       "C012",
+       0.9,
+       1.0
+      ],
+      [
+       "C014",
+       0.9,
+       1.0
+      ],
+      [
+       "C017",
+       0.9,
+       1.0
+      ],
+      [
+       "C019",
+       0.95,
+       1.0
+      ],
+      [
+       "C021",
+       1.1,
+       1.025
+      ]
+     ]
+    },
+    "rounding": {
+     "unit": 10,
+     "mode": "round",
+     "group_column": "rep",
+     "groups": {
+      "高橋": {
+       "unit": 500,
+       "mode": "round"
+      }
+     }
+    },
+    "min_charge": {
+     "チラシ": 5000.0,
+     "リーフレット": "要聞き取り ≤-14224250.0",
+     "冊子": "要聞き取り ≤-19584.25",
+     "名刺": "要聞き取り ≤-353024.52",
+     "封筒": "要聞き取り ≤5180.0"
+    },
+    "multipliers": {
+     "m:kw:note_tags:#spot": {
+      "0": 1.0,
+      "1": 1.2
+     },
+     "m:kw:note_tags:#rush": {
+      "0": 1.0,
+      "1": 1.25
+     }
+    },
+    "revisions_engine": [],
+    "term_versions": [],
+    "dates_in_extension_columns": [
+     "2023-04-01",
+     "2024-07-01",
+     "2025-04-01"
+    ],
+    "n_terms": 136,
+    "n_params": 504,
+    "extensions": [
+     "10_note_tags.py",
+     "20_candidates.json"
+    ]
+   }
+  },
+  "sign": {
+   "frozen": {
+    "customer_rates": {
+     "customers": 82,
+     "ok": 49,
+     "true_not_1": 33,
+     "true_not_1_ok": 0,
+     "true_1": 49,
+     "true_1_ok": 49,
+     "mismatch_examples": [
+      [
+       "1001",
+       0.95,
+       1.0
+      ],
+      [
+       "1005",
+       0.8,
+       1.0
+      ],
+      [
+       "1007",
+       0.95,
+       1.0
+      ],
+      [
+       "1010",
+       0.95,
+       1.0
+      ],
+      [
+       "1012",
+       0.8,
+       1.0
+      ],
+      [
+       "1019",
+       0.8,
+       1.0
+      ],
+      [
+       "1020",
+       0.95,
+       1.0
+      ],
+      [
+       "1022",
+       0.95,
+       1.0
+      ],
+      [
+       "1023",
+       0.88,
+       1.0
+      ],
+      [
+       "1027",
+       0.95,
+       1.0
+      ],
+      [
+       "1030",
+       0.8,
+       1.0
+      ],
+      [
+       "1031",
+       0.95,
+       1.0
+      ]
+     ]
+    },
+    "rounding": {
+     "unit": 100,
+     "mode": "round",
+     "group_column": "rep",
+     "groups": {
+      "高橋": {
+       "unit": 10,
+       "mode": "round"
+      }
+     }
+    },
+    "min_charge": {
+     "アルミ複合板看板": "要聞き取り ≤-1174000.0",
+     "インクジェット出力": 6000.0,
+     "カルプ文字": "要聞き取り ≤-45000.0",
+     "袖看板": 165000.0
+    },
+    "multipliers": {
+     "m:kw:remarks:至急": {
+      "0": 1.0,
+      "1": 1.4
+     }
+    },
+    "revisions_engine": [],
+    "term_versions": [],
+    "dates_in_extension_columns": [],
+    "n_terms": 66,
+    "n_params": 349,
+    "extensions": []
+   },
+   "assisted": {
+    "customer_rates": {
+     "customers": 82,
+     "ok": 47,
+     "true_not_1": 33,
+     "true_not_1_ok": 0,
+     "true_1": 49,
+     "true_1_ok": 47,
+     "mismatch_examples": [
+      [
+       "1001",
+       0.95,
+       1.0
+      ],
+      [
+       "1005",
+       0.8,
+       1.0
+      ],
+      [
+       "1007",
+       0.95,
+       1.0
+      ],
+      [
+       "1010",
+       0.95,
+       1.0
+      ],
+      [
+       "1012",
+       0.8,
+       1.0
+      ],
+      [
+       "1015",
+       1.0,
+       1.2
+      ],
+      [
+       "1019",
+       0.8,
+       1.32
+      ],
+      [
+       "1020",
+       0.95,
+       1.0
+      ],
+      [
+       "1022",
+       0.95,
+       1.0
+      ],
+      [
+       "1023",
+       0.88,
+       1.0
+      ],
+      [
+       "1027",
+       0.95,
+       1.0
+      ],
+      [
+       "1030",
+       0.8,
+       1.0
+      ]
+     ]
+    },
+    "rounding": {
+     "unit": 100,
+     "mode": "floor",
+     "group_column": "rep",
+     "groups": {
+      "高橋": {
+       "unit": 10,
+       "mode": "floor"
+      }
+     }
+    },
+    "min_charge": {
+     "アルミ複合板看板": "要聞き取り ≤-215528.0",
+     "インクジェット出力": 6000.0,
+     "カルプ文字": "要聞き取り ≤10000.0",
+     "袖看板": "要聞き取り ≤75000.0"
+    },
+    "multipliers": {
+     "m:rush>=1": {
+      "0": 1.0,
+      "1": 1.3
+     },
+     "m:kw:site:浜松市天王町": {
+      "0": 1.0,
+      "1": 0.8
+     },
+     "m:night>=1": {
+      "0": 1.0,
+      "1": 1.3
+     },
+     "m:kw:site:浜松市三方原町": {
+      "0": 1.0,
+      "1": 0.7
+     },
+     "m:kw:site:崎市": {
+      "0": 1.0,
+      "1": 1.4
+     }
+    },
+    "revisions_engine": [],
+    "term_versions": [],
+    "dates_in_extension_columns": [],
+    "n_terms": 51,
+    "n_params": 131,
+    "extensions": [
+     "10_terms.json"
+    ]
+   }
+  }
+ },
+ "recovery": {
+  "print": [
+   {
+    "rule": "単価表の改定日 2023-04-01 / 2024-07-01 / 2025-04-01",
+    "frozen": "missed",
+    "assisted": "exact",
+    "evidence": "frozen: meta.revisions 空、版つきの表なし。assisted: 分析者が残差から読んだ3つの日付（3つとも正確）を price_period 列として拡張で投入し、エンジンが18項で使用。エンジン単独では見つけていない"
+   },
+   {
+    "rule": "改定の中身（用紙×1.15・×1.08、版代・通し・最低料金・端数単位などの改定、2025-04 は名刺と封筒だけ）",
+    "frozen": "missed",
+    "assisted": "approx",
+    "evidence": "assisted: price_period ごとの差額を区分ごとに当てはめたもので、単価表の改定としては読めない"
+   },
+   {
+    "rule": "製法の切替（1種類あたり1,000枚以上はオフセット。冊子は300部以上）",
+    "frozen": "approx",
+    "assisted": "missed",
+    "evidence": "frozen: チラシ『total_qty≥1000 で版数×種類×5,000』（境界は総数で近似、版代2,500＋通し2,000に近い値）。assisted: 該当する境界なし"
+   },
+   {
+    "rule": "オフセットの積算（版代・通し・用紙250枚単位・断裁）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "assisted は分析者の sheets（全判換算の通し）を候補にしたが、係数は打ち消し合う値で積算にならない"
+   },
+   {
+    "rule": "オンデマンドの積算（クリックの段階、データ処理料、前回同様で免除）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "対応する項なし"
+   },
+   {
+    "rule": "折り加工（二つ折／三つ折・Z折）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "assisted は語を候補にしたが採用されず"
+   },
+   {
+    "rule": "片面PP（チラシ：3,000円＋A4換算単価）",
+    "frozen": "approx",
+    "assisted": "missed",
+    "evidence": "frozen: 片面PP で ×1.1 の掛率（語は正しく、形が違う）。assisted: チラシには項なし"
+   },
+   {
+    "rule": "冊子の積算・製本（台数、製本の段取り＋部数単価）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "pages・quantity の表は ±百万円規模の打ち消し合い"
+   },
+   {
+    "rule": "封筒（箱単位の用紙、版・通し、角2は×1.5）",
+    "frozen": "approx",
+    "assisted": "missed",
+    "evidence": "frozen: 『1,000枚ごとの箱数×用紙別単価』（白ケント80g 5,000、クラフト85g 11,500 など。真値は長3/洋長3 1,000枚箱、角2 500枚箱、改定あり）。assisted: 箱の構造なし"
+   },
+   {
+    "rule": "名刺の基本（1箱目＋追加箱、色数別）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "frozen: 人数×数量別の表（100枚 2,300 …）と色数別の枚数単価で、正常見積の±1%一致は1割台。assisted: kinds と persons_eff に ±40万円の打ち消し合う係数"
+   },
+   {
+    "rule": "名刺の人数段階（6〜10人目90%、11人目〜80%）",
+    "frozen": "missed",
+    "assisted": "approx",
+    "evidence": "assisted: 分析者の persons_eff（min(k,5)+0.9×…+0.8×…）は正確な式だが、エンジンは kinds と打ち消し合う係数で使い、6人以上の正常見積85件のうち円単位の一致は8件（frozen は12件）。frozen: なし"
+   },
+   {
+    "rule": "名刺の片面PP（1箱あたり+600円）",
+    "frozen": "missed",
+    "assisted": "exact",
+    "evidence": "assisted: 片面PP で persons_eff×枚数×6円（=100枚あたり600円、掛率の対象）"
+   },
+   {
+    "rule": "名刺の特殊紙（1箱あたり+300円）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "用紙別の表は打ち消し合う大きな値"
+   },
+   {
+    "rule": "名刺の角丸（1人あたり+500円）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "assisted: 角丸で max(人数,7)×200＋版数×人数×100。値も形も違う"
+   },
+   {
+    "rule": "名刺の新規デザイン（3,000円＋500円×(人数−1)）",
+    "frozen": "approx",
+    "assisted": "approx",
+    "evidence": "frozen: 『新規』で一律3,000円（掛率対象外）＝1人の場合だけ一致。assisted: 1,000円×掛率＋2,000円×persons_eff"
+   },
+   {
+    "rule": "名刺の修正料 1,000円（『修正なし』『肩書変更あり』は対象外）",
+    "frozen": "missed",
+    "assisted": "exact",
+    "evidence": "assisted: 分析者のタグ #fix（データ修正/文字修正/修正あり）で 1,000円、掛率の対象外"
+   },
+   {
+    "rule": "名刺以外の修正料 3,000円→2024-07以降3,500円",
+    "frozen": "missed",
+    "assisted": "approx",
+    "evidence": "assisted: #fix でチラシ 3,500円×種類数、リーフレット 6,000円×種類数−1.3円×枚数、冊子はページ数比例。改定なし"
+   },
+   {
+    "rule": "特色・DIC（オフセットと封筒で4,000円）",
+    "frozen": "approx",
+    "assisted": "approx",
+    "evidence": "frozen: 封筒だけ『DIC』で4,000円×種類数。assisted: #spot（DIC/特色）で ×1.2 の掛率"
+   },
+   {
+    "rule": "色校（オフセット8,000円、オンデマンド1,500円）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "対応する項なし"
+   },
+   {
+    "rule": "帯掛（1,000部ごとに400円）",
+    "frozen": "missed",
+    "assisted": "approx",
+    "evidence": "assisted: 分析者の bundles（『N枚ごと』の束数）×360円。語は正しく、単位が違う"
+   },
+   {
+    "rule": "特急（『特急』のみ、最低料金後の+25%）",
+    "frozen": "approx",
+    "assisted": "exact",
+    "evidence": "frozen: 『特急』で ×1.2。assisted: #rush（特急のみ）で ×1.25"
+   },
+   {
+    "rule": "得意先ごとの掛率（0.75〜1.10）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "掛率が1.0でない30得意先のうち一致は frozen 6（G区分0.90の5校と C019）、assisted 2（C036、G07）。frozen は D区分を1.10（真値0.75〜0.85）、K区分を0.80（真値1.00）とした"
+   },
+   {
+    "rule": "掛率の変更（C003 2024-01-01、D02 2024-07-01）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "掛率表に版なし"
+   },
+   {
+    "rule": "掛率は加工・配送などの加算に掛からない",
+    "frozen": "approx",
+    "assisted": "approx",
+    "evidence": "一部の項は『掛率の後に加算』だが、どの項かは真の構造と対応しない"
+   },
+   {
+    "rule": "最低料金 5,000円→2024-07以降5,500円（名刺を除く。掛率の後）",
+    "frozen": "missed",
+    "assisted": "approx",
+    "evidence": "チラシで68件発動。frozen: 全区分『要聞き取り（発動例なし）』で、チラシの上限5,530円は真値を含むが『発動例なし』は誤り。assisted: チラシ5,000円（P0〜P1は正確、5,500円への改定なし）"
+   },
+   {
+    "rule": "名刺には最低料金がない",
+    "frozen": "flagged",
+    "assisted": "flagged",
+    "evidence": "両方とも『要聞き取り（発動例なし）』で、真値（なし）と矛盾しない（assisted の上限は負の値で、自分の誤った予測から計算されている）"
+   },
+   {
+    "rule": "封筒の最低料金 5,000→5,500円（履歴では発動しない）",
+    "frozen": "flagged",
+    "assisted": "missed",
+    "evidence": "frozen: 上限6,900円で真値を含む。assisted: 上限5,180円で、2024-07以降の5,500円を含まない"
+   },
+   {
+    "rule": "リーフレット・冊子の最低料金（履歴では発動しない）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "上限が負の値（自分の誤った予測から計算）で、真値と矛盾"
+   },
+   {
+    "rule": "配送料（市内800円・小計1万円以上無料、市外1,500円・3万円以上無料、引取0円）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "配送区分の定数と係数はあるが無料になる境界がない（assisted の分析メモは境界に気づいたが、文法で表せない）"
+   },
+   {
+    "rule": "県外の重量制（1kg以下はメール便、超えると15kgごとの箱）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "対応する項なし"
+   },
+   {
+    "rule": "端数処理（10円未満切り捨て→2024-07以降100円未満切り捨て）",
+    "frozen": "approx",
+    "assisted": "approx",
+    "evidence": "両方『10円未満四捨五入』。単位は前半だけ正しく、方式（切り捨て）と100円への変更が違う"
+   },
+   {
+    "rule": "高橋の癖（1万円以上は500円未満切り捨て）",
+    "frozen": "approx",
+    "assisted": "approx",
+    "evidence": "両方『高橋は500円未満四捨五入』。単位は正しく、方式と1万円の条件が違う"
+   },
+   {
+    "rule": "税表示（インボイス前、空欄は C/D=税抜・G/K/一般=税込）",
+    "frozen": "missed",
+    "assisted": "approx",
+    "evidence": "frozen: 規則はなく、見積ごとに整合する読みを選ぶ。空欄の正常見積371件のうち128件を誤読。assisted: 分析者の式で C/D=税抜・K/一般=税込（G は未指定）、誤読3件（すべて G）"
+   }
+  ],
+  "sign": [
+   {
+    "rule": "改定日 2023-05-01 / 2024-04-01 / 2025-07-01",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "両方とも meta.revisions 空、版つきの表なし"
+   },
+   {
+    "rule": "改定の猶予（常連・1023・1041 は 2024-05-31 まで旧表）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "対応する項なし"
+   },
+   {
+    "rule": "得意先区分の掛率（常連0.95、同業0.80、1023 0.88→0.85、1041 0.90）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "frozen: 得意先の掛率なし。assisted: 1015 ×1.2、1019 ×1.32、1048 ×1.1（真値は1.0、0.8、1.0）"
+   },
+   {
+    "rule": "掛率は製品小計だけに掛かる",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "掛率がないため該当なし"
+   },
+   {
+    "rule": "1077 は出張費なし",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "対応する項なし"
+   },
+   {
+    "rule": "アルミ複合板の材料（3×6／4×8 の板取り、超える場合は継ぎ）",
+    "frozen": "missed",
+    "assisted": "approx",
+    "evidence": "assisted: 分析者の board36／board48／board_over をエンジンが採用。単価 6,200／11,000（真値 5,200→6,400／9,800→12,000、改定なし）、継ぎは 30,000×枚数"
+   },
+   {
+    "rule": "アルミ複合板の出力（0.1m²切り上げ・最低0.3m²、面数、10m²/30m²の数量割引）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "assisted: ceil(面積,0.1)×13,000 と 面積×(−12,000) の打ち消し合い。面数は片面/両面で符号の違う面積単価"
+   },
+   {
+    "rule": "加工費（1枚あたり1,200→1,500円、角R+400、穴あけ+300）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "対応する項なし"
+   },
+   {
+    "rule": "セットアップ（アルミ・IJ 2,000円、カルプ 3,000→3,500円。リピートで免除）",
+    "frozen": "missed",
+    "assisted": "approx",
+    "evidence": "assisted: アルミの固定 2,000円は正しいが、リピート免除（『前回』のフラグは作られたが未使用）なし"
+   },
+   {
+    "rule": "インクジェットのロール幅課金（短辺900mm超は1.37m幅×長さ）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "対応する項なし"
+   },
+   {
+    "rule": "インクジェットのメディア単価・ラミネート・20/50m²の数量割引",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "frozen: メディア別はターポリンだけ、値は無関係。assisted: 面積単価なし"
+   },
+   {
+    "rule": "ハトメ（ターポリン、500mmごと）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "assisted: 分析者の eyelets を候補にしたが採用されず"
+   },
+   {
+    "rule": "カルプ文字（文字高の段階、厚み・仕上げの係数、10円切り上げ）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "frozen: 文字高×文字数（100mm単位）×1,000円＋固定230,000−施工200,000 など。assisted: 厚み30mmだけ文字高×文字数×10円"
+   },
+   {
+    "rule": "カルプ文字の21文字目以降15%引き",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "対応する項なし"
+   },
+   {
+    "rule": "袖看板（サイズ区分の表、大型は0.5m²ごと、LED内照）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "frozen: 面積の連続式と『最低料金165,000円』（真の区分表にない値）。assisted: 面積値ごとの表（打ち消し合い）"
+   },
+   {
+    "rule": "製品の最低料金 5,000円→2024-04以降6,000円",
+    "frozen": "approx",
+    "assisted": "approx",
+    "evidence": "履歴で発動するのはインクジェットだけ（168件、うち95件が6,000円）。両方ともインクジェット6,000円（改定前の5,000円なし）"
+   },
+   {
+    "rule": "カルプ文字・袖看板の最低料金（履歴では発動しない）",
+    "frozen": "missed",
+    "assisted": "flagged",
+    "evidence": "frozen: カルプの上限は負の値、袖看板は最低料金165,000円と断定（真の表にない値）。assisted: カルプ ≤10,000円・袖看板 ≤75,000円で、真値を含む"
+   },
+   {
+    "rule": "アルミ複合板の最低料金（履歴では発動しない）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "上限が負の値（自分の誤った予測から計算）"
+   },
+   {
+    "rule": "特急・至急（製品額の30%、最低3,000円）",
+    "frozen": "approx",
+    "assisted": "approx",
+    "evidence": "frozen: 『至急』だけ ×1.4（『特急』のフラグは未使用）。assisted: 分析者の rush（特急/至急）で ×1.3。最低3,000円と『製品額だけ』の範囲はなし"
+   },
+   {
+    "rule": "デザイン料（修正3,000円、新規は品目別 10,000/6,000/8,000/15,000）",
+    "frozen": "approx",
+    "assisted": "approx",
+    "evidence": "design 列で項は立つが値が違う（例: frozen IJ 修正8,000・新規10,000、assisted アルミ 新規10,000（正しい）＋面積比例の項）"
+   },
+   {
+    "rule": "施工費（品目別の基本、最低12,000→15,000円）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "installed／install_qty の定数は真の式と対応しない"
+   },
+   {
+    "rule": "夜間（施工費の50%増）",
+    "frozen": "missed",
+    "assisted": "approx",
+    "evidence": "assisted: 分析者の night で ×1.3（全体に掛かる）"
+   },
+   {
+    "rule": "高所（2m／4m／9m の段階）",
+    "frozen": "approx",
+    "assisted": "approx",
+    "evidence": "frozen: 4.5m以上（=4m超）でアルミ+20,000・袖+10,000、カルプは3.5m以上。assisted: アルミ 2.2m以上（=2m超）+10,000（2024-04以降の値と一致）、4.5m以上でさらに+30,000、カルプ4m以上。9m超の段階はなし"
+   },
+   {
+    "rule": "電気工事（LED袖看板の施工で18,000→22,000円）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "対応する項なし"
+   },
+   {
+    "rule": "撤去15,000→18,000円・処分5,000円（『撤去は別途』『処分不要』は除外）",
+    "frozen": "missed",
+    "assisted": "approx",
+    "evidence": "frozen: 撤去・処分のフラグは作られたが未使用。assisted: 分析者の removal でアルミ+10,000・IJ+20,000、処分は未使用"
+   },
+   {
+    "rule": "現地調査 5,000→6,000円（＋出張費）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "assisted: 『現地調査』と survey のフラグは作られたが未使用"
+   },
+   {
+    "rule": "出張費（現場までの距離帯、施工または現調のとき）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "frozen: 市町村別の定数（袋井市 690,000 など）。assisted: 町名の語に ×0.7〜×1.4 の掛率など"
+   },
+   {
+    "rule": "担当者別の端数処理（田中 3万円以上は1,000円切り捨て、渡辺 100円四捨五入、高橋 2024-06まで10円）",
+    "frozen": "approx",
+    "assisted": "approx",
+    "evidence": "frozen: 100円四捨五入・高橋10円四捨五入。assisted: 100円切り捨て・高橋10円切り捨て（佐藤・鈴木・田中の3万円未満と高橋の前半は正しい）。田中の1,000円・渡辺の四捨五入・高橋の切替はなし"
+   },
+   {
+    "rule": "税込見積（インボイス前は税込額を100円未満切り捨て）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "対応する処理なし（assisted の分析メモは指摘）。インボイス前の税込の正常見積129件のうち78件で税抜額を読み違える"
+   },
+   {
+    "rule": "税表示の空欄（渡辺など。空欄はすべて税抜）",
+    "frozen": "missed",
+    "assisted": "missed",
+    "evidence": "規則はなく見積ごとに読みを選ぶ。空欄の正常見積185件のうち frozen 96件、assisted 84件を税込と誤読"
+   }
+  ]
+ },
+ "scored_files": {
+  "runs/frozen/print/predictions.csv": {
+   "sha256": "1a758adac930ed3ba7c2a3d6c30206803d1339bda071db6354f0ef1ab78a998c",
+   "mtime_utc": "2026-10-07T06:59:23+00:00"
+  },
+  "runs/frozen/print/rules.json": {
+   "sha256": "a9776c2759f249a4eba5e1939ee03ca807989384c29af20e7841be9b6b2f33b6",
+   "mtime_utc": "2026-10-07T06:59:23+00:00"
+  },
+  "runs/assisted/print/predictions.csv": {
+   "sha256": "6aabc6542709c5f66705ae512d704a18096ab261ce13c01f795516a813f99c34",
+   "mtime_utc": "2026-10-07T09:50:34+00:00"
+  },
+  "runs/assisted/print/rules.json": {
+   "sha256": "096f6869e51a599423fbaf9eb76be61df6b0f5452c6d0906997b882538a83f2b",
+   "mtime_utc": "2026-10-07T09:50:34+00:00"
+  },
+  "runs/frozen/sign/predictions.csv": {
+   "sha256": "803b28f21fbcefa651425384b353d6ae791157e13dc5bc3f0f17b19563598756",
+   "mtime_utc": "2026-10-07T07:14:20+00:00"
+  },
+  "runs/frozen/sign/rules.json": {
+   "sha256": "7f0dd2b0f72fc8c8501768780364188ac5e76b320da6c40a641e5189db83d926",
+   "mtime_utc": "2026-10-07T07:14:20+00:00"
+  },
+  "runs/assisted/sign/predictions.csv": {
+   "sha256": "b741c1e14d90483b407448482e789166e4766dce067d101f37850d9e997b03a7",
+   "mtime_utc": "2026-10-07T12:36:25+00:00"
+  },
+  "runs/assisted/sign/rules.json": {
+   "sha256": "5de8079c86a70f448aa9e73ac4b0db48afdc38ca884df9f035ab11ed0b3e4f09",
+   "mtime_utc": "2026-10-07T12:36:25+00:00"
+  }
+ },
+ "truth_summary": {
+  "print": {
+   "n": 2400,
+   "clean": 2245,
+   "nonclean": 155,
+   "nonclean_conforming": 27,
+   "quirks": {
+    "clean": 2245,
+    "quantity_entry_error": 5,
+    "copied_customer_rate": 12,
+    "unrecorded_rush": 12,
+    "undocumented_discount": 18,
+    "omitted_delivery_fee": 6,
+    "rounding_inconsistency": 15,
+    "digit_typo": 8,
+    "superseded_by_revision": 18,
+    "negotiated_revision": 9,
+    "unreconcilable": 7,
+    "duplicate_entry": 9,
+    "stale_price_table": 24,
+    "tax_label_error": 7,
+    "stale_customer_rate": 5
+   }
+  },
+  "sign": {
+   "n": 2378,
+   "clean": 2225,
+   "nonclean": 153,
+   "nonclean_conforming": 25,
+   "quirks": {
+    "clean": 2225,
+    "duplicate": 8,
+    "manager_discount": 20,
+    "travel_omitted": 10,
+    "revision_v1": 12,
+    "revision_v2": 12,
+    "impossible": 6,
+    "rounding_inconsistent": 15,
+    "tax_label_error": 8,
+    "multiplier_copy": 14,
+    "stale_table": 26,
+    "digit_typo": 10,
+    "rush_unrecorded": 12
+   }
+  }
+ },
+ "threshold0": {
+  "print": {
+   "frozen": {
+    "n": 2400,
+    "n_clean": 2245,
+    "missing_predictions": 0,
+    "accuracy": {
+     "rule_net/all": {
+      "exact": 226,
+      "100": 285,
+      "1pct": 299,
+      "n": 2400
+     },
+     "rule_net/clean": {
+      "exact": 217,
+      "100": 275,
+      "1pct": 283,
+      "n": 2245
+     },
+     "true_net/all": {
+      "exact": 230,
+      "100": 289,
+      "1pct": 302,
+      "n": 2400
+     },
+     "true_net/clean": {
+      "exact": 217,
+      "100": 275,
+      "1pct": 283,
+      "n": 2245
+     }
+    },
+    "by_segment_clean": {
+     "チラシ": {
+      "n": 782,
+      "exact": 34,
+      "1pct": 49,
+      "10pct": 274
+     },
+     "リーフレット": {
+      "n": 312,
+      "exact": 23,
+      "1pct": 34,
+      "10pct": 164
+     },
+     "冊子": {
+      "n": 242,
+      "exact": 55,
+      "1pct": 65,
+      "10pct": 106
+     },
+     "名刺": {
+      "n": 583,
+      "exact": 64,
+      "1pct": 81,
+      "10pct": 273
+     },
+     "封筒": {
+      "n": 326,
+      "exact": 41,
+      "1pct": 54,
+      "10pct": 198
+     }
+    },
+    "status": {
+     "abstained": 1939,
+     "deviation": 98,
+     "unexplained": 132,
+     "reproduced": 231
+    },
+    "reproduced": {
+     "n": 231,
+     "clean": 217,
+     "nonclean_conforming": 6,
+     "nonclean_deviating": 8,
+     "pred_equals_rule_net": 223,
+     "examples_absorbed": [
+      [
+       "Q2305-002",
+       "stale_price_table",
+       "priced with period-0 tables after revision",
+       45500,
+       46500
+      ],
+      [
+       "Q2402-026",
+       "stale_customer_rate",
+       "old customer rate 1.00 used",
+       14000,
+       13500
+      ],
+      [
+       "Q2404-001",
+       "stale_customer_rate",
+       "old customer rate 1.00 used",
+       124000,
+       117500
+      ],
+      [
+       "Q2408-010",
+       "stale_price_table",
+       "priced with period-1 tables after revision",
+       69870,
+       76100
+      ],
+      [
+       "Q2409-019",
+       "stale_customer_rate",
+       "old customer rate 0.80 used",
+       43500,
+       46000
+      ],
+      [
+       "Q2411-020",
+       "undocumented_discount",
+       "minus_5pct: 29000 -> 27500",
+       27500,
+       29000
+      ],
+      [
+       "Q2412-002",
+       "tax_label_error",
+       "double_tax",
+       13200,
+       12000
+      ],
+      [
+       "Q2509-010",
+       "undocumented_discount",
+       "floor_1000: 18500 -> 18000",
+       18000,
+       18500
+      ]
+     ]
+    },
+    "detection": {
+     "nonclean_all": {
+      "positives": 155,
+      "flagged": 230,
+      "tp": 17,
+      "fp": 213,
+      "fn": 138,
+      "precision": 0.07391304347826087,
+      "recall": 0.10967741935483871
+     },
+     "nonclean_deviating": {
+      "positives": 128,
+      "flagged": 230,
+      "tp": 15,
+      "fp": 215,
+      "fn": 113,
+      "precision": 0.06521739130434782,
+      "recall": 0.1171875
+     }
+    },
+    "class_accuracy": {
+     "flagged_true": 17,
+     "strict": 3,
+     "lenient": 3,
+     "deviation_only_n": 6,
+     "deviation_only_strict": 2,
+     "confusion": {
+      "stale_price_table -> unexplained": 3,
+      "digit_typo -> unexplained": 2,
+      "unrecorded_rush -> unexplained": 2,
+      "rounding_inconsistency -> undocumented_discount": 1,
+      "undocumented_discount -> undocumented_discount": 1,
+      "duplicate_entry -> unexplained": 1,
+      "stale_customer_rate -> unrecorded_surcharge": 1,
+      "duplicate_entry -> revision_or_duplicate": 1,
+      "tax_label_error -> unrecorded_surcharge": 1,
+      "rounding_inconsistency -> unrecorded_surcharge": 1,
+      "undocumented_discount -> unexplained": 1,
+      "rounding_inconsistency -> unexplained": 1,
+      "unreconcilable -> unexplained": 1
+     }
+    },
+    "false_accusations": {
+     "n": 92,
+     "by_class": {
+      "undocumented_discount": 45,
+      "rounding_inconsistency": 10,
+      "unrecorded_surcharge": 19,
+      "copied_rate": 15,
+      "typo": 2,
+      "revision_or_duplicate": 1
+     },
+     "clean_unexplained": 121,
+     "examples": [
+      [
+       "Q2210-005",
+       "冊子",
+       "undocumented_discount",
+       44020,
+       40400,
+       "規則の金額 44,020円 を 40,400円 に端数調整（3,620円 引き）、条件の記録なし"
+      ],
+      [
+       "Q2210-021",
+       "名刺",
+       "undocumented_discount",
+       23500,
+       21500,
+       "規則の金額 23,500円 から 7% 引き（21,500円）、条件の記録なし"
+      ],
+      [
+       "Q2210-059",
+       "名刺",
+       "rounding_inconsistency",
+       9780,
+       9800,
+       "100円未満を四捨五入にすると一致（規則は 10円未満四捨五入）"
+      ],
+      [
+       "Q2211-051",
+       "名刺",
+       "undocumented_discount",
+       4970,
+       4600,
+       "規則の金額 4,970円 を 4,600円 に端数調整（370円 引き）、条件の記録なし"
+      ],
+      [
+       "Q2212-055",
+       "名刺",
+       "unrecorded_surcharge",
+       8000,
+       9700,
+       "規則の金額 8,000円 に 1,700円 の上乗せ。同じ上乗せが条件の記録なしで 4 件"
+      ],
+      [
+       "Q2301-012",
+       "冊子",
+       "undocumented_discount",
+       63500,
+       57000,
+       "規則の金額 63,500円 を 57,000円 に端数調整（6,500円 引き）、条件の記録なし"
+      ],
+      [
+       "Q2301-021",
+       "名刺",
+       "copied_rate",
+       12500,
+       10500,
+       "得意先 C022 の掛率 0.79 を当てると一致（この得意先の掛率は 1）"
+      ],
+      [
+       "Q2303-021",
+       "冊子",
+       "copied_rate",
+       25000,
+       23500,
+       "区分 G の掛率 0.9 を当てると一致（この得意先の掛率は 0.84）"
+      ]
+     ]
+    },
+    "abstentions": {
+     "n": 1939,
+     "clean": 1815,
+     "nonclean": 124,
+     "reasons": {
+      "同じ条件の組み合わせの再現率が低い（#、#件）": 1718,
+      "履歴で確定できないパラメータを使う見積（要聞き取り）": 221
+     }
+    },
+    "reading_clean": {
+     "n": 2245,
+     "obs_equals_true_net": 2117
+    }
+   },
+   "assisted": {
+    "n": 2400,
+    "n_clean": 2245,
+    "missing_predictions": 0,
+    "accuracy": {
+     "rule_net/all": {
+      "exact": 469,
+      "100": 537,
+      "1pct": 583,
+      "n": 2400
+     },
+     "rule_net/clean": {
+      "exact": 455,
+      "100": 520,
+      "1pct": 563,
+      "n": 2245
+     },
+     "true_net/all": {
+      "exact": 470,
+      "100": 536,
+      "1pct": 582,
+      "n": 2400
+     },
+     "true_net/clean": {
+      "exact": 455,
+      "100": 520,
+      "1pct": 563,
+      "n": 2245
+     }
+    },
+    "by_segment_clean": {
+     "チラシ": {
+      "n": 782,
+      "exact": 120,
+      "1pct": 167,
+      "10pct": 392
+     },
+     "リーフレット": {
+      "n": 312,
+      "exact": 57,
+      "1pct": 82,
+      "10pct": 219
+     },
+     "冊子": {
+      "n": 242,
+      "exact": 51,
+      "1pct": 61,
+      "10pct": 133
+     },
+     "名刺": {
+      "n": 583,
+      "exact": 169,
+      "1pct": 181,
+      "10pct": 335
+     },
+     "封筒": {
+      "n": 326,
+      "exact": 58,
+      "1pct": 72,
+      "10pct": 216
+     }
+    },
+    "status": {
+     "unexplained": 819,
+     "abstained": 569,
+     "reproduced": 467,
+     "deviation": 545
+    },
+    "reproduced": {
+     "n": 467,
+     "clean": 455,
+     "nonclean_conforming": 4,
+     "nonclean_deviating": 8,
+     "pred_equals_rule_net": 459,
+     "examples_absorbed": [
+      [
+       "Q2303-005",
+       "rounding_inconsistency",
+       "rounded with half_up_100 instead of floor-10",
+       27200,
+       27180
+      ],
+      [
+       "Q2308-002",
+       "omitted_delivery_fee",
+       "delivery fee 1300 not added",
+       49500,
+       51000
+      ],
+      [
+       "Q2312-022",
+       "copied_customer_rate",
+       "rate 0.80 copied from previous quote for D01",
+       14500,
+       18000
+      ],
+      [
+       "Q2401-022",
+       "omitted_delivery_fee",
+       "delivery fee 1500 not added",
+       5000,
+       6500
+      ],
+      [
+       "Q2402-026",
+       "stale_customer_rate",
+       "old customer rate 1.00 used",
+       14000,
+       13500
+      ],
+      [
+       "Q2404-001",
+       "stale_customer_rate",
+       "old customer rate 1.00 used",
+       124000,
+       117500
+      ],
+      [
+       "Q2405-001",
+       "stale_customer_rate",
+       "old customer rate 1.00 used",
+       155000,
+       147000
+      ],
+      [
+       "Q2503-044-R2",
+       "negotiated_revision",
+       "price cut on re-issue: 56000 -> 53000",
+       53000,
+       56000
+      ]
+     ]
+    },
+    "detection": {
+     "nonclean_all": {
+      "positives": 155,
+      "flagged": 1364,
+      "tp": 104,
+      "fp": 1260,
+      "fn": 51,
+      "precision": 0.07624633431085044,
+      "recall": 0.6709677419354839
+     },
+     "nonclean_deviating": {
+      "positives": 128,
+      "flagged": 1364,
+      "tp": 89,
+      "fp": 1275,
+      "fn": 39,
+      "precision": 0.06524926686217009,
+      "recall": 0.6953125
+     }
+    },
+    "class_accuracy": {
+     "flagged_true": 104,
+     "strict": 27,
+     "lenient": 33,
+     "deviation_only_n": 47,
+     "deviation_only_strict": 18,
+     "confusion": {
+      "stale_price_table -> unexplained": 8,
+      "undocumented_discount -> unexplained": 7,
+      "superseded_by_revision -> unexplained": 7,
+      "undocumented_discount -> undocumented_discount": 6,
+      "copied_customer_rate -> unexplained": 6,
+      "digit_typo -> unexplained": 5,
+      "negotiated_revision -> revision_or_duplicate": 5,
+      "unreconcilable -> unexplained": 5,
+      "stale_price_table -> undocumented_discount": 5,
+      "rounding_inconsistency -> unexplained": 4,
+      "tax_label_error -> unexplained": 4,
+      "unrecorded_rush -> unexplained": 4,
+      "quantity_entry_error -> unexplained": 3,
+      "superseded_by_revision -> unrecorded_surcharge": 3,
+      "unrecorded_rush -> unrecorded_surcharge": 2,
+      "omitted_delivery_fee -> unexplained": 2,
+      "rounding_inconsistency -> undocumented_discount": 2,
+      "duplicate_entry -> revision_or_duplicate": 2,
+      "tax_label_error -> unrecorded_surcharge": 2,
+      "duplicate_entry -> unexplained": 2,
+      "rounding_inconsistency -> rounding_inconsistency": 2,
+      "copied_customer_rate -> undocumented_discount": 2,
+      "unrecorded_rush -> typo": 2,
+      "copied_customer_rate -> unrecorded_surcharge": 1,
+      "digit_typo -> undocumented_discount": 1,
+      "digit_typo -> unrecorded_surcharge": 1,
+      "unreconcilable -> unrecorded_surcharge": 1,
+      "unrecorded_rush -> undocumented_discount": 1,
+      "stale_customer_rate -> copied_rate": 1,
+      "stale_customer_rate -> unrecorded_surcharge": 1,
+      "undocumented_discount -> copied_rate": 1,
+      "undocumented_discount -> rounding_inconsistency": 1,
+      "rounding_inconsistency -> unrecorded_surcharge": 1,
+      "superseded_by_revision -> undocumented_discount": 1,
+      "copied_customer_rate -> copied_rate": 1,
+      "stale_price_table -> typo": 1,
+      "stale_price_table -> copied_rate": 1
+     }
+    },
+    "false_accusations": {
+     "n": 498,
+     "by_class": {
+      "unrecorded_surcharge": 149,
+      "copied_rate": 84,
+      "undocumented_discount": 186,
+      "rounding_inconsistency": 53,
+      "revision_or_duplicate": 9,
+      "typo": 17
+     },
+     "clean_unexplained": 762,
+     "examples": [
+      [
+       "Q2210-014",
+       "リーフレット",
+       "unrecorded_surcharge",
+       48500,
+       55500,
+       "規則の金額 48,500円 に 7,000円 の上乗せ。同じ上乗せが条件の記録なしで 5 件"
+      ],
+      [
+       "Q2210-028",
+       "チラシ",
+       "unrecorded_surcharge",
+       33000,
+       35500,
+       "規則の金額 33,000円 の ×1.15（35,500円）。同じ割増が条件の記録なしで 5 件"
+      ],
+      [
+       "Q2210-037",
+       "チラシ",
+       "unrecorded_surcharge",
+       5000,
+       6500,
+       "規則の金額 5,000円 に 1,500円 の上乗せ。同じ上乗せが条件の記録なしで 29 件"
+      ],
+      [
+       "Q2210-040",
+       "チラシ",
+       "unrecorded_surcharge",
+       68880,
+       75480,
+       "規則の金額 68,880円 に 6,600円 の上乗せ。同じ上乗せが条件の記録なしで 3 件"
+      ],
+      [
+       "Q2210-042",
+       "リーフレット",
+       "copied_rate",
+       18500,
+       17500,
+       "得意先 G07 の掛率 0.95 を当てると一致（この得意先の掛率は 1）"
+      ],
+      [
+       "Q2210-045",
+       "封筒",
+       "undocumented_discount",
+       28630,
+       26700,
+       "規則の金額 28,630円 を 26,700円 に端数調整（1,930円 引き）、条件の記録なし"
+      ],
+      [
+       "Q2211-005",
+       "リーフレット",
+       "unrecorded_surcharge",
+       46500,
+       48500,
+       "規則の金額 46,500円 に 2,000円 の上乗せ。同じ上乗せが条件の記録なしで 28 件"
+      ],
+      [
+       "Q2211-006",
+       "封筒",
+       "unrecorded_surcharge",
+       6780,
+       7080,
+       "規則の金額 6,780円 に 300円 の上乗せ。同じ上乗せが条件の記録なしで 5 件"
+      ]
+     ]
+    },
+    "abstentions": {
+     "n": 569,
+     "clean": 530,
+     "nonclean": 39,
+     "reasons": {
+      "履歴で確定できないパラメータを使う見積（要聞き取り）": 269,
+      "同じ条件の組み合わせの再現率が低い（#、#件）": 248,
+      "同じ「端数調整」が#件あり、total_qty #〜# に集中（#。名刺 全体で": 13,
+      "同じ「+#円」が#件あり、total_qty≤# に集中（#。チラシ 全体では ": 12,
+      "同じ「+#円」が#件あり、delivery=市外 に集中（#。チラシ 全体では ": 8,
+      "同じ「#円引き」が#件あり、kinds=# に集中（#。名刺 全体では #）。記": 7
+     }
+    },
+    "reading_clean": {
+     "n": 2245,
+     "obs_equals_true_net": 2242
+    }
+   }
+  },
+  "sign": {
+   "frozen": {
+    "n": 2378,
+    "n_clean": 2225,
+    "missing_predictions": 0,
+    "accuracy": {
+     "rule_net/all": {
+      "exact": 110,
+      "100": 115,
+      "1pct": 129,
+      "n": 2378
+     },
+     "rule_net/clean": {
+      "exact": 108,
+      "100": 113,
+      "1pct": 124,
+      "n": 2225
+     },
+     "true_net/all": {
+      "exact": 110,
+      "100": 116,
+      "1pct": 128,
+      "n": 2378
+     },
+     "true_net/clean": {
+      "exact": 108,
+      "100": 113,
+      "1pct": 124,
+      "n": 2225
+     }
+    },
+    "by_segment_clean": {
+     "アルミ複合板看板": {
+      "n": 825,
+      "exact": 12,
+      "1pct": 19,
+      "10pct": 136
+     },
+     "インクジェット出力": {
+      "n": 775,
+      "exact": 71,
+      "1pct": 75,
+      "10pct": 154
+     },
+     "カルプ文字": {
+      "n": 393,
+      "exact": 16,
+      "1pct": 18,
+      "10pct": 87
+     },
+     "袖看板": {
+      "n": 232,
+      "exact": 9,
+      "1pct": 12,
+      "10pct": 55
+     }
+    },
+    "status": {
+     "abstained": 1976,
+     "unexplained": 198,
+     "reproduced": 110,
+     "deviation": 94
+    },
+    "reproduced": {
+     "n": 110,
+     "clean": 108,
+     "nonclean_conforming": 1,
+     "nonclean_deviating": 1,
+     "pred_equals_rule_net": 109,
+     "examples_absorbed": [
+      [
+       "2507-032",
+       "stale_table",
+       "priced with table v2 instead of v3; diff=-1000",
+       14000,
+       15000
+      ]
+     ]
+    },
+    "detection": {
+     "nonclean_all": {
+      "positives": 153,
+      "flagged": 292,
+      "tp": 19,
+      "fp": 273,
+      "fn": 134,
+      "precision": 0.06506849315068493,
+      "recall": 0.12418300653594772
+     },
+     "nonclean_deviating": {
+      "positives": 128,
+      "flagged": 292,
+      "tp": 18,
+      "fp": 274,
+      "fn": 110,
+      "precision": 0.06164383561643835,
+      "recall": 0.140625
+     }
+    },
+    "class_accuracy": {
+     "flagged_true": 19,
+     "strict": 1,
+     "lenient": 3,
+     "deviation_only_n": 4,
+     "deviation_only_strict": 1,
+     "confusion": {
+      "multiplier_copy -> unexplained": 3,
+      "digit_typo -> unexplained": 2,
+      "rush_unrecorded -> unexplained": 2,
+      "rounding_inconsistent -> unexplained": 2,
+      "manager_discount -> unexplained": 2,
+      "stale_table -> unexplained": 2,
+      "revision_v1 -> unexplained": 1,
+      "revision_v2 -> revision_or_duplicate": 1,
+      "revision_v1 -> undocumented_discount": 1,
+      "tax_label_error -> unrecorded_surcharge": 1,
+      "travel_omitted -> unexplained": 1,
+      "manager_discount -> unrecorded_surcharge": 1
+     }
+    },
+    "false_accusations": {
+     "n": 90,
+     "by_class": {
+      "unrecorded_surcharge": 70,
+      "typo": 2,
+      "undocumented_discount": 17,
+      "rounding_inconsistency": 1
+     },
+     "clean_unexplained": 183,
+     "examples": [
+      [
+       "2210-070",
+       "カルプ文字",
+       "unrecorded_surcharge",
+       124200,
+       130000,
+       "規則の金額 124,200円 に 5,800円 の上乗せ。同じ上乗せが条件の記録なしで 3 件"
+      ],
+      [
+       "2210-074",
+       "インクジェット出力",
+       "typo",
+       6000,
+       63000,
+       "桁の脱落・重複：規則どおりなら 6,000 のところ 63,000 と記載"
+      ],
+      [
+       "2212-023",
+       "カルプ文字",
+       "unrecorded_surcharge",
+       6800,
+       41800,
+       "規則の金額 6,800円 に 35,000円 の上乗せ。同じ上乗せが条件の記録なしで 4 件"
+      ],
+      [
+       "2212-043",
+       "インクジェット出力",
+       "unrecorded_surcharge",
+       6000,
+       33000,
+       "規則の金額 6,000円 に 27,000円 の上乗せ。同じ上乗せが条件の記録なしで 3 件"
+      ],
+      [
+       "2302-033",
+       "カルプ文字",
+       "unrecorded_surcharge",
+       89000,
+       175000,
+       "規則の金額 89,000円 に 86,000円 の上乗せ。同じ上乗せが条件の記録なしで 3 件"
+      ],
+      [
+       "2303-026",
+       "カルプ文字",
+       "undocumented_discount",
+       52000,
+       50900,
+       "規則の金額 52,000円 から 2% 引き（50,900円）、条件の記録なし"
+      ],
+      [
+       "2303-039",
+       "袖看板",
+       "undocumented_discount",
+       165000,
+       140000,
+       "規則の金額 165,000円 から 25,000円 引き、条件の記録なし"
+      ],
+      [
+       "2303-066",
+       "カルプ文字",
+       "unrecorded_surcharge",
+       21800,
+       24900,
+       "規則の金額 21,800円 に 3,100円 の上乗せ。同じ上乗せが条件の記録なしで 3 件"
+      ]
+     ]
+    },
+    "abstentions": {
+     "n": 1976,
+     "clean": 1844,
+     "nonclean": 132,
+     "reasons": {
+      "同じ条件の組み合わせの再現率が低い（#、#件）": 1632,
+      "履歴で確定できないパラメータを使う見積（要聞き取り）": 343,
+      "金額を読めない": 1
+     }
+    },
+    "reading_clean": {
+     "n": 2225,
+     "obs_equals_true_net": 2051
+    }
+   },
+   "assisted": {
+    "n": 2378,
+    "n_clean": 2225,
+    "missing_predictions": 0,
+    "accuracy": {
+     "rule_net/all": {
+      "exact": 131,
+      "100": 147,
+      "1pct": 183,
+      "n": 2378
+     },
+     "rule_net/clean": {
+      "exact": 124,
+      "100": 140,
+      "1pct": 173,
+      "n": 2225
+     },
+     "true_net/all": {
+      "exact": 135,
+      "100": 151,
+      "1pct": 186,
+      "n": 2378
+     },
+     "true_net/clean": {
+      "exact": 124,
+      "100": 140,
+      "1pct": 173,
+      "n": 2225
+     }
+    },
+    "by_segment_clean": {
+     "アルミ複合板看板": {
+      "n": 825,
+      "exact": 25,
+      "1pct": 57,
+      "10pct": 349
+     },
+     "インクジェット出力": {
+      "n": 775,
+      "exact": 75,
+      "1pct": 79,
+      "10pct": 180
+     },
+     "カルプ文字": {
+      "n": 393,
+      "exact": 10,
+      "1pct": 14,
+      "10pct": 76
+     },
+     "袖看板": {
+      "n": 232,
+      "exact": 14,
+      "1pct": 23,
+      "10pct": 132
+     }
+    },
+    "status": {
+     "abstained": 1871,
+     "deviation": 141,
+     "unexplained": 231,
+     "reproduced": 135
+    },
+    "reproduced": {
+     "n": 135,
+     "clean": 124,
+     "nonclean_conforming": 3,
+     "nonclean_deviating": 8,
+     "pred_equals_rule_net": 127,
+     "examples_absorbed": [
+      [
+       "2304-009",
+       "manager_discount",
+       "undocumented discount 8800 (7.1%) from rule_net 123800",
+       115000,
+       123800
+      ],
+      [
+       "2310-006",
+       "multiplier_copy",
+       "multiplier 950 per mille used instead of 880; diff=13000",
+       177000,
+       164000
+      ],
+      [
+       "2402-054",
+       "revision_v1",
+       "travel fee 4000 omitted in v1; corrected in re-issued quote",
+       53000,
+       57000
+      ],
+      [
+       "2406-028",
+       "rounding_inconsistent",
+       "rounded 'halfup1000' instead of 'floor100' (pre-round 59500)",
+       60000,
+       59500
+      ],
+      [
+       "2411-028",
+       "stale_table",
+       "previous contract multiplier 880 per mille used after 2024-1",
+       27800,
+       27500
+      ],
+      [
+       "2507-032",
+       "stale_table",
+       "priced with table v2 instead of v3; diff=-1000",
+       14000,
+       15000
+      ],
+      [
+       "2509-006",
+       "manager_discount",
+       "undocumented discount 3400 (6.7%) from rule_net 50400",
+       47000,
+       50400
+      ],
+      [
+       "2509-047",
+       "rounding_inconsistent",
+       "rounded 'floor1000' instead of 'floor100' (pre-round 42800);",
+       42000,
+       42800
+      ]
+     ]
+    },
+    "detection": {
+     "nonclean_all": {
+      "positives": 153,
+      "flagged": 372,
+      "tp": 22,
+      "fp": 350,
+      "fn": 131,
+      "precision": 0.05913978494623656,
+      "recall": 0.1437908496732026
+     },
+     "nonclean_deviating": {
+      "positives": 128,
+      "flagged": 372,
+      "tp": 19,
+      "fp": 353,
+      "fn": 109,
+      "precision": 0.051075268817204304,
+      "recall": 0.1484375
+     }
+    },
+    "class_accuracy": {
+     "flagged_true": 22,
+     "strict": 2,
+     "lenient": 3,
+     "deviation_only_n": 9,
+     "deviation_only_strict": 2,
+     "confusion": {
+      "multiplier_copy -> unexplained": 4,
+      "stale_table -> unexplained": 4,
+      "revision_v2 -> revision_or_duplicate": 2,
+      "manager_discount -> unexplained": 2,
+      "stale_table -> undocumented_discount": 1,
+      "revision_v1 -> undocumented_discount": 1,
+      "manager_discount -> unrecorded_surcharge": 1,
+      "rush_unrecorded -> unexplained": 1,
+      "rounding_inconsistent -> undocumented_discount": 1,
+      "revision_v1 -> unrecorded_surcharge": 1,
+      "digit_typo -> unexplained": 1,
+      "multiplier_copy -> unrecorded_surcharge": 1,
+      "travel_omitted -> unrecorded_surcharge": 1,
+      "rounding_inconsistent -> unexplained": 1
+     }
+    },
+    "false_accusations": {
+     "n": 132,
+     "by_class": {
+      "unrecorded_surcharge": 79,
+      "copied_rate": 4,
+      "undocumented_discount": 43,
+      "typo": 3,
+      "rounding_inconsistency": 3
+     },
+     "clean_unexplained": 218,
+     "examples": [
+      [
+       "2210-006",
+       "袖看板",
+       "unrecorded_surcharge",
+       294000,
+       313000,
+       "規則の金額 294,000円 に 19,000円 の上乗せ。同じ上乗せが条件の記録なしで 5 件"
+      ],
+      [
+       "2210-046",
+       "アルミ複合板看板",
+       "unrecorded_surcharge",
+       97000,
+       106800,
+       "規則の金額 97,000円 に 9,800円 の上乗せ。同じ上乗せが条件の記録なしで 7 件"
+      ],
+      [
+       "2211-015",
+       "袖看板",
+       "unrecorded_surcharge",
+       127000,
+       127100,
+       "規則の金額 127,000円 に 100円 の上乗せ。同じ上乗せが条件の記録なしで 7 件"
+      ],
+      [
+       "2211-053",
+       "アルミ複合板看板",
+       "copied_rate",
+       69100,
+       69900,
+       "得意先 1015 の掛率 1.2 を当てると一致（この得意先の掛率は 1）"
+      ],
+      [
+       "2211-057",
+       "袖看板",
+       "unrecorded_surcharge",
+       294000,
+       298500,
+       "規則の金額 294,000円 に 4,500円 の上乗せ。同じ上乗せが条件の記録なしで 6 件"
+      ],
+      [
+       "2211-058",
+       "袖看板",
+       "undocumented_discount",
+       169000,
+       165000,
+       "規則の金額 169,000円 から 4,000円 引き、条件の記録なし"
+      ],
+      [
+       "2212-001",
+       "袖看板",
+       "unrecorded_surcharge",
+       208000,
+       228000,
+       "規則の金額 208,000円 に 20,000円 の上乗せ。同じ上乗せが条件の記録なしで 6 件"
+      ],
+      [
+       "2212-051",
+       "袖看板",
+       "typo",
+       135000,
+       130500,
+       "数字の入れ替わり：規則どおりなら 135,000 のところ 130,500 と記載"
+      ]
+     ]
+    },
+    "abstentions": {
+     "n": 1871,
+     "clean": 1751,
+     "nonclean": 120,
+     "reasons": {
+      "同じ条件の組み合わせの再現率が低い（#、#件）": 1767,
+      "履歴で確定できないパラメータを使う見積（要聞き取り）": 82,
+      "同じ「端数調整」が#件あり、install_qty=# に集中（#。アルミ複合板": 16,
+      "同じ「端数調整」が#件あり、area_m#≤# に集中（#。袖看板 全体では #": 5,
+      "金額を読めない": 1
+     }
+    },
+    "reading_clean": {
+     "n": 2225,
+     "obs_equals_true_net": 2063
+    }
+   }
+  }
+ }
+}
