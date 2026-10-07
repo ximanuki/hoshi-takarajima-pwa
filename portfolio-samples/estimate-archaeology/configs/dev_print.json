@@ -1,0 +1,25 @@
+{
+  "name": "dev-print",
+  "notes": "Development config for devdata/print (same column layout as the blind print schema).",
+  "columns": {
+    "id": "quote_id",
+    "date": "quote_date",
+    "customer": "customer_code",
+    "rep": "rep",
+    "amount": "amount",
+    "tax_label": "tax_label",
+    "tax_amount": "tax_amount"
+  },
+  "segment": "product",
+  "customer_class": "regex(customer_code, '^(一般|[A-Za-z]+)', 1, 'その他')",
+  "revision_id_pattern": "-R\\d+$",
+  "derived": {
+    "total_qty": "quantity * kinds",
+    "lead_days": "days_between(quote_date, due_date)"
+  },
+  "categorical": ["size", "paper", "colors", "delivery"],
+  "numeric": ["quantity", "kinds", "pages", "total_qty"],
+  "text": ["notes", "finishing"],
+  "thresholds": ["lead_days"],
+  "features": ["pages * quantity * kinds"]
+}

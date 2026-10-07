@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI総務さん — 出典つきで答える社内規程アシスタント</title>
+  <meta name="description" content="社内規程に関する質問に、根拠の条文と引用箇所を示して答えるデモ。資料にないことには「資料に記載がありません」と答えます。">
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <h1 class="brand"><span class="brand-mark" aria-hidden="true">総</span>AI総務さん</h1>
+      <p class="tagline">社内規程の質問に、<strong>出典（資料・ページ・引用箇所）つき</strong>で答えます。資料にないことは推測しません。</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <form id="ask-form" class="ask" autocomplete="off">
+      <label for="question" class="visually-hidden">質問</label>
+      <textarea id="question" name="question" rows="2" maxlength="300"
+        placeholder="例：有給休暇は入社してからいつ、何日もらえますか？" required></textarea>
+      <div class="ask-row">
+        <div class="examples" id="examples" aria-label="質問の例"></div>
+        <button type="submit" id="ask-button">質問する</button>
+      </div>
+    </form>
+
+    <section id="status" class="status" role="status" aria-live="polite" hidden></section>
+
+    <section id="result" class="result" hidden aria-live="polite">
+      <article class="answer-card" id="answer-card">
+        <h2 class="card-title" id="answer-title">回答</h2>
+        <div id="answer" class="answer"></div>
+        <p id="abstain-note" class="abstain-note" hidden>
+          検索した資料の中に、この質問に答える十分な根拠が見つかりませんでした。総務担当者に直接お問い合わせください。
+        </p>
+        <p id="meta" class="meta"></p>
+      </article>
+
+      <section id="citations-section" class="citations" hidden>
+        <h2 class="section-title">出典</h2>
+        <ol id="citations" class="citation-list"></ol>
+      </section>
+
+      <details class="debug">
+        <summary>検索結果の内訳（デバッグ）</summary>
+        <table class="retrieved">
+          <thead><tr><th>順位</th><th>箇所</th><th>ページ</th><th>BM25順位</th><th>ベクトル順位</th></tr></thead>
+          <tbody id="retrieved"></tbody>
+        </table>
+      </details>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <h2 class="footer-title">収録資料</h2>
+      <ul id="documents" class="documents"><li>読み込み中…</li></ul>
+      <p class="disclaimer">デモ用のアプリです。回答は資料の記載をもとに自動生成されたもので、法的助言ではありません。実際の運用では自社の就業規則と担当者の判断を優先してください。</p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,2710 @@
+{
+ "meta": {
+  "date": "2026-10-07T01:54:12+09:00",
+  "version": "0.1.0",
+  "qa_file": "data/eval/qa.jsonl",
+  "qa_sha256_12": "c70cd167a016",
+  "questions": 97,
+  "answerable": 81,
+  "unanswerable": 16,
+  "dev": 49,
+  "test": 48,
+  "chunks": 245,
+  "documents": [
+   "モデル就業規則（令和7年12月版）",
+   "経費精算・出張旅費規程（架空のサンプル）"
+  ],
+  "embedder": "intfloat/multilingual-e5-small@614241f622f5",
+  "glossary_terms": 34,
+  "rrf_k": 60,
+  "candidate_k": 30,
+  "top_k": 5,
+  "threshold_configured": 0.4,
+  "python": "3.13.16",
+  "machine": "Linux x86_64, 4 CPUs"
+ },
+ "retrieval": {
+  "bm25": {
+   "all": {
+    "recall@1": 0.7283950617283951,
+    "recall@3": 0.8641975308641975,
+    "recall@5": 0.9506172839506173,
+    "mrr@10": 0.8149323927101705
+   },
+   "dev": {
+    "recall@1": 0.8048780487804879,
+    "recall@3": 0.926829268292683,
+    "recall@5": 0.9512195121951219,
+    "mrr@10": 0.8666666666666666
+   },
+   "test": {
+    "recall@1": 0.65,
+    "recall@3": 0.8,
+    "recall@5": 0.95,
+    "mrr@10": 0.7619047619047619
+   },
+   "mhlw": {
+    "recall@1": 0.6857142857142857,
+    "recall@3": 0.8428571428571429,
+    "recall@5": 0.9428571428571428,
+    "mrr@10": 0.7858503401360545
+   },
+   "sample": {
+    "recall@1": 1.0,
+    "recall@3": 1.0,
+    "recall@5": 1.0,
+    "mrr@10": 1.0
+   }
+  },
+  "dense": {
+   "all": {
+    "recall@1": 0.7037037037037037,
+    "recall@3": 0.9135802469135802,
+    "recall@5": 0.9382716049382716,
+    "mrr@10": 0.8079561042524005
+   },
+   "dev": {
+    "recall@1": 0.7804878048780488,
+    "recall@3": 0.975609756097561,
+    "recall@5": 0.975609756097561,
+    "mrr@10": 0.8699186991869918
+   },
+   "test": {
+    "recall@1": 0.625,
+    "recall@3": 0.85,
+    "recall@5": 0.9,
+    "mrr@10": 0.7444444444444445
+   },
+   "mhlw": {
+    "recall@1": 0.6571428571428571,
+    "recall@3": 0.9,
+    "recall@5": 0.9285714285714286,
+    "mrr@10": 0.7777777777777778
+   },
+   "sample": {
+    "recall@1": 1.0,
+    "recall@3": 1.0,
+    "recall@5": 1.0,
+    "mrr@10": 1.0
+   }
+  },
+  "hybrid": {
+   "all": {
+    "recall@1": 0.7777777777777778,
+    "recall@3": 0.9382716049382716,
+    "recall@5": 0.9629629629629629,
+    "mrr@10": 0.8606995884773663
+   },
+   "dev": {
+    "recall@1": 0.8536585365853658,
+    "recall@3": 0.9512195121951219,
+    "recall@5": 1.0,
+    "mrr@10": 0.9052845528455284
+   },
+   "test": {
+    "recall@1": 0.7,
+    "recall@3": 0.925,
+    "recall@5": 0.925,
+    "mrr@10": 0.8150000000000001
+   },
+   "mhlw": {
+    "recall@1": 0.7428571428571429,
+    "recall@3": 0.9285714285714286,
+    "recall@5": 0.9571428571428572,
+    "mrr@10": 0.8388095238095238
+   },
+   "sample": {
+    "recall@1": 1.0,
+    "recall@3": 1.0,
+    "recall@5": 1.0,
+    "mrr@10": 1.0
+   }
+  }
+ },
+ "retrieval_no_glossary": {
+  "bm25": {
+   "recall@1": 0.7160493827160493,
+   "recall@3": 0.8148148148148148,
+   "recall@5": 0.8888888888888888,
+   "mrr@10": 0.7837938467568097
+  },
+  "hybrid": {
+   "recall@1": 0.7530864197530864,
+   "recall@3": 0.9259259259259259,
+   "recall@5": 0.9382716049382716,
+   "mrr@10": 0.8373456790123457
+  }
+ },
+ "bm25_tokenizer_ablation": {
+  "char1gram": {
+   "bm25": {
+    "all": {
+     "recall@1": 0.7037037037037037,
+     "recall@3": 0.8765432098765432,
+     "recall@5": 0.9382716049382716,
+     "mrr@10": 0.8071330589849108
+    },
+    "dev": {
+     "recall@1": 0.7804878048780488,
+     "recall@3": 0.9512195121951219,
+     "recall@5": 0.9512195121951219,
+     "mrr@10": 0.8644986449864498
+    },
+    "test": {
+     "recall@1": 0.625,
+     "recall@3": 0.8,
+     "recall@5": 0.925,
+     "mrr@10": 0.7483333333333333
+    }
+   },
+   "hybrid": {
+    "all": {
+     "recall@1": 0.7654320987654321,
+     "recall@3": 0.9382716049382716,
+     "recall@5": 0.9629629629629629,
+     "mrr@10": 0.8585831863609641
+    },
+    "dev": {
+     "recall@1": 0.9024390243902439,
+     "recall@3": 0.975609756097561,
+     "recall@5": 0.975609756097561,
+     "mrr@10": 0.9384436701509872
+    },
+    "test": {
+     "recall@1": 0.625,
+     "recall@3": 0.9,
+     "recall@5": 0.95,
+     "mrr@10": 0.7767261904761905
+    }
+   }
+  },
+  "char2gram": {
+   "bm25": {
+    "all": {
+     "recall@1": 0.7283950617283951,
+     "recall@3": 0.8641975308641975,
+     "recall@5": 0.9506172839506173,
+     "mrr@10": 0.8149323927101705
+    },
+    "dev": {
+     "recall@1": 0.8048780487804879,
+     "recall@3": 0.926829268292683,
+     "recall@5": 0.9512195121951219,
+     "mrr@10": 0.8666666666666666
+    },
+    "test": {
+     "recall@1": 0.65,
+     "recall@3": 0.8,
+     "recall@5": 0.95,
+     "mrr@10": 0.7619047619047619
+    }
+   },
+   "hybrid": {
+    "all": {
+     "recall@1": 0.7777777777777778,
+     "recall@3": 0.9382716049382716,
+     "recall@5": 0.9629629629629629,
+     "mrr@10": 0.8606995884773663
+    },
+    "dev": {
+     "recall@1": 0.8536585365853658,
+     "recall@3": 0.9512195121951219,
+     "recall@5": 1.0,
+     "mrr@10": 0.9052845528455284
+    },
+    "test": {
+     "recall@1": 0.7,
+     "recall@3": 0.925,
+     "recall@5": 0.925,
+     "mrr@10": 0.8150000000000001
+    }
+   }
+  },
+  "char2gram+uni": {
+   "bm25": {
+    "all": {
+     "recall@1": 0.7654320987654321,
+     "recall@3": 0.9135802469135802,
+     "recall@5": 0.9753086419753086,
+     "mrr@10": 0.8490740740740741
+    },
+    "dev": {
+     "recall@1": 0.8536585365853658,
+     "recall@3": 0.926829268292683,
+     "recall@5": 0.975609756097561,
+     "mrr@10": 0.8971544715447154
+    },
+    "test": {
+     "recall@1": 0.675,
+     "recall@3": 0.9,
+     "recall@5": 0.975,
+     "mrr@10": 0.7997916666666667
+    }
+   },
+   "hybrid": {
+    "all": {
+     "recall@1": 0.7654320987654321,
+     "recall@3": 0.9135802469135802,
+     "recall@5": 0.9629629629629629,
+     "mrr@10": 0.8551440329218107
+    },
+    "dev": {
+     "recall@1": 0.8536585365853658,
+     "recall@3": 0.9512195121951219,
+     "recall@5": 1.0,
+     "mrr@10": 0.910569105691057
+    },
+    "test": {
+     "recall@1": 0.675,
+     "recall@3": 0.875,
+     "recall@5": 0.925,
+     "mrr@10": 0.7983333333333333
+    }
+   }
+  },
+  "char3gram": {
+   "bm25": {
+    "all": {
+     "recall@1": 0.5679012345679012,
+     "recall@3": 0.7654320987654321,
+     "recall@5": 0.8271604938271605,
+     "mrr@10": 0.6764893200078385
+    },
+    "dev": {
+     "recall@1": 0.7073170731707317,
+     "recall@3": 0.8780487804878049,
+     "recall@5": 0.9024390243902439,
+     "mrr@10": 0.7956252419667054
+    },
+    "test": {
+     "recall@1": 0.425,
+     "recall@3": 0.65,
+     "recall@5": 0.75,
+     "mrr@10": 0.5543750000000001
+    }
+   },
+   "hybrid": {
+    "all": {
+     "recall@1": 0.7283950617283951,
+     "recall@3": 0.8765432098765432,
+     "recall@5": 0.9259259259259259,
+     "mrr@10": 0.8149862825788752
+    },
+    "dev": {
+     "recall@1": 0.9024390243902439,
+     "recall@3": 0.926829268292683,
+     "recall@5": 0.9512195121951219,
+     "mrr@10": 0.9225609756097561
+    },
+    "test": {
+     "recall@1": 0.55,
+     "recall@3": 0.825,
+     "recall@5": 0.9,
+     "mrr@10": 0.7047222222222222
+    }
+   }
+  }
+ },
+ "latency_ms": {
+  "bm25": {
+   "median": 0.5572539994318504,
+   "p95": 0.9913829999277368
+  },
+  "dense": {
+   "median": 9.254695999516116,
+   "p95": 12.512387999777275
+  },
+  "hybrid": {
+   "median": 9.98152400006802,
+   "p95": 12.994511999750102
+  }
+ },
+ "abstention": {
+  "all": {
+   "precision": 0.7777777777777778,
+   "recall": 0.875,
+   "f1": 0.823529411764706,
+   "false_abstention_rate": 0.04938271604938271,
+   "tp": 14,
+   "fp": 4,
+   "fn": 2,
+   "tn": 77
+  },
+  "dev": {
+   "precision": 0.7272727272727273,
+   "recall": 1.0,
+   "f1": 0.8421052631578948,
+   "false_abstention_rate": 0.07317073170731707,
+   "tp": 8,
+   "fp": 3,
+   "fn": 0,
+   "tn": 38
+  },
+  "test": {
+   "precision": 0.8571428571428571,
+   "recall": 0.75,
+   "f1": 0.7999999999999999,
+   "false_abstention_rate": 0.025,
+   "tp": 6,
+   "fp": 1,
+   "fn": 2,
+   "tn": 39
+  }
+ },
+ "signal_auroc": {
+  "all": {
+   "dense_top": 0.9702932098765432,
+   "lexical_coverage": 0.9174382716049383,
+   "support (combined)": 0.9753086419753086
+  },
+  "dev": {
+   "dense_top": 0.9527439024390244,
+   "lexical_coverage": 0.9207317073170732,
+   "support (combined)": 0.9786585365853658
+  },
+  "test": {
+   "dense_top": 0.984375,
+   "lexical_coverage": 0.90625,
+   "support (combined)": 0.975
+  }
+ },
+ "sweep_dev": [
+  {
+   "threshold": 0.0,
+   "precision": 0.0,
+   "recall": 0.0,
+   "f1": 0.0,
+   "false_abstention_rate": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 8,
+   "tn": 41
+  },
+  {
+   "threshold": 0.02,
+   "precision": 0.0,
+   "recall": 0.0,
+   "f1": 0.0,
+   "false_abstention_rate": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 8,
+   "tn": 41
+  },
+  {
+   "threshold": 0.04,
+   "precision": 0.0,
+   "recall": 0.0,
+   "f1": 0.0,
+   "false_abstention_rate": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 8,
+   "tn": 41
+  },
+  {
+   "threshold": 0.06,
+   "precision": 0.0,
+   "recall": 0.0,
+   "f1": 0.0,
+   "false_abstention_rate": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 8,
+   "tn": 41
+  },
+  {
+   "threshold": 0.08,
+   "precision": 0.0,
+   "recall": 0.0,
+   "f1": 0.0,
+   "false_abstention_rate": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 8,
+   "tn": 41
+  },
+  {
+   "threshold": 0.1,
+   "precision": 0.0,
+   "recall": 0.0,
+   "f1": 0.0,
+   "false_abstention_rate": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 8,
+   "tn": 41
+  },
+  {
+   "threshold": 0.12,
+   "precision": 0.0,
+   "recall": 0.0,
+   "f1": 0.0,
+   "false_abstention_rate": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 8,
+   "tn": 41
+  },
+  {
+   "threshold": 0.14,
+   "precision": 1.0,
+   "recall": 0.125,
+   "f1": 0.2222222222222222,
+   "false_abstention_rate": 0.0,
+   "tp": 1,
+   "fp": 0,
+   "fn": 7,
+   "tn": 41
+  },
+  {
+   "threshold": 0.16,
+   "precision": 1.0,
+   "recall": 0.125,
+   "f1": 0.2222222222222222,
+   "false_abstention_rate": 0.0,
+   "tp": 1,
+   "fp": 0,
+   "fn": 7,
+   "tn": 41
+  },
+  {
+   "threshold": 0.18,
+   "precision": 1.0,
+   "recall": 0.125,
+   "f1": 0.2222222222222222,
+   "false_abstention_rate": 0.0,
+   "tp": 1,
+   "fp": 0,
+   "fn": 7,
+   "tn": 41
+  },
+  {
+   "threshold": 0.2,
+   "precision": 1.0,
+   "recall": 0.25,
+   "f1": 0.4,
+   "false_abstention_rate": 0.0,
+   "tp": 2,
+   "fp": 0,
+   "fn": 6,
+   "tn": 41
+  },
+  {
+   "threshold": 0.22,
+   "precision": 1.0,
+   "recall": 0.375,
+   "f1": 0.5454545454545454,
+   "false_abstention_rate": 0.0,
+   "tp": 3,
+   "fp": 0,
+   "fn": 5,
+   "tn": 41
+  },
+  {
+   "threshold": 0.24,
+   "precision": 1.0,
+   "recall": 0.375,
+   "f1": 0.5454545454545454,
+   "false_abstention_rate": 0.0,
+   "tp": 3,
+   "fp": 0,
+   "fn": 5,
+   "tn": 41
+  },
+  {
+   "threshold": 0.26,
+   "precision": 1.0,
+   "recall": 0.375,
+   "f1": 0.5454545454545454,
+   "false_abstention_rate": 0.0,
+   "tp": 3,
+   "fp": 0,
+   "fn": 5,
+   "tn": 41
+  },
+  {
+   "threshold": 0.28,
+   "precision": 1.0,
+   "recall": 0.5,
+   "f1": 0.6666666666666666,
+   "false_abstention_rate": 0.0,
+   "tp": 4,
+   "fp": 0,
+   "fn": 4,
+   "tn": 41
+  },
+  {
+   "threshold": 0.3,
+   "precision": 1.0,
+   "recall": 0.5,
+   "f1": 0.6666666666666666,
+   "false_abstention_rate": 0.0,
+   "tp": 4,
+   "fp": 0,
+   "fn": 4,
+   "tn": 41
+  },
+  {
+   "threshold": 0.32,
+   "precision": 1.0,
+   "recall": 0.5,
+   "f1": 0.6666666666666666,
+   "false_abstention_rate": 0.0,
+   "tp": 4,
+   "fp": 0,
+   "fn": 4,
+   "tn": 41
+  },
+  {
+   "threshold": 0.34,
+   "precision": 1.0,
+   "recall": 0.625,
+   "f1": 0.7692307692307693,
+   "false_abstention_rate": 0.0,
+   "tp": 5,
+   "fp": 0,
+   "fn": 3,
+   "tn": 41
+  },
+  {
+   "threshold": 0.36,
+   "precision": 1.0,
+   "recall": 0.625,
+   "f1": 0.7692307692307693,
+   "false_abstention_rate": 0.0,
+   "tp": 5,
+   "fp": 0,
+   "fn": 3,
+   "tn": 41
+  },
+  {
+   "threshold": 0.38,
+   "precision": 0.7,
+   "recall": 0.875,
+   "f1": 0.7777777777777777,
+   "false_abstention_rate": 0.07317073170731707,
+   "tp": 7,
+   "fp": 3,
+   "fn": 1,
+   "tn": 38
+  },
+  {
+   "threshold": 0.4,
+   "precision": 0.7272727272727273,
+   "recall": 1.0,
+   "f1": 0.8421052631578948,
+   "false_abstention_rate": 0.07317073170731707,
+   "tp": 8,
+   "fp": 3,
+   "fn": 0,
+   "tn": 38
+  },
+  {
+   "threshold": 0.42,
+   "precision": 0.6666666666666666,
+   "recall": 1.0,
+   "f1": 0.8,
+   "false_abstention_rate": 0.0975609756097561,
+   "tp": 8,
+   "fp": 4,
+   "fn": 0,
+   "tn": 37
+  },
+  {
+   "threshold": 0.44,
+   "precision": 0.6666666666666666,
+   "recall": 1.0,
+   "f1": 0.8,
+   "false_abstention_rate": 0.0975609756097561,
+   "tp": 8,
+   "fp": 4,
+   "fn": 0,
+   "tn": 37
+  },
+  {
+   "threshold": 0.46,
+   "precision": 0.6153846153846154,
+   "recall": 1.0,
+   "f1": 0.761904761904762,
+   "false_abstention_rate": 0.12195121951219512,
+   "tp": 8,
+   "fp": 5,
+   "fn": 0,
+   "tn": 36
+  },
+  {
+   "threshold": 0.48,
+   "precision": 0.5714285714285714,
+   "recall": 1.0,
+   "f1": 0.7272727272727273,
+   "false_abstention_rate": 0.14634146341463414,
+   "tp": 8,
+   "fp": 6,
+   "fn": 0,
+   "tn": 35
+  },
+  {
+   "threshold": 0.5,
+   "precision": 0.5333333333333333,
+   "recall": 1.0,
+   "f1": 0.6956521739130436,
+   "false_abstention_rate": 0.17073170731707318,
+   "tp": 8,
+   "fp": 7,
+   "fn": 0,
+   "tn": 34
+  },
+  {
+   "threshold": 0.52,
+   "precision": 0.5,
+   "recall": 1.0,
+   "f1": 0.6666666666666666,
+   "false_abstention_rate": 0.1951219512195122,
+   "tp": 8,
+   "fp": 8,
+   "fn": 0,
+   "tn": 33
+  },
+  {
+   "threshold": 0.54,
+   "precision": 0.47058823529411764,
+   "recall": 1.0,
+   "f1": 0.6399999999999999,
+   "false_abstention_rate": 0.21951219512195122,
+   "tp": 8,
+   "fp": 9,
+   "fn": 0,
+   "tn": 32
+  },
+  {
+   "threshold": 0.56,
+   "precision": 0.4444444444444444,
+   "recall": 1.0,
+   "f1": 0.6153846153846153,
+   "false_abstention_rate": 0.24390243902439024,
+   "tp": 8,
+   "fp": 10,
+   "fn": 0,
+   "tn": 31
+  },
+  {
+   "threshold": 0.58,
+   "precision": 0.42105263157894735,
+   "recall": 1.0,
+   "f1": 0.5925925925925926,
+   "false_abstention_rate": 0.2682926829268293,
+   "tp": 8,
+   "fp": 11,
+   "fn": 0,
+   "tn": 30
+  },
+  {
+   "threshold": 0.6,
+   "precision": 0.4,
+   "recall": 1.0,
+   "f1": 0.5714285714285715,
+   "false_abstention_rate": 0.2926829268292683,
+   "tp": 8,
+   "fp": 12,
+   "fn": 0,
+   "tn": 29
+  },
+  {
+   "threshold": 0.62,
+   "precision": 0.4,
+   "recall": 1.0,
+   "f1": 0.5714285714285715,
+   "false_abstention_rate": 0.2926829268292683,
+   "tp": 8,
+   "fp": 12,
+   "fn": 0,
+   "tn": 29
+  },
+  {
+   "threshold": 0.64,
+   "precision": 0.4,
+   "recall": 1.0,
+   "f1": 0.5714285714285715,
+   "false_abstention_rate": 0.2926829268292683,
+   "tp": 8,
+   "fp": 12,
+   "fn": 0,
+   "tn": 29
+  },
+  {
+   "threshold": 0.66,
+   "precision": 0.38095238095238093,
+   "recall": 1.0,
+   "f1": 0.5517241379310345,
+   "false_abstention_rate": 0.3170731707317073,
+   "tp": 8,
+   "fp": 13,
+   "fn": 0,
+   "tn": 28
+  },
+  {
+   "threshold": 0.68,
+   "precision": 0.34782608695652173,
+   "recall": 1.0,
+   "f1": 0.5161290322580645,
+   "false_abstention_rate": 0.36585365853658536,
+   "tp": 8,
+   "fp": 15,
+   "fn": 0,
+   "tn": 26
+  },
+  {
+   "threshold": 0.7,
+   "precision": 0.32,
+   "recall": 1.0,
+   "f1": 0.48484848484848486,
+   "false_abstention_rate": 0.4146341463414634,
+   "tp": 8,
+   "fp": 17,
+   "fn": 0,
+   "tn": 24
+  },
+  {
+   "threshold": 0.72,
+   "precision": 0.2962962962962963,
+   "recall": 1.0,
+   "f1": 0.45714285714285713,
+   "false_abstention_rate": 0.4634146341463415,
+   "tp": 8,
+   "fp": 19,
+   "fn": 0,
+   "tn": 22
+  },
+  {
+   "threshold": 0.74,
+   "precision": 0.2857142857142857,
+   "recall": 1.0,
+   "f1": 0.4444444444444445,
+   "false_abstention_rate": 0.4878048780487805,
+   "tp": 8,
+   "fp": 20,
+   "fn": 0,
+   "tn": 21
+  },
+  {
+   "threshold": 0.76,
+   "precision": 0.26666666666666666,
+   "recall": 1.0,
+   "f1": 0.4210526315789474,
+   "false_abstention_rate": 0.5365853658536586,
+   "tp": 8,
+   "fp": 22,
+   "fn": 0,
+   "tn": 19
+  },
+  {
+   "threshold": 0.78,
+   "precision": 0.25806451612903225,
+   "recall": 1.0,
+   "f1": 0.41025641025641024,
+   "false_abstention_rate": 0.5609756097560976,
+   "tp": 8,
+   "fp": 23,
+   "fn": 0,
+   "tn": 18
+  },
+  {
+   "threshold": 0.8,
+   "precision": 0.24242424242424243,
+   "recall": 1.0,
+   "f1": 0.3902439024390244,
+   "false_abstention_rate": 0.6097560975609756,
+   "tp": 8,
+   "fp": 25,
+   "fn": 0,
+   "tn": 16
+  },
+  {
+   "threshold": 0.82,
+   "precision": 0.22857142857142856,
+   "recall": 1.0,
+   "f1": 0.3720930232558139,
+   "false_abstention_rate": 0.6585365853658537,
+   "tp": 8,
+   "fp": 27,
+   "fn": 0,
+   "tn": 14
+  },
+  {
+   "threshold": 0.84,
+   "precision": 0.21621621621621623,
+   "recall": 1.0,
+   "f1": 0.35555555555555557,
+   "false_abstention_rate": 0.7073170731707317,
+   "tp": 8,
+   "fp": 29,
+   "fn": 0,
+   "tn": 12
+  },
+  {
+   "threshold": 0.86,
+   "precision": 0.21052631578947367,
+   "recall": 1.0,
+   "f1": 0.34782608695652173,
+   "false_abstention_rate": 0.7317073170731707,
+   "tp": 8,
+   "fp": 30,
+   "fn": 0,
+   "tn": 11
+  },
+  {
+   "threshold": 0.88,
+   "precision": 0.20512820512820512,
+   "recall": 1.0,
+   "f1": 0.3404255319148936,
+   "false_abstention_rate": 0.7560975609756098,
+   "tp": 8,
+   "fp": 31,
+   "fn": 0,
+   "tn": 10
+  },
+  {
+   "threshold": 0.9,
+   "precision": 0.2,
+   "recall": 1.0,
+   "f1": 0.33333333333333337,
+   "false_abstention_rate": 0.7804878048780488,
+   "tp": 8,
+   "fp": 32,
+   "fn": 0,
+   "tn": 9
+  },
+  {
+   "threshold": 0.92,
+   "precision": 0.2,
+   "recall": 1.0,
+   "f1": 0.33333333333333337,
+   "false_abstention_rate": 0.7804878048780488,
+   "tp": 8,
+   "fp": 32,
+   "fn": 0,
+   "tn": 9
+  },
+  {
+   "threshold": 0.94,
+   "precision": 0.2,
+   "recall": 1.0,
+   "f1": 0.33333333333333337,
+   "false_abstention_rate": 0.7804878048780488,
+   "tp": 8,
+   "fp": 32,
+   "fn": 0,
+   "tn": 9
+  },
+  {
+   "threshold": 0.96,
+   "precision": 0.1951219512195122,
+   "recall": 1.0,
+   "f1": 0.326530612244898,
+   "false_abstention_rate": 0.8048780487804879,
+   "tp": 8,
+   "fp": 33,
+   "fn": 0,
+   "tn": 8
+  },
+  {
+   "threshold": 0.98,
+   "precision": 0.19047619047619047,
+   "recall": 1.0,
+   "f1": 0.32,
+   "false_abstention_rate": 0.8292682926829268,
+   "tp": 8,
+   "fp": 34,
+   "fn": 0,
+   "tn": 7
+  },
+  {
+   "threshold": 1.0,
+   "precision": 0.18604651162790697,
+   "recall": 1.0,
+   "f1": 0.3137254901960785,
+   "false_abstention_rate": 0.8536585365853658,
+   "tp": 8,
+   "fp": 35,
+   "fn": 0,
+   "tn": 6
+  },
+  {
+   "threshold": 1.02,
+   "precision": 0.18604651162790697,
+   "recall": 1.0,
+   "f1": 0.3137254901960785,
+   "false_abstention_rate": 0.8536585365853658,
+   "tp": 8,
+   "fp": 35,
+   "fn": 0,
+   "tn": 6
+  },
+  {
+   "threshold": 1.04,
+   "precision": 0.18604651162790697,
+   "recall": 1.0,
+   "f1": 0.3137254901960785,
+   "false_abstention_rate": 0.8536585365853658,
+   "tp": 8,
+   "fp": 35,
+   "fn": 0,
+   "tn": 6
+  },
+  {
+   "threshold": 1.06,
+   "precision": 0.17391304347826086,
+   "recall": 1.0,
+   "f1": 0.29629629629629634,
+   "false_abstention_rate": 0.926829268292683,
+   "tp": 8,
+   "fp": 38,
+   "fn": 0,
+   "tn": 3
+  },
+  {
+   "threshold": 1.08,
+   "precision": 0.17391304347826086,
+   "recall": 1.0,
+   "f1": 0.29629629629629634,
+   "false_abstention_rate": 0.926829268292683,
+   "tp": 8,
+   "fp": 38,
+   "fn": 0,
+   "tn": 3
+  },
+  {
+   "threshold": 1.1,
+   "precision": 0.16666666666666666,
+   "recall": 1.0,
+   "f1": 0.2857142857142857,
+   "false_abstention_rate": 0.975609756097561,
+   "tp": 8,
+   "fp": 40,
+   "fn": 0,
+   "tn": 1
+  },
+  {
+   "threshold": 1.12,
+   "precision": 0.16666666666666666,
+   "recall": 1.0,
+   "f1": 0.2857142857142857,
+   "false_abstention_rate": 0.975609756097561,
+   "tp": 8,
+   "fp": 40,
+   "fn": 0,
+   "tn": 1
+  },
+  {
+   "threshold": 1.14,
+   "precision": 0.16326530612244897,
+   "recall": 1.0,
+   "f1": 0.2807017543859649,
+   "false_abstention_rate": 1.0,
+   "tp": 8,
+   "fp": 41,
+   "fn": 0,
+   "tn": 0
+  },
+  {
+   "threshold": 1.16,
+   "precision": 0.16326530612244897,
+   "recall": 1.0,
+   "f1": 0.2807017543859649,
+   "false_abstention_rate": 1.0,
+   "tp": 8,
+   "fp": 41,
+   "fn": 0,
+   "tn": 0
+  },
+  {
+   "threshold": 1.18,
+   "precision": 0.16326530612244897,
+   "recall": 1.0,
+   "f1": 0.2807017543859649,
+   "false_abstention_rate": 1.0,
+   "tp": 8,
+   "fp": 41,
+   "fn": 0,
+   "tn": 0
+  },
+  {
+   "threshold": 1.2,
+   "precision": 0.16326530612244897,
+   "recall": 1.0,
+   "f1": 0.2807017543859649,
+   "false_abstention_rate": 1.0,
+   "tp": 8,
+   "fp": 41,
+   "fn": 0,
+   "tn": 0
+  }
+ ],
+ "threshold_selected_on_dev": {
+  "threshold": 0.4,
+  "precision": 0.7272727272727273,
+  "recall": 1.0,
+  "f1": 0.8421052631578948,
+  "false_abstention_rate": 0.07317073170731707,
+  "tp": 8,
+  "fp": 3,
+  "fn": 0,
+  "tn": 38
+ },
+ "test_at_selected_threshold": {
+  "precision": 0.8571428571428571,
+  "recall": 0.75,
+  "f1": 0.7999999999999999,
+  "false_abstention_rate": 0.025,
+  "tp": 6,
+  "fp": 1,
+  "fn": 2,
+  "tn": 39
+ },
+ "extractive_quality": {
+  "answered": 77,
+  "answerable": 81,
+  "contains_answer": 0.7142857142857143,
+  "citation_hits_gold": 0.6623376623376623
+ },
+ "claude": {
+  "status": "skipped",
+  "reason": "ANTHROPIC_API_KEY が未設定のため未実行 (not run: no ANTHROPIC_API_KEY)"
+ },
+ "cost_estimate": {
+  "mean_prompt_chars": 3331.2337662337663,
+  "tokens_per_char": [
+   0.8,
+   1.3
+  ],
+  "assumed_output_tokens": 250,
+  "rows": [
+   {
+    "model": "claude-haiku-4-5-20251001",
+    "input_per_mtok": 1.0,
+    "output_per_mtok": 5.0,
+    "usd_low": 0.003914987012987013,
+    "usd_high": 0.005580603896103897
+   },
+   {
+    "model": "claude-sonnet-5-5",
+    "input_per_mtok": 2.0,
+    "output_per_mtok": 10.0,
+    "usd_low": 0.007829974025974027,
+    "usd_high": 0.011161207792207794
+   }
+  ]
+ },
+ "per_item": {
+  "q001": {
+   "support": 0.5000609038465581,
+   "signals": {
+    "dense_top": 0.8779,
+    "lexical_coverage": 0.1884,
+    "bm25_top": 28.7442
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「３ 第１項又は第２項の年次有給休暇は、労働者があらかじめ請求する時季に取得させる。」[1]「５ 第１項又は第２項の年次有給休暇が１０日以上与えられた労働者に対しては、第３項の規定にかかわらず、付与日から１年以内に、当該労働者の有する年次有給休暇日数のうち５日について、会社が労働者の意見を聴取し、その意見を尊重した上で、あらかじめ時季を指定して取得させる。」[2]"
+  },
+  "q002": {
+   "support": 0.7241959292412077,
+   "signals": {
+    "dense_top": 0.8833,
+    "lexical_coverage": 0.391,
+    "bm25_top": 45.5184
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「７ 付与日から１年以内に取得しなかった年次有給休暇は、付与日から２年以内に限り繰り越して取得することができる。」[1]"
+  },
+  "q003": {
+   "support": 1.0551261096565132,
+   "signals": {
+    "dense_top": 0.9123,
+    "lexical_coverage": 0.606,
+    "bm25_top": 72.9
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「４ 前項の規定にかかわらず、労働者代表との書面による協定により、各労働者の有する年次有給休暇日数のうち５日を超える部分について、あらかじめ時季を指定して取得させることがある。」[1]「５ 第１項又は第２項の年次有給休暇が１０日以上与えられた労働者に対しては、第３項の規定にかかわらず、付与日から１年以内に、当該労働者の有する年次有給休暇日数のうち５日について、会社が労働者の意見を聴取し、その意見を尊重した上で、あらかじめ時季を指定して取得させる。」[2]"
+  },
+  "q004": {
+   "support": 0.8317149579228353,
+   "signals": {
+    "dense_top": 0.9139,
+    "lexical_coverage": 0.3762,
+    "bm25_top": 47.7328
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「１ 労使協定を締結すれば、年に５日を限度として、時間単位で年次有給休暇を与えることができます（労基法第３９条第４項）。」[1]「③ 年次有給休暇１日分に相当する時間単位年休の時間数（１日分の年次有給休暇に対応する所定労働時間数を基に定めます。」[2]"
+  },
+  "q005": {
+   "support": 1.0564770847456422,
+   "signals": {
+    "dense_top": 0.896,
+    "lexical_coverage": 0.6723,
+    "bm25_top": 51.377
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「９ 年次有給休暇は日単位で取得することが原則ですが、労働者が希望し、使用者が同意した場合であれば半日単位で与えることが可能です。」[1]"
+  },
+  "q006": {
+   "support": 0.6660477299688166,
+   "signals": {
+    "dense_top": 0.882,
+    "lexical_coverage": 0.338,
+    "bm25_top": 35.0565
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「また、事前に年次有給休暇を買い上げて労働者に休暇を与えないことは法違反となります。」[1]「２ 所定労働時間や所定労働日数が変動する労働者の場合、本規程例第１項又は第２項のいずれに該当するかに関しては、年次有給休暇の「基準日」において定められている週所定労働時間及び週所定労働日数又は年間所定労働日数によって判断することとなります。」[2]"
+  },
+  "q007": {
+   "support": 0.5214977804825026,
+   "signals": {
+    "dense_top": 0.861,
+    "lexical_coverage": 0.2775,
+    "bm25_top": 34.6355
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「また、事前に年次有給休暇を買い上げて労働者に休暇を与えないことは法違反となります。」[1]「１１ 本規程例第４項に定める年次有給休暇の計画的付与制度とは、労働者代表との間で労使協定を結んだ場合、最低５日間は労働者が自由に取得できる日数として残し、５日を超える部分について、協定で年次有給休暇を与える時季を定めて労働者に計画的に取得させるものです（労基法第３９条第６項）。」[2]"
+  },
+  "q008": {
+   "support": 0.5656280738496375,
+   "signals": {
+    "dense_top": 0.8789,
+    "lexical_coverage": 0.25,
+    "bm25_top": 34.0103
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「５ 通常の労働者の年次有給休暇の日数は、その後、勤続年数が１年増すごとに所定の日数を加えた年次有給休暇を付与しなければなりません（労基法第３９条第２項）。」[1]「２ 所定労働時間や所定労働日数が変動する労働者の場合、本規程例第１項又は第２項のいずれに該当するかに関しては、年次有給休暇の「基準日」において定められている週所定労働時間及び週所定労働日数又は年間所定労働日数によって判断することとなります。」[2]"
+  },
+  "q009": {
+   "support": 0.6561604205707919,
+   "signals": {
+    "dense_top": 0.9023,
+    "lexical_coverage": 0.2469,
+    "bm25_top": 29.744
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「（産前産後の休業）第２５条 ６週間（多胎妊娠の場合は１４週間）以内に出産予定の女性労働者から請求があったときは、休業させる。」[1]"
+  },
+  "q010": {
+   "support": 0.6156874953200432,
+   "signals": {
+    "dense_top": 0.8999,
+    "lexical_coverage": 0.2162,
+    "bm25_top": 18.8711
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「ただし、産後６週間を経過した女性労働者から請求があったときは、医師が支障がないと認めた業務には就かせることができます（労基法第６５条第２項）。」[1]"
+  },
+  "q011": {
+   "support": 0.4967677514613979,
+   "signals": {
+    "dense_top": 0.8613,
+    "lexical_coverage": 0.2515,
+    "bm25_top": 36.1979
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「１ 育児時間については、生後満１年に達しない子を育てている女性労働者から請求があった場合は、授乳その他育児のための時間を、一般の休憩時間とは別に、１日２回各々少なくとも３０分の時間を与えなければなりません（労基法第６７条)。」[1]"
+  },
+  "q012": {
+   "support": 0.9173634688489003,
+   "signals": {
+    "dense_top": 0.8911,
+    "lexical_coverage": 0.5529,
+    "bm25_top": 22.6735
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「（育児時間及び生理休暇）第２７条 １歳に満たない子を養育する女性労働者から請求があったときは、休憩時間のほか１日について２回、１回について３０分の育児時間を与える。」[1]「なお、本規則第２７条第２項に定める生理休暇について、年次有給休暇の出勤率の算定に当たって出勤したものとみなすことも、もちろん差し支えありません。」[2]"
+  },
+  "q013": {
+   "support": 0.5743596859617539,
+   "signals": {
+    "dense_top": 0.8726,
+    "lexical_coverage": 0.2838,
+    "bm25_top": 44.744
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「（母性健康管理の措置）第２６条 妊娠中又は出産後１年を経過しない女性労働者から、所定労働時間内に、母子保健法に基づく保健指導又は健康診査を受けるために申出があったときは、次の範囲で時間内通院を認める。」[1]「① 産前の場合妊娠２３週まで・・・・・・・・４週に１回妊娠２４週から３５週まで ・・・２週に１回妊娠３６週から出産まで ・・・・１週に１回ただし、医師又は助産師（以下「医師等」という。」[2]"
+  },
+  "q014": {
+   "support": 0.924450718214639,
+   "signals": {
+    "dense_top": 0.9317,
+    "lexical_coverage": 0.3977,
+    "bm25_top": 57.085
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「２ 労働者が不妊治療のための休業を請求したときは、休業開始日の属する事業年度（毎年４月１日から翌年３月３１日まで）を含む引き続く５事業年度の期間において、最長１年間を限度に休業することができる。」[1]"
+  },
+  "q015": {
+   "support": 0.6813023204635771,
+   "signals": {
+    "dense_top": 0.9152,
+    "lexical_coverage": 0.2205,
+    "bm25_top": 23.4538
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「【第３２条 裁判員等のための休暇、立候補のための休暇】裁判員制度に関し、労働者が裁判員若しくは補充裁判員となった場合又は裁判員候補者となった場合や、法定の選挙運動期間中に選挙運動を行う場合で、労働者からその職務に必要な時間を請求されたときは、労基法第７条により使用者はこれを拒んではなりません。」[1]"
+  },
+  "q016": {
+   "support": 0.7705247744600601,
+   "signals": {
+    "dense_top": 0.8837,
+    "lexical_coverage": 0.4356,
+    "bm25_top": 45.5002
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「２ 労働者が国又は地方公共団体の議会の議員の選挙において候補者となった場合には、選挙運動の期間につき、選挙運動のために必要な日数の休暇を与える。」[1]"
+  },
+  "q017": {
+   "support": 1.085747410029632,
+   "signals": {
+    "dense_top": 0.8882,
+    "lexical_coverage": 0.7329,
+    "bm25_top": 100.7547
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「・ 犯罪被害者等の被害回復のための休暇※」[1]「※ 犯罪被害者等の被害回復のための休暇とは、犯罪被害等による心身の治療のための通院や、警察等からの事情聴取、裁判への出廷・傍聴等に活用することのできる休暇のことをいいます。」[2]"
+  },
+  "q018": {
+   "support": 0.7473967743258896,
+   "signals": {
+    "dense_top": 0.8879,
+    "lexical_coverage": 0.3957,
+    "bm25_top": 35.7933
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「［例１］ 完全週休２日制を採用する場合の規程例」[1]「１日の労働時間を８時間とし、完全週休２日制を採用する場合の規程例です。」[2]"
+  },
+  "q019": {
+   "support": 0.5406010171927029,
+   "signals": {
+    "dense_top": 0.8809,
+    "lexical_coverage": 0.2171,
+    "bm25_top": 26.5992
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「②限度時間を超えて労働させる場合臨時的に限度時間を超えて労働させる必要がある場合には、①の限度時間を超えて労働させることが可能ですが、その場合にも、１か月の時間外労働と休日労働を合算した時間について１００時間未満、１年の時間外労働（休日労働は含まない）について７２０時間以内としなければなりません。」[1]「代替休暇として与えることができる時間数１か月の時間外労働時間数 ①換算率 ②換算率 ②労働者が代替休暇を取得しなかった場合に支払う割増賃金率（５割以上） （ア）労働者が代替休暇を取得した場合に支払う割増賃金率（２割５分以上） （イ）また、上記（ア）労働者が代替休暇を取得しなかった場合に支払う割増賃金率は５割以上の率とする必要があり、上記（イ）労働者が代替休暇を取得した場合に支払う割増賃金率は２割５分以上の率とする必要があります。」[2]"
+  },
+  "q020": {
+   "support": 0.47275083620194225,
+   "signals": {
+    "dense_top": 0.8698,
+    "lexical_coverage": 0.1937,
+    "bm25_top": 23.687
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「３ 休憩時間については、１日の労働時間が６時間を超える場合には少なくとも４５分、８時間を超える場合には少なくとも１時間の休憩時間を与えなければなりません（労基法第３４条）。」[1]「４ 休日については、毎週少なくとも１回又は４週間を通じ４日以上与えなければなりません（労基法第３５条）。」[2]"
+  },
+  "q021": {
+   "support": 1.1255702917575077,
+   "signals": {
+    "dense_top": 0.9066,
+    "lexical_coverage": 0.6994,
+    "bm25_top": 50.1802
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「振替休日と代休の労基法上での取扱いの違いは次のとおりです。」[1]「「労働基準法上の振替休日と代休の取扱いの違い」」[2]"
+  },
+  "q022": {
+   "support": 0.7973542373742429,
+   "signals": {
+    "dense_top": 0.8982,
+    "lexical_coverage": 0.4045,
+    "bm25_top": 40.0263
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「その一方で、代休は、定められた法定休日に休日労働を行わせた場合ですから、その後に代休を与えても休日労働をさせたことが帳消しにされるものではありませんので、休日労働に対する割増賃金を支払う必要があります。」[1]"
+  },
+  "q023": {
+   "support": 0.727204116590233,
+   "signals": {
+    "dense_top": 0.8714,
+    "lexical_coverage": 0.4417,
+    "bm25_top": 46.7718
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「使用者の指示があった場合には即時に業務に従事することを求められており、労働から離れることが保障されていない状態で待機等している時間（いわゆる「手待ち時間」）については労働時間に当たり休憩時間ではありませんので注意してください。」[1]"
+  },
+  "q024": {
+   "support": 0.5753741827729539,
+   "signals": {
+    "dense_top": 0.8861,
+    "lexical_coverage": 0.231,
+    "bm25_top": 17.7277
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「※ 以下の事業・業務については、2024 年４月１日から次の内容（特例）の時間外労働の上限規制が適用されています。」[1]「事業・業務 特例の内容建設業（災害時における復旧及び復興の事業に限る）上記の時間外労働の上限規制のうち、時間外・休日労働を１か月１００時間未満、複数月平均８０時間以内とする規定は適用されません。」[2]"
+  },
+  "q025": {
+   "support": 0.7898714526169431,
+   "signals": {
+    "dense_top": 0.8939,
+    "lexical_coverage": 0.4143,
+    "bm25_top": 45.1162
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「②限度時間を超えて労働させる場合臨時的に限度時間を超えて労働させる必要がある場合には、①の限度時間を超えて労働させることが可能ですが、その場合にも、１か月の時間外労働と休日労働を合算した時間について１００時間未満、１年の時間外労働（休日労働は含まない）について７２０時間以内としなければなりません。」[1]"
+  },
+  "q026": {
+   "support": 0.5303621637561176,
+   "signals": {
+    "dense_top": 0.8693,
+    "lexical_coverage": 0.2531,
+    "bm25_top": 27.8538
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「②限度時間を超えて労働させる場合臨時的に限度時間を超えて労働させる必要がある場合には、①の限度時間を超えて労働させることが可能ですが、その場合にも、１か月の時間外労働と休日労働を合算した時間について１００時間未満、１年の時間外労働（休日労働は含まない）について７２０時間以内としなければなりません。」[1]「その一方で、代休は、定められた法定休日に休日労働を行わせた場合ですから、その後に代休を与えても休日労働をさせたことが帳消しにされるものではありませんので、休日労働に対する割増賃金を支払う必要があります。」[2]"
+  },
+  "q027": {
+   "support": 0.6621255414266516,
+   "signals": {
+    "dense_top": 0.8713,
+    "lexical_coverage": 0.3769,
+    "bm25_top": 39.3284
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「７ 年少者（１８歳未満の者）については、一定の場合を除き、労基法により時間外労働、休日労働やいわゆる変形労働時間制により労働させることはできません（労基法第６０条）。」[1]「また、原則として午後１０時から翌日５時までの深夜時間帯に労働させることもできません（労基法第６１条）。」[2]"
+  },
+  "q028": {
+   "support": 0.4338303014057461,
+   "signals": {
+    "dense_top": 0.8659,
+    "lexical_coverage": 0.1704,
+    "bm25_top": 20.033
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「（母性健康管理の措置）第２６条 妊娠中又は出産後１年を経過しない女性労働者から、所定労働時間内に、母子保健法に基づく保健指導又は健康診査を受けるために申出があったときは、次の範囲で時間内通院を認める。」[1]「２ 妊娠中又は出産後１年を経過しない女性労働者から、保健指導又は健康診査に基づき勤務時間等について医師等の指導を受けた旨申出があった場合、次の措置を講ずる。」[2]"
+  },
+  "q029": {
+   "support": 0.9741895453930373,
+   "signals": {
+    "dense_top": 0.9038,
+    "lexical_coverage": 0.5588,
+    "bm25_top": 67.1703
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「１ 労働時間等の設定の改善に関する特別措置法（労働時間等設定改善法）が改正され、２０１９年（平成３１年）４月１日から、勤務間インターバル制度の導入が事業主の努力義務となりました。」[1]「２ 勤務間インターバル制度とは、終業時刻から次の始業時刻の間に、一定時間以上の休息時間（インターバル時間）を設けることで、従業員の生活時間や睡眠時間を確保しようとするものです。」[2]"
+  },
+  "q030": {
+   "support": 0.9776204921546093,
+   "signals": {
+    "dense_top": 0.905,
+    "lexical_coverage": 0.5578,
+    "bm25_top": 44.7458
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「２ 月６０時間を超える時間外労働については、割増賃金率は５割以上とされています。」[1]「３ 月６０時間を超える時間外労働に対する割増率を含めた時間外労働、休日労働、深夜労働に対する割増率は、就業規則に盛り込まなければなりません。」[2]"
+  },
+  "q031": {
+   "support": 0.7545122922697063,
+   "signals": {
+    "dense_top": 0.8886,
+    "lexical_coverage": 0.4002,
+    "bm25_top": 37.1782
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「１ 法定労働時間を超えて労働させた場合には２割５分以上、法定休日（週１回又は４週４日）に労働させた場合には３割５分以上、深夜（午後１０時から午前５時までの間）に労働させた場合には２割５分以上の割増率で計算した割増賃金をそれぞれ支払わなければなりません（労基法第３７条第１項・第４項）。」[1]"
+  },
+  "q032": {
+   "support": 0.9951288454942689,
+   "signals": {
+    "dense_top": 0.9061,
+    "lexical_coverage": 0.5709,
+    "bm25_top": 47.1908
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「７ 管理監督者については、労働時間、休憩及び休日に関する規定は適用しないとされている一方、深夜労働に関する規定の適用は排除されていません。」[1]「このため、時間外労働又は休日労働の割増賃金の支払の問題は生じませんが、深夜労働については割増賃金を支払わなければなりません。」[2]"
+  },
+  "q033": {
+   "support": 0.8154081146302353,
+   "signals": {
+    "dense_top": 0.8757,
+    "lexical_coverage": 0.5124,
+    "bm25_top": 55.3565
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「家族手当や通勤手当等割増賃金の算定基礎から除外することができる手当は除きます。」[1]"
+  },
+  "q034": {
+   "support": 0.8476167708921729,
+   "signals": {
+    "dense_top": 0.9084,
+    "lexical_coverage": 0.4139,
+    "bm25_top": 48.9602
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「賃金支払日２５％の割増賃金の支払４月５月６月７月１５日代替休暇の取得月６０時間を超える時間外労働意向確認取得の意向あり（ｂ）（ａ）以外の場合（労働者に代替休暇取得の意向がない場合や労働者の意向が確認できない場合等）」[1]「４ 法定割増賃金率の引上げ分の割増賃金の支払が不要となる時間代替休暇は、法定割増賃金率の引上げ分の割増賃金の支払に代えて与えられるものであることから、法定割増賃金率の引上げ分の割増賃金の支払が不要となる時間は、１か月に６０時間を超える時間外労働のうち労働者が取得した代替休暇に対応する時間の労働となります。」[2]"
+  },
+  "q035": {
+   "support": 0.9892766057279315,
+   "signals": {
+    "dense_top": 0.9145,
+    "lexical_coverage": 0.5314,
+    "bm25_top": 38.2912
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「（２）代替休暇の単位代替休暇の単位は、代替休暇はまとまった単位で与えることによって労働者の休息の機会とする観点から、１日又は半日とされており、労使協定には、その一方又は両方を代替休暇の単位として定める必要があります。」[1]「（４）代替休暇の取得日及び割増賃金の支払日代替休暇の労使協定については、上記（１）から（３）までの事項を必ず定める必要があります（労基則第１９条の２）が、このほか労使協定で定めるべきものとしては、次のものが考えられます。」[2]"
+  },
+  "q036": {
+   "support": 0.6275010961068072,
+   "signals": {
+    "dense_top": 0.8859,
+    "lexical_coverage": 0.2837,
+    "bm25_top": 23.9939
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「【第４４条 臨時休業の賃金】会社側の都合(使用者の責に帰すべき事由)により、所定労働日に労働者を休業させる場合には、平均賃金の６０％以上の休業手当を支払わなければなりません(労基法第２６条)。」[1]「（臨時休業の賃金）第４４条 会社側の都合により、所定労働日に労働者を休業させた場合は、休業１日につき労基法第１２条に規定する平均賃金の６割を支給する。」[2]"
+  },
+  "q037": {
+   "support": 0.3724781566664734,
+   "signals": {
+    "dense_top": 0.8493,
+    "lexical_coverage": 0.1753,
+    "bm25_top": 17.181
+   },
+   "abstained": true,
+   "abstain_reason": "low_retrieval_support",
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": false,
+   "answer": "資料に記載がありません"
+  },
+  "q038": {
+   "support": 0.2772722369680981,
+   "signals": {
+    "dense_top": 0.8381,
+    "lexical_coverage": 0.1249,
+    "bm25_top": 21.1547
+   },
+   "abstained": true,
+   "abstain_reason": "low_retrieval_support",
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": false,
+   "answer": "資料に記載がありません"
+  },
+  "q039": {
+   "support": 0.373023316593036,
+   "signals": {
+    "dense_top": 0.8617,
+    "lexical_coverage": 0.1261,
+    "bm25_top": 30.2181
+   },
+   "abstained": true,
+   "abstain_reason": "low_retrieval_support",
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": false,
+   "answer": "資料に記載がありません"
+  },
+  "q040": {
+   "support": 0.6276885199763667,
+   "signals": {
+    "dense_top": 0.8863,
+    "lexical_coverage": 0.2826,
+    "bm25_top": 17.1349
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「（賞与）第５０条 賞与は、原則として、下記の算定対象期間に在籍した労働者に対し、会社の業績等を勘案して下記の支給日に支給する。」[1]「１ 賞与は、労基法その他の法律によって設けることが義務付けられているものではありません。」[2]"
+  },
+  "q041": {
+   "support": 0.7026696132787171,
+   "signals": {
+    "dense_top": 0.8866,
+    "lexical_coverage": 0.3564,
+    "bm25_top": 37.7472
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「２ 就業規則に、賞与の支給対象者を一定の日（例えば、６月１日や１２月１日、又は賞与支給日）に在籍した者とする規定を設けることで、期間の途中で退職等し、その日に在職しない者には支給しないこととすることも可能です。」[1]「（賞与）第５０条 賞与は、原則として、下記の算定対象期間に在籍した労働者に対し、会社の業績等を勘案して下記の支給日に支給する。」[2]"
+  },
+  "q042": {
+   "support": 0.564880466293818,
+   "signals": {
+    "dense_top": 0.858,
+    "lexical_coverage": 0.3328,
+    "bm25_top": 18.3316
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「２ 労働者の定年を定める場合は、定年年齢は６０歳を下回ることはできません（高年齢者等の雇用の安定等に関する法律（昭和４６年法律第６８号）第８条）。」[1]"
+  },
+  "q043": {
+   "support": 0.831750608647059,
+   "signals": {
+    "dense_top": 0.8935,
+    "lexical_coverage": 0.4577,
+    "bm25_top": 40.5435
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「［例 2］ 定年を満６５歳とし、その後希望者を継続雇用する例（定年等）第５１条 労働者の定年は、満６５歳とし、定年に達した日の属する月の末日をもって退職とする。」[1]「２ 前項の規定にかかわらず、定年後も引き続き雇用されることを希望し、解雇事由又は退職事由に該当しない労働者については、満６５歳までこれを継続雇用する。」[2]"
+  },
+  "q044": {
+   "support": 0.6096431099460116,
+   "signals": {
+    "dense_top": 0.8667,
+    "lexical_coverage": 0.3429,
+    "bm25_top": 30.4184
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「① 退職を願い出て会社が承認したとき、又は退職願を提出して 日を経過したとき」[1]"
+  },
+  "q045": {
+   "support": 0.8034723420920207,
+   "signals": {
+    "dense_top": 0.9001,
+    "lexical_coverage": 0.4029,
+    "bm25_top": 32.4943
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「２ 前項の規定により労働者を解雇する場合は、少なくとも３０日前に予告をする。」[1]"
+  },
+  "q046": {
+   "support": 0.7961799392109908,
+   "signals": {
+    "dense_top": 0.9013,
+    "lexical_coverage": 0.391,
+    "bm25_top": 36.8816
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「③ 労働者の業務上の負傷、疾病による休業期間とその後３０日間及び産前産後の休業の期間（産前６週間（多胎妊娠の場合は１４週間）以内又は産後８週間以内の女性が休業する期間）とその後３０日間の解雇（労基法第１９条）。」[1]「３ 産前産後の休業を請求し、又は取得したことを理由として解雇その他不利益な取扱いをしてはいけません（均等法第９条第３項）。」[2]"
+  },
+  "q047": {
+   "support": 0.8381497201380768,
+   "signals": {
+    "dense_top": 0.8605,
+    "lexical_coverage": 0.596,
+    "bm25_top": 54.9263
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「また、有期労働契約が３回以上更新されている場合や１年を超えて継続勤務している有期契約労働者について、契約を更新しない場合、使用者は少なくとも契約の期間が満了する日の３０日前までに、その予告をしなければなりません（あらかじめその契約を更新しない旨が明示されている場合を除きます。」[1]"
+  },
+  "q048": {
+   "support": 0.5744895290899535,
+   "signals": {
+    "dense_top": 0.8949,
+    "lexical_coverage": 0.1949,
+    "bm25_top": 20.9098
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「ただし、第６８条第２項により懲戒解雇された者には、退職金の全部又は一部を支給しないことがある。」[1]「３ 前項の規定は、労働基準監督署長の認定を受けて労働者を第６７条第１項第４号に定める懲戒解雇にする場合又は次の各号のいずれかに該当する労働者を解雇する場合は適用しない。」[2]"
+  },
+  "q049": {
+   "support": 0.6786163497713293,
+   "signals": {
+    "dense_top": 0.8948,
+    "lexical_coverage": 0.2993,
+    "bm25_top": 33.9944
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「（退職金の額）第５５条 退職金の額は、退職又は解雇の時の基本給の額に、勤続年数に応じて定めた下表の支給率を乗じた金額とする。」[1]"
+  },
+  "q050": {
+   "support": 0.7690937917532479,
+   "signals": {
+    "dense_top": 0.8816,
+    "lexical_coverage": 0.4427,
+    "bm25_top": 45.1529
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「（退職金の額）第５５条 退職金の額は、退職又は解雇の時の基本給の額に、勤続年数に応じて定めた下表の支給率を乗じた金額とする。」[1]「２ 第９条により休職する期間については、会社の都合による場合を除き、前項の勤続年数に算入しない。」[2]"
+  },
+  "q051": {
+   "support": 0.8743392704483606,
+   "signals": {
+    "dense_top": 0.9251,
+    "lexical_coverage": 0.3739,
+    "bm25_top": 56.9788
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「（無期労働契約への転換）第５７条 期間の定めのある労働契約（有期労働契約）で雇用する従業員のうち、通算契約期間が５年を超える従業員は、別に定める様式で申込むことにより、現在締結している有期労働契約の契約期間の末日の翌日から、期間の定めのない労働契約（無期労働契約）での雇用に転換することができる。」[1]"
+  },
+  "q052": {
+   "support": 0.6054346175484189,
+   "signals": {
+    "dense_top": 0.9023,
+    "lexical_coverage": 0.1964,
+    "bm25_top": 31.3693
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「１ 事業者は、一般健康診断を１年に１回（深夜労働その他労働安全衛生規則（昭和４７年労働省令第３２号）第１３条第１項第３号で定める業務に従事する者は６か月ごとに１回）定期的に実施しなければなりません（安衛法第６６条第１項）。」[1]「（健康診断）第５９条 労働者に対しては、採用の際及び毎年１回（深夜労働に従事する者は６か月ごとに１回）、定期に健康診断を行う。」[2]"
+  },
+  "q053": {
+   "support": 0.8400454878678906,
+   "signals": {
+    "dense_top": 0.8799,
+    "lexical_coverage": 0.5206,
+    "bm25_top": 74.3379
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「５ 労働者の同意を得て、事業者に提供されたストレスチェックの結果及び医師による面接指導の結果は、事業者が記録を作成し、５年間保存しなければならないとされています（労働安全衛生規則第５２条の１３、第５２条の１８）。」[1]「また、ストレスチェックの結果は、医師、保健師等から労働者に直接通知されなければならず、本人の同意がない限り、事業者は把握してはいけません（安衛法第６６条の１０第２項）。」[2]"
+  },
+  "q054": {
+   "support": 0.7306269143244639,
+   "signals": {
+    "dense_top": 0.8907,
+    "lexical_coverage": 0.368,
+    "bm25_top": 39.2018
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「２ 事業者は、休憩時間を除き１週間当たり４０時間を超えて労働させた場合におけるその超えた時間が、１か月当たり８０時間を超え、かつ、疲労の蓄積が認められる労働者について、その者の申出により医師による面接指導を行わなければなりません（安衛法第６６条の８第１項）。」[1]「３ 時間外労働が一定時間を超えなくても、長時間の労働により、疲労の蓄積が認められ、又は健康上の不安を有している労働者に対しても同様に、その者の申出により面接指導又は面接指導に準ずる措置を講じるよう努めなければなりません（安衛法第６６条の９）。」[2]"
+  },
+  "q055": {
+   "support": 1.0821219678761596,
+   "signals": {
+    "dense_top": 0.9046,
+    "lexical_coverage": 0.6639,
+    "bm25_top": 51.8524
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「なお、安全衛生教育の実施に要する時間は労働時間と解されますので、当該教育が法定労働時間外に行われた場合には、当然、割増賃金の支払が必要になります。」[1]"
+  },
+  "q056": {
+   "support": 0.5364249671289485,
+   "signals": {
+    "dense_top": 0.8674,
+    "lexical_coverage": 0.2667,
+    "bm25_top": 25.9965
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「ただし、業務災害により休業する場合の最初の３日間は、労災保険からの休業補償給付が行われないので、事業主は、労基法に基づいて平均賃金の６０％以上の休業補償を行う必要があります。」[1]"
+  },
+  "q057": {
+   "support": 0.7658499581255864,
+   "signals": {
+    "dense_top": 0.88,
+    "lexical_coverage": 0.4457,
+    "bm25_top": 37.1307
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「裁判においては、使用者の行った懲戒処分が公正とは認められない場合には、当該懲戒処分について懲戒権の濫用として無効であると判断したものもあります。」[1]「」と定められており、懲戒事由に合理性がない場合、当該事由に基づいた懲戒処分は懲戒権の濫用と判断される場合があります。」[2]"
+  },
+  "q058": {
+   "support": 0.5345672488818112,
+   "signals": {
+    "dense_top": 0.8703,
+    "lexical_coverage": 0.2535,
+    "bm25_top": 19.702
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「なお、どのような形で副業・兼業を行う場合でも、過労等により業務に支障を来さないようにする観点から、就業時間が長時間にならないよう配慮することが望ましいです。」[1]"
+  },
+  "q059": {
+   "support": 0.4793791015806708,
+   "signals": {
+    "dense_top": 0.8647,
+    "lexical_coverage": 0.2205,
+    "bm25_top": 30.6976
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「４ 裁判例では、労働者の副業・兼業について各企業の制限が許される場合は、第２項各号で規定したような場合であることが示されていると考えられます。」[1]「２ 会社は、労働者からの前項の業務に従事する旨の届出に基づき、当該労働者が当該業務に従事することにより次の各号のいずれかに該当する場合には、これを禁止又は制限することができる。」[2]"
+  },
+  "q060": {
+   "support": 0.6303881782964662,
+   "signals": {
+    "dense_top": 0.8891,
+    "lexical_coverage": 0.274,
+    "bm25_top": 27.7527
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「特に、労働者が自社、副業・兼業先の両方で雇用されている場合には、労基法第３８条等を踏まえ、労働者の副業・兼業の内容等を把握するため、次の事項を確認することが考えられます。」[1]「※２ 副業・兼業を行う場合の労働時間管理については、「副業・兼業の場合における労働時間管理に係る労働基準法第３８条第１項の解釈等について」（令和２年９月１日付け基発０９０１第３号）に、労働時間の通算や簡便な労働時間管理の方法について考え方を示していますので、その考え方に基づき通算を行うことになります。」[2]"
+  },
+  "q061": {
+   "support": 0.5873129173652734,
+   "signals": {
+    "dense_top": 0.8823,
+    "lexical_coverage": 0.2582,
+    "bm25_top": 27.0492
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「（採用時の提出書類）第５条 労働者として採用された者は、採用された日から 週間以内に次の書類を提出しなければならない。」[1]「【第５条 採用時の提出書類】会社は、労働者の年齢、現住所を確認するに当たり、労働者から戸籍謄本（抄本）や住民票の写しを提出させることは適切ではありません。」[2]"
+  },
+  "q062": {
+   "support": 0.9895096498508499,
+   "signals": {
+    "dense_top": 0.9061,
+    "lexical_coverage": 0.5651,
+    "bm25_top": 36.9597
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「２ 試用期間中の解雇については、最初の１４日間以内であれば即時に解雇することができますが、試用期間中の者も１４日を超えて雇用した後に解雇する場合には、原則として３０日以上前に予告をしなければなりません。」[1]「３ 試用期間中に労働者として不適格と認めた者は、解雇することがある。」[2]"
+  },
+  "q063": {
+   "support": 0.8825150560344657,
+   "signals": {
+    "dense_top": 0.8932,
+    "lexical_coverage": 0.5097,
+    "bm25_top": 35.3415
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「４ 試用期間は、勤続年数に通算する。」[1]"
+  },
+  "q064": {
+   "support": 0.7002851620552775,
+   "signals": {
+    "dense_top": 0.8648,
+    "lexical_coverage": 0.441,
+    "bm25_top": 67.24
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「（人事異動）第８条 会社は、業務上必要がある場合に、労働者に対して就業する場所及び従事する業務の変更を命ずることがある。」[1]「２ 会社は、業務上必要がある場合に、労働者を在籍のまま関係会社へ出向させることがある。」[2]"
+  },
+  "q065": {
+   "support": 0.366442379602958,
+   "signals": {
+    "dense_top": 0.8655,
+    "lexical_coverage": 0.1044,
+    "bm25_top": 18.7409
+   },
+   "abstained": true,
+   "abstain_reason": "low_retrieval_support",
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": false,
+   "answer": "資料に記載がありません"
+  },
+  "q066": {
+   "support": 0.9810837660059505,
+   "signals": {
+    "dense_top": 0.912,
+    "lexical_coverage": 0.5329,
+    "bm25_top": 66.8395
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「７．労働時間の記録に関する書類の保存使用者は、労働者名簿、賃金台帳のみならず、出勤簿やタイムカード等の労働時間の記録に関する書類について、労働基準法第１０９条に基づき、３年間保存しなければならないこと。」[1]"
+  },
+  "q067": {
+   "support": 0.7417837102644318,
+   "signals": {
+    "dense_top": 0.8971,
+    "lexical_coverage": 0.3536,
+    "bm25_top": 40.7201
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「例えば、１企業で２以上の営業所、店舗等を有している場合、企業全体の労働者の数を合計するのではなく、それぞれの営業所、店舗等を１つの事業場としてとらえ、常時使用する労働者が１０人以上の事業場について就業規則を作成する義務が生じます。」[1]"
+  },
+  "q068": {
+   "support": 0.5357063095470249,
+   "signals": {
+    "dense_top": 0.8788,
+    "lexical_coverage": 0.2206,
+    "bm25_top": 32.7769
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「３ 第１項第１号により休職し、休職期間が満了してもなお傷病が治癒せず就業が困難な場合は、休職期間の満了をもって退職とする。」[1]"
+  },
+  "q069": {
+   "support": 0.7963482716014872,
+   "signals": {
+    "dense_top": 0.8758,
+    "lexical_coverage": 0.4933,
+    "bm25_top": 59.8359
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「（職場のパワーハラスメントの禁止）第１２条 職務上の地位や人間関係などの職場内の優越的な関係を背景とした、業務上必要かつ相当な範囲を超えた言動により、他の労働者の就業環境を害するようなことをしてはならない。」[1]"
+  },
+  "q070": {
+   "support": 0.7412870632496186,
+   "signals": {
+    "dense_top": 0.8802,
+    "lexical_coverage": 0.4203,
+    "bm25_top": 38.7287
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「１ 本規程例では労働者が遅刻、早退若しくは欠勤等をする場合、事前の申出と会社の承認を得ることとしていますが、どのような手続を規定するかは各事業場で決めることです。」[1]"
+  },
+  "q071": {
+   "support": 0.9595663668701706,
+   "signals": {
+    "dense_top": 0.9293,
+    "lexical_coverage": 0.4425,
+    "bm25_top": 50.7086
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「立て替えた経費は、支出した日の属する月の翌月10日までに経費精算システムで申請しなければならない。」[1]"
+  },
+  "q072": {
+   "support": 0.8364831669203565,
+   "signals": {
+    "dense_top": 0.9056,
+    "lexical_coverage": 0.4139,
+    "bm25_top": 61.98
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「2 期限を過ぎた申請は、所属長の理由書を添付した場合に限り、支出日から3か月以内であれば受け付ける。」[1]"
+  },
+  "q073": {
+   "support": 0.4014120011602531,
+   "signals": {
+    "dense_top": 0.8524,
+    "lexical_coverage": 0.1917,
+    "bm25_top": 29.0948
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「経費の申請には、領収書の原本又は電子データの領収書を添付する。」[1]「3 領収書を紛失した場合は、支払証明書に所属長の確認印を受けて提出する。」[2]"
+  },
+  "q074": {
+   "support": 0.4457355168084209,
+   "signals": {
+    "dense_top": 0.8711,
+    "lexical_coverage": 0.1612,
+    "bm25_top": 26.3444
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「1件当たり3万円以上の物品の購入は、購入前に所属長の承認を得なければならない。」[1]「また、事前に年次有給休暇を買い上げて労働者に休暇を与えないことは法違反となります。」[2]"
+  },
+  "q075": {
+   "support": 0.7133752453702555,
+   "signals": {
+    "dense_top": 0.9009,
+    "lexical_coverage": 0.3097,
+    "bm25_top": 44.3276
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「取引先との会食等の交際費は、1人当たり5,000円以下の場合は所属長の承認で支出できる。」[1]"
+  },
+  "q076": {
+   "support": 0.5312664189485695,
+   "signals": {
+    "dense_top": 0.8804,
+    "lexical_coverage": 0.2096,
+    "bm25_top": 18.5262
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「2 新幹線は、片道100km以上の移動の場合に利用できる。」[1]"
+  },
+  "q077": {
+   "support": 0.44811092172120487,
+   "signals": {
+    "dense_top": 0.8002,
+    "lexical_coverage": 0.4473,
+    "bm25_top": 43.441
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「4 グリーン車及びビジネスクラスの利用は、役員に限る。」[1]"
+  },
+  "q078": {
+   "support": 0.5241691174714442,
+   "signals": {
+    "dense_top": 0.8902,
+    "lexical_coverage": 0.1635,
+    "bm25_top": 25.4729
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": false,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「出張の日当は、日帰り出張は1日1,000円、宿泊を伴う出張は1日2,000円とする。」[1]"
+  },
+  "q079": {
+   "support": 1.0539566742941733,
+   "signals": {
+    "dense_top": 0.9223,
+    "lexical_coverage": 0.5646,
+    "bm25_top": 56.3024
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「出張の日当は、日帰り出張は1日1,000円、宿泊を伴う出張は1日2,000円とする。」[1]"
+  },
+  "q080": {
+   "support": 0.6399604192815802,
+   "signals": {
+    "dense_top": 0.8807,
+    "lexical_coverage": 0.3171,
+    "bm25_top": 40.3564
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「① 午後10時から午前5時までの間に移動する場合」[1]「裁判例でも、自動車運転業務について、隔日勤務に就くタクシー運転手が非番日に会社に無断で輸出車の移送、船積み等をするアルバイトを行った事例において、「タクシー乗務の性質上、乗務前の休養が要請されること等の事情を考えると、本件アルバイトは就業規則により禁止された兼業に該当すると解するのが相当である」としたものがあることに留意が必要です（都タクシー事件 広島地裁決定昭和５９年１２月１８日）。」[2]"
+  },
+  "q081": {
+   "support": 0.6800012279205061,
+   "signals": {
+    "dense_top": 0.8859,
+    "lexical_coverage": 0.3363,
+    "bm25_top": 44.4233
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": true,
+   "citation_hits_gold": true,
+   "answer": "資料には次のように記載されています。「出張者は、帰着後5営業日以内に出張報告書を所属長に提出しなければならない。」[1]"
+  },
+  "q082": {
+   "support": 0.321953661759925,
+   "signals": {
+    "dense_top": 0.8478,
+    "lexical_coverage": 0.1307,
+    "bm25_top": 14.6794
+   },
+   "abstained": true,
+   "abstain_reason": "low_retrieval_support",
+   "declined_by_extractive": false,
+   "contains_answer": null,
+   "citation_hits_gold": false,
+   "answer": "資料に記載がありません"
+  },
+  "q083": {
+   "support": 0.20618947142695782,
+   "signals": {
+    "dense_top": 0.8337,
+    "lexical_coverage": 0.0714,
+    "bm25_top": 12.3702
+   },
+   "abstained": true,
+   "abstain_reason": "low_retrieval_support",
+   "declined_by_extractive": false,
+   "contains_answer": null,
+   "citation_hits_gold": false,
+   "answer": "資料に記載がありません"
+  },
+  "q084": {
+   "support": 0.2094765247412444,
+   "signals": {
+    "dense_top": 0.8243,
+    "lexical_coverage": 0.1121,
+    "bm25_top": 13.5583
+   },
+   "abstained": true,
+   "abstain_reason": "low_retrieval_support",
+   "declined_by_extractive": false,
+   "contains_answer": null,
+   "citation_hits_gold": false,
+   "answer": "資料に記載がありません"
+  },
+  "q085": {
+   "support": 0.3900042302362958,
+   "signals": {
+    "dense_top": 0.8533,
+    "lexical_coverage": 0.1769,
+    "bm25_top": 22.82
+   },
+   "abstained": true,
+   "abstain_reason": "low_retrieval_support",
+   "declined_by_extractive": false,
+   "contains_answer": null,
+   "citation_hits_gold": false,
+   "answer": "資料に記載がありません"
+  },
+  "q086": {
+   "support": 0.26961063205548286,
+   "signals": {
+    "dense_top": 0.8258,
+    "lexical_coverage": 0.1665,
+    "bm25_top": 10.788
+   },
+   "abstained": true,
+   "abstain_reason": "low_retrieval_support",
+   "declined_by_extractive": false,
+   "contains_answer": null,
+   "citation_hits_gold": false,
+   "answer": "資料に記載がありません"
+  },
+  "q087": {
+   "support": 0.4867767655529732,
+   "signals": {
+    "dense_top": 0.8607,
+    "lexical_coverage": 0.2441,
+    "bm25_top": 12.4692
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": null,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「なお、休暇は暦日単位のほか半日単位、時間単位でもあっても差し支えありません。」[1]「１０ 年次有給休暇は、計画的付与の場合を除き、労働者の請求する時季に与えなければなりません。」[2]"
+  },
+  "q088": {
+   "support": 0.37714124316326914,
+   "signals": {
+    "dense_top": 0.8561,
+    "lexical_coverage": 0.1527,
+    "bm25_top": 24.2597
+   },
+   "abstained": true,
+   "abstain_reason": "low_retrieval_support",
+   "declined_by_extractive": false,
+   "contains_answer": null,
+   "citation_hits_gold": false,
+   "answer": "資料に記載がありません"
+  },
+  "q089": {
+   "support": 0.41107514358622604,
+   "signals": {
+    "dense_top": 0.8458,
+    "lexical_coverage": 0.2279,
+    "bm25_top": 22.1371
+   },
+   "abstained": false,
+   "abstain_reason": null,
+   "declined_by_extractive": false,
+   "contains_answer": null,
+   "citation_hits_gold": false,
+   "answer": "資料には次のように記載されています。「【第６５条 教育訓練】事業主が、労働者に対し教育訓練において性別を理由に差別的取扱いをすることは禁止されています（均等法第６条）。」[1]「また、労基法をはじめ様々な法律で解雇が禁止される場合が定められています。」[2]"
+  },
+  "q090": {
+   "support": 0.3879495910767563,
+   "signals": {
+    "dense_top": 0.8617,
+    "lexical_coverage": 0.1411,
+    "bm25_top": 21.9288
+   },
+   "abstained": true,
+   "abstain_reason": "low_retrieval_support",
+   "declined_by_extractive": false,
+   "contains_answer": null,
+   "citation_hits_gold": false,
+   "answer": "資料に記載がありません"
+  },
+  "q091": {
+   "support": 0.2270665069992437,
+   "signals": {
+    "dense_top": 0.8296,
+    "lexical_coverage": 0.1088,
+    "bm25_top": 21.9012
+   },
+   "abstained": true,
+   "abstain_reason": "low_retrieval_support",
+   "declined_by_extractive": false,
+   "contains_answer": null,
+   "citation_hits_gold": false,
+   "answer": "資料に記載がありません"
+  },
+  "q092": {
+   "support": 0.19329144426730266,
+   "signals": {
+    "dense_top": 0.8316,
+    "lexical_coverage": 0.067,
+    "bm25_top": 11.3887
+   },
+   "abstained": true,
+   "abstain_reason": "low_retrieval_support",
+   "declined_by_extractive": false,
+   "contains_answer": null,
+   "citation_hits_gold": false,
+   "answer": "資料に記載がありません"
+  },
+  "q093": {
+   "support": 0.2919713103755489,
+   "signals": {
+    "dense_top": 0.8253,
+    "lexical_coverage": 0.1906,
+    "bm25_top": 34.6293
+   },
+   "abstained": true,
+   "abstain_reason": "low_retrieval_support",
+   "declined_by_extractive": false,
+   "contains_answer": null,
+   "citation_hits_gold": false,
+   "answer": "資料に記載がありません"
+  },
+  "q094": {
+   "support": 0.36869631463358515,
+   "signals": {
+    "dense_top": 0.8132,
+    "lexical_coverage": 0.316,
+    "bm25_top": 21.7764
+   },
+   "abstained": true,
+   "abstain_reason": "low_retrieval_support",
+   "declined_by_extractive": false,
+   "contains_answer": null,
+   "citation_hits_gold": false,
+   "answer": "資料に記載がありません"
+  },
+  "q095": {
+   "support": 0.2839861514053179,
+   "signals": {
+    "dense_top": 0.8361,
+    "lexical_coverage": 0.1395,
+    "bm25_top": 12.9203
+   },
+   "abstained": true,
+   "abstain_reason": "low_retrieval_support",
+   "declined_by_extractive": false,
+   "contains_answer": null,
+   "citation_hits_gold": false,
+   "answer": "資料に記載がありません"
+  },
+  "q096": {
+   "support": 0.13603062650996695,
+   "signals": {
+    "dense_top": 0.8019,
+    "lexical_coverage": 0.1283,
+    "bm25_top": 17.2605
+   },
+   "abstained": true,
+   "abstain_reason": "low_retrieval_support",
+   "declined_by_extractive": false,
+   "contains_answer": null,
+   "citation_hits_gold": false,
+   "answer": "資料に記載がありません"
+  },
+  "q097": {
+   "support": 0.2632882404718543,
+   "signals": {
+    "dense_top": 0.8496,
+    "lexical_coverage": 0.0647,
+    "bm25_top": 22.094
+   },
+   "abstained": true,
+   "abstain_reason": "low_retrieval_support",
+   "declined_by_extractive": false,
+   "contains_answer": null,
+   "citation_hits_gold": false,
+   "answer": "資料に記載がありません"
+  }
+ },
+ "ranks": {
+  "bm25": {
+   "q001": 5,
+   "q002": 1,
+   "q003": 1,
+   "q004": 1,
+   "q005": 1,
+   "q006": 1,
+   "q007": 1,
+   "q008": 1,
+   "q009": 1,
+   "q010": 1,
+   "q011": 1,
+   "q012": 2,
+   "q013": 1,
+   "q014": 1,
+   "q015": 2,
+   "q016": 1,
+   "q017": 1,
+   "q018": 1,
+   "q019": null,
+   "q020": 4,
+   "q021": 1,
+   "q022": 1,
+   "q023": 1,
+   "q024": 4,
+   "q025": 1,
+   "q026": 5,
+   "q027": 1,
+   "q028": 3,
+   "q029": 1,
+   "q030": 1,
+   "q031": 1,
+   "q032": 1,
+   "q033": 1,
+   "q034": 5,
+   "q035": 1,
+   "q036": 1,
+   "q037": null,
+   "q038": 7,
+   "q039": 2,
+   "q040": 1,
+   "q041": 1,
+   "q042": 1,
+   "q043": 1,
+   "q044": 4,
+   "q045": 1,
+   "q046": 2,
+   "q047": 1,
+   "q048": 2,
+   "q049": 1,
+   "q050": 1,
+   "q051": 1,
+   "q052": 1,
+   "q053": 2,
+   "q054": 1,
+   "q055": 1,
+   "q056": 2,
+   "q057": 3,
+   "q058": 10,
+   "q059": 2,
+   "q060": 1,
+   "q061": 1,
+   "q062": 2,
+   "q063": 1,
+   "q064": 1,
+   "q065": 1,
+   "q066": 1,
+   "q067": 1,
+   "q068": 1,
+   "q069": 1,
+   "q070": 4,
+   "q071": 1,
+   "q072": 1,
+   "q073": 1,
+   "q074": 1,
+   "q075": 1,
+   "q076": 1,
+   "q077": 1,
+   "q078": 1,
+   "q079": 1,
+   "q080": 1,
+   "q081": 1
+  },
+  "dense": {
+   "q001": 3,
+   "q002": 4,
+   "q003": 1,
+   "q004": 1,
+   "q005": 1,
+   "q006": 1,
+   "q007": 1,
+   "q008": 9,
+   "q009": 1,
+   "q010": 1,
+   "q011": 1,
+   "q012": 2,
+   "q013": 1,
+   "q014": 1,
+   "q015": 2,
+   "q016": 2,
+   "q017": 1,
+   "q018": 4,
+   "q019": 2,
+   "q020": 6,
+   "q021": 1,
+   "q022": 1,
+   "q023": 1,
+   "q024": 3,
+   "q025": 1,
+   "q026": null,
+   "q027": 1,
+   "q028": 1,
+   "q029": 1,
+   "q030": 1,
+   "q031": 1,
+   "q032": 1,
+   "q033": 3,
+   "q034": 3,
+   "q035": 1,
+   "q036": 1,
+   "q037": 3,
+   "q038": null,
+   "q039": 1,
+   "q040": 1,
+   "q041": 1,
+   "q042": 1,
+   "q043": 1,
+   "q044": 2,
+   "q045": 2,
+   "q046": 1,
+   "q047": 1,
+   "q048": 1,
+   "q049": 1,
+   "q050": 1,
+   "q051": 1,
+   "q052": 1,
+   "q053": 2,
+   "q054": 3,
+   "q055": 1,
+   "q056": 1,
+   "q057": 1,
+   "q058": 2,
+   "q059": 1,
+   "q060": 1,
+   "q061": 1,
+   "q062": 2,
+   "q063": 2,
+   "q064": 1,
+   "q065": 6,
+   "q066": 1,
+   "q067": 1,
+   "q068": 1,
+   "q069": 1,
+   "q070": 2,
+   "q071": 1,
+   "q072": 1,
+   "q073": 1,
+   "q074": 1,
+   "q075": 1,
+   "q076": 1,
+   "q077": 1,
+   "q078": 1,
+   "q079": 1,
+   "q080": 1,
+   "q081": 1
+  },
+  "hybrid": {
+   "q001": 4,
+   "q002": 1,
+   "q003": 1,
+   "q004": 1,
+   "q005": 1,
+   "q006": 1,
+   "q007": 1,
+   "q008": 3,
+   "q009": 1,
+   "q010": 1,
+   "q011": 1,
+   "q012": 2,
+   "q013": 1,
+   "q014": 1,
+   "q015": 2,
+   "q016": 1,
+   "q017": 1,
+   "q018": 2,
+   "q019": 5,
+   "q020": 1,
+   "q021": 1,
+   "q022": 1,
+   "q023": 1,
+   "q024": 2,
+   "q025": 1,
+   "q026": 10,
+   "q027": 1,
+   "q028": 1,
+   "q029": 1,
+   "q030": 1,
+   "q031": 1,
+   "q032": 1,
+   "q033": 1,
+   "q034": 3,
+   "q035": 1,
+   "q036": 1,
+   "q037": 3,
+   "q038": 6,
+   "q039": 1,
+   "q040": 1,
+   "q041": 1,
+   "q042": 1,
+   "q043": 1,
+   "q044": 2,
+   "q045": 1,
+   "q046": 1,
+   "q047": 1,
+   "q048": 1,
+   "q049": 1,
+   "q050": 1,
+   "q051": 1,
+   "q052": 1,
+   "q053": 2,
+   "q054": 2,
+   "q055": 1,
+   "q056": 1,
+   "q057": 1,
+   "q058": 6,
+   "q059": 1,
+   "q060": 1,
+   "q061": 1,
+   "q062": 2,
+   "q063": 1,
+   "q064": 1,
+   "q065": 3,
+   "q066": 1,
+   "q067": 1,
+   "q068": 1,
+   "q069": 1,
+   "q070": 2,
+   "q071": 1,
+   "q072": 1,
+   "q073": 1,
+   "q074": 1,
+   "q075": 1,
+   "q076": 1,
+   "q077": 1,
+   "q078": 1,
+   "q079": 1,
+   "q080": 1,
+   "q081": 1
+  }
+ }
+}

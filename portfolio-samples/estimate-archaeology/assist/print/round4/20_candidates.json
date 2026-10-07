@@ -1,0 +1,31 @@
+{
+  "_comment": "Round 4 = round 3 + (a) price_period, a categorical key for the three price-list revisions read off the residuals (2023-04-01, 2024-07-01, 2025-04-01), so that any table can take per-period values, (b) eight search variants (the four defaults plus forward-initialised and no-plain-first combinations) to reduce the path dependence seen in rounds 2-3. The engine keeps a term only if more quotes reproduce to the yen.",
+  "text": ["note_tags"],
+  "keywords": ["#rush", "#design", "#fix", "#spot", "#band", "#proof", "片面PP", "角丸", "三つ折", "二つ折", "Z折", "中綴じ"],
+  "categorical": ["price_period"],
+  "derived": {
+    "tax_label": "if_(isblank(tax_label), if_(regex(customer_code, '^(一般|K)', 1, '') != '', '税込', if_(regex(customer_code, '^([CD])[0-9]', 1, '') != '', '税抜', '')), tax_label)",
+    "price_period": "if_(date(quote_date) >= date('2025-04-01'), '2025-04〜', if_(date(quote_date) >= date('2024-07-01'), '2024-07〜', if_(date(quote_date) >= date('2023-04-01'), '2023-04〜', '〜2023-03')))",
+    "a4eq": "if_(product == '名刺' or product == '封筒', 0, quantity * kinds * if_(size == 'A3', 2, if_(size == 'B4', 1.5, if_(size == 'B5', 0.75, if_(size == 'A5', 0.5, 1)))))",
+    "sheets": "if_(product == 'チラシ' or product == 'リーフレット', ceil(quantity / if_(size == 'A3', 4, if_(size == 'A4', 8, if_(size == 'B4', 8, 16)))) * kinds, 0)",
+    "persons_eff": "if_(product == '名刺', min(kinds, 5) + 0.9 * min(max(kinds - 5, 0), 5) + 0.8 * max(kinds - 10, 0), 0)"
+  },
+  "features": ["a4eq", "sheets", "bundles", "persons_eff", "persons_eff * quantity"],
+  "thresholds": ["a4eq"],
+  "search": {
+    "max_keywords": 0,
+    "max_feature_degree": 1,
+    "max_thresholds_per_column": 0,
+    "work_budget": 180,
+    "variants": [
+      {"ordinal_keys_in_rich": true},
+      {"plain_first": false},
+      {"additive_test": true},
+      {"ordinal_keys_in_rich": true, "additive_test": true},
+      {"init": "forward"},
+      {"init": "forward", "additive_test": true},
+      {"ordinal_keys_in_rich": true, "plain_first": false},
+      {"additive_test": true, "plain_first": false}
+    ]
+  }
+}

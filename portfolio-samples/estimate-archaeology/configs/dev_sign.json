@@ -1,0 +1,27 @@
+{
+  "name": "dev-sign",
+  "notes": "Development config for devdata/sign (same column layout as the blind sign schema).",
+  "columns": {
+    "id": "quote_no",
+    "date": "issue_date",
+    "customer": "customer_code",
+    "rep": "rep",
+    "amount": "amount",
+    "tax_label": "tax_label"
+  },
+  "segment": "item",
+  "customer_class": "if_(customer_code == '9999', '諸口', '口座')",
+  "revision_id_pattern": "^\\d{4}-\\d{3}-\\d+$",
+  "derived": {
+    "area_m2": "width_mm * height_mm / 1000000",
+    "area_total": "width_mm * height_mm * qty / 1000000",
+    "installed": "if_(install == '有', 1, 0)",
+    "install_qty": "if_(install == '有', qty, 0)",
+    "site_town": "regex(site, '^\\s*(.+?[市町村])', 1, '')"
+  },
+  "categorical": ["thickness_mm", "sides", "media", "laminate", "finish", "lighting", "design", "install", "site_town"],
+  "numeric": ["qty", "area_m2", "installed", "install_qty", "height_mm"],
+  "text": ["remarks"],
+  "thresholds": ["install_height_m", "area_m2", "width_mm"],
+  "features": ["area_m2 * qty", "height_mm * qty"]
+}

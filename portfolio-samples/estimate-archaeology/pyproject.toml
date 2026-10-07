@@ -1,0 +1,54 @@
+[build-system]
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "estimate-archaeology"
+version = "0.1.0"
+description = "Recover deterministic pricing rules from past quotes and classify quotes that deviate from them (no LLM in the arithmetic)"
+readme = "README.md"
+requires-python = ">=3.12"
+# Runtime: numpy only. Everything else is the standard library.
+dependencies = [
+  "numpy==2.5.3",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest==9.1.1",
+  "ruff==0.16.10",
+]
+
+[project.scripts]
+ea = "estimate_archaeology.cli:main"
+
+[tool.hatch.build]
+exclude = ["blind", "runs", "devdata/*/", ".venv"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/estimate_archaeology"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+markers = [
+  "slow: runs the full solver on a generated dev dataset (deselect with -m 'not slow')",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+src = ["src", "tests", "devdata"]
+extend-exclude = ["blind", "runs", "reports"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "N"]
+ignore = [
+  "RUF001",  # ambiguous unicode: Japanese full-width punctuation is intentional
+  "RUF002",
+  "RUF003",
+  "E501",    # long Japanese string literals are fine
+  "N806",    # matrix names (X, A, F, R) follow the maths
+  "N803",
+  "SIM108",
+]

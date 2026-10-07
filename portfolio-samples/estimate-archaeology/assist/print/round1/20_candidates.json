@@ -1,0 +1,12 @@
+{
+  "_comment": "Round 1 (analyst proposal from runs/frozen/print residuals + quotes.csv/SCHEMA.md). Remarks: only tagged request kinds are keywords (mined chatter dropped). Sheets: A-size equivalents and full-sheet counts from the standard sheet yields, as candidate quantities. The engine keeps a term only if more quotes reproduce to the yen.",
+  "text": ["note_tags"],
+  "keywords": ["#rush", "#design", "#fix", "#spot", "#band", "#proof", "片面PP", "角丸", "三つ折", "二つ折", "Z折", "中綴じ"],
+  "derived": {
+    "a4eq": "quantity * kinds * if_(size == 'A3', 2, if_(size == 'B4', 1.5, if_(size == 'B5', 0.75, if_(size == 'A5', 0.5, 1))))",
+    "sheets": "ceil(quantity / if_(size == 'A3', 4, if_(size == 'A4', 8, if_(size == 'B4', 8, if_(size == 'A5', 16, if_(size == 'B5', 16, 1)))))) * kinds"
+  },
+  "features": ["a4eq", "sheets", "bundles"],
+  "thresholds": ["a4eq"],
+  "search": {"max_keywords": 0}
+}

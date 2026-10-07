@@ -1,0 +1,977 @@
+[
+  {
+    "n": 2434,
+    "exact": 2180,
+    "exact_rate": 0.895645028759244,
+    "within_100_yen": 0.8989317995069844,
+    "within_1_percent": 0.9013968775677896,
+    "clean_exact_rate": 0.9565217391304348,
+    "clean_in_grammar_exact_rate": 0.9995256166982922,
+    "clean_out_of_grammar_exact_rate": 0.42011834319526625,
+    "n_clean_in_grammar": 2108,
+    "n_clean_out_of_grammar": 169,
+    "deviations_true": 157,
+    "flagged": 160,
+    "detection_precision": 0.90625,
+    "detection_recall": 0.9235668789808917,
+    "class_accuracy_on_detected": 0.8344827586206897,
+    "false_quirk_attributions": 12,
+    "abstained": 94,
+    "per_label": {
+      "clean": {
+        "n": 2277,
+        "flagged": 15,
+        "class_correct": 0,
+        "reproduced": 2178,
+        "abstained": 84
+      },
+      "copied_rate": {
+        "n": 11,
+        "flagged": 11,
+        "class_correct": 11,
+        "reproduced": 0,
+        "abstained": 0
+      },
+      "revision_or_duplicate": {
+        "n": 18,
+        "flagged": 9,
+        "class_correct": 9,
+        "reproduced": 0,
+        "abstained": 9
+      },
+      "rounding_inconsistency": {
+        "n": 7,
+        "flagged": 6,
+        "class_correct": 6,
+        "reproduced": 0,
+        "abstained": 1
+      },
+      "stale_table": {
+        "n": 65,
+        "flagged": 64,
+        "class_correct": 57,
+        "reproduced": 1,
+        "abstained": 0
+      },
+      "typo": {
+        "n": 8,
+        "flagged": 8,
+        "class_correct": 8,
+        "reproduced": 0,
+        "abstained": 0
+      },
+      "undocumented_discount": {
+        "n": 28,
+        "flagged": 27,
+        "class_correct": 11,
+        "reproduced": 1,
+        "abstained": 0
+      },
+      "unexplained": {
+        "n": 6,
+        "flagged": 6,
+        "class_correct": 6,
+        "reproduced": 0,
+        "abstained": 0
+      },
+      "unrecorded_surcharge": {
+        "n": 14,
+        "flagged": 14,
+        "class_correct": 13,
+        "reproduced": 0,
+        "abstained": 0
+      }
+    },
+    "confusion": {
+      "copied_rate -> copied_rate": 11,
+      "revision_or_duplicate -> revision_or_duplicate": 9,
+      "rounding_inconsistency -> rounding_inconsistency": 6,
+      "stale_table -> stale_table": 57,
+      "stale_table -> undocumented_discount": 4,
+      "stale_table -> unexplained": 3,
+      "typo -> typo": 8,
+      "undocumented_discount -> copied_rate": 7,
+      "undocumented_discount -> rounding_inconsistency": 4,
+      "undocumented_discount -> stale_table": 2,
+      "undocumented_discount -> undocumented_discount": 11,
+      "undocumented_discount -> unexplained": 3,
+      "unexplained -> unexplained": 6,
+      "unrecorded_surcharge -> unexplained": 1,
+      "unrecorded_surcharge -> unrecorded_surcharge": 13
+    },
+    "name": "print",
+    "seconds": 627.9,
+    "config": "configs/dev_print.json",
+    "data": "devdata/print",
+    "what": "print-like shop; 7% of clean quotes carry a rule meant to be outside the grammar (only the month-end flyer discount really is)",
+    "extensions": "",
+    "core_sha256": "c4cff0df0b072a20d7221267921da3f906b71933662dbd5b3089d36322337906",
+    "stop": {
+      "threshold": 0.8,
+      "scope": "global",
+      "overall_rate": 0.895645028759244,
+      "global_stop": false,
+      "segments_stopped": []
+    },
+    "revisions": [
+      {
+        "segment": "チラシ",
+        "date": "2024-04-01",
+        "consistent_from": "2024-03-26",
+        "consistent_to": "2024-04-01"
+      },
+      {
+        "segment": "チラシ",
+        "date": "2025-01-01",
+        "consistent_from": "2024-12-28",
+        "consistent_to": "2025-01-07"
+      },
+      {
+        "segment": "リーフレット",
+        "date": "2024-04-01",
+        "consistent_from": "2024-03-31",
+        "consistent_to": "2024-04-09"
+      },
+      {
+        "segment": "リーフレット",
+        "date": "2025-01-01",
+        "consistent_from": "2024-12-15",
+        "consistent_to": "2025-01-07"
+      },
+      {
+        "segment": "冊子",
+        "date": "2024-04-01",
+        "consistent_from": "2024-03-20",
+        "consistent_to": "2024-04-03"
+      },
+      {
+        "segment": "冊子",
+        "date": "2025-01-01",
+        "consistent_from": "2024-12-31",
+        "consistent_to": "2025-03-02"
+      },
+      {
+        "segment": "名刺",
+        "date": "2024-04-01",
+        "consistent_from": "2024-04-01",
+        "consistent_to": "2024-04-01"
+      },
+      {
+        "segment": "名刺",
+        "date": "2025-01-01",
+        "consistent_from": "2024-12-28",
+        "consistent_to": "2025-01-23"
+      },
+      {
+        "segment": "封筒",
+        "date": "2024-04-04",
+        "consistent_from": "2024-04-02",
+        "consistent_to": "2024-04-04"
+      },
+      {
+        "segment": "封筒",
+        "date": "2024-11-01",
+        "consistent_from": "2024-10-19",
+        "consistent_to": "2024-11-12"
+      }
+    ],
+    "no_stop": {
+      "flagged": 160,
+      "detection_precision": 0.90625,
+      "detection_recall": 0.9235668789808917,
+      "class_accuracy_on_detected": 0.8344827586206897,
+      "false_quirk_attributions": 12
+    }
+  },
+  {
+    "n": 2410,
+    "exact": 1839,
+    "exact_rate": 0.7630705394190871,
+    "within_100_yen": 0.8037344398340249,
+    "within_1_percent": 0.8448132780082988,
+    "clean_exact_rate": 0.8095659875996457,
+    "clean_in_grammar_exact_rate": 0.819672131147541,
+    "clean_out_of_grammar_exact_rate": 0.7574931880108992,
+    "n_clean_in_grammar": 1891,
+    "n_clean_out_of_grammar": 367,
+    "deviations_true": 152,
+    "flagged": 0,
+    "detection_precision": NaN,
+    "detection_recall": 0.0,
+    "class_accuracy_on_detected": NaN,
+    "false_quirk_attributions": 0,
+    "abstained": 571,
+    "per_label": {
+      "clean": {
+        "n": 2258,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 1828,
+        "abstained": 430
+      },
+      "copied_rate": {
+        "n": 19,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 1,
+        "abstained": 18
+      },
+      "revision_or_duplicate": {
+        "n": 20,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 0,
+        "abstained": 20
+      },
+      "rounding_inconsistency": {
+        "n": 8,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 1,
+        "abstained": 7
+      },
+      "stale_table": {
+        "n": 35,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 8,
+        "abstained": 27
+      },
+      "typo": {
+        "n": 9,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 0,
+        "abstained": 9
+      },
+      "undocumented_discount": {
+        "n": 35,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 1,
+        "abstained": 34
+      },
+      "unexplained": {
+        "n": 12,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 0,
+        "abstained": 12
+      },
+      "unrecorded_surcharge": {
+        "n": 14,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 0,
+        "abstained": 14
+      }
+    },
+    "confusion": {},
+    "name": "sign",
+    "seconds": 769.6,
+    "config": "configs/dev_sign.json",
+    "data": "devdata/sign",
+    "what": "sign-like shop; 16% of clean quotes carry a rule meant to be outside the grammar (both turn out expressible)",
+    "extensions": "",
+    "core_sha256": "c4cff0df0b072a20d7221267921da3f906b71933662dbd5b3089d36322337906",
+    "stop": {
+      "threshold": 0.8,
+      "scope": "global",
+      "overall_rate": 0.7630705394190871,
+      "global_stop": true,
+      "segments_stopped": [
+        "インクジェット出力",
+        "袖看板"
+      ]
+    },
+    "revisions": [
+      {
+        "segment": "アルミ複合板看板",
+        "date": "2024-10-01",
+        "consistent_from": "2024-10-01",
+        "consistent_to": "2024-10-01"
+      },
+      {
+        "segment": "インクジェット出力",
+        "date": "2024-10-01",
+        "consistent_from": "2024-09-27",
+        "consistent_to": "2024-10-01"
+      },
+      {
+        "segment": "カルプ文字",
+        "date": "2024-10-01",
+        "consistent_from": "2024-09-29",
+        "consistent_to": "2024-10-03"
+      }
+    ],
+    "no_stop": {
+      "flagged": 462,
+      "detection_precision": 0.2683982683982684,
+      "detection_recall": 0.8157894736842105,
+      "class_accuracy_on_detected": 0.7096774193548387,
+      "false_quirk_attributions": 226
+    }
+  },
+  {
+    "n": 2438,
+    "exact": 1693,
+    "exact_rate": 0.6944216570959804,
+    "within_100_yen": 0.7206726825266612,
+    "within_1_percent": 0.7514356029532404,
+    "clean_exact_rate": 0.7431838170624451,
+    "clean_in_grammar_exact_rate": 0.7574159525379037,
+    "clean_out_of_grammar_exact_rate": 0.714663143989432,
+    "n_clean_in_grammar": 1517,
+    "n_clean_out_of_grammar": 757,
+    "deviations_true": 164,
+    "flagged": 0,
+    "detection_precision": NaN,
+    "detection_recall": 0.0,
+    "class_accuracy_on_detected": NaN,
+    "false_quirk_attributions": 0,
+    "abstained": 745,
+    "per_label": {
+      "clean": {
+        "n": 2274,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 1690,
+        "abstained": 584
+      },
+      "copied_rate": {
+        "n": 13,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 0,
+        "abstained": 13
+      },
+      "revision_or_duplicate": {
+        "n": 22,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 0,
+        "abstained": 22
+      },
+      "rounding_inconsistency": {
+        "n": 13,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 1,
+        "abstained": 12
+      },
+      "stale_table": {
+        "n": 64,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 1,
+        "abstained": 63
+      },
+      "typo": {
+        "n": 8,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 0,
+        "abstained": 8
+      },
+      "undocumented_discount": {
+        "n": 26,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 1,
+        "abstained": 25
+      },
+      "unexplained": {
+        "n": 5,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 0,
+        "abstained": 5
+      },
+      "unrecorded_surcharge": {
+        "n": 13,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 0,
+        "abstained": 13
+      }
+    },
+    "confusion": {},
+    "name": "print_heavy",
+    "seconds": 486.6,
+    "config": "configs/dev_print.json",
+    "data": "devdata/print_heavy",
+    "what": "same shop, 33% of clean quotes carry such rules (month-end discount from day 15): the stop rule should fire",
+    "extensions": "",
+    "core_sha256": "c4cff0df0b072a20d7221267921da3f906b71933662dbd5b3089d36322337906",
+    "stop": {
+      "threshold": 0.8,
+      "scope": "global",
+      "overall_rate": 0.6944216570959804,
+      "global_stop": true,
+      "segments_stopped": [
+        "チラシ",
+        "冊子"
+      ]
+    },
+    "revisions": [
+      {
+        "segment": "チラシ",
+        "date": "2024-04-01",
+        "consistent_from": "2024-03-31",
+        "consistent_to": "2024-04-01"
+      },
+      {
+        "segment": "リーフレット",
+        "date": "2024-04-01",
+        "consistent_from": "2024-03-31",
+        "consistent_to": "2024-04-09"
+      },
+      {
+        "segment": "リーフレット",
+        "date": "2025-01-01",
+        "consistent_from": "2024-12-15",
+        "consistent_to": "2025-01-07"
+      },
+      {
+        "segment": "冊子",
+        "date": "2024-04-01",
+        "consistent_from": "2024-03-10",
+        "consistent_to": "2024-04-26"
+      },
+      {
+        "segment": "名刺",
+        "date": "2024-04-01",
+        "consistent_from": "2024-04-01",
+        "consistent_to": "2024-04-01"
+      },
+      {
+        "segment": "名刺",
+        "date": "2025-01-01",
+        "consistent_from": "2024-12-28",
+        "consistent_to": "2025-01-23"
+      },
+      {
+        "segment": "封筒",
+        "date": "2024-04-04",
+        "consistent_from": "2024-04-02",
+        "consistent_to": "2024-04-04"
+      },
+      {
+        "segment": "封筒",
+        "date": "2024-11-01",
+        "consistent_from": "2024-10-19",
+        "consistent_to": "2024-11-12"
+      }
+    ],
+    "no_stop": {
+      "flagged": 462,
+      "detection_precision": 0.329004329004329,
+      "detection_recall": 0.926829268292683,
+      "class_accuracy_on_detected": 0.7302631578947368,
+      "false_quirk_attributions": 182
+    }
+  },
+  {
+    "n": 2434,
+    "exact": 2278,
+    "exact_rate": 0.9359079704190633,
+    "within_100_yen": 0.938783894823336,
+    "within_1_percent": 0.9400164338537387,
+    "clean_exact_rate": 0.9995608256477821,
+    "clean_in_grammar_exact_rate": 0.9995256166982922,
+    "clean_out_of_grammar_exact_rate": 1.0,
+    "n_clean_in_grammar": 2108,
+    "n_clean_out_of_grammar": 169,
+    "deviations_true": 157,
+    "flagged": 156,
+    "detection_precision": 0.9935897435897436,
+    "detection_recall": 0.9872611464968153,
+    "class_accuracy_on_detected": 0.8709677419354839,
+    "false_quirk_attributions": 1,
+    "abstained": 0,
+    "per_label": {
+      "clean": {
+        "n": 2277,
+        "flagged": 1,
+        "class_correct": 0,
+        "reproduced": 2276,
+        "abstained": 0
+      },
+      "copied_rate": {
+        "n": 11,
+        "flagged": 11,
+        "class_correct": 11,
+        "reproduced": 0,
+        "abstained": 0
+      },
+      "revision_or_duplicate": {
+        "n": 18,
+        "flagged": 18,
+        "class_correct": 18,
+        "reproduced": 0,
+        "abstained": 0
+      },
+      "rounding_inconsistency": {
+        "n": 7,
+        "flagged": 7,
+        "class_correct": 7,
+        "reproduced": 0,
+        "abstained": 0
+      },
+      "stale_table": {
+        "n": 65,
+        "flagged": 64,
+        "class_correct": 60,
+        "reproduced": 1,
+        "abstained": 0
+      },
+      "typo": {
+        "n": 8,
+        "flagged": 8,
+        "class_correct": 8,
+        "reproduced": 0,
+        "abstained": 0
+      },
+      "undocumented_discount": {
+        "n": 28,
+        "flagged": 27,
+        "class_correct": 11,
+        "reproduced": 1,
+        "abstained": 0
+      },
+      "unexplained": {
+        "n": 6,
+        "flagged": 6,
+        "class_correct": 6,
+        "reproduced": 0,
+        "abstained": 0
+      },
+      "unrecorded_surcharge": {
+        "n": 14,
+        "flagged": 14,
+        "class_correct": 14,
+        "reproduced": 0,
+        "abstained": 0
+      }
+    },
+    "confusion": {
+      "copied_rate -> copied_rate": 11,
+      "revision_or_duplicate -> revision_or_duplicate": 18,
+      "rounding_inconsistency -> rounding_inconsistency": 7,
+      "stale_table -> stale_table": 60,
+      "stale_table -> undocumented_discount": 3,
+      "stale_table -> unexplained": 1,
+      "typo -> typo": 8,
+      "undocumented_discount -> copied_rate": 7,
+      "undocumented_discount -> rounding_inconsistency": 4,
+      "undocumented_discount -> stale_table": 2,
+      "undocumented_discount -> undocumented_discount": 11,
+      "undocumented_discount -> unexplained": 3,
+      "unexplained -> unexplained": 6,
+      "unrecorded_surcharge -> unrecorded_surcharge": 14
+    },
+    "name": "print_assisted",
+    "seconds": 559.4,
+    "config": "configs/dev_print.json",
+    "data": "devdata/print",
+    "what": "same as print + extensions/dev_print_assisted (day of month, signatures; added without touching the core)",
+    "extensions": "extensions/dev_print_assisted",
+    "core_sha256": "c4cff0df0b072a20d7221267921da3f906b71933662dbd5b3089d36322337906",
+    "stop": {
+      "threshold": 0.8,
+      "scope": "global",
+      "overall_rate": 0.9359079704190633,
+      "global_stop": false,
+      "segments_stopped": []
+    },
+    "revisions": [
+      {
+        "segment": "チラシ",
+        "date": "2024-04-01",
+        "consistent_from": "2024-03-31",
+        "consistent_to": "2024-04-01"
+      },
+      {
+        "segment": "チラシ",
+        "date": "2025-01-01",
+        "consistent_from": "2024-12-29",
+        "consistent_to": "2025-01-07"
+      },
+      {
+        "segment": "リーフレット",
+        "date": "2024-04-01",
+        "consistent_from": "2024-03-31",
+        "consistent_to": "2024-04-09"
+      },
+      {
+        "segment": "リーフレット",
+        "date": "2025-01-01",
+        "consistent_from": "2024-12-15",
+        "consistent_to": "2025-01-07"
+      },
+      {
+        "segment": "冊子",
+        "date": "2024-04-01",
+        "consistent_from": "2024-03-20",
+        "consistent_to": "2024-04-03"
+      },
+      {
+        "segment": "冊子",
+        "date": "2025-01-01",
+        "consistent_from": "2024-12-31",
+        "consistent_to": "2025-03-02"
+      },
+      {
+        "segment": "名刺",
+        "date": "2024-04-01",
+        "consistent_from": "2024-04-01",
+        "consistent_to": "2024-04-01"
+      },
+      {
+        "segment": "名刺",
+        "date": "2025-01-01",
+        "consistent_from": "2024-12-28",
+        "consistent_to": "2025-01-23"
+      },
+      {
+        "segment": "封筒",
+        "date": "2024-04-04",
+        "consistent_from": "2024-04-02",
+        "consistent_to": "2024-04-04"
+      },
+      {
+        "segment": "封筒",
+        "date": "2024-11-01",
+        "consistent_from": "2024-10-19",
+        "consistent_to": "2024-11-12"
+      }
+    ],
+    "no_stop": {
+      "flagged": 156,
+      "detection_precision": 0.9935897435897436,
+      "detection_recall": 0.9872611464968153,
+      "class_accuracy_on_detected": 0.8709677419354839,
+      "false_quirk_attributions": 1
+    }
+  },
+  {
+    "n": 2434,
+    "exact": 2162,
+    "exact_rate": 0.8882497945768283,
+    "within_100_yen": 0.8985209531635169,
+    "within_1_percent": 0.8989317995069844,
+    "clean_exact_rate": 0.9486166007905138,
+    "clean_in_grammar_exact_rate": 0.9886148007590133,
+    "clean_out_of_grammar_exact_rate": 0.44970414201183434,
+    "n_clean_in_grammar": 2108,
+    "n_clean_out_of_grammar": 169,
+    "deviations_true": 157,
+    "flagged": 179,
+    "detection_precision": 0.8435754189944135,
+    "detection_recall": 0.9617834394904459,
+    "class_accuracy_on_detected": 0.8344370860927153,
+    "false_quirk_attributions": 27,
+    "abstained": 93,
+    "per_label": {
+      "clean": {
+        "n": 2277,
+        "flagged": 28,
+        "class_correct": 0,
+        "reproduced": 2160,
+        "abstained": 89
+      },
+      "copied_rate": {
+        "n": 11,
+        "flagged": 10,
+        "class_correct": 10,
+        "reproduced": 0,
+        "abstained": 1
+      },
+      "revision_or_duplicate": {
+        "n": 18,
+        "flagged": 18,
+        "class_correct": 18,
+        "reproduced": 0,
+        "abstained": 0
+      },
+      "rounding_inconsistency": {
+        "n": 7,
+        "flagged": 6,
+        "class_correct": 6,
+        "reproduced": 0,
+        "abstained": 1
+      },
+      "stale_table": {
+        "n": 65,
+        "flagged": 62,
+        "class_correct": 54,
+        "reproduced": 1,
+        "abstained": 2
+      },
+      "typo": {
+        "n": 8,
+        "flagged": 8,
+        "class_correct": 8,
+        "reproduced": 0,
+        "abstained": 0
+      },
+      "undocumented_discount": {
+        "n": 28,
+        "flagged": 27,
+        "class_correct": 11,
+        "reproduced": 1,
+        "abstained": 0
+      },
+      "unexplained": {
+        "n": 6,
+        "flagged": 6,
+        "class_correct": 6,
+        "reproduced": 0,
+        "abstained": 0
+      },
+      "unrecorded_surcharge": {
+        "n": 14,
+        "flagged": 14,
+        "class_correct": 13,
+        "reproduced": 0,
+        "abstained": 0
+      }
+    },
+    "confusion": {
+      "copied_rate -> copied_rate": 10,
+      "revision_or_duplicate -> revision_or_duplicate": 18,
+      "rounding_inconsistency -> rounding_inconsistency": 6,
+      "stale_table -> stale_table": 54,
+      "stale_table -> undocumented_discount": 5,
+      "stale_table -> unexplained": 3,
+      "typo -> typo": 8,
+      "undocumented_discount -> copied_rate": 7,
+      "undocumented_discount -> rounding_inconsistency": 4,
+      "undocumented_discount -> stale_table": 2,
+      "undocumented_discount -> undocumented_discount": 11,
+      "undocumented_discount -> unexplained": 3,
+      "unexplained -> unexplained": 6,
+      "unrecorded_surcharge -> unexplained": 1,
+      "unrecorded_surcharge -> unrecorded_surcharge": 13
+    },
+    "name": "print_schema_cfg",
+    "seconds": 621.3,
+    "config": "configs/blind_print.json",
+    "data": "devdata/print",
+    "what": "dev print data with the schema-only blind config (checks that config runs; no blind data)",
+    "extensions": "",
+    "core_sha256": "c4cff0df0b072a20d7221267921da3f906b71933662dbd5b3089d36322337906",
+    "stop": {
+      "threshold": 0.8,
+      "scope": "global",
+      "overall_rate": 0.8882497945768283,
+      "global_stop": false,
+      "segments_stopped": []
+    },
+    "revisions": [
+      {
+        "segment": "チラシ",
+        "date": "2024-04-01",
+        "consistent_from": "2024-03-26",
+        "consistent_to": "2024-04-01"
+      },
+      {
+        "segment": "チラシ",
+        "date": "2025-01-01",
+        "consistent_from": "2024-12-28",
+        "consistent_to": "2025-01-07"
+      },
+      {
+        "segment": "リーフレット",
+        "date": "2024-04-01",
+        "consistent_from": "2024-03-31",
+        "consistent_to": "2024-04-09"
+      },
+      {
+        "segment": "リーフレット",
+        "date": "2025-01-01",
+        "consistent_from": "2024-12-15",
+        "consistent_to": "2025-01-07"
+      },
+      {
+        "segment": "冊子",
+        "date": "2024-04-01",
+        "consistent_from": "2024-03-20",
+        "consistent_to": "2024-04-03"
+      },
+      {
+        "segment": "冊子",
+        "date": "2025-01-01",
+        "consistent_from": "2024-12-31",
+        "consistent_to": "2025-03-02"
+      },
+      {
+        "segment": "名刺",
+        "date": "2024-04-01",
+        "consistent_from": "2024-04-01",
+        "consistent_to": "2024-04-01"
+      },
+      {
+        "segment": "名刺",
+        "date": "2025-01-01",
+        "consistent_from": "2024-12-28",
+        "consistent_to": "2025-01-23"
+      },
+      {
+        "segment": "封筒",
+        "date": "2024-04-04",
+        "consistent_from": "2024-04-02",
+        "consistent_to": "2024-04-04"
+      },
+      {
+        "segment": "封筒",
+        "date": "2024-11-01",
+        "consistent_from": "2024-10-19",
+        "consistent_to": "2024-11-12"
+      }
+    ],
+    "no_stop": {
+      "flagged": 179,
+      "detection_precision": 0.8435754189944135,
+      "detection_recall": 0.9617834394904459,
+      "class_accuracy_on_detected": 0.8344370860927153,
+      "false_quirk_attributions": 27
+    }
+  },
+  {
+    "n": 2410,
+    "exact": 1372,
+    "exact_rate": 0.5692946058091286,
+    "within_100_yen": 0.5883817427385892,
+    "within_1_percent": 0.6473029045643154,
+    "clean_exact_rate": 0.604074402125775,
+    "clean_in_grammar_exact_rate": 0.5700687466948704,
+    "clean_out_of_grammar_exact_rate": 0.779291553133515,
+    "n_clean_in_grammar": 1891,
+    "n_clean_out_of_grammar": 367,
+    "deviations_true": 152,
+    "flagged": 0,
+    "detection_precision": NaN,
+    "detection_recall": 0.0,
+    "class_accuracy_on_detected": NaN,
+    "false_quirk_attributions": 0,
+    "abstained": 1038,
+    "per_label": {
+      "clean": {
+        "n": 2258,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 1364,
+        "abstained": 894
+      },
+      "copied_rate": {
+        "n": 19,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 1,
+        "abstained": 18
+      },
+      "revision_or_duplicate": {
+        "n": 20,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 1,
+        "abstained": 19
+      },
+      "rounding_inconsistency": {
+        "n": 8,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 0,
+        "abstained": 8
+      },
+      "stale_table": {
+        "n": 35,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 6,
+        "abstained": 29
+      },
+      "typo": {
+        "n": 9,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 0,
+        "abstained": 9
+      },
+      "undocumented_discount": {
+        "n": 35,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 0,
+        "abstained": 35
+      },
+      "unexplained": {
+        "n": 12,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 0,
+        "abstained": 12
+      },
+      "unrecorded_surcharge": {
+        "n": 14,
+        "flagged": 0,
+        "class_correct": 0,
+        "reproduced": 0,
+        "abstained": 14
+      }
+    },
+    "confusion": {},
+    "name": "sign_schema_cfg",
+    "seconds": 888.2,
+    "config": "configs/blind_sign.json",
+    "data": "devdata/sign",
+    "what": "dev sign data with the schema-only blind config (checks that config runs; no blind data)",
+    "extensions": "",
+    "core_sha256": "c4cff0df0b072a20d7221267921da3f906b71933662dbd5b3089d36322337906",
+    "stop": {
+      "threshold": 0.8,
+      "scope": "global",
+      "overall_rate": 0.5692946058091286,
+      "global_stop": true,
+      "segments_stopped": [
+        "インクジェット出力",
+        "カルプ文字",
+        "袖看板"
+      ]
+    },
+    "revisions": [
+      {
+        "segment": "アルミ複合板看板",
+        "date": "2024-10-01",
+        "consistent_from": "2024-10-01",
+        "consistent_to": "2024-10-01"
+      },
+      {
+        "segment": "インクジェット出力",
+        "date": "2024-10-01",
+        "consistent_from": "2024-09-25",
+        "consistent_to": "2024-10-15"
+      },
+      {
+        "segment": "カルプ文字",
+        "date": "2024-10-08",
+        "consistent_from": "2024-10-07",
+        "consistent_to": "2024-10-08"
+      },
+      {
+        "segment": "袖看板",
+        "date": "2024-11-01",
+        "consistent_from": "2024-10-05",
+        "consistent_to": "2024-11-11"
+      }
+    ],
+    "no_stop": {
+      "flagged": 871,
+      "detection_precision": 0.14925373134328357,
+      "detection_recall": 0.8552631578947368,
+      "class_accuracy_on_detected": 0.6615384615384615,
+      "false_quirk_attributions": 528
+    }
+  }
+]

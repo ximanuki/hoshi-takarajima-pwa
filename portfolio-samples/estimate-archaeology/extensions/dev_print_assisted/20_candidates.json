@@ -1,0 +1,9 @@
+{
+  "_comment": "Candidate terms proposed after reading coverage.md of the dev print run (hints: low reproduction late in the month and for booklets with many pages). The engine still decides by exact-yen matches; a candidate that does not reproduce more quotes is not used.",
+  "derived": {
+    "quote_dom": "day_of_month(quote_date)",
+    "signatures": "ceil(pages / 16)"
+  },
+  "thresholds": ["quote_dom", "pages"],
+  "features": ["signatures * quantity * kinds"]
+}

@@ -1,0 +1,260 @@
+{
+  "recordedAt": "2026-10-06T16:26:32.629Z",
+  "responses": {
+    "https://cyberjapandata2.gsi.go.jp/general/dem/scripts/getelevation.php?lon=132.4766&lat=34.4669&outtype=JSON": {
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "file": "cyberjapandata2-074f0d169f.json"
+    },
+    "https://cyberjapandata2.gsi.go.jp/general/dem/scripts/getelevation.php?lon=138.7274&lat=35.3606&outtype=JSON": {
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "file": "cyberjapandata2-2101d774ce.json"
+    },
+    "https://cyberjapandata2.gsi.go.jp/general/dem/scripts/getelevation.php?lon=139.085562&lat=35.110623&outtype=JSON": {
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "file": "cyberjapandata2-fc269cd417.json"
+    },
+    "https://cyberjapandata2.gsi.go.jp/general/dem/scripts/getelevation.php?lon=139.81636&lat=35.672993&outtype=JSON": {
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "file": "cyberjapandata2-1ba43d8c9c.json"
+    },
+    "https://cyberjapandata2.gsi.go.jp/general/dem/scripts/getelevation.php?lon=141.5&lat=34&outtype=JSON": {
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "file": "cyberjapandata2-eb17596932.json"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/01_flood_l1_shinsuishin_newlegend_data/17/113769/52153.png": {
+      "status": 200,
+      "contentType": "image/png",
+      "file": "tile-01_flood_l1_shinsuishin_newlegend_data-17-113769-52153.png"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/01_flood_l1_shinsuishin_newlegend_data/17/116175/51868.png": {
+      "status": 404,
+      "contentType": "application/json",
+      "file": "tile-01_flood_l1_shinsuishin_newlegend_data-17-116175-51868.json"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/01_flood_l1_shinsuishin_newlegend_data/17/116441/51616.png": {
+      "status": 200,
+      "contentType": "image/png",
+      "file": "tile-01_flood_l1_shinsuishin_newlegend_data-17-116441-51616.png"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/01_flood_l2_kaokutoukai_hanran_data/17/113769/52153.png": {
+      "status": 200,
+      "contentType": "image/png",
+      "file": "tile-01_flood_l2_kaokutoukai_hanran_data-17-113769-52153.png"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/01_flood_l2_kaokutoukai_hanran_data/17/116175/51868.png": {
+      "status": 404,
+      "contentType": "application/json",
+      "file": "tile-01_flood_l2_kaokutoukai_hanran_data-17-116175-51868.json"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/01_flood_l2_kaokutoukai_hanran_data/17/116441/51616.png": {
+      "status": 404,
+      "contentType": "application/json",
+      "file": "tile-01_flood_l2_kaokutoukai_hanran_data-17-116441-51616.json"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/01_flood_l2_kaokutoukai_kagan_data/17/113769/52153.png": {
+      "status": 404,
+      "contentType": "application/json",
+      "file": "tile-01_flood_l2_kaokutoukai_kagan_data-17-113769-52153.json"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/01_flood_l2_kaokutoukai_kagan_data/17/116175/51868.png": {
+      "status": 404,
+      "contentType": "application/json",
+      "file": "tile-01_flood_l2_kaokutoukai_kagan_data-17-116175-51868.json"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/01_flood_l2_kaokutoukai_kagan_data/17/116441/51616.png": {
+      "status": 404,
+      "contentType": "application/json",
+      "file": "tile-01_flood_l2_kaokutoukai_kagan_data-17-116441-51616.json"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/01_flood_l2_keizoku_data/17/113769/52153.png": {
+      "status": 200,
+      "contentType": "image/png",
+      "file": "tile-01_flood_l2_keizoku_data-17-113769-52153.png"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/01_flood_l2_keizoku_data/17/116175/51868.png": {
+      "status": 404,
+      "contentType": "application/json",
+      "file": "tile-01_flood_l2_keizoku_data-17-116175-51868.json"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/01_flood_l2_keizoku_data/17/116441/51616.png": {
+      "status": 200,
+      "contentType": "image/png",
+      "file": "tile-01_flood_l2_keizoku_data-17-116441-51616.png"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/01_flood_l2_shinsuishin_data/17/113769/52153.png": {
+      "status": 200,
+      "contentType": "image/png",
+      "file": "tile-01_flood_l2_shinsuishin_data-17-113769-52153.png"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/01_flood_l2_shinsuishin_data/17/116175/51868.png": {
+      "status": 404,
+      "contentType": "application/json",
+      "file": "tile-01_flood_l2_shinsuishin_data-17-116175-51868.json"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/01_flood_l2_shinsuishin_data/17/116441/51616.png": {
+      "status": 200,
+      "contentType": "image/png",
+      "file": "tile-01_flood_l2_shinsuishin_data-17-116441-51616.png"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/02_naisui_data/17/113769/52153.png": {
+      "status": 404,
+      "contentType": "application/json",
+      "file": "tile-02_naisui_data-17-113769-52153.json"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/02_naisui_data/17/116175/51868.png": {
+      "status": 404,
+      "contentType": "application/json",
+      "file": "tile-02_naisui_data-17-116175-51868.json"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/02_naisui_data/17/116441/51616.png": {
+      "status": 404,
+      "contentType": "application/json",
+      "file": "tile-02_naisui_data-17-116441-51616.json"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/03_hightide_l2_shinsuishin_data/17/113769/52153.png": {
+      "status": 404,
+      "contentType": "application/json",
+      "file": "tile-03_hightide_l2_shinsuishin_data-17-113769-52153.json"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/03_hightide_l2_shinsuishin_data/17/116175/51868.png": {
+      "status": 200,
+      "contentType": "image/png",
+      "file": "tile-03_hightide_l2_shinsuishin_data-17-116175-51868.png"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/03_hightide_l2_shinsuishin_data/17/116441/51616.png": {
+      "status": 200,
+      "contentType": "image/png",
+      "file": "tile-03_hightide_l2_shinsuishin_data-17-116441-51616.png"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/04_tsunami_newlegend_data/17/113769/52153.png": {
+      "status": 404,
+      "contentType": "application/json",
+      "file": "tile-04_tsunami_newlegend_data-17-113769-52153.json"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/04_tsunami_newlegend_data/17/116172/51872.png": {
+      "status": 200,
+      "contentType": "image/png",
+      "file": "tile-04_tsunami_newlegend_data-17-116172-51872.png"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/04_tsunami_newlegend_data/17/116175/51868.png": {
+      "status": 200,
+      "contentType": "image/png",
+      "file": "tile-04_tsunami_newlegend_data-17-116175-51868.png"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/04_tsunami_newlegend_data/17/116441/51616.png": {
+      "status": 404,
+      "contentType": "application/json",
+      "file": "tile-04_tsunami_newlegend_data-17-116441-51616.json"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/05_dosekiryukeikaikuiki/17/113769/52153.png": {
+      "status": 404,
+      "contentType": "application/json",
+      "file": "tile-05_dosekiryukeikaikuiki-17-113769-52153.json"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/05_dosekiryukeikaikuiki/17/116175/51868.png": {
+      "status": 200,
+      "contentType": "application/octet-stream",
+      "file": "tile-05_dosekiryukeikaikuiki-17-116175-51868.png"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/05_dosekiryukeikaikuiki/17/116441/51616.png": {
+      "status": 404,
+      "contentType": "application/json",
+      "file": "tile-05_dosekiryukeikaikuiki-17-116441-51616.json"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/05_jisuberikeikaikuiki/17/113769/52153.png": {
+      "status": 404,
+      "contentType": "application/json",
+      "file": "tile-05_jisuberikeikaikuiki-17-113769-52153.json"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/05_jisuberikeikaikuiki/17/116175/51868.png": {
+      "status": 404,
+      "contentType": "application/json",
+      "file": "tile-05_jisuberikeikaikuiki-17-116175-51868.json"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/05_jisuberikeikaikuiki/17/116441/51616.png": {
+      "status": 404,
+      "contentType": "application/json",
+      "file": "tile-05_jisuberikeikaikuiki-17-116441-51616.json"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/05_kyukeishakeikaikuiki/17/113769/52153.png": {
+      "status": 404,
+      "contentType": "application/json",
+      "file": "tile-05_kyukeishakeikaikuiki-17-113769-52153.json"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/05_kyukeishakeikaikuiki/17/116175/51868.png": {
+      "status": 200,
+      "contentType": "image/png",
+      "file": "tile-05_kyukeishakeikaikuiki-17-116175-51868.png"
+    },
+    "https://disaportaldata.gsi.go.jp/raster/05_kyukeishakeikaikuiki/17/116441/51616.png": {
+      "status": 404,
+      "contentType": "application/json",
+      "file": "tile-05_kyukeishakeikaikuiki-17-116441-51616.json"
+    },
+    "https://msearch.gsi.go.jp/address-search/AddressSearch?q=%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A%E3%81%8B%E3%81%8D%E3%81%8F%E3%81%91%E3%81%93": {
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "file": "msearch-6edd228634.json"
+    },
+    "https://msearch.gsi.go.jp/address-search/AddressSearch?q=%E5%AF%8C%E5%A3%AB%E5%B1%B1": {
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "file": "msearch-2c4382e120.json"
+    },
+    "https://msearch.gsi.go.jp/address-search/AddressSearch?q=%E5%AF%8C%E5%A3%AB%E5%B1%B1%E9%A0%82": {
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "file": "msearch-860b6030fc.json"
+    },
+    "https://msearch.gsi.go.jp/address-search/AddressSearch?q=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E6%B0%B8%E7%94%B0%E7%94%BA1-7-1": {
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "file": "msearch-38e1d85fc4.json"
+    },
+    "https://msearch.gsi.go.jp/address-search/AddressSearch?q=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B1%9F%E6%9D%B1%E5%8C%BA%E6%9D%B1%E9%99%BD4-11-28": {
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "file": "msearch-b5a0423107.json"
+    },
+    "https://msearch.gsi.go.jp/address-search/AddressSearch?q=%E8%8C%A8%E5%9F%8E%E7%9C%8C%E3%81%A4%E3%81%8F%E3%81%B0%E5%B8%82%E5%8C%97%E9%83%B71": {
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "file": "msearch-a10f9c8133.json"
+    },
+    "https://vldb.gsi.go.jp/sokuchi/surveycalc/geoid/calcgh/cgi/geoidcalc.pl?outputType=json&latitude=33.1&longitude=139.79": {
+      "status": 200,
+      "contentType": "application/json; charset=UTF-8",
+      "file": "vldb-1ab16b5c45.json"
+    },
+    "https://vldb.gsi.go.jp/sokuchi/surveycalc/geoid/calcgh/cgi/geoidcalc.pl?outputType=json&latitude=36.10377479&longitude=140.08785504": {
+      "status": 200,
+      "contentType": "application/json; charset=UTF-8",
+      "file": "vldb-ec646dfae6.json"
+    },
+    "https://vldb.gsi.go.jp/sokuchi/surveycalc/surveycalc/bl2st_calc.pl?outputType=json&ellipsoid=GRS80&latitude1=36.10377477&longitude1=140.08785502&latitude2=35.65502847&longitude2=139.74475044": {
+      "status": 200,
+      "contentType": "application/json; charset=UTF-8",
+      "file": "vldb-4e64a0c5d2.json"
+    },
+    "https://vldb.gsi.go.jp/sokuchi/surveycalc/surveycalc/bl2xy.pl?outputType=json&refFrame=2&zone=9&latitude=36.10377479&longitude=140.08785504": {
+      "status": 200,
+      "contentType": "application/json; charset=UTF-8",
+      "file": "vldb-6853a330c1.json"
+    },
+    "https://vldb.gsi.go.jp/sokuchi/surveycalc/surveycalc/bl2xy.pl?outputType=json&refFrame=2&zone=9&latitude=36.104961&longitude=140.085052": {
+      "status": 200,
+      "contentType": "application/json; charset=UTF-8",
+      "file": "vldb-4fcb182844.json"
+    },
+    "https://vldb.gsi.go.jp/sokuchi/surveycalc/surveycalc/xy2bl.pl?outputType=json&refFrame=2&zone=9&publicX=11543.688&publicY=22916.244": {
+      "status": 200,
+      "contentType": "application/json; charset=UTF-8",
+      "file": "vldb-a978dfaf74.json"
+    }
+  }
+}
