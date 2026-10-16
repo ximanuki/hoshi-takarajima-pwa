@@ -314,7 +314,10 @@ function listBasisText(list: ApplicableList): string {
     case 'kept_before_agreed_date':
       return `合意した適用日（${ag?.effective ? toWareki(ag.effective) : '-'}）より前のため、旧定価 ${formatYen(list.price)} が基準です`;
     case 'current':
-      return `定価 ${formatYen(list.price)}（${toWareki(list.since)}から）が基準です`;
+      // a product without a 定価 history has one open row from the beginning of time: no date to show
+      return list.since > '1873-01-01'
+        ? `定価 ${formatYen(list.price)}（${toWareki(list.since)}から）が基準です`
+        : `定価 ${formatYen(list.price)} が基準です`;
   }
 }
 

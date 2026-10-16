@@ -62,20 +62,23 @@ function periodLabel(period: string): string {
   return `${period}年`;
 }
 
-const W = 560;
-const H = 220;
-const PAD = { top: 16, right: 64, bottom: 28, left: 48 };
+const PAD = { top: 14, right: 60, bottom: 26, left: 44 };
 
 export function LineChart({
   points,
   title,
   unit,
   format = (v) => v.toLocaleString('ja-JP'),
+  width: W = 560,
+  height: H = 220,
 }: {
   points: readonly LinePoint[];
   title: string;
   unit: string;
   format?: (v: number) => string;
+  /** size of the drawing in SVG units; text keeps its size, so a smaller drawing reads larger when scaled down */
+  width?: number;
+  height?: number;
 }) {
   const [active, setActive] = useState<number | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -110,7 +113,7 @@ export function LineChart({
       .map((p, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${y(p.value).toFixed(1)}`)
       .join('');
     return { ticks, x, y, xTicks, monthly, path, decimals: decimalsOf(step) };
-  }, [points]);
+  }, [points, W, H]);
 
   if (points.length === 0) return null;
   const last = points.length - 1;

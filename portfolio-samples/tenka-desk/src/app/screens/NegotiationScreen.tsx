@@ -324,6 +324,9 @@ function CustomerLog({ cust }: { cust: string }) {
         className="no-print"
         actions={
           <div className="button-row tight">
+            <button type="button" className="btn btn-small btn-ghost" onClick={() => navigate('negotiation')}>
+              閉じる
+            </button>
             <a className="btn btn-small" href={href('letter', cust)}>
               申入書
             </a>
@@ -596,11 +599,6 @@ function CustomerLog({ cust }: { cust: string }) {
           の先頭12桁で、前の記録のコードを含めて計算しています。
         </p>
       </section>
-      <div className="no-print">
-        <button type="button" className="btn btn-ghost" onClick={() => navigate('negotiation')}>
-          選択を外す
-        </button>
-      </div>
     </>
   );
 }

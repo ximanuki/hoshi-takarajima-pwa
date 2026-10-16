@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { type FileKind, LAYOUTS, mapColumns, toWareki } from '../../engine/index.ts';
 import { DropZone } from '../components/DropZone.tsx';
 import { Badge, Card, Icon, Kpi, Notice, PageHeader } from '../components/ui.tsx';
@@ -57,6 +57,9 @@ export function ImportScreen() {
             hint="UTF-8・Shift_JIS のどちらでも読めます。列の見出しから、売上明細・得意先マスタ・特値一覧などの種類を判別します。"
             onFiles={(files) => app.addFiles(files)}
           />
+          <p className="muted small">
+            自社の販売データだけを使う前提です。他社の価格情報を読み込んだり、他社と比べたりする機能はありません。
+          </p>
           {inputs?.source === 'sample' && (
             <p className="muted small">
               ファイルを読み込むと、サンプルデータは外して自社のファイルだけで計算し直します。
@@ -384,6 +387,7 @@ function ColumnMapper({
   onClose: () => void;
 }) {
   const [specId, setSpecId] = useState<string>(current?.specId ?? LAYOUTS[0]?.id ?? 'sales-A');
+  const baseId = useId();
   const spec = LAYOUTS.find((l) => l.id === specId) ?? LAYOUTS[0];
   const header = file?.header ?? [];
   const initial = useMemo(() => {
@@ -422,12 +426,13 @@ function ColumnMapper({
       </label>
       <div className="mapper-grid">
         {spec.columns.map((col) => (
-          <label key={col.field} className="field">
-            <span>
+          <div key={col.field} className="field">
+            <label htmlFor={`${baseId}-${col.field}`}>
               {col.headers[0]}
               {col.required && <span className="text-critical">（必須）</span>}
-            </span>
+            </label>
             <select
+              id={`${baseId}-${col.field}`}
               value={choice[col.field] ?? ''}
               onChange={(e) => setChoice({ ...choice, [col.field]: e.target.value })}
             >
@@ -438,7 +443,7 @@ function ColumnMapper({
                 </option>
               ))}
             </select>
-          </label>
+          </div>
         ))}
       </div>
       {missing.length > 0 && (

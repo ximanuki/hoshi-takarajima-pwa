@@ -363,7 +363,9 @@ function FindingDetail({ f }: { f: Finding }) {
               <th scope="col" className="num">
                 不足額
               </th>
-              <th scope="col">元ファイルの行</th>
+              <th scope="col" className="num">
+                元ファイルの行
+              </th>
             </tr>
           </thead>
           <tbody>

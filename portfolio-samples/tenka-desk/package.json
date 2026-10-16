@@ -17,7 +17,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "sample": "cd data-gen && npm run gen",
-    "evaluate": "node scripts/evaluate.ts"
+    "evaluate": "node scripts/evaluate.ts",
+    "e2e": "npm run build && playwright test",
+    "e2e:only": "playwright test",
+    "check": "npm run typecheck && npm run lint && npm test"
   },
   "dependencies": {
     "react": "19.3.0",

@@ -115,6 +115,26 @@ describe('diagnoseLine: leaks', () => {
   });
 });
 
+describe('data without a 定価 history', () => {
+  it('explains a finding without a start date for the 定価', () => {
+    const bare = new Dataset({ ...fixtureInput(), listPriceHistory: [], costHistory: [] });
+    const d = diagnoseLine(
+      bare,
+      bare.resolveLines([
+        line({ cust: '000001', rawSku: 'DB-1001', date: D, unitPrice: 520 }),
+      ])[0] as ReturnType<typeof line>,
+    );
+    expect(d.leak).toBe('rate_out_of_tier');
+    const text = explainLine(d).join('');
+    expect(text).toContain('定価 770円 が基準です');
+    const r = diagnose(
+      bare,
+      bare.resolveLines([line({ cust: '000001', rawSku: 'DB-1001', date: D, unitPrice: 520 })]),
+    );
+    expect(r.findings).toHaveLength(1);
+  });
+});
+
 describe('diagnose: findings and impact', () => {
   const lines = [
     // 反映漏れ for A商事 × DB-1001, outside and inside the window, still going on

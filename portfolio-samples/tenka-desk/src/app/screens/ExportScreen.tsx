@@ -150,14 +150,16 @@ export function ExportScreen() {
                   checked={opts.currentPrice === k}
                   onChange={() => setOpts({ currentPrice: k })}
                 />
-                {
+                <span>
                   {
-                    system: '販売管理の今の単価（おすすめ）',
-                    expected: '取り決めどおりの単価',
-                    last_billed: '最後に請求した単価',
-                  }[k]
-                }
-                <span className="block small muted">{CURRENT_PRICE_HELP[k]}</span>
+                    {
+                      system: '販売管理の今の単価（おすすめ）',
+                      expected: '取り決めどおりの単価',
+                      last_billed: '最後に請求した単価',
+                    }[k]
+                  }
+                  <span className="block small muted">{CURRENT_PRICE_HELP[k]}</span>
+                </span>
               </label>
             ))}
           </fieldset>

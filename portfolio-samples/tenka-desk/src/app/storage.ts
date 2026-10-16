@@ -1,12 +1,12 @@
 /**
  * Storage in this browser only: IndexedDB for the data (files, settings,
- * 協議記録) and localStorage for small view preferences. Nothing is sent
- * anywhere. Every call can fail (private windows, blocked site data), so the
+ * 協議記録). Nothing is sent anywhere. Every call can fail (private windows, blocked site data), so the
  * callers treat storage as best effort and the app keeps working without it.
  */
 
 const DB_NAME = 'tenka-desk';
 const STORE = 'kv';
+/** prefix of any localStorage key this app may have written (removed by clearAllStorage) */
 const PREF_PREFIX = 'tenka-desk:';
 
 let dbPromise: Promise<IDBDatabase> | null = null;
@@ -85,21 +85,5 @@ export async function clearAllStorage(): Promise<void> {
     for (const k of keys) localStorage.removeItem(k);
   } catch {
     // localStorage is not available
-  }
-}
-
-export function getPref(key: string): string | null {
-  try {
-    return localStorage.getItem(PREF_PREFIX + key);
-  } catch {
-    return null;
-  }
-}
-
-export function setPref(key: string, value: string): void {
-  try {
-    localStorage.setItem(PREF_PREFIX + key, value);
-  } catch {
-    // ignore: a preference is a convenience only
   }
 }

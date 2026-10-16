@@ -354,10 +354,9 @@ function LetterSheets({ data }: { data: LetterData }) {
           {data.sender.tel && <p className="small">TEL {data.sender.tel}</p>}
         </div>
         <h2 className="letter-title">{data.title}</h2>
-        <p className="letter-salutation">{data.salutation}</p>
-        {data.body.map((p) => (
-          <p key={p} className="letter-para">
-            {p}
+        {data.body.map((p, i) => (
+          <p key={p} className={i === 0 ? 'letter-para letter-first' : 'letter-para'}>
+            {i === 0 ? `${data.salutation}　${p}` : p}
           </p>
         ))}
         <p className="letter-close">{data.complimentaryClose}</p>
@@ -440,6 +439,8 @@ function LetterSheets({ data }: { data: LetterData }) {
                     title={e.chart.label}
                     unit={e.chart.unit}
                     format={chartFormat(e.chart.unit, e.chart.points)}
+                    width={380}
+                    height={190}
                   />
                 )}
                 <p className="evidence-statement">{e.statement}</p>
