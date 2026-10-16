@@ -1305,7 +1305,7 @@ function main(): void {
   };
 
   // issues: one row per (type, customer, SKU)
-  type Agg = { type: string; cust: string; sku: string; cause: string; group: string; lines: number; first: string; last: string; total: number; last12: number; floorLast12: number; ongoing: boolean };
+  type Agg = { type: string; cust: string; sku: string; cause: string; group: string; fixed: boolean; lines: number; first: string; last: string; total: number; last12: number; floorLast12: number; ongoing: boolean };
   const agg = new Map<string, Agg>();
   const injCause = new Map<string, Inj>();
   for (const x of inj.all) injCause.set(x.group || `${x.type}:${x.cust}:${x.sku}`, x);
@@ -1317,14 +1317,16 @@ function main(): void {
     if (!a) {
       let cause = '';
       let group = '';
+      let fixed = false;
       if (r.label === 'leak_below_margin_floor') {
         cause = lowMarginPairs.has(pairKey(ev.cust.code, ev.sku.code)) ? '特値の設定が粗利下限を下回る' : '仕入値上げ(2026年4月)後も定価を据え置き';
       } else {
         const x = injCause.get(ev.injId) ?? fail(`no injection ${ev.injId}`);
         cause = x.cause;
         group = x.group;
+        fixed = x.to !== null;
       }
-      a = { type: r.label, cust: ev.cust.code, sku: ev.sku.code, cause, group, lines: 0, first: ev.date, last: ev.date, total: 0, last12: 0, floorLast12: 0, ongoing: false };
+      a = { type: r.label, cust: ev.cust.code, sku: ev.sku.code, cause, group, fixed, lines: 0, first: ev.date, last: ev.date, total: 0, last12: 0, floorLast12: 0, ongoing: false };
       agg.set(key, a);
     }
     a.lines++;
@@ -1335,7 +1337,7 @@ function main(): void {
       a.floorLast12 += r.floorGap;
     }
   }
-  // "ongoing" = the pair's last sale in the history is still affected
+  // "ongoing" = not fixed, and the pair's last sale in the history is still affected
   const lastSale = new Map<string, string>();
   for (const [k, arr] of salesByPair) lastSale.set(k, arr[arr.length - 1].date);
   const typeOrder = new Map<string, number>(LEAK_TYPES.map((x, i) => [x, i]));
@@ -1345,7 +1347,7 @@ function main(): void {
   const counters: Record<string, number> = {};
   const issueId = new Map<string, string>();
   for (const a of issues) {
-    a.ongoing = a.last === lastSale.get(pairKey(a.cust, a.sku));
+    a.ongoing = !a.fixed && a.last === lastSale.get(pairKey(a.cust, a.sku));
     counters[a.type] = (counters[a.type] ?? 0) + 1;
     issueId.set(`${a.type}|${a.cust}|${a.sku}`, `${prefix[a.type]}-${String(counters[a.type]).padStart(4, '0')}`);
   }
