@@ -5,3 +5,5 @@ public/sample/
 data-gen/truth/
 test-results/
 playwright-report/
+# 点検用のスクリーンショット（約18MB。docs/screenshots/ の公開用とは別）
+docs/review-screens/
