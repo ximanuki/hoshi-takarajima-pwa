@@ -1,0 +1,1536 @@
+{
+ "id": "minimum-wage",
+ "title_ja": "地域別最低賃金（時間額）",
+ "publisher_ja": "厚生労働省",
+ "source_page_url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/roudoukijun/minimumichiran/",
+ "source_files": [
+  {
+   "title_ja": "平成14年度から令和８年度までの地域別最低賃金改定状況（Excel）",
+   "url": "https://www.mhlw.go.jp/content/11200000/001756130.xlsx"
+  },
+  {
+   "title_ja": "令和８年度地域別最低賃金全国一覧（PDF）",
+   "url": "https://www.mhlw.go.jp/content/11200000/001753404.pdf"
+  }
+ ],
+ "retrieved_at_utc": "2026-10-16T16:15:39Z",
+ "unit_ja": "円（時間額）",
+ "national_weighted_average": [
+  {
+   "fiscal_year": 2002,
+   "label_ja": "平成14年度",
+   "yen": 663
+  },
+  {
+   "fiscal_year": 2003,
+   "label_ja": "平成15年度",
+   "yen": 664
+  },
+  {
+   "fiscal_year": 2004,
+   "label_ja": "平成16年度",
+   "yen": 665
+  },
+  {
+   "fiscal_year": 2005,
+   "label_ja": "平成17年度",
+   "yen": 668
+  },
+  {
+   "fiscal_year": 2006,
+   "label_ja": "平成18年度",
+   "yen": 673
+  },
+  {
+   "fiscal_year": 2007,
+   "label_ja": "平成19年度",
+   "yen": 687
+  },
+  {
+   "fiscal_year": 2008,
+   "label_ja": "平成20年度",
+   "yen": 703
+  },
+  {
+   "fiscal_year": 2009,
+   "label_ja": "平成21年度",
+   "yen": 713
+  },
+  {
+   "fiscal_year": 2010,
+   "label_ja": "平成22年度",
+   "yen": 730
+  },
+  {
+   "fiscal_year": 2011,
+   "label_ja": "平成23年度",
+   "yen": 737
+  },
+  {
+   "fiscal_year": 2012,
+   "label_ja": "平成24年度",
+   "yen": 749
+  },
+  {
+   "fiscal_year": 2013,
+   "label_ja": "平成25年度",
+   "yen": 764
+  },
+  {
+   "fiscal_year": 2014,
+   "label_ja": "平成26年度",
+   "yen": 780
+  },
+  {
+   "fiscal_year": 2015,
+   "label_ja": "平成27年度",
+   "yen": 798
+  },
+  {
+   "fiscal_year": 2016,
+   "label_ja": "平成28年度",
+   "yen": 823
+  },
+  {
+   "fiscal_year": 2017,
+   "label_ja": "平成29年度",
+   "yen": 848,
+   "note_ja": "Excel上の値は小数を含む計算値のため、セルの表示書式（整数）に合わせて四捨五入した値を収録。"
+  },
+  {
+   "fiscal_year": 2018,
+   "label_ja": "平成30年度",
+   "yen": 874
+  },
+  {
+   "fiscal_year": 2019,
+   "label_ja": "令和元年度",
+   "yen": 901
+  },
+  {
+   "fiscal_year": 2020,
+   "label_ja": "令和2年度",
+   "yen": 902
+  },
+  {
+   "fiscal_year": 2021,
+   "label_ja": "令和3年度",
+   "yen": 930
+  },
+  {
+   "fiscal_year": 2022,
+   "label_ja": "令和4年度",
+   "yen": 961
+  },
+  {
+   "fiscal_year": 2023,
+   "label_ja": "令和5年度",
+   "yen": 1004
+  },
+  {
+   "fiscal_year": 2024,
+   "label_ja": "令和6年度",
+   "yen": 1055
+  },
+  {
+   "fiscal_year": 2025,
+   "label_ja": "令和7年度",
+   "yen": 1121
+  },
+  {
+   "fiscal_year": 2026,
+   "label_ja": "令和8年度",
+   "yen": 1177,
+   "note_ja": "Excel上の値は小数を含む計算値のため、セルの表示書式（整数）に合わせて四捨五入した値を収録。",
+   "increase_yen_official": 56,
+   "increase_rate_pct_official": 5.0
+  }
+ ],
+ "by_prefecture": {
+  "fiscal_years": [
+   2023,
+   2024,
+   2025,
+   2026
+  ],
+  "prefectures": [
+   {
+    "code": "01",
+    "name_ja": "北海道",
+    "name_ja_full": "北海道",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 960,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 1010,
+      "effective_date": "2024-10-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1075,
+      "effective_date": "2025-10-04"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1131,
+      "effective_date": "2026-10-01",
+      "increase_yen_official": 56,
+      "increase_rate_pct_official": 5.2
+     }
+    ]
+   },
+   {
+    "code": "02",
+    "name_ja": "青森",
+    "name_ja_full": "青森県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 898,
+      "effective_date": "2023-10-07"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 953,
+      "effective_date": "2024-10-05"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1029,
+      "effective_date": "2025-11-21"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1090,
+      "effective_date": "2026-10-29",
+      "increase_yen_official": 61,
+      "increase_rate_pct_official": 5.9
+     }
+    ]
+   },
+   {
+    "code": "03",
+    "name_ja": "岩手",
+    "name_ja_full": "岩手県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 893,
+      "effective_date": "2023-10-04"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 952,
+      "effective_date": "2024-10-27"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1031,
+      "effective_date": "2025-12-01"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1090,
+      "effective_date": "2026-12-01",
+      "increase_yen_official": 59,
+      "increase_rate_pct_official": 5.7
+     }
+    ]
+   },
+   {
+    "code": "04",
+    "name_ja": "宮城",
+    "name_ja_full": "宮城県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 923,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 973,
+      "effective_date": "2024-10-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1038,
+      "effective_date": "2025-10-04"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1098,
+      "effective_date": "2026-10-01",
+      "increase_yen_official": 60,
+      "increase_rate_pct_official": 5.8
+     }
+    ]
+   },
+   {
+    "code": "05",
+    "name_ja": "秋田",
+    "name_ja_full": "秋田県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 897,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 951,
+      "effective_date": "2024-10-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1031,
+      "effective_date": "2026-03-31"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1090,
+      "effective_date": "2026-10-14",
+      "increase_yen_official": 59,
+      "increase_rate_pct_official": 5.7
+     }
+    ]
+   },
+   {
+    "code": "06",
+    "name_ja": "山形",
+    "name_ja_full": "山形県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 900,
+      "effective_date": "2023-10-14"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 955,
+      "effective_date": "2024-10-19"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1032,
+      "effective_date": "2025-12-23"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1092,
+      "effective_date": "2026-10-30",
+      "increase_yen_official": 60,
+      "increase_rate_pct_official": 5.8
+     }
+    ]
+   },
+   {
+    "code": "07",
+    "name_ja": "福島",
+    "name_ja_full": "福島県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 900,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 955,
+      "effective_date": "2024-10-05"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1033,
+      "effective_date": "2026-01-01"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1094,
+      "effective_date": "2026-10-16",
+      "increase_yen_official": 61,
+      "increase_rate_pct_official": 5.9
+     }
+    ]
+   },
+   {
+    "code": "08",
+    "name_ja": "茨城",
+    "name_ja_full": "茨城県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 953,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 1005,
+      "effective_date": "2024-10-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1074,
+      "effective_date": "2025-10-12"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1136,
+      "effective_date": "2026-10-18",
+      "increase_yen_official": 62,
+      "increase_rate_pct_official": 5.8
+     }
+    ]
+   },
+   {
+    "code": "09",
+    "name_ja": "栃木",
+    "name_ja_full": "栃木県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 954,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 1004,
+      "effective_date": "2024-10-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1068,
+      "effective_date": "2025-10-01"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1125,
+      "effective_date": "2026-10-01",
+      "increase_yen_official": 57,
+      "increase_rate_pct_official": 5.3
+     }
+    ]
+   },
+   {
+    "code": "10",
+    "name_ja": "群馬",
+    "name_ja_full": "群馬県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 935,
+      "effective_date": "2023-10-05"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 985,
+      "effective_date": "2024-10-04"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1063,
+      "effective_date": "2026-03-01"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1120,
+      "effective_date": "2026-10-03",
+      "increase_yen_official": 57,
+      "increase_rate_pct_official": 5.4
+     }
+    ]
+   },
+   {
+    "code": "11",
+    "name_ja": "埼玉",
+    "name_ja_full": "埼玉県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 1028,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 1078,
+      "effective_date": "2024-10-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1141,
+      "effective_date": "2025-11-01"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1196,
+      "effective_date": "2026-10-01",
+      "increase_yen_official": 55,
+      "increase_rate_pct_official": 4.8
+     }
+    ]
+   },
+   {
+    "code": "12",
+    "name_ja": "千葉",
+    "name_ja_full": "千葉県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 1026,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 1076,
+      "effective_date": "2024-10-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1140,
+      "effective_date": "2025-10-03"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1195,
+      "effective_date": "2026-10-01",
+      "increase_yen_official": 55,
+      "increase_rate_pct_official": 4.8
+     }
+    ]
+   },
+   {
+    "code": "13",
+    "name_ja": "東京",
+    "name_ja_full": "東京都",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 1113,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 1163,
+      "effective_date": "2024-10-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1226,
+      "effective_date": "2025-10-03"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1280,
+      "effective_date": "2026-10-01",
+      "increase_yen_official": 54,
+      "increase_rate_pct_official": 4.4
+     }
+    ]
+   },
+   {
+    "code": "14",
+    "name_ja": "神奈川",
+    "name_ja_full": "神奈川県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 1112,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 1162,
+      "effective_date": "2024-10-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1225,
+      "effective_date": "2025-10-04"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1279,
+      "effective_date": "2026-10-01",
+      "increase_yen_official": 54,
+      "increase_rate_pct_official": 4.4
+     }
+    ]
+   },
+   {
+    "code": "15",
+    "name_ja": "新潟",
+    "name_ja_full": "新潟県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 931,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 985,
+      "effective_date": "2024-10-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1050,
+      "effective_date": "2025-10-02"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1108,
+      "effective_date": "2026-10-01",
+      "increase_yen_official": 58,
+      "increase_rate_pct_official": 5.5
+     }
+    ]
+   },
+   {
+    "code": "16",
+    "name_ja": "富山",
+    "name_ja_full": "富山県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 948,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 998,
+      "effective_date": "2024-10-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1062,
+      "effective_date": "2025-10-12"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1119,
+      "effective_date": "2026-10-01",
+      "increase_yen_official": 57,
+      "increase_rate_pct_official": 5.4
+     }
+    ]
+   },
+   {
+    "code": "17",
+    "name_ja": "石川",
+    "name_ja_full": "石川県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 933,
+      "effective_date": "2023-10-08"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 984,
+      "effective_date": "2024-10-05"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1054,
+      "effective_date": "2025-10-08"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1113,
+      "effective_date": "2026-10-03",
+      "increase_yen_official": 59,
+      "increase_rate_pct_official": 5.6
+     }
+    ]
+   },
+   {
+    "code": "18",
+    "name_ja": "福井",
+    "name_ja_full": "福井県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 931,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 984,
+      "effective_date": "2024-10-05"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1053,
+      "effective_date": "2025-10-08"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1112,
+      "effective_date": "2026-10-04",
+      "increase_yen_official": 59,
+      "increase_rate_pct_official": 5.6
+     }
+    ]
+   },
+   {
+    "code": "19",
+    "name_ja": "山梨",
+    "name_ja_full": "山梨県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 938,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 988,
+      "effective_date": "2024-10-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1052,
+      "effective_date": "2025-12-01"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1113,
+      "effective_date": "2026-11-01",
+      "increase_yen_official": 61,
+      "increase_rate_pct_official": 5.8
+     }
+    ]
+   },
+   {
+    "code": "20",
+    "name_ja": "長野",
+    "name_ja_full": "長野県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 948,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 998,
+      "effective_date": "2024-10-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1061,
+      "effective_date": "2025-10-03"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1117,
+      "effective_date": "2026-10-02",
+      "increase_yen_official": 56,
+      "increase_rate_pct_official": 5.3
+     }
+    ]
+   },
+   {
+    "code": "21",
+    "name_ja": "岐阜",
+    "name_ja_full": "岐阜県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 950,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 1001,
+      "effective_date": "2024-10-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1065,
+      "effective_date": "2025-10-18"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1121,
+      "effective_date": "2026-10-01",
+      "increase_yen_official": 56,
+      "increase_rate_pct_official": 5.3
+     }
+    ]
+   },
+   {
+    "code": "22",
+    "name_ja": "静岡",
+    "name_ja_full": "静岡県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 984,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 1034,
+      "effective_date": "2024-10-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1097,
+      "effective_date": "2025-11-01"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1154,
+      "effective_date": "2026-10-15",
+      "increase_yen_official": 57,
+      "increase_rate_pct_official": 5.2
+     }
+    ]
+   },
+   {
+    "code": "23",
+    "name_ja": "愛知",
+    "name_ja_full": "愛知県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 1027,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 1077,
+      "effective_date": "2024-10-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1140,
+      "effective_date": "2025-10-18"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1195,
+      "effective_date": "2026-10-01",
+      "increase_yen_official": 55,
+      "increase_rate_pct_official": 4.8
+     }
+    ]
+   },
+   {
+    "code": "24",
+    "name_ja": "三重",
+    "name_ja_full": "三重県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 973,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 1023,
+      "effective_date": "2024-10-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1087,
+      "effective_date": "2025-11-21"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1143,
+      "effective_date": "2026-10-01",
+      "increase_yen_official": 56,
+      "increase_rate_pct_official": 5.2
+     }
+    ]
+   },
+   {
+    "code": "25",
+    "name_ja": "滋賀",
+    "name_ja_full": "滋賀県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 967,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 1017,
+      "effective_date": "2024-10-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1080,
+      "effective_date": "2025-10-05"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1136,
+      "effective_date": "2026-10-03",
+      "increase_yen_official": 56,
+      "increase_rate_pct_official": 5.2
+     }
+    ]
+   },
+   {
+    "code": "26",
+    "name_ja": "京都",
+    "name_ja_full": "京都府",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 1008,
+      "effective_date": "2023-10-06"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 1058,
+      "effective_date": "2024-10-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1122,
+      "effective_date": "2025-11-21"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1180,
+      "effective_date": "2026-11-16",
+      "increase_yen_official": 58,
+      "increase_rate_pct_official": 5.2
+     }
+    ]
+   },
+   {
+    "code": "27",
+    "name_ja": "大阪",
+    "name_ja_full": "大阪府",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 1064,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 1114,
+      "effective_date": "2024-10-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1177,
+      "effective_date": "2025-10-16"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1231,
+      "effective_date": "2026-10-01",
+      "increase_yen_official": 54,
+      "increase_rate_pct_official": 4.6
+     }
+    ]
+   },
+   {
+    "code": "28",
+    "name_ja": "兵庫",
+    "name_ja_full": "兵庫県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 1001,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 1052,
+      "effective_date": "2024-10-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1116,
+      "effective_date": "2025-10-04"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1172,
+      "effective_date": "2026-10-01",
+      "increase_yen_official": 56,
+      "increase_rate_pct_official": 5.0
+     }
+    ]
+   },
+   {
+    "code": "29",
+    "name_ja": "奈良",
+    "name_ja_full": "奈良県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 936,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 986,
+      "effective_date": "2024-10-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1051,
+      "effective_date": "2025-11-16"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1107,
+      "effective_date": "2026-10-04",
+      "increase_yen_official": 56,
+      "increase_rate_pct_official": 5.3
+     }
+    ]
+   },
+   {
+    "code": "30",
+    "name_ja": "和歌山",
+    "name_ja_full": "和歌山県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 929,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 980,
+      "effective_date": "2024-10-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1045,
+      "effective_date": "2025-11-01"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1101,
+      "effective_date": "2026-10-03",
+      "increase_yen_official": 56,
+      "increase_rate_pct_official": 5.4
+     }
+    ]
+   },
+   {
+    "code": "31",
+    "name_ja": "鳥取",
+    "name_ja_full": "鳥取県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 900,
+      "effective_date": "2023-10-05"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 957,
+      "effective_date": "2024-10-05"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1030,
+      "effective_date": "2025-10-04"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1090,
+      "effective_date": "2026-10-03",
+      "increase_yen_official": 60,
+      "increase_rate_pct_official": 5.8
+     }
+    ]
+   },
+   {
+    "code": "32",
+    "name_ja": "島根",
+    "name_ja_full": "島根県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 904,
+      "effective_date": "2023-10-06"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 962,
+      "effective_date": "2024-10-12"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1033,
+      "effective_date": "2025-11-17"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1092,
+      "effective_date": "2026-10-10",
+      "increase_yen_official": 59,
+      "increase_rate_pct_official": 5.7
+     }
+    ]
+   },
+   {
+    "code": "33",
+    "name_ja": "岡山",
+    "name_ja_full": "岡山県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 932,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 982,
+      "effective_date": "2024-10-02"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1047,
+      "effective_date": "2025-12-01"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1104,
+      "effective_date": "2026-10-02",
+      "increase_yen_official": 57,
+      "increase_rate_pct_official": 5.4
+     }
+    ]
+   },
+   {
+    "code": "34",
+    "name_ja": "広島",
+    "name_ja_full": "広島県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 970,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 1020,
+      "effective_date": "2024-10-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1085,
+      "effective_date": "2025-11-01"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1141,
+      "effective_date": "2026-10-11",
+      "increase_yen_official": 56,
+      "increase_rate_pct_official": 5.2
+     }
+    ]
+   },
+   {
+    "code": "35",
+    "name_ja": "山口",
+    "name_ja_full": "山口県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 928,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 979,
+      "effective_date": "2024-10-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1043,
+      "effective_date": "2025-10-16"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1101,
+      "effective_date": "2026-10-08",
+      "increase_yen_official": 58,
+      "increase_rate_pct_official": 5.6
+     }
+    ]
+   },
+   {
+    "code": "36",
+    "name_ja": "徳島",
+    "name_ja_full": "徳島県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 896,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 980,
+      "effective_date": "2024-11-01"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1046,
+      "effective_date": "2026-01-01"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1103,
+      "effective_date": "2026-11-01",
+      "increase_yen_official": 57,
+      "increase_rate_pct_official": 5.4
+     }
+    ]
+   },
+   {
+    "code": "37",
+    "name_ja": "香川",
+    "name_ja_full": "香川県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 918,
+      "effective_date": "2023-10-01"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 970,
+      "effective_date": "2024-10-02"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1036,
+      "effective_date": "2025-10-18"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1092,
+      "effective_date": "2026-10-01",
+      "increase_yen_official": 56,
+      "increase_rate_pct_official": 5.4
+     }
+    ]
+   },
+   {
+    "code": "38",
+    "name_ja": "愛媛",
+    "name_ja_full": "愛媛県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 897,
+      "effective_date": "2023-10-06"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 956,
+      "effective_date": "2024-10-13"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1033,
+      "effective_date": "2025-12-01"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1093,
+      "effective_date": "2026-11-01",
+      "increase_yen_official": 60,
+      "increase_rate_pct_official": 5.8
+     }
+    ]
+   },
+   {
+    "code": "39",
+    "name_ja": "高知",
+    "name_ja_full": "高知県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 897,
+      "effective_date": "2023-10-08"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 952,
+      "effective_date": "2024-10-09"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1023,
+      "effective_date": "2025-12-01"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1086,
+      "effective_date": "2026-10-29",
+      "increase_yen_official": 63,
+      "increase_rate_pct_official": 6.2
+     }
+    ]
+   },
+   {
+    "code": "40",
+    "name_ja": "福岡",
+    "name_ja_full": "福岡県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 941,
+      "effective_date": "2023-10-06"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 992,
+      "effective_date": "2024-10-05"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1057,
+      "effective_date": "2025-11-16"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1114,
+      "effective_date": "2026-10-04",
+      "increase_yen_official": 57,
+      "increase_rate_pct_official": 5.4
+     }
+    ]
+   },
+   {
+    "code": "41",
+    "name_ja": "佐賀",
+    "name_ja_full": "佐賀県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 900,
+      "effective_date": "2023-10-14"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 956,
+      "effective_date": "2024-10-17"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1030,
+      "effective_date": "2025-11-21"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1095,
+      "effective_date": "2026-11-15",
+      "increase_yen_official": 65,
+      "increase_rate_pct_official": 6.3
+     }
+    ]
+   },
+   {
+    "code": "42",
+    "name_ja": "長崎",
+    "name_ja_full": "長崎県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 898,
+      "effective_date": "2023-10-13"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 953,
+      "effective_date": "2024-10-12"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1031,
+      "effective_date": "2025-12-01"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1087,
+      "effective_date": "2026-11-02",
+      "increase_yen_official": 56,
+      "increase_rate_pct_official": 5.4
+     }
+    ]
+   },
+   {
+    "code": "43",
+    "name_ja": "熊本",
+    "name_ja_full": "熊本県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 898,
+      "effective_date": "2023-10-08"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 952,
+      "effective_date": "2024-10-05"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1034,
+      "effective_date": "2026-01-01"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1092,
+      "effective_date": "2026-12-01",
+      "increase_yen_official": 58,
+      "increase_rate_pct_official": 5.6
+     }
+    ]
+   },
+   {
+    "code": "44",
+    "name_ja": "大分",
+    "name_ja_full": "大分県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 899,
+      "effective_date": "2023-10-06"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 954,
+      "effective_date": "2024-10-05"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1035,
+      "effective_date": "2026-01-01"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1096,
+      "effective_date": "2026-11-01",
+      "increase_yen_official": 61,
+      "increase_rate_pct_official": 5.9
+     }
+    ]
+   },
+   {
+    "code": "45",
+    "name_ja": "宮崎",
+    "name_ja_full": "宮崎県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 897,
+      "effective_date": "2023-10-06"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 952,
+      "effective_date": "2024-10-05"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1023,
+      "effective_date": "2025-11-16"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1085,
+      "effective_date": "2026-10-24",
+      "increase_yen_official": 62,
+      "increase_rate_pct_official": 6.1
+     }
+    ]
+   },
+   {
+    "code": "46",
+    "name_ja": "鹿児島",
+    "name_ja_full": "鹿児島県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 897,
+      "effective_date": "2023-10-06"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 953,
+      "effective_date": "2024-10-05"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1026,
+      "effective_date": "2025-11-01"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1090,
+      "effective_date": "2026-10-25",
+      "increase_yen_official": 64,
+      "increase_rate_pct_official": 6.2
+     }
+    ]
+   },
+   {
+    "code": "47",
+    "name_ja": "沖縄",
+    "name_ja_full": "沖縄県",
+    "values": [
+     {
+      "fiscal_year": 2023,
+      "yen": 896,
+      "effective_date": "2023-10-08"
+     },
+     {
+      "fiscal_year": 2024,
+      "yen": 952,
+      "effective_date": "2024-10-09"
+     },
+     {
+      "fiscal_year": 2025,
+      "yen": 1023,
+      "effective_date": "2025-12-01"
+     },
+     {
+      "fiscal_year": 2026,
+      "yen": 1086,
+      "effective_date": "2026-12-02",
+      "increase_yen_official": 63,
+      "increase_rate_pct_official": 6.2
+     }
+    ]
+   }
+  ]
+ },
+ "notes_ja": [
+  "年度は改定の年度（例：令和8年度＝2026年度の改定）。各都道府県の新しい金額は effective_date（発効日）から適用され、それまでは前年度の金額が適用される。",
+  "令和8年度の金額は公表資料上「答申された改定額」。取得日時点で発効日が未到来の都道府県がある。",
+  "全国加重平均額は厚生労働省の公表値。",
+  "increase_yen_official / increase_rate_pct_official は令和8年度全国一覧PDFに記載の引上げ額・引上げ率（率は小数第1位）。"
+ ],
+ "credit_ja": "出典：厚生労働省「地域別最低賃金の全国一覧」（https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/roudoukijun/minimumichiran/）を加工して作成",
+ "transformations_ja": [
+  "Excel(H14～R8シート)から全国加重平均額（全年度）と、47都道府県の令和5～8年度の改定額・発効年月日を抽出。",
+  "全国加重平均額のうち平成29年度・令和8年度はExcelのセル値が小数を含む計算値のため、セルの表示書式（整数）に合わせ四捨五入（848円・1,177円。令和8年度はPDFの1,177円と一致）。",
+  "都道府県名の全角スペースを除去し（name_ja は資料の表記どおり「東京」「青森」など）、正式名称（name_ja_full：東京都・青森県など）とJIS都道府県コード(01～47)を付与。発効年月日をISO形式(YYYY-MM-DD)に変換。",
+  "令和8年度・令和7年度の金額、令和8年度の発効日・引上げ額をPDFと突き合わせ、全47都道府県＋全国加重平均で一致を確認。"
+ ],
+ "synthetic": false
+}

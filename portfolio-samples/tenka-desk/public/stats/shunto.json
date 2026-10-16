@@ -1,0 +1,116 @@
+{
+ "id": "shunto",
+ "title_ja": "民間主要企業 春季賃上げ状況（妥結額・賃上げ率）",
+ "publisher_ja": "厚生労働省",
+ "source_page_url": "https://www.mhlw.go.jp/stf/newpage_74889.html",
+ "source_files": [
+  {
+   "title_ja": "第２表 民間主要企業における春季賃上げ状況の推移（PDF）",
+   "url": "https://www.mhlw.go.jp/content/12604000/001727594.pdf"
+  }
+ ],
+ "retrieved_at_utc": "2026-10-16T16:16:29Z",
+ "series": [
+  {
+   "year": 2012,
+   "label_ja": "平成24年",
+   "settlement_yen": 5400,
+   "rate_pct": 1.78
+  },
+  {
+   "year": 2013,
+   "label_ja": "平成25年",
+   "settlement_yen": 5478,
+   "rate_pct": 1.8
+  },
+  {
+   "year": 2014,
+   "label_ja": "平成26年",
+   "settlement_yen": 6711,
+   "rate_pct": 2.19
+  },
+  {
+   "year": 2015,
+   "label_ja": "平成27年",
+   "settlement_yen": 7367,
+   "rate_pct": 2.38
+  },
+  {
+   "year": 2016,
+   "label_ja": "平成28年",
+   "settlement_yen": 6639,
+   "rate_pct": 2.14
+  },
+  {
+   "year": 2017,
+   "label_ja": "平成29年",
+   "settlement_yen": 6570,
+   "rate_pct": 2.11
+  },
+  {
+   "year": 2018,
+   "label_ja": "平成30年",
+   "settlement_yen": 7033,
+   "rate_pct": 2.26
+  },
+  {
+   "year": 2019,
+   "label_ja": "令和元年",
+   "settlement_yen": 6790,
+   "rate_pct": 2.18
+  },
+  {
+   "year": 2020,
+   "label_ja": "令和2年",
+   "settlement_yen": 6286,
+   "rate_pct": 2.0
+  },
+  {
+   "year": 2021,
+   "label_ja": "令和3年",
+   "settlement_yen": 5854,
+   "rate_pct": 1.86
+  },
+  {
+   "year": 2022,
+   "label_ja": "令和4年",
+   "settlement_yen": 6898,
+   "rate_pct": 2.2
+  },
+  {
+   "year": 2023,
+   "label_ja": "令和5年",
+   "settlement_yen": 11245,
+   "rate_pct": 3.6
+  },
+  {
+   "year": 2024,
+   "label_ja": "令和6年",
+   "settlement_yen": 17415,
+   "rate_pct": 5.33
+  },
+  {
+   "year": 2025,
+   "label_ja": "令和7年",
+   "settlement_yen": 18629,
+   "rate_pct": 5.52
+  },
+  {
+   "year": 2026,
+   "label_ja": "令和8年",
+   "settlement_yen": 18167,
+   "rate_pct": 5.18
+  }
+ ],
+ "notes_ja": [
+  "集計対象は、資本金10億円以上かつ従業員1,000人以上の労働組合のある企業のうち、妥結額などを把握できた企業（令和8年は428社）。",
+  "妥結額・賃上げ率は定期昇給分を含む。賃上げ率は現行ベース（交渉前の平均賃金）に対する率。",
+  "大企業中心の集計であり、中小企業や特定地域の賃金動向をそのまま表すものではない。"
+ ],
+ "credit_ja": "出典：厚生労働省「民間主要企業春季賃上げ要求・妥結状況」（https://www.mhlw.go.jp/stf/newpage_74889.html）を加工して作成",
+ "transformations_ja": [
+  "第２表（画像形式のPDF）から2012年（平成24年）～2026年（令和8年）の妥結額・賃上げ率を転記。現行ベース・分散係数は収録していない。",
+  "転記値は、労働政策研究・研修機構（JILPT）「早わかり グラフでみる長期労働統計」の表（同じ厚生労働省統計の機械可読版）と全件一致すること、2025年・2026年分は厚生労働省の報道発表本文とも一致することを確認（JILPTの表自体は再配布していない）。"
+ ],
+ "synthetic": false
+}
