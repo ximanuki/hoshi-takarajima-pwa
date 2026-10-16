@@ -46,6 +46,21 @@ export interface FollowupInputs {
 
 const NO_FOLLOWUP: FollowupInputs = { masterSource: 'built', masterFile: null, salesFile: null };
 
+/**
+ * 協議記録・交渉結果ファイル・反映チェックの入力は、サンプル（架空）と自社データで別々に保存する。
+ * 共有すると、サンプルで記録した「合意」が同じ得意先コード（例: 001001）の実在の得意先に付いて
+ * 書き出しに入ったり、自社の記録がサンプルを試しただけで消えたりする。
+ */
+type Scope = 'sample' | 'upload';
+const SCOPED_KEYS = ['logs', 'followup', 'outcomes'] as const;
+type ScopedKey = (typeof SCOPED_KEYS)[number];
+const scopedKey = (key: ScopedKey, scope: Scope) => `${key}:${scope}`;
+
+function normaliseFollowup(f: FollowupInputs | null | undefined): FollowupInputs {
+  if (!f) return NO_FOLLOWUP;
+  return { ...NO_FOLLOWUP, ...f, masterSource: f.masterSource ?? (f.masterFile ? 'file' : 'built') };
+}
+
 export interface AppContextValue {
   ready: boolean;
   busy: string | null;
@@ -105,7 +120,8 @@ function useDebounced<T>(value: T, ms: number): T {
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
-  const [busy, setBusy] = useState<string | null>(null);
+  // 前回の保存内容を読み終えるまでは操作を受け付けない（読み込みの完了が、先に押されたサンプル読み込みを上書きしないように）
+  const [busy, setBusy] = useState<string | null>('前回のデータを確認しています…');
   const [error, setError] = useState<string | null>(null);
   const [storageOk, setStorageOk] = useState(true);
   const [inputs, setInputs] = useState<InputsState>(null);
@@ -117,12 +133,53 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   /** files currently loaded (sample files are kept in memory only) */
   const sourcesRef = useRef<SourceFile[]>([]);
+  /** whose 協議記録 etc. are shown: the sample's or the user's (see Scope) */
+  const scopeRef = useRef<Scope>('upload');
+  /** resolves once what this browser saved last time has been restored; user actions wait for it */
+  const restoredRef = useRef<{ promise: Promise<void>; resolve: () => void } | null>(null);
+  if (restoredRef.current === null) {
+    let resolve: () => void = () => {};
+    const promise = new Promise<void>((r) => {
+      resolve = r;
+    });
+    restoredRef.current = { promise, resolve };
+  }
+  const whenRestored = useCallback(() => restoredRef.current?.promise ?? Promise.resolve(), []);
   const buildSeq = useRef(0);
   const settingsRef = useRef(settings);
   settingsRef.current = settings;
+  /** set by clearAll: the reset settings must not be written back right after the database was deleted */
+  const justCleared = useRef(false);
 
   const persist = useCallback((key: string, value: unknown) => {
     idbSet(key, value).catch(() => setStorageOk(false));
+  }, []);
+
+  const persistScoped = useCallback(
+    (key: ScopedKey, value: unknown) => persist(scopedKey(key, scopeRef.current), value),
+    [persist],
+  );
+
+  /** show the 協議記録 etc. saved for the other data source (the current ones stay saved under their own) */
+  const switchScope = useCallback(async (next: Scope) => {
+    if (scopeRef.current === next) return;
+    scopeRef.current = next;
+    let l: Record<string, NegotiationLog> | undefined;
+    let f: FollowupInputs | undefined;
+    let o: SourceFile | null | undefined;
+    try {
+      [l, f, o] = await Promise.all([
+        idbGet<Record<string, NegotiationLog>>(scopedKey('logs', next)),
+        idbGet<FollowupInputs>(scopedKey('followup', next)),
+        idbGet<SourceFile | null>(scopedKey('outcomes', next)),
+      ]);
+    } catch {
+      setStorageOk(false);
+    }
+    if (scopeRef.current !== next) return;
+    setLogs(l ?? {});
+    setFollowupState(normaliseFollowup(f));
+    setOutcomesFileState(o ?? null);
   }, []);
 
   const rebuild = useCallback(
@@ -166,32 +223,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
       let savedInputs: InputsState = null;
       let restored = defaultSettings();
       try {
-        const [s, i, l, f, o] = await Promise.all([
-          idbGet<unknown>('settings'),
-          idbGet<InputsState>('inputs'),
-          idbGet<Record<string, NegotiationLog>>('logs'),
-          idbGet<FollowupInputs>('followup'),
-          idbGet<SourceFile | null>('outcomes'),
-        ]);
+        const [s, i] = await Promise.all([idbGet<unknown>('settings'), idbGet<InputsState>('inputs')]);
         if (cancelled) return;
         restored = restoreSettings(s);
         setSettings(restored);
         settingsRef.current = restored;
-        if (l) setLogs(l);
-        if (f)
-          setFollowupState({
-            ...NO_FOLLOWUP,
-            ...f,
-            masterSource: f.masterSource ?? (f.masterFile ? 'file' : 'built'),
-          });
-        if (o) setOutcomesFileState(o);
         savedInputs = i ?? null;
+        const scope: Scope = savedInputs?.source ?? 'upload';
+        scopeRef.current = scope;
+        const [l, f, o] = await Promise.all([
+          idbGet<Record<string, NegotiationLog>>(scopedKey('logs', scope)),
+          idbGet<FollowupInputs>(scopedKey('followup', scope)),
+          idbGet<SourceFile | null>(scopedKey('outcomes', scope)),
+        ]);
+        if (cancelled) return;
+        if (l) setLogs(l);
+        if (f) setFollowupState(normaliseFollowup(f));
+        if (o) setOutcomesFileState(o);
       } catch {
         setStorageOk(false);
       }
       if (cancelled) return;
       setInputs(savedInputs);
       setReady(true);
+      restoredRef.current?.resolve();
+      if (!savedInputs) setBusy(null);
       if (savedInputs?.source === 'upload') await rebuild(savedInputs.files, false, restored);
       else if (savedInputs?.source === 'sample') {
         setBusy('サンプルデータ（架空）を読み込んでいます…');
@@ -212,6 +268,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // save settings (debounced: sliders change them often)
   useEffect(() => {
     if (!ready) return;
+    if (justCleared.current) {
+      justCleared.current = false;
+      return;
+    }
     const t = setTimeout(() => persist('settings', settings), 400);
     return () => clearTimeout(t);
   }, [settings, ready, persist]);
@@ -230,10 +290,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const loadSample = useCallback(
     async (layout: SampleLayout) => {
+      await whenRestored();
       setError(null);
       setBusy('サンプルデータ（架空）を読み込んでいます…');
       try {
         const files = await fetchSampleFiles(sampleFileNames(layout));
+        await switchScope('sample');
         setInputsAndSave({ source: 'sample', layout });
         const next = { ...settingsRef.current, company: null, overrides: {}, revisionDates: {} };
         setSettings(next);
@@ -244,14 +306,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setError(e instanceof Error ? e.message : String(e));
       }
     },
-    [rebuild, setInputsAndSave],
+    [rebuild, setInputsAndSave, switchScope, whenRestored],
   );
 
   const addFiles = useCallback(
     async (files: SourceFile[]) => {
+      await whenRestored();
       const current = inputs?.source === 'upload' ? inputs.files : [];
       const names = new Set(files.map((f) => f.name));
       const merged = [...current.filter((f) => !names.has(f.name)), ...files];
+      await switchScope('upload');
       setInputsAndSave({ source: 'upload', files: merged });
       if (inputs?.source === 'sample') {
         const next = { ...settingsRef.current, company: null, overrides: {} };
@@ -260,7 +324,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }
       await rebuild(merged, false);
     },
-    [inputs, rebuild, setInputsAndSave],
+    [inputs, rebuild, setInputsAndSave, switchScope, whenRestored],
   );
 
   const removeFile = useCallback(
@@ -316,43 +380,45 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const next = appendEvent(logOf(logs, cust), draft);
         const all = { ...logs, [cust]: next };
         setLogs(all);
-        persist('logs', all);
+        persistScoped('logs', all);
         return null;
       } catch (e) {
         return e instanceof NegotiationError || e instanceof Error ? e.message : String(e);
       }
     },
-    [logs, persist],
+    [logs, persistScoped],
   );
 
   const replaceLogs = useCallback(
     (next: Record<string, NegotiationLog>) => {
       setLogs(next);
-      persist('logs', next);
+      persistScoped('logs', next);
     },
-    [persist],
+    [persistScoped],
   );
 
   const setFollowup = useCallback(
     (f: FollowupInputs) => {
       setFollowupState(f);
-      persist('followup', f);
+      persistScoped('followup', f);
     },
-    [persist],
+    [persistScoped],
   );
 
   const setOutcomesFile = useCallback(
     (f: SourceFile | null) => {
       setOutcomesFileState(f);
-      persist('outcomes', f);
+      persistScoped('outcomes', f);
     },
-    [persist],
+    [persistScoped],
   );
 
   const clearAll = useCallback(async () => {
     buildSeq.current++;
+    justCleared.current = true;
     await clearAllStorage();
     sourcesRef.current = [];
+    scopeRef.current = 'upload';
     const d = defaultSettings();
     settingsRef.current = d;
     setSettings(d);
