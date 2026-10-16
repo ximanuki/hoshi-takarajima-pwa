@@ -526,16 +526,14 @@ export class LayoutNotRecognisedError extends Error {
  * detect the layout from the header (or use `layoutId` with optional manual
  * column names) and import it.
  */
-export function importFile(
-  name: string,
-  data: Uint8Array | string,
-  options: {
-    encoding?: TextEncodingName | 'auto';
-    kinds?: FileKind[];
-    spec?: LayoutSpec;
-    columnOverrides?: Record<string, string>;
-  } = {},
-): FileImport {
+export interface ImportOptions {
+  encoding?: TextEncodingName | 'auto';
+  kinds?: FileKind[];
+  spec?: LayoutSpec;
+  columnOverrides?: Record<string, string>;
+}
+
+export function importFile(name: string, data: Uint8Array | string, options: ImportOptions = {}): FileImport {
   const decoded: DecodedText =
     typeof data === 'string'
       ? { text: data, encoding: 'utf-8', bom: false }

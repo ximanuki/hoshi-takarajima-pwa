@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { encodeShiftJis } from './encoding.ts';
-import { companyFromJson, loadWorkspace, settingsFromJson } from './workspace.ts';
+import { importFile, LayoutNotRecognisedError } from './importers.ts';
+import { layoutById } from './layouts.ts';
+import { companyFromJson, loadWorkspace, settingsFromJson, workspaceFromImports } from './workspace.ts';
 
 const files = {
   customers:
@@ -72,6 +74,54 @@ describe('loadWorkspace', () => {
     ]);
     expect(ws.importIssues).toHaveLength(1);
     expect(ws.importIssues[0]?.file).toBe('sales.csv');
+  });
+});
+
+describe('per-file import options', () => {
+  it('reads a file with a header the layouts do not know, using the column names the user chose', () => {
+    const custom = '日付,伝票,明細,顧客番号,品目コード,数量,販売単価\n20250501,1,1,1,db1001,5,504\n';
+    const base = [
+      { name: 'customers.csv', data: files.customers },
+      { name: 'products.csv', data: files.products },
+      { name: 'tiers.csv', data: files.tiers },
+    ];
+    expect(() => loadWorkspace([...base, { name: 'custom.csv', data: custom }])).toThrow(
+      LayoutNotRecognisedError,
+    );
+    const ws = loadWorkspace([
+      ...base,
+      {
+        name: 'custom.csv',
+        data: custom,
+        import: {
+          spec: layoutById('sales-B'),
+          columnOverrides: {
+            date: '日付',
+            slip: '伝票',
+            line: '明細',
+            cust: '顧客番号',
+            sku: '品目コード',
+            unitPrice: '販売単価',
+          },
+        },
+      },
+    ]);
+    const lines = ws.sales.get('custom.csv') ?? [];
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toMatchObject({ cust: '000001', sku: 'DB-1001', unitPrice: 504, date: '2025-05-01' });
+  });
+
+  it('builds the same workspace from files imported beforehand', () => {
+    const inputs = [
+      { name: 'customers.csv', data: files.customers },
+      { name: 'products.csv', data: files.products },
+      { name: 'tiers.csv', data: files.tiers },
+      { name: 'sales.csv', data: files.sales },
+    ];
+    const a = loadWorkspace(inputs);
+    const b = workspaceFromImports(inputs.map((f) => importFile(f.name, f.data)));
+    expect(b.sales).toEqual(a.sales);
+    expect([...b.dataset.customers.keys()]).toEqual([...a.dataset.customers.keys()]);
   });
 });
 

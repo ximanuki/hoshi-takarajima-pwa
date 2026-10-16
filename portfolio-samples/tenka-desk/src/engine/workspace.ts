@@ -5,7 +5,7 @@
 
 import { Dataset, inferRevisionDates } from './dataset.ts';
 import { type IsoDate, toWareki } from './dates.ts';
-import { type FileImport, type ImportIssue, importFile } from './importers.ts';
+import { type FileImport, type ImportIssue, type ImportOptions, importFile } from './importers.ts';
 import type {
   Category,
   Company,
@@ -28,6 +28,8 @@ import type {
 export interface InputFile {
   name: string;
   data: Uint8Array | string;
+  /** how to read this file (e.g. a layout and column names chosen by the user); default: detect */
+  import?: ImportOptions;
 }
 
 export interface WorkspaceOptions {
@@ -52,7 +54,17 @@ export interface Workspace {
 }
 
 export function loadWorkspace(inputs: readonly InputFile[], options: WorkspaceOptions = {}): Workspace {
-  const files = inputs.map((f) => importFile(f.name, f.data));
+  return workspaceFromImports(
+    inputs.map((f) => importFile(f.name, f.data, f.import)),
+    options,
+  );
+}
+
+/**
+ * Build a Workspace from files that were already imported (importFile), e.g.
+ * when the caller imports each file itself to report unreadable files one by one.
+ */
+export function workspaceFromImports(files: readonly FileImport[], options: WorkspaceOptions = {}): Workspace {
   const customers: Customer[] = [];
   const products: Product[] = [];
   const tiers: RateTier[] = [];
@@ -159,7 +171,7 @@ export function loadWorkspace(inputs: readonly InputFile[], options: WorkspaceOp
       rows.map((r) => ({ ...r, sku: dataset.resolveSku(r.skuKey) })),
     );
   }
-  return { dataset, files, sales, priceMasters, newListPrices, importIssues, notes };
+  return { dataset, files: [...files], sales, priceMasters, newListPrices, importIssues, notes };
 }
 
 function num(o: Record<string, unknown>, k: string): number | undefined {
