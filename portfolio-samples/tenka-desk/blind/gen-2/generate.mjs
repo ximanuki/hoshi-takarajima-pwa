@@ -10,7 +10,7 @@
 // 乱数は固定シード、時計・Math.random は使いません。何度実行しても同じバイト列になります。
 
 import { createHash } from 'node:crypto';
-import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const SCRATCH = '/tmp/claude-0/-home-user-hoshi-takarajima-pwa/ec916e31-752a-5975-905b-5b512ec7224c/scratchpad';
@@ -1329,7 +1329,7 @@ SLIPS.sort((a, b) => (a.date !== b.date ? (a.date < b.date ? -1 : 1) : a.cust !=
 }
 
 // ================================================================ 書き出し（入力データ）
-rmSync(OUT, { recursive: true, force: true });
+// 出力先は消さない（--out の打ち間違いでほかのファイルを消さないように）。毎回同じ名前のファイルを上書きする
 mkdirSync(OUT, { recursive: true });
 const COMPANY = { name: '架空ケミカル工材株式会社', short: '架空ケミカル工材' };
 const nameFor = (c, date) => (c.oldName && date < c.renamed ? c.oldName : c.name);
@@ -1882,7 +1882,6 @@ function verifyFromFiles() {
 
 // ================================================================ 正解の書き出し（リポジトリの外だけ）
 const TRUTH_DIR = join(SEALED, 'truth');
-rmSync(TRUTH_DIR, { recursive: true, force: true });
 mkdirSync(TRUTH_DIR, { recursive: true });
 const truthText = (h, rows) => `${[csvLine(h), ...rows.map((r) => csvLine(r))].join('\n')}\n`;
 writeFileSync(join(TRUTH_DIR, 'lines.csv'), truthText(['file', 'row', 'line_id', 'label', 'date', 'customer', 'product', 'qty', 'billed', 'reference', 'reference_kind', 'shortfall_yen', 'below_floor', 'floor_price', 'last12m', 'pattern'], truthRows));
