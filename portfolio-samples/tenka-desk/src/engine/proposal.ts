@@ -105,7 +105,7 @@ export interface ProposalInput {
   passThroughBp?: number;
   /** 適用日 of the new prices */
   effectiveDate: IsoDate;
-  /** day the current prices are read (default: the day before effectiveDate is not assumed; pass it) */
+  /** day the current prices and costs are read (e.g. the last day of the sales data) */
   asOf: IsoDate;
   /** limit to these customers */
   customers?: readonly string[];
