@@ -1,0 +1,158 @@
+/**
+ * Builds a Dataset from the files a user loads: each file is decoded, its
+ * layout detected and imported, and the masters are put together.
+ */
+
+import { Dataset, inferRevisionDates } from './dataset.ts';
+import { type IsoDate, toWareki } from './dates.ts';
+import { type FileImport, type ImportIssue, importFile } from './importers.ts';
+import type {
+  Category,
+  Company,
+  CostRow,
+  Customer,
+  ListPriceRow,
+  NewListPrice,
+  PriceMasterRow,
+  Product,
+  RateTier,
+  Revision,
+  RevisionAgreement,
+  SalesLine,
+  Settings,
+  SpecialPrice,
+  Supplier,
+  SupplierNotice,
+} from './types.ts';
+
+export interface InputFile {
+  name: string;
+  data: Uint8Array | string;
+}
+
+export interface WorkspaceOptions {
+  settings?: Partial<Settings>;
+  company?: Company;
+  /**
+   * 改定日 for each agreements file (by file name). Without it, a single
+   * agreements file is assigned to the single 定価改定 date found in the history.
+   */
+  revisionDates?: Record<string, IsoDate>;
+}
+
+export interface Workspace {
+  dataset: Dataset;
+  files: FileImport[];
+  /** sales exports by file name, in load order */
+  sales: Map<string, SalesLine[]>;
+  priceMasters: Map<string, PriceMasterRow[]>;
+  newListPrices: NewListPrice[];
+  importIssues: { file: string; issue: ImportIssue }[];
+  notes: string[];
+}
+
+export function loadWorkspace(inputs: readonly InputFile[], options: WorkspaceOptions = {}): Workspace {
+  const files = inputs.map((f) => importFile(f.name, f.data));
+  const customers: Customer[] = [];
+  const products: Product[] = [];
+  const tiers: RateTier[] = [];
+  const categories: Category[] = [];
+  const suppliers: Supplier[] = [];
+  const listHist: ListPriceRow[] = [];
+  const costHist: CostRow[] = [];
+  const specials: SpecialPrice[] = [];
+  const notices: SupplierNotice[] = [];
+  const newListPrices: NewListPrice[] = [];
+  const agreementFiles: { name: string; rows: RevisionAgreement[] }[] = [];
+  const sales = new Map<string, SalesLine[]>();
+  const priceMasters = new Map<string, PriceMasterRow[]>();
+  const importIssues: { file: string; issue: ImportIssue }[] = [];
+  const notes: string[] = [];
+
+  for (const f of files) {
+    for (const issue of f.data.result.issues) importIssues.push({ file: f.name, issue });
+    const d = f.data;
+    switch (d.kind) {
+      case 'customers':
+        customers.push(...d.result.records);
+        break;
+      case 'products':
+        products.push(...d.result.records);
+        break;
+      case 'rateTiers':
+        tiers.push(...d.result.records);
+        break;
+      case 'categories':
+        categories.push(...d.result.records);
+        break;
+      case 'suppliers':
+        suppliers.push(...d.result.records);
+        break;
+      case 'listPriceHistory':
+        listHist.push(...d.result.records);
+        break;
+      case 'costHistory':
+        costHist.push(...d.result.records);
+        break;
+      case 'specials':
+        specials.push(...d.result.records);
+        break;
+      case 'supplierNotices':
+        notices.push(...d.result.records);
+        break;
+      case 'newListPrices':
+        newListPrices.push(...d.result.records);
+        break;
+      case 'agreements':
+        agreementFiles.push({ name: f.name, rows: d.result.records });
+        break;
+      case 'sales':
+        sales.set(f.name, d.result.records);
+        break;
+      case 'priceMaster':
+        priceMasters.set(f.name, d.result.records);
+        break;
+    }
+  }
+
+  const inferred = inferRevisionDates(listHist);
+  const revisions: Revision[] = [];
+  for (const af of agreementFiles) {
+    let date = options.revisionDates?.[af.name];
+    if (date === undefined) {
+      if (agreementFiles.length === 1 && inferred.length === 1) {
+        date = inferred[0];
+        if (date !== undefined) notes.push(`${af.name} を ${toWareki(date)} の定価改定の合意状況として扱いました（定価の履歴から判断）。`);
+      }
+    }
+    if (date === undefined) {
+      notes.push(`${af.name}: どの定価改定の合意状況か決められないため、使っていません。改定日を指定してください。`);
+      continue;
+    }
+    revisions.push({ date, label: `${toWareki(date)} 定価改定`, agreements: af.rows });
+  }
+
+  const datasetInput = {
+    customers,
+    products,
+    rateTiers: tiers,
+    categories,
+    suppliers,
+    listPriceHistory: listHist,
+    costHistory: costHist,
+    specials,
+    revisions,
+    supplierNotices: notices,
+    ...(options.settings ? { settings: options.settings } : {}),
+    ...(options.company ? { company: options.company } : {}),
+  };
+  const dataset = new Dataset(datasetInput);
+  for (const [name, lines] of sales) sales.set(name, dataset.resolveLines(lines));
+  for (const [name, rows] of priceMasters) {
+    priceMasters.set(
+      name,
+      rows.map((r) => ({ ...r, sku: dataset.resolveSku(r.skuKey) })),
+    );
+  }
+  return { dataset, files, sales, priceMasters, newListPrices, importIssues, notes };
+}
