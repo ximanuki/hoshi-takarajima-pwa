@@ -90,7 +90,9 @@ export function PageHeader({ step, title, lead, actions }: { step?: number; titl
     <header className="page-header">
       <div>
         {step !== undefined && <p className="page-step">ステップ {step}</p>}
-        <h1 className="page-title">{title}</h1>
+        <h1 className="page-title" tabIndex={-1}>
+          {title}
+        </h1>
         {lead && <div className="page-lead">{lead}</div>}
       </div>
       {actions && <div className="page-actions no-print">{actions}</div>}
