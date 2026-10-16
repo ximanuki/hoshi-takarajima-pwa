@@ -1,0 +1,5 @@
+node_modules/
+dist/
+# 生成物（`cd data-gen && npm run gen` で同じものを作り直せる。約30MBあるのでコミットしない）
+public/sample/
+data-gen/truth/
