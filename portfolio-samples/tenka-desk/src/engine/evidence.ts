@@ -257,24 +257,36 @@ function shiftPeriod(period: string, months: number): string {
   return `${yy}-${String(mm).padStart(2, '0')}`;
 }
 
+/** Name of the statistic as credited ("企業物価指数"), else the dataset title without its parenthesis. */
+function statName(ds: IndexDataset): string {
+  return /「([^」]+)」/.exec(ds.credit)?.[1] ?? ds.title.replace(/（.*）$/, '');
+}
+
+function publisherShort(publisher: string): string {
+  return publisher.replace(/\s.*$/, '');
+}
+
 function indexChange(ds: IndexDataset, code: string, basePeriod: string | undefined, topic: EvidenceTopic): EvidenceItem | null {
   const series = ds.series.find((x) => x.code === code);
   if (!series || ds.periods.length === 0) return null;
   const lastIdx = ds.periods.length - 1;
   const latestPeriod = ds.periods[lastIdx] as string;
-  const wanted = basePeriod ?? shiftPeriod(latestPeriod, -12);
-  let baseIdx = ds.periods.indexOf(wanted);
+  let baseIdx = basePeriod !== undefined ? ds.periods.indexOf(basePeriod) : -1;
+  if (baseIdx < 0) baseIdx = ds.periods.indexOf(shiftPeriod(latestPeriod, -12));
   if (baseIdx < 0) baseIdx = 0;
   const basePer = ds.periods[baseIdx] as string;
   const latest = series.values[lastIdx] as number;
   const base = series.values[baseIdx] as number;
   const bp = changeBp(tenths(latest), tenths(base));
-  const name = series.name === '総平均' ? `${ds.title.replace(/（.*）$/, '')}（総平均）` : `${ds.title.replace(/（.*）$/, '')}（${series.name}）`;
-  const statement = `${ds.publisher.replace(/\s.*$/, '')}「${ds.title.replace(/（.*）$/, '')}」によりますと、${series.name}の指数（${series.unit}）は${toWarekiMonth(latestPeriod)}に${fmtIndex(latest)}となり、${toWarekiMonth(basePer)}の${fmtIndex(base)}から${formatBp(Math.abs(bp))}${direction(bp)}しております（変化率は本ツールで計算）。`;
+  const indexTitle = ds.title.replace(/（.*）$/, '');
+  const stat = statName(ds);
+  const subject = indexTitle === stat ? series.name : `${indexTitle}の${series.name}`;
+  const title = `${indexTitle}（${series.name}）`;
+  const statement = `${publisherShort(ds.publisher)}「${stat}」によりますと、${subject}（${series.unit}）は${toWarekiMonth(latestPeriod)}に${fmtIndex(latest)}となり、${toWarekiMonth(basePer)}の${fmtIndex(base)}から${formatBp(Math.abs(bp))}${direction(bp)}しております（変化率は本ツールで計算）。`;
   return {
     id: `${ds.id}:${code}`,
     topic,
-    title: name,
+    title,
     statement,
     figures: [
       { label: toWarekiMonth(basePer), value: fmtIndex(base) },
@@ -283,7 +295,7 @@ function indexChange(ds: IndexDataset, code: string, basePeriod: string | undefi
     ],
     computedByTool: true,
     source: { publisher: ds.publisher, title: ds.title, url: ds.url, retrievedAt: ds.retrievedAt, credit: ds.credit },
-    chart: { label: name, unit: series.unit, points: ds.periods.map((p, i) => ({ period: p, value: series.values[i] as number })) },
+    chart: { label: title, unit: series.unit, points: ds.periods.map((p, i) => ({ period: p, value: series.values[i] as number })) },
   };
 }
 
@@ -298,7 +310,7 @@ function officialYoY(ds: IndexDataset, code: string): EvidenceItem | null {
     id: `${ds.id}:${code}`,
     topic: 'general',
     title: `${title}（総平均・前年比）`,
-    statement: `${ds.publisher.replace(/\s.*$/, '')}「${title}」によりますと、${toWarekiMonth(period)}の総平均は前年同月比${v >= 0 ? '+' : ''}${v.toFixed(1)}％でございました。`,
+    statement: `${publisherShort(ds.publisher)}「${statName(ds)}」によりますと、${toWarekiMonth(period)}の${title}（総平均）は前年同月比${v >= 0 ? '+' : ''}${v.toFixed(1)}％でございました。`,
     figures: [{ label: `${toWarekiMonth(period)} 前年同月比`, value: `${v >= 0 ? '+' : ''}${v.toFixed(1)}%` }],
     computedByTool: false,
     source: { publisher: ds.publisher, title: ds.title, url: ds.url, retrievedAt: ds.retrievedAt, credit: ds.credit },
@@ -380,7 +392,7 @@ export function buildEvidence(stats: StatsBundle, options: EvidenceOptions): Evi
   }
   if (stats.sppi && inc.logistics) {
     const f = stats.sppi.series.find((x) => x.name === SPPI_FREIGHT_NAME);
-    if (f) push(indexChange(stats.sppi, f.code, options.basePeriod ? shiftPeriod(options.basePeriod, -1) : undefined, 'logistics'));
+    if (f) push(indexChange(stats.sppi, f.code, options.basePeriod, 'logistics'));
   }
   if (stats.minimumWage && inc.labor) push(minimumWageItem(stats.minimumWage, options.asOf, options.prefecture));
   if (stats.shunto && inc.labor) push(shuntoItem(stats.shunto));
