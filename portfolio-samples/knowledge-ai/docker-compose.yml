@@ -1,0 +1,21 @@
+services:
+  app:
+    build: .
+    image: knowledge-ai:local
+    ports:
+      - "8000:8000"
+    environment:
+      # Without a key the app runs in extractive mode (no LLM).
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      KAI_LLM_PROVIDER: ${KAI_LLM_PROVIDER:-auto}
+      KAI_CLAUDE_MODEL: ${KAI_CLAUDE_MODEL:-claude-haiku-4-5-20251001}
+      # public-demo guard rails
+      KAI_RATE_LIMIT_PER_MINUTE: ${KAI_RATE_LIMIT_PER_MINUTE:-10}
+      KAI_PER_IP_DAILY_CAP: ${KAI_PER_IP_DAILY_CAP:-100}
+      KAI_DAILY_CAP: ${KAI_DAILY_CAP:-1000}
+      # set to true only behind a reverse proxy that sets X-Forwarded-For
+      KAI_TRUST_PROXY_HEADERS: ${KAI_TRUST_PROXY_HEADERS:-false}
+    read_only: true
+    tmpfs:
+      - /tmp
+    restart: unless-stopped

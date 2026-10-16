@@ -1,0 +1,3629 @@
+{
+  "dsl": "ea-dsl/0.1",
+  "segment_column": "_segment",
+  "flags": [
+    {
+      "name": "kw:remarks:急ぎ",
+      "kind": "keyword",
+      "columns": [
+        "remarks"
+      ],
+      "pattern": "急ぎ"
+    },
+    {
+      "name": "kw:remarks:既存撤去",
+      "kind": "keyword",
+      "columns": [
+        "remarks"
+      ],
+      "pattern": "既存撤去"
+    },
+    {
+      "name": "kw:remarks:夜間作業",
+      "kind": "keyword",
+      "columns": [
+        "remarks"
+      ],
+      "pattern": "夜間作業"
+    },
+    {
+      "name": "install_height_m>=4",
+      "kind": "threshold",
+      "columns": [
+        "install_height_m"
+      ],
+      "threshold": 4.0
+    },
+    {
+      "name": "width_mm>=2700",
+      "kind": "threshold",
+      "columns": [
+        "width_mm"
+      ],
+      "threshold": 2700.0
+    },
+    {
+      "name": "area_m2>=0.504",
+      "kind": "threshold",
+      "columns": [
+        "area_m2"
+      ],
+      "threshold": 0.504
+    },
+    {
+      "name": "width_mm>=841",
+      "kind": "threshold",
+      "columns": [
+        "width_mm"
+      ],
+      "threshold": 841.0
+    },
+    {
+      "name": "area_m2>=0.378",
+      "kind": "threshold",
+      "columns": [
+        "area_m2"
+      ],
+      "threshold": 0.378
+    }
+  ],
+  "terms": [
+    {
+      "id": "インクジェット出力:area_m2[media]",
+      "segment": "インクジェット出力",
+      "role": "per_unit",
+      "feature": {
+        "expr": "area_m2 * qty",
+        "clamp_min": 0.5
+      },
+      "key": {
+        "columns": [
+          "media"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": true,
+      "table": {
+        "合成紙": [
+          2500.0
+        ],
+        "ターポリン": [
+          3500.0
+        ],
+        "メッシュ": [
+          4500.0
+        ],
+        "塩ビシート": [
+          4000.0
+        ]
+      }
+    },
+    {
+      "id": "インクジェット出力:area_m2[laminate]",
+      "segment": "インクジェット出力",
+      "role": "per_unit",
+      "feature": {
+        "expr": "area_m2 * qty",
+        "clamp_min": 0.5
+      },
+      "key": {
+        "columns": [
+          "laminate"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": true,
+      "table": {
+        "マット": [
+          1500.0
+        ],
+        "グロス": [
+          1500.0
+        ],
+        "なし": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "インクジェット出力:1[design]",
+      "segment": "インクジェット出力",
+      "role": "fixed_by_key",
+      "feature": {
+        "expr": "1"
+      },
+      "key": {
+        "columns": [
+          "design"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": false,
+      "table": {
+        "新規": [
+          25000.0
+        ],
+        "修正": [
+          5000.0
+        ],
+        "支給": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "インクジェット出力:install_qty",
+      "segment": "インクジェット出力",
+      "role": "per_unit",
+      "feature": {
+        "expr": "install_qty",
+        "per_pack": true,
+        "step_by": "media",
+        "steps": {
+          "ターポリン": 3.0
+        }
+      },
+      "key": null,
+      "versions": [
+        "2024-10-01"
+      ],
+      "apply_multipliers": true,
+      "table": {
+        "": [
+          8000.0,
+          8400.0
+        ]
+      }
+    },
+    {
+      "id": "インクジェット出力:installed[site_town]",
+      "segment": "インクジェット出力",
+      "role": "per_unit",
+      "feature": {
+        "expr": "installed"
+      },
+      "key": {
+        "columns": [
+          "site_town"
+        ]
+      },
+      "versions": [
+        "2024-10-01"
+      ],
+      "apply_multipliers": true,
+      "table": {
+        "中島村": [
+          35000.0,
+          40000.0
+        ],
+        "西浜町": [
+          35000.0,
+          36600.0
+        ],
+        "東山町": [
+          25000.0,
+          26600.0
+        ],
+        "南川市": [
+          25000.0,
+          26600.0
+        ],
+        "北原市": [
+          20000.0,
+          21600.0
+        ]
+      }
+    },
+    {
+      "id": "インクジェット出力:installed[install_height_m>=4]",
+      "segment": "インクジェット出力",
+      "role": "per_unit",
+      "feature": {
+        "expr": "installed"
+      },
+      "key": {
+        "columns": [
+          "install_height_m>=4"
+        ]
+      },
+      "versions": [
+        "2024-10-01"
+      ],
+      "apply_multipliers": true,
+      "table": {
+        "1": [
+          35010.0,
+          35000.0
+        ],
+        "0": [
+          0.0,
+          0.0
+        ],
+        "": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "インクジェット出力:1[kw:remarks:既存撤去]",
+      "segment": "インクジェット出力",
+      "role": "fixed_by_key",
+      "feature": {
+        "expr": "1"
+      },
+      "key": {
+        "columns": [
+          "kw:remarks:既存撤去"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": true,
+      "table": {
+        "1": [
+          12000.0
+        ],
+        "0": [
+          0.0
+        ],
+        "": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "インクジェット出力:1[kw:remarks:夜間作業]",
+      "segment": "インクジェット出力",
+      "role": "fixed_by_key",
+      "feature": {
+        "expr": "1"
+      },
+      "key": {
+        "columns": [
+          "kw:remarks:夜間作業"
+        ]
+      },
+      "versions": [
+        "2024-10-01"
+      ],
+      "apply_multipliers": true,
+      "table": {
+        "1": [
+          15000.0,
+          10000.0
+        ],
+        "0": [
+          0.0,
+          0.0
+        ],
+        "": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "袖看板:1",
+      "segment": "袖看板",
+      "role": "fixed",
+      "feature": {
+        "expr": "1"
+      },
+      "key": null,
+      "versions": [],
+      "apply_multipliers": false,
+      "table": {
+        "": [
+          -10200.0
+        ]
+      }
+    },
+    {
+      "id": "袖看板:height_mm * qty",
+      "segment": "袖看板",
+      "role": "per_unit",
+      "feature": {
+        "expr": "height_mm * qty",
+        "clamp_min": 1500.0
+      },
+      "key": null,
+      "versions": [],
+      "apply_multipliers": false,
+      "table": {
+        "": [
+          8.0
+        ]
+      }
+    },
+    {
+      "id": "袖看板:qty",
+      "segment": "袖看板",
+      "role": "per_unit",
+      "feature": {
+        "expr": "qty"
+      },
+      "key": null,
+      "versions": [],
+      "apply_multipliers": true,
+      "table": {
+        "": [
+          48500.0
+        ]
+      }
+    },
+    {
+      "id": "袖看板:install_qty[sides]",
+      "segment": "袖看板",
+      "role": "per_unit",
+      "feature": {
+        "expr": "install_qty"
+      },
+      "key": {
+        "columns": [
+          "sides"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": true,
+      "table": {
+        "片面": [
+          -19800.0
+        ],
+        "両面": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "袖看板:area_m2 * qty[lighting]",
+      "segment": "袖看板",
+      "role": "per_unit",
+      "feature": {
+        "expr": "area_m2 * qty",
+        "ceil_step": 0.5
+      },
+      "key": {
+        "columns": [
+          "lighting"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": true,
+      "table": {
+        "LED内照": [
+          47500.0
+        ],
+        "なし": [
+          47800.0
+        ]
+      }
+    },
+    {
+      "id": "袖看板:install_qty[lighting]",
+      "segment": "袖看板",
+      "role": "per_unit",
+      "feature": {
+        "expr": "install_qty"
+      },
+      "key": {
+        "columns": [
+          "lighting"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": true,
+      "table": {
+        "LED内照": [
+          35000.0
+        ],
+        "なし": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "袖看板:1[design]",
+      "segment": "袖看板",
+      "role": "fixed_by_key",
+      "feature": {
+        "expr": "1"
+      },
+      "key": {
+        "columns": [
+          "design"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": false,
+      "table": {
+        "新規": [
+          25000.0
+        ],
+        "修正": [
+          5500.0
+        ],
+        "支給": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "袖看板:qty[site_town]",
+      "segment": "袖看板",
+      "role": "per_unit",
+      "feature": {
+        "expr": "area_m2 * qty",
+        "ceil_step": 0.5
+      },
+      "key": {
+        "columns": [
+          "site_town"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": true,
+      "table": {
+        "中島村": [
+          -2000.0
+        ],
+        "西浜町": [
+          -5000.0
+        ],
+        "東山町": [
+          5000.0
+        ],
+        "南川市": [
+          3000.0
+        ],
+        "北原市": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "袖看板:qty[site_town]",
+      "segment": "袖看板",
+      "role": "per_unit",
+      "feature": {
+        "expr": "height_mm * qty",
+        "clamp_min": 1500.0
+      },
+      "key": {
+        "columns": [
+          "site_town"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": true,
+      "table": {
+        "中島村": [
+          11.0
+        ],
+        "西浜町": [
+          29.0
+        ],
+        "東山町": [
+          5.0
+        ],
+        "南川市": [
+          4.0
+        ],
+        "北原市": [
+          13.1
+        ]
+      }
+    },
+    {
+      "id": "袖看板:qty[site_town]",
+      "segment": "袖看板",
+      "role": "per_unit",
+      "feature": {
+        "expr": "qty"
+      },
+      "key": {
+        "columns": [
+          "site_town"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": true,
+      "table": {
+        "中島村": [
+          8000.0
+        ],
+        "西浜町": [
+          -10000.0
+        ],
+        "東山町": [
+          22000.0
+        ],
+        "南川市": [
+          14000.0
+        ],
+        "北原市": [
+          -0.001
+        ]
+      }
+    },
+    {
+      "id": "袖看板:area_m2[site_town]",
+      "segment": "袖看板",
+      "role": "per_unit",
+      "feature": {
+        "expr": "area_m2"
+      },
+      "key": {
+        "columns": [
+          "site_town"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": true,
+      "table": {
+        "中島村": [
+          25000.0
+        ],
+        "西浜町": [
+          9000.0
+        ],
+        "東山町": [
+          -10000.0
+        ],
+        "南川市": [
+          1000.0
+        ],
+        "北原市": [
+          -1000.0
+        ]
+      }
+    },
+    {
+      "id": "袖看板:height_mm[site_town]",
+      "segment": "袖看板",
+      "role": "per_unit",
+      "feature": {
+        "expr": "height_mm"
+      },
+      "key": {
+        "columns": [
+          "site_town"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": true,
+      "table": {
+        "中島村": [
+          -7.0
+        ],
+        "西浜町": [
+          -1.0
+        ],
+        "東山町": [
+          -5.0
+        ],
+        "南川市": [
+          0.0
+        ],
+        "北原市": [
+          -0.5
+        ]
+      }
+    },
+    {
+      "id": "袖看板:1[install_height_m>=4]",
+      "segment": "袖看板",
+      "role": "fixed_by_key",
+      "feature": {
+        "expr": "1"
+      },
+      "key": {
+        "columns": [
+          "install_height_m>=4"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": true,
+      "table": {
+        "1": [
+          34700.0
+        ],
+        "0": [
+          0.0
+        ],
+        "": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "袖看板:height_mm[kw:remarks:既存撤去]",
+      "segment": "袖看板",
+      "role": "per_unit",
+      "feature": {
+        "expr": "height_mm"
+      },
+      "key": {
+        "columns": [
+          "kw:remarks:既存撤去"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": true,
+      "table": {
+        "1": [
+          2.0
+        ],
+        "0": [
+          0.0
+        ],
+        "": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "アルミ複合板看板:1",
+      "segment": "アルミ複合板看板",
+      "role": "fixed",
+      "feature": {
+        "expr": "1"
+      },
+      "key": null,
+      "versions": [
+        "2024-10-01"
+      ],
+      "apply_multipliers": true,
+      "table": {
+        "": [
+          -450.0,
+          -490.0
+        ]
+      }
+    },
+    {
+      "id": "アルミ複合板看板:qty",
+      "segment": "アルミ複合板看板",
+      "role": "per_unit",
+      "feature": {
+        "expr": "qty"
+      },
+      "key": null,
+      "versions": [],
+      "apply_multipliers": true,
+      "table": {
+        "": [
+          2000.0
+        ]
+      }
+    },
+    {
+      "id": "アルミ複合板看板:area_m2[laminate]",
+      "segment": "アルミ複合板看板",
+      "role": "per_unit",
+      "feature": {
+        "expr": "area_m2",
+        "ceil_step": 0.1,
+        "times": "qty"
+      },
+      "key": {
+        "columns": [
+          "laminate"
+        ]
+      },
+      "versions": [
+        "2024-10-01"
+      ],
+      "apply_multipliers": true,
+      "table": {
+        "マット": [
+          14000.0,
+          15500.0
+        ],
+        "グロス": [
+          14000.0,
+          15500.0
+        ],
+        "なし": [
+          12000.0,
+          13500.0
+        ]
+      }
+    },
+    {
+      "id": "アルミ複合板看板:1[design]",
+      "segment": "アルミ複合板看板",
+      "role": "fixed_by_key",
+      "feature": {
+        "expr": "1"
+      },
+      "key": {
+        "columns": [
+          "design"
+        ]
+      },
+      "versions": [
+        "2024-10-01"
+      ],
+      "apply_multipliers": false,
+      "table": {
+        "新規": [
+          25500.0,
+          25500.0
+        ],
+        "修正": [
+          5500.0,
+          5520.0
+        ],
+        "支給": [
+          500.0,
+          510.0
+        ]
+      }
+    },
+    {
+      "id": "アルミ複合板看板:installed[install]",
+      "segment": "アルミ複合板看板",
+      "role": "per_unit",
+      "feature": {
+        "expr": "installed"
+      },
+      "key": {
+        "columns": [
+          "install"
+        ]
+      },
+      "versions": [
+        "2024-10-01"
+      ],
+      "apply_multipliers": true,
+      "table": {
+        "有": [
+          20000.0,
+          22010.0
+        ]
+      }
+    },
+    {
+      "id": "アルミ複合板看板:install_qty[install]",
+      "segment": "アルミ複合板看板",
+      "role": "per_unit",
+      "feature": {
+        "expr": "install_qty"
+      },
+      "key": {
+        "columns": [
+          "install"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": true,
+      "table": {
+        "有": [
+          8000.0
+        ]
+      }
+    },
+    {
+      "id": "アルミ複合板看板:installed[site_town]",
+      "segment": "アルミ複合板看板",
+      "role": "per_unit",
+      "feature": {
+        "expr": "installed"
+      },
+      "key": {
+        "columns": [
+          "site_town"
+        ]
+      },
+      "versions": [
+        "2024-10-01"
+      ],
+      "apply_multipliers": true,
+      "table": {
+        "中島村": [
+          15000.0,
+          15000.0
+        ],
+        "西浜町": [
+          15000.0,
+          15000.0
+        ],
+        "東山町": [
+          5000.0,
+          5000.0
+        ],
+        "南川市": [
+          5000.0,
+          4990.0
+        ],
+        "北原市": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "アルミ複合板看板:installed[install_height_m>=4]",
+      "segment": "アルミ複合板看板",
+      "role": "per_unit",
+      "feature": {
+        "expr": "installed"
+      },
+      "key": {
+        "columns": [
+          "install_height_m>=4"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": true,
+      "table": {
+        "1": [
+          35000.0
+        ],
+        "0": [
+          0.0
+        ],
+        "": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "アルミ複合板看板:1[kw:remarks:夜間作業]",
+      "segment": "アルミ複合板看板",
+      "role": "fixed_by_key",
+      "feature": {
+        "expr": "1"
+      },
+      "key": {
+        "columns": [
+          "kw:remarks:夜間作業"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": true,
+      "table": {
+        "1": [
+          15000.0
+        ],
+        "0": [
+          0.0
+        ],
+        "": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "アルミ複合板看板:qty[width_mm>=2700]",
+      "segment": "アルミ複合板看板",
+      "role": "per_unit",
+      "feature": {
+        "expr": "qty"
+      },
+      "key": {
+        "columns": [
+          "width_mm>=2700"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": true,
+      "table": {
+        "1": [
+          3000.0
+        ],
+        "0": [
+          0.0
+        ],
+        "": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "アルミ複合板看板:qty[kw:remarks:既存撤去]",
+      "segment": "アルミ複合板看板",
+      "role": "per_unit",
+      "feature": {
+        "expr": "qty",
+        "clamp_min": 3
+      },
+      "key": {
+        "columns": [
+          "kw:remarks:既存撤去"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": true,
+      "table": {
+        "1": [
+          4000.0
+        ],
+        "0": [
+          0.0
+        ],
+        "": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "アルミ複合板看板:area_m2[thickness_mm,sides]",
+      "segment": "アルミ複合板看板",
+      "role": "per_unit",
+      "feature": {
+        "expr": "area_m2",
+        "ceil_step": 0.1,
+        "times": "qty"
+      },
+      "key": {
+        "columns": [
+          "thickness_mm",
+          "sides"
+        ]
+      },
+      "versions": [
+        "2024-10-01"
+      ],
+      "apply_multipliers": true,
+      "table": {
+        "4|両面": [
+          15000.0,
+          16200.0
+        ],
+        "3|両面": [
+          9595.0,
+          10803.0
+        ],
+        "4|片面": [
+          3000.0,
+          3000.0
+        ],
+        "3|片面": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "カルプ文字:1",
+      "segment": "カルプ文字",
+      "role": "fixed",
+      "feature": {
+        "expr": "1"
+      },
+      "key": null,
+      "versions": [
+        "2024-10-01"
+      ],
+      "apply_multipliers": true,
+      "table": {
+        "": [
+          20000.0,
+          21075.0
+        ]
+      }
+    },
+    {
+      "id": "カルプ文字:height_mm",
+      "segment": "カルプ文字",
+      "role": "per_unit",
+      "feature": {
+        "expr": "height_mm",
+        "ceil_step": 100.0,
+        "per_pack": true,
+        "times": "qty"
+      },
+      "key": null,
+      "versions": [
+        "2024-10-01"
+      ],
+      "apply_multipliers": true,
+      "table": {
+        "": [
+          50.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "カルプ文字:install_qty[thickness_mm]",
+      "segment": "カルプ文字",
+      "role": "per_unit",
+      "feature": {
+        "expr": "install_qty"
+      },
+      "key": {
+        "columns": [
+          "thickness_mm"
+        ]
+      },
+      "versions": [
+        "2024-10-01"
+      ],
+      "apply_multipliers": true,
+      "table": {
+        "30": [
+          5100.0,
+          5200.0
+        ],
+        "10": [
+          3900.0,
+          4000.0
+        ],
+        "20": [
+          4400.0,
+          4500.0
+        ]
+      }
+    },
+    {
+      "id": "カルプ文字:installed[design]",
+      "segment": "カルプ文字",
+      "role": "per_unit",
+      "feature": {
+        "expr": "installed"
+      },
+      "key": {
+        "columns": [
+          "design"
+        ]
+      },
+      "versions": [
+        "2024-10-01"
+      ],
+      "apply_multipliers": false,
+      "table": {
+        "新規": [
+          25000.0,
+          26020.0
+        ],
+        "修正": [
+          5000.0,
+          6020.0
+        ],
+        "支給": [
+          0.0,
+          1020.0
+        ]
+      }
+    },
+    {
+      "id": "カルプ文字:1[install_height_m>=4]",
+      "segment": "カルプ文字",
+      "role": "fixed_by_key",
+      "feature": {
+        "expr": "1"
+      },
+      "key": {
+        "columns": [
+          "install_height_m>=4"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": true,
+      "table": {
+        "1": [
+          35000.0
+        ],
+        "0": [
+          0.0
+        ],
+        "": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "カルプ文字:1[kw:remarks:既存撤去]",
+      "segment": "カルプ文字",
+      "role": "fixed_by_key",
+      "feature": {
+        "expr": "1"
+      },
+      "key": {
+        "columns": [
+          "kw:remarks:既存撤去"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": true,
+      "table": {
+        "1": [
+          12000.0
+        ],
+        "0": [
+          0.0
+        ],
+        "": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "カルプ文字:1[kw:remarks:夜間作業]",
+      "segment": "カルプ文字",
+      "role": "fixed_by_key",
+      "feature": {
+        "expr": "1"
+      },
+      "key": {
+        "columns": [
+          "kw:remarks:夜間作業"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": true,
+      "table": {
+        "1": [
+          15000.0
+        ],
+        "0": [
+          0.0
+        ],
+        "": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "カルプ文字:install_qty[finish]",
+      "segment": "カルプ文字",
+      "role": "per_unit",
+      "feature": {
+        "expr": "install_qty"
+      },
+      "key": {
+        "columns": [
+          "finish"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": true,
+      "table": {
+        "塗装": [
+          1000.0
+        ],
+        "シート貼り": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "カルプ文字:1[site_town]",
+      "segment": "カルプ文字",
+      "role": "fixed_by_key",
+      "feature": {
+        "expr": "1"
+      },
+      "key": {
+        "columns": [
+          "site_town"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": true,
+      "table": {
+        "中島村": [
+          15000.0
+        ],
+        "西浜町": [
+          15000.0
+        ],
+        "東山町": [
+          5000.0
+        ],
+        "南川市": [
+          5000.0
+        ],
+        "北原市": [
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "カルプ文字:height_mm[height_mm]",
+      "segment": "カルプ文字",
+      "role": "per_unit",
+      "feature": {
+        "expr": "height_mm",
+        "ceil_step": 100.0,
+        "per_pack": true,
+        "times": "qty"
+      },
+      "key": {
+        "columns": [
+          "height_mm"
+        ]
+      },
+      "versions": [
+        "2024-10-01"
+      ],
+      "apply_multipliers": true,
+      "table": {
+        "600": [
+          1600.0,
+          1635.0
+        ],
+        "400": [
+          1300.0,
+          0.0
+        ],
+        "800": [
+          1188.0,
+          1225.0
+        ],
+        "50": [
+          -1350.0,
+          -1400.0
+        ],
+        "150": [
+          0.0,
+          0.0
+        ],
+        "250": [
+          650.0,
+          665.0
+        ],
+        "500": [
+          1030.0,
+          1060.0
+        ],
+        "100": [
+          -1350.0,
+          -1400.0
+        ],
+        "300": [
+          650.0,
+          665.0
+        ],
+        "80": [
+          -1350.0,
+          -1400.0
+        ],
+        "200": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "袖看板:qty[kw:remarks:既存撤去]",
+      "segment": "袖看板",
+      "role": "per_unit",
+      "feature": {
+        "expr": "qty"
+      },
+      "key": {
+        "columns": [
+          "kw:remarks:既存撤去"
+        ]
+      },
+      "versions": [],
+      "apply_multipliers": false,
+      "table": {
+        "1": [
+          10000.0
+        ],
+        "0": [
+          0.0
+        ],
+        "": [
+          0.0
+        ]
+      }
+    }
+  ],
+  "multipliers": [
+    {
+      "id": "m:customer",
+      "role": "customer_rate",
+      "key": {
+        "columns": [
+          "_customer"
+        ]
+      },
+      "table": {
+        "1003": 0.9,
+        "1007": 0.9,
+        "1012": 0.9495
+      },
+      "fallback_key": {
+        "columns": [
+          "_customer_class"
+        ]
+      },
+      "fallback_table": {
+        "口座": 1.0,
+        "諸口": 1.1
+      },
+      "default": 1.0
+    },
+    {
+      "id": "m:kw:remarks:急ぎ",
+      "role": "category",
+      "key": {
+        "columns": [
+          "kw:remarks:急ぎ"
+        ]
+      },
+      "table": {
+        "0": 1.0,
+        "1": 1.2
+      },
+      "fallback_key": null,
+      "fallback_table": {},
+      "default": 1.0
+    }
+  ],
+  "min_charge": {
+    "アルミ複合板看板": {
+      "value": null,
+      "stage": "post",
+      "consistent_range": [
+        null,
+        4450.0
+      ]
+    },
+    "インクジェット出力": {
+      "value": 5000.0,
+      "stage": "post",
+      "consistent_range": [
+        5000.0,
+        5090.0
+      ]
+    },
+    "カルプ文字": {
+      "value": null,
+      "stage": "post",
+      "consistent_range": [
+        null,
+        27720.0
+      ]
+    },
+    "袖看板": {
+      "value": null,
+      "stage": "post",
+      "consistent_range": [
+        null,
+        76260.0
+      ]
+    }
+  },
+  "rounding": {
+    "unit": 100,
+    "mode": "floor",
+    "group_column": "rep",
+    "groups": {
+      "山本": {
+        "unit": 1000,
+        "mode": "floor"
+      }
+    }
+  },
+  "tax_rounding": "floor",
+  "meta": {
+    "generator": "estimate-archaeology 0.1.0",
+    "dataset": "dev-sign",
+    "fit": {
+      "n": 2410,
+      "exact": 1839,
+      "exact_rate": 0.7630705394190871,
+      "date_from": "2022-04-01",
+      "date_to": "2025-09-30",
+      "seconds": 769.6,
+      "search_seconds": 769.2
+    },
+    "revisions": [
+      {
+        "segment": "アルミ複合板看板",
+        "date": "2024-10-01",
+        "consistent_from": "2024-10-01",
+        "consistent_to": "2024-10-01"
+      },
+      {
+        "segment": "インクジェット出力",
+        "date": "2024-10-01",
+        "consistent_from": "2024-09-27",
+        "consistent_to": "2024-10-01"
+      },
+      {
+        "segment": "カルプ文字",
+        "date": "2024-10-01",
+        "consistent_from": "2024-09-29",
+        "consistent_to": "2024-10-03"
+      }
+    ],
+    "search_variants": [
+      {
+        "variant": {
+          "ordinal_keys_in_rich": true
+        },
+        "exact": 381,
+        "params": 129,
+        "chosen": false,
+        "search_work_G": 80.16,
+        "wall_clock_cap_hit": false
+      },
+      {
+        "variant": {
+          "plain_first": false
+        },
+        "exact": 1660,
+        "params": 126,
+        "chosen": true,
+        "search_work_G": 39.09,
+        "wall_clock_cap_hit": false
+      },
+      {
+        "variant": {
+          "additive_test": true
+        },
+        "exact": 1649,
+        "params": 126,
+        "chosen": false,
+        "search_work_G": 44.55,
+        "wall_clock_cap_hit": false
+      },
+      {
+        "variant": {
+          "ordinal_keys_in_rich": true,
+          "additive_test": true
+        },
+        "exact": 268,
+        "params": 153,
+        "chosen": false,
+        "search_work_G": 85.94,
+        "wall_clock_cap_hit": false
+      }
+    ],
+    "segments_from_other_variants": [
+      {
+        "segment": "アルミ複合板看板",
+        "variant": 2
+      },
+      {
+        "segment": "カルプ文字",
+        "variant": 2
+      }
+    ],
+    "params": [
+      {
+        "term": "インクジェット出力:area_m2[media]",
+        "level": "合成紙",
+        "version": 0,
+        "value": 2500.0,
+        "rows": 153,
+        "support": 120,
+        "consistent_range": [
+          2500.0,
+          2500.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "インクジェット出力:area_m2[media]",
+        "level": "ターポリン",
+        "version": 0,
+        "value": 3500.0,
+        "rows": 164,
+        "support": 113,
+        "consistent_range": [
+          3500.0,
+          3500.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "インクジェット出力:area_m2[media]",
+        "level": "メッシュ",
+        "version": 0,
+        "value": 4500.0,
+        "rows": 168,
+        "support": 136,
+        "consistent_range": [
+          4500.0,
+          4500.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "インクジェット出力:area_m2[media]",
+        "level": "塩ビシート",
+        "version": 0,
+        "value": 4000.0,
+        "rows": 188,
+        "support": 152,
+        "consistent_range": [
+          4000.0,
+          4000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "インクジェット出力:area_m2[laminate]",
+        "level": "マット",
+        "version": 0,
+        "value": 1500.0,
+        "rows": 116,
+        "support": 95,
+        "consistent_range": [
+          1500.0,
+          1500.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "インクジェット出力:area_m2[laminate]",
+        "level": "グロス",
+        "version": 0,
+        "value": 1500.0,
+        "rows": 164,
+        "support": 126,
+        "consistent_range": [
+          1500.0,
+          1500.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "インクジェット出力:area_m2[laminate]",
+        "level": "なし",
+        "version": 0,
+        "value": 0.0,
+        "rows": 393,
+        "support": 300,
+        "consistent_range": [
+          0.0,
+          2.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "インクジェット出力:1[design]",
+        "level": "新規",
+        "version": 0,
+        "value": 25000.0,
+        "rows": 136,
+        "support": 101,
+        "consistent_range": [
+          25000.0,
+          25000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "インクジェット出力:1[design]",
+        "level": "修正",
+        "version": 0,
+        "value": 5000.0,
+        "rows": 188,
+        "support": 139,
+        "consistent_range": [
+          5000.0,
+          5000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "インクジェット出力:1[design]",
+        "level": "支給",
+        "version": 0,
+        "value": 0.0,
+        "rows": 349,
+        "support": 281,
+        "consistent_range": [
+          0.0,
+          3.0
+        ],
+        "status": "range"
+      },
+      {
+        "term": "インクジェット出力:install_qty",
+        "level": "",
+        "version": 0,
+        "value": 8000.0,
+        "rows": 225,
+        "support": 169,
+        "consistent_range": [
+          8000.0,
+          8000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "インクジェット出力:install_qty",
+        "level": "",
+        "version": 1,
+        "value": 8400.0,
+        "rows": 96,
+        "support": 44,
+        "consistent_range": [
+          8400.0,
+          8400.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "インクジェット出力:installed[site_town]",
+        "level": "中島村",
+        "version": 0,
+        "value": 35000.0,
+        "rows": 16,
+        "support": 14,
+        "consistent_range": [
+          35000.0,
+          35000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "インクジェット出力:installed[site_town]",
+        "level": "中島村",
+        "version": 1,
+        "value": 40000.0,
+        "rows": 4,
+        "support": 0,
+        "status": "not_identifiable"
+      },
+      {
+        "term": "インクジェット出力:installed[site_town]",
+        "level": "西浜町",
+        "version": 0,
+        "value": 35000.0,
+        "rows": 19,
+        "support": 14,
+        "consistent_range": [
+          35000.0,
+          35000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "インクジェット出力:installed[site_town]",
+        "level": "西浜町",
+        "version": 1,
+        "value": 36600.0,
+        "rows": 12,
+        "support": 7,
+        "consistent_range": [
+          36600.0,
+          36610.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "インクジェット出力:installed[site_town]",
+        "level": "東山町",
+        "version": 0,
+        "value": 25000.0,
+        "rows": 36,
+        "support": 28,
+        "consistent_range": [
+          25000.0,
+          25000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "インクジェット出力:installed[site_town]",
+        "level": "東山町",
+        "version": 1,
+        "value": 26600.0,
+        "rows": 22,
+        "support": 8,
+        "consistent_range": [
+          26590.0,
+          26610.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "インクジェット出力:installed[site_town]",
+        "level": "南川市",
+        "version": 0,
+        "value": 25000.0,
+        "rows": 45,
+        "support": 33,
+        "consistent_range": [
+          25000.0,
+          25000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "インクジェット出力:installed[site_town]",
+        "level": "南川市",
+        "version": 1,
+        "value": 26600.0,
+        "rows": 19,
+        "support": 10,
+        "consistent_range": [
+          26590.0,
+          26600.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "インクジェット出力:installed[site_town]",
+        "level": "北原市",
+        "version": 0,
+        "value": 20000.0,
+        "rows": 109,
+        "support": 80,
+        "consistent_range": [
+          20000.0,
+          20000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "インクジェット出力:installed[site_town]",
+        "level": "北原市",
+        "version": 1,
+        "value": 21600.0,
+        "rows": 39,
+        "support": 19,
+        "consistent_range": [
+          21600.0,
+          21600.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "インクジェット出力:installed[install_height_m>=4]",
+        "level": "1",
+        "version": 0,
+        "value": 35010.0,
+        "rows": 91,
+        "support": 69,
+        "consistent_range": [
+          35006.0,
+          35016.0
+        ],
+        "status": "range"
+      },
+      {
+        "term": "インクジェット出力:installed[install_height_m>=4]",
+        "level": "1",
+        "version": 1,
+        "value": 35000.0,
+        "rows": 37,
+        "support": 20,
+        "consistent_range": [
+          35000.0,
+          35000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "インクジェット出力:1[kw:remarks:既存撤去]",
+        "level": "1",
+        "version": 0,
+        "value": 12000.0,
+        "rows": 37,
+        "support": 26,
+        "consistent_range": [
+          12000.0,
+          12000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "インクジェット出力:1[kw:remarks:夜間作業]",
+        "level": "1",
+        "version": 0,
+        "value": 15000.0,
+        "rows": 31,
+        "support": 22,
+        "consistent_range": [
+          15000.0,
+          15000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "インクジェット出力:1[kw:remarks:夜間作業]",
+        "level": "1",
+        "version": 1,
+        "value": 10000.0,
+        "rows": 6,
+        "support": 0,
+        "status": "not_identifiable"
+      },
+      {
+        "term": "袖看板:1",
+        "level": "",
+        "version": 0,
+        "value": -10200.0,
+        "rows": 271,
+        "support": 51,
+        "consistent_range": [
+          -10210.0,
+          -10200.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:height_mm * qty",
+        "level": "",
+        "version": 0,
+        "value": 8.0,
+        "rows": 271,
+        "support": 51,
+        "consistent_range": [
+          8.0,
+          8.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:qty",
+        "level": "",
+        "version": 0,
+        "value": 48500.0,
+        "rows": 271,
+        "support": 51,
+        "consistent_range": [
+          48500.0,
+          48500.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:install_qty[sides]",
+        "level": "片面",
+        "version": 0,
+        "value": -19800.0,
+        "rows": 103,
+        "support": 16,
+        "consistent_range": [
+          -19820.0,
+          -19790.0
+        ],
+        "status": "range"
+      },
+      {
+        "term": "袖看板:install_qty[sides]",
+        "level": "両面",
+        "version": 0,
+        "value": 0.0,
+        "rows": 168,
+        "support": 35,
+        "consistent_range": [
+          -8.0,
+          0.0
+        ],
+        "status": "range"
+      },
+      {
+        "term": "袖看板:area_m2 * qty[lighting]",
+        "level": "LED内照",
+        "version": 0,
+        "value": 47500.0,
+        "rows": 125,
+        "support": 30,
+        "consistent_range": [
+          47500.0,
+          47500.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:area_m2 * qty[lighting]",
+        "level": "なし",
+        "version": 0,
+        "value": 47800.0,
+        "rows": 146,
+        "support": 21,
+        "consistent_range": [
+          47800.0,
+          47800.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:install_qty[lighting]",
+        "level": "LED内照",
+        "version": 0,
+        "value": 35000.0,
+        "rows": 125,
+        "support": 30,
+        "consistent_range": [
+          35000.0,
+          35000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:install_qty[lighting]",
+        "level": "なし",
+        "version": 0,
+        "value": 0.0,
+        "rows": 146,
+        "support": 21,
+        "consistent_range": [
+          -8.0,
+          0.0
+        ],
+        "status": "range"
+      },
+      {
+        "term": "袖看板:1[design]",
+        "level": "新規",
+        "version": 0,
+        "value": 25000.0,
+        "rows": 44,
+        "support": 9,
+        "consistent_range": [
+          25000.0,
+          25000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:1[design]",
+        "level": "修正",
+        "version": 0,
+        "value": 5500.0,
+        "rows": 80,
+        "support": 16,
+        "consistent_range": [
+          5450.0,
+          5500.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:1[design]",
+        "level": "支給",
+        "version": 0,
+        "value": 0.0,
+        "rows": 147,
+        "support": 26,
+        "consistent_range": [
+          -11.0,
+          0.0
+        ],
+        "status": "range"
+      },
+      {
+        "term": "袖看板:qty[site_town]",
+        "level": "中島村",
+        "version": 0,
+        "value": -2000.0,
+        "rows": 25,
+        "support": 5,
+        "consistent_range": [
+          -2100.0,
+          -1900.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:qty[site_town]",
+        "level": "西浜町",
+        "version": 0,
+        "value": -5000.0,
+        "rows": 29,
+        "support": 4,
+        "consistent_range": [
+          -5000.0,
+          -5000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:qty[site_town]",
+        "level": "東山町",
+        "version": 0,
+        "value": 5000.0,
+        "rows": 35,
+        "support": 3,
+        "consistent_range": [
+          5000.0,
+          5000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:qty[site_town]",
+        "level": "南川市",
+        "version": 0,
+        "value": 3000.0,
+        "rows": 58,
+        "support": 14,
+        "consistent_range": [
+          3000.0,
+          3000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:qty[site_town]",
+        "level": "北原市",
+        "version": 0,
+        "value": 0.0,
+        "rows": 124,
+        "support": 25,
+        "consistent_range": [
+          -8.0,
+          0.0
+        ],
+        "status": "range"
+      },
+      {
+        "term": "袖看板:qty[site_town]",
+        "level": "中島村",
+        "version": 0,
+        "value": 11.0,
+        "rows": 25,
+        "support": 5,
+        "consistent_range": [
+          10.9,
+          11.1
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:qty[site_town]",
+        "level": "西浜町",
+        "version": 0,
+        "value": 29.0,
+        "rows": 29,
+        "support": 4,
+        "consistent_range": [
+          29.0,
+          29.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:qty[site_town]",
+        "level": "東山町",
+        "version": 0,
+        "value": 5.0,
+        "rows": 35,
+        "support": 3,
+        "consistent_range": [
+          5.0,
+          5.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:qty[site_town]",
+        "level": "南川市",
+        "version": 0,
+        "value": 4.0,
+        "rows": 58,
+        "support": 14,
+        "consistent_range": [
+          4.0,
+          4.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:qty[site_town]",
+        "level": "北原市",
+        "version": 0,
+        "value": 13.1,
+        "rows": 124,
+        "support": 25,
+        "consistent_range": [
+          13.1,
+          13.1
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:qty[site_town]",
+        "level": "中島村",
+        "version": 0,
+        "value": 8000.0,
+        "rows": 25,
+        "support": 5,
+        "consistent_range": [
+          7900.0,
+          8200.0
+        ],
+        "status": "range"
+      },
+      {
+        "term": "袖看板:qty[site_town]",
+        "level": "西浜町",
+        "version": 0,
+        "value": -10000.0,
+        "rows": 29,
+        "support": 4,
+        "consistent_range": [
+          -10000.0,
+          -10000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:qty[site_town]",
+        "level": "東山町",
+        "version": 0,
+        "value": 22000.0,
+        "rows": 35,
+        "support": 3,
+        "consistent_range": [
+          22000.0,
+          22000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:qty[site_town]",
+        "level": "南川市",
+        "version": 0,
+        "value": 14000.0,
+        "rows": 58,
+        "support": 14,
+        "consistent_range": [
+          14000.0,
+          14000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:qty[site_town]",
+        "level": "北原市",
+        "version": 0,
+        "value": -0.001,
+        "rows": 124,
+        "support": 25,
+        "consistent_range": [
+          -0.301,
+          -0.001
+        ],
+        "status": "range"
+      },
+      {
+        "term": "袖看板:area_m2[site_town]",
+        "level": "中島村",
+        "version": 0,
+        "value": 25000.0,
+        "rows": 25,
+        "support": 5,
+        "consistent_range": [
+          25000.0,
+          25000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:area_m2[site_town]",
+        "level": "西浜町",
+        "version": 0,
+        "value": 9000.0,
+        "rows": 29,
+        "support": 4,
+        "consistent_range": [
+          8900.0,
+          9000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:area_m2[site_town]",
+        "level": "東山町",
+        "version": 0,
+        "value": -10000.0,
+        "rows": 35,
+        "support": 3,
+        "consistent_range": [
+          -10000.0,
+          -10000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:area_m2[site_town]",
+        "level": "南川市",
+        "version": 0,
+        "value": 1000.0,
+        "rows": 58,
+        "support": 14,
+        "consistent_range": [
+          1000.0,
+          1000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:area_m2[site_town]",
+        "level": "北原市",
+        "version": 0,
+        "value": -1000.0,
+        "rows": 124,
+        "support": 25,
+        "consistent_range": [
+          -1000.0,
+          -1000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:height_mm[site_town]",
+        "level": "中島村",
+        "version": 0,
+        "value": -7.0,
+        "rows": 25,
+        "support": 5,
+        "consistent_range": [
+          -7.1,
+          -6.9
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:height_mm[site_town]",
+        "level": "西浜町",
+        "version": 0,
+        "value": -1.0,
+        "rows": 29,
+        "support": 4,
+        "consistent_range": [
+          -1.0,
+          -1.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:height_mm[site_town]",
+        "level": "東山町",
+        "version": 0,
+        "value": -5.0,
+        "rows": 35,
+        "support": 3,
+        "consistent_range": [
+          -5.0,
+          -5.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:height_mm[site_town]",
+        "level": "南川市",
+        "version": 0,
+        "value": 0.0,
+        "rows": 58,
+        "support": 14,
+        "consistent_range": [
+          0.0,
+          0.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:height_mm[site_town]",
+        "level": "北原市",
+        "version": 0,
+        "value": -0.5,
+        "rows": 124,
+        "support": 25,
+        "consistent_range": [
+          -0.5,
+          -0.5
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:1[install_height_m>=4]",
+        "level": "1",
+        "version": 0,
+        "value": 34700.0,
+        "rows": 98,
+        "support": 19,
+        "consistent_range": [
+          34680.0,
+          34730.0
+        ],
+        "status": "range"
+      },
+      {
+        "term": "袖看板:height_mm[kw:remarks:既存撤去]",
+        "level": "1",
+        "version": 0,
+        "value": 2.0,
+        "rows": 38,
+        "support": 6,
+        "consistent_range": [
+          1.9,
+          2.1
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:1",
+        "level": "",
+        "version": 0,
+        "value": -450.0,
+        "rows": 629,
+        "support": 542,
+        "consistent_range": [
+          -450.0,
+          -450.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:1",
+        "level": "",
+        "version": 1,
+        "value": -490.0,
+        "rows": 250,
+        "support": 204,
+        "consistent_range": [
+          -490.0,
+          -489.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:qty",
+        "level": "",
+        "version": 0,
+        "value": 2000.0,
+        "rows": 879,
+        "support": 746,
+        "consistent_range": [
+          2000.0,
+          2000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:area_m2[laminate]",
+        "level": "マット",
+        "version": 0,
+        "value": 14000.0,
+        "rows": 124,
+        "support": 112,
+        "consistent_range": [
+          14000.0,
+          14000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:area_m2[laminate]",
+        "level": "マット",
+        "version": 1,
+        "value": 15500.0,
+        "rows": 56,
+        "support": 46,
+        "consistent_range": [
+          15500.0,
+          15500.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:area_m2[laminate]",
+        "level": "グロス",
+        "version": 0,
+        "value": 14000.0,
+        "rows": 206,
+        "support": 175,
+        "consistent_range": [
+          14000.0,
+          14000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:area_m2[laminate]",
+        "level": "グロス",
+        "version": 1,
+        "value": 15500.0,
+        "rows": 63,
+        "support": 52,
+        "consistent_range": [
+          15500.0,
+          15500.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:area_m2[laminate]",
+        "level": "なし",
+        "version": 0,
+        "value": 12000.0,
+        "rows": 299,
+        "support": 255,
+        "consistent_range": [
+          12000.0,
+          12000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:area_m2[laminate]",
+        "level": "なし",
+        "version": 1,
+        "value": 13500.0,
+        "rows": 131,
+        "support": 106,
+        "consistent_range": [
+          13500.0,
+          13500.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:1[design]",
+        "level": "新規",
+        "version": 0,
+        "value": 25500.0,
+        "rows": 128,
+        "support": 115,
+        "consistent_range": [
+          25500.0,
+          25500.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:1[design]",
+        "level": "新規",
+        "version": 1,
+        "value": 25500.0,
+        "rows": 48,
+        "support": 41,
+        "consistent_range": [
+          25500.0,
+          25500.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:1[design]",
+        "level": "修正",
+        "version": 0,
+        "value": 5500.0,
+        "rows": 168,
+        "support": 146,
+        "consistent_range": [
+          5500.0,
+          5500.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:1[design]",
+        "level": "修正",
+        "version": 1,
+        "value": 5520.0,
+        "rows": 66,
+        "support": 54,
+        "consistent_range": [
+          5520.0,
+          5521.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:1[design]",
+        "level": "支給",
+        "version": 0,
+        "value": 500.0,
+        "rows": 333,
+        "support": 281,
+        "consistent_range": [
+          500.0,
+          500.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:1[design]",
+        "level": "支給",
+        "version": 1,
+        "value": 510.0,
+        "rows": 136,
+        "support": 109,
+        "consistent_range": [
+          509.0,
+          516.0
+        ],
+        "status": "range"
+      },
+      {
+        "term": "アルミ複合板看板:installed[install]",
+        "level": "有",
+        "version": 0,
+        "value": 20000.0,
+        "rows": 311,
+        "support": 268,
+        "consistent_range": [
+          20000.0,
+          20000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:installed[install]",
+        "level": "有",
+        "version": 1,
+        "value": 22010.0,
+        "rows": 98,
+        "support": 81,
+        "consistent_range": [
+          22007.0,
+          22012.0
+        ],
+        "status": "range"
+      },
+      {
+        "term": "アルミ複合板看板:install_qty[install]",
+        "level": "有",
+        "version": 0,
+        "value": 8000.0,
+        "rows": 409,
+        "support": 349,
+        "consistent_range": [
+          8000.0,
+          8000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:installed[site_town]",
+        "level": "中島村",
+        "version": 0,
+        "value": 15000.0,
+        "rows": 26,
+        "support": 22,
+        "consistent_range": [
+          15000.0,
+          15000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:installed[site_town]",
+        "level": "中島村",
+        "version": 1,
+        "value": 15000.0,
+        "rows": 8,
+        "support": 7,
+        "consistent_range": [
+          15000.0,
+          15000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:installed[site_town]",
+        "level": "西浜町",
+        "version": 0,
+        "value": 15000.0,
+        "rows": 37,
+        "support": 32,
+        "consistent_range": [
+          15000.0,
+          15000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:installed[site_town]",
+        "level": "西浜町",
+        "version": 1,
+        "value": 15000.0,
+        "rows": 11,
+        "support": 9,
+        "consistent_range": [
+          15000.0,
+          15000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:installed[site_town]",
+        "level": "東山町",
+        "version": 0,
+        "value": 5000.0,
+        "rows": 39,
+        "support": 31,
+        "consistent_range": [
+          5000.0,
+          5000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:installed[site_town]",
+        "level": "東山町",
+        "version": 1,
+        "value": 5000.0,
+        "rows": 19,
+        "support": 16,
+        "consistent_range": [
+          5000.0,
+          5000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:installed[site_town]",
+        "level": "南川市",
+        "version": 0,
+        "value": 5000.0,
+        "rows": 69,
+        "support": 61,
+        "consistent_range": [
+          5000.0,
+          5000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:installed[site_town]",
+        "level": "南川市",
+        "version": 1,
+        "value": 4990.0,
+        "rows": 15,
+        "support": 13,
+        "consistent_range": [
+          4980.0,
+          4995.0
+        ],
+        "status": "range"
+      },
+      {
+        "term": "アルミ複合板看板:installed[site_town]",
+        "level": "北原市",
+        "version": 0,
+        "value": 0.0,
+        "rows": 140,
+        "support": 122,
+        "consistent_range": [
+          0.0,
+          7.0
+        ],
+        "status": "range"
+      },
+      {
+        "term": "アルミ複合板看板:installed[site_town]",
+        "level": "北原市",
+        "version": 1,
+        "value": 0.0,
+        "rows": 45,
+        "support": 36,
+        "consistent_range": [
+          -3.0,
+          2.0
+        ],
+        "status": "range"
+      },
+      {
+        "term": "アルミ複合板看板:installed[install_height_m>=4]",
+        "level": "1",
+        "version": 0,
+        "value": 35000.0,
+        "rows": 156,
+        "support": 134,
+        "consistent_range": [
+          35000.0,
+          35000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:1[kw:remarks:夜間作業]",
+        "level": "1",
+        "version": 0,
+        "value": 15000.0,
+        "rows": 54,
+        "support": 47,
+        "consistent_range": [
+          15000.0,
+          15000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:qty[width_mm>=2700]",
+        "level": "1",
+        "version": 0,
+        "value": 3000.0,
+        "rows": 296,
+        "support": 265,
+        "consistent_range": [
+          3000.0,
+          3000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:qty[kw:remarks:既存撤去]",
+        "level": "1",
+        "version": 0,
+        "value": 4000.0,
+        "rows": 56,
+        "support": 43,
+        "consistent_range": [
+          4000.0,
+          4000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:area_m2[thickness_mm,sides]",
+        "level": "4|両面",
+        "version": 0,
+        "value": 15000.0,
+        "rows": 52,
+        "support": 45,
+        "consistent_range": [
+          15000.0,
+          15000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:area_m2[thickness_mm,sides]",
+        "level": "4|両面",
+        "version": 1,
+        "value": 16200.0,
+        "rows": 19,
+        "support": 15,
+        "consistent_range": [
+          16200.0,
+          16200.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:area_m2[thickness_mm,sides]",
+        "level": "3|両面",
+        "version": 0,
+        "value": 9595.0,
+        "rows": 98,
+        "support": 69,
+        "consistent_range": [
+          9595.0,
+          9597.0
+        ],
+        "status": "range"
+      },
+      {
+        "term": "アルミ複合板看板:area_m2[thickness_mm,sides]",
+        "level": "3|両面",
+        "version": 1,
+        "value": 10803.0,
+        "rows": 36,
+        "support": 26,
+        "consistent_range": [
+          10802.9,
+          10803.7
+        ],
+        "status": "range"
+      },
+      {
+        "term": "アルミ複合板看板:area_m2[thickness_mm,sides]",
+        "level": "4|片面",
+        "version": 0,
+        "value": 3000.0,
+        "rows": 145,
+        "support": 127,
+        "consistent_range": [
+          3000.0,
+          3000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:area_m2[thickness_mm,sides]",
+        "level": "4|片面",
+        "version": 1,
+        "value": 3000.0,
+        "rows": 58,
+        "support": 50,
+        "consistent_range": [
+          3000.0,
+          3000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:area_m2[thickness_mm,sides]",
+        "level": "3|片面",
+        "version": 0,
+        "value": 0.0,
+        "rows": 334,
+        "support": 301,
+        "consistent_range": [
+          0.0,
+          1.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "アルミ複合板看板:area_m2[thickness_mm,sides]",
+        "level": "3|片面",
+        "version": 1,
+        "value": 0.0,
+        "rows": 137,
+        "support": 113,
+        "consistent_range": [
+          0.0,
+          1.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:1",
+        "level": "",
+        "version": 0,
+        "value": 20000.0,
+        "rows": 419,
+        "support": 398,
+        "consistent_range": [
+          20000.0,
+          20000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:1",
+        "level": "",
+        "version": 1,
+        "value": 21075.0,
+        "rows": 168,
+        "support": 123,
+        "consistent_range": [
+          21073.0,
+          21079.5
+        ],
+        "status": "range"
+      },
+      {
+        "term": "カルプ文字:height_mm",
+        "level": "",
+        "version": 0,
+        "value": 50.0,
+        "rows": 419,
+        "support": 398,
+        "consistent_range": [
+          50.0,
+          50.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:height_mm",
+        "level": "",
+        "version": 1,
+        "value": 0.0,
+        "rows": 168,
+        "support": 123,
+        "consistent_range": [
+          0.0,
+          0.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:install_qty[thickness_mm]",
+        "level": "30",
+        "version": 0,
+        "value": 5100.0,
+        "rows": 71,
+        "support": 70,
+        "consistent_range": [
+          5100.0,
+          5100.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:install_qty[thickness_mm]",
+        "level": "30",
+        "version": 1,
+        "value": 5200.0,
+        "rows": 30,
+        "support": 19,
+        "consistent_range": [
+          5200.0,
+          5200.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:install_qty[thickness_mm]",
+        "level": "10",
+        "version": 0,
+        "value": 3900.0,
+        "rows": 178,
+        "support": 170,
+        "consistent_range": [
+          3900.0,
+          3900.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:install_qty[thickness_mm]",
+        "level": "10",
+        "version": 1,
+        "value": 4000.0,
+        "rows": 58,
+        "support": 44,
+        "consistent_range": [
+          4000.0,
+          4000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:install_qty[thickness_mm]",
+        "level": "20",
+        "version": 0,
+        "value": 4400.0,
+        "rows": 170,
+        "support": 158,
+        "consistent_range": [
+          4400.0,
+          4400.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:install_qty[thickness_mm]",
+        "level": "20",
+        "version": 1,
+        "value": 4500.0,
+        "rows": 80,
+        "support": 60,
+        "consistent_range": [
+          4500.0,
+          4500.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:installed[design]",
+        "level": "新規",
+        "version": 0,
+        "value": 25000.0,
+        "rows": 73,
+        "support": 71,
+        "consistent_range": [
+          25000.0,
+          25000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:installed[design]",
+        "level": "新規",
+        "version": 1,
+        "value": 26020.0,
+        "rows": 32,
+        "support": 21,
+        "consistent_range": [
+          26018.0,
+          26024.0
+        ],
+        "status": "range"
+      },
+      {
+        "term": "カルプ文字:installed[design]",
+        "level": "修正",
+        "version": 0,
+        "value": 5000.0,
+        "rows": 116,
+        "support": 110,
+        "consistent_range": [
+          5000.0,
+          5000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:installed[design]",
+        "level": "修正",
+        "version": 1,
+        "value": 6020.0,
+        "rows": 57,
+        "support": 43,
+        "consistent_range": [
+          6018.0,
+          6024.0
+        ],
+        "status": "range"
+      },
+      {
+        "term": "カルプ文字:installed[design]",
+        "level": "支給",
+        "version": 0,
+        "value": 0.0,
+        "rows": 230,
+        "support": 217,
+        "consistent_range": [
+          0.0,
+          5.0
+        ],
+        "status": "range"
+      },
+      {
+        "term": "カルプ文字:installed[design]",
+        "level": "支給",
+        "version": 1,
+        "value": 1020.0,
+        "rows": 79,
+        "support": 59,
+        "consistent_range": [
+          1018.0,
+          1024.0
+        ],
+        "status": "range"
+      },
+      {
+        "term": "カルプ文字:1[install_height_m>=4]",
+        "level": "1",
+        "version": 0,
+        "value": 35000.0,
+        "rows": 226,
+        "support": 203,
+        "consistent_range": [
+          35000.0,
+          35000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:1[kw:remarks:既存撤去]",
+        "level": "1",
+        "version": 0,
+        "value": 12000.0,
+        "rows": 95,
+        "support": 85,
+        "consistent_range": [
+          12000.0,
+          12000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:1[kw:remarks:夜間作業]",
+        "level": "1",
+        "version": 0,
+        "value": 15000.0,
+        "rows": 72,
+        "support": 63,
+        "consistent_range": [
+          15000.0,
+          15000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:install_qty[finish]",
+        "level": "塗装",
+        "version": 0,
+        "value": 1000.0,
+        "rows": 241,
+        "support": 213,
+        "consistent_range": [
+          1000.0,
+          1000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:install_qty[finish]",
+        "level": "シート貼り",
+        "version": 0,
+        "value": 0.0,
+        "rows": 346,
+        "support": 308,
+        "consistent_range": [
+          0.0,
+          0.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:1[site_town]",
+        "level": "中島村",
+        "version": 0,
+        "value": 15000.0,
+        "rows": 44,
+        "support": 41,
+        "consistent_range": [
+          15000.0,
+          15000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:1[site_town]",
+        "level": "西浜町",
+        "version": 0,
+        "value": 15000.0,
+        "rows": 64,
+        "support": 56,
+        "consistent_range": [
+          15000.0,
+          15000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:1[site_town]",
+        "level": "東山町",
+        "version": 0,
+        "value": 5000.0,
+        "rows": 107,
+        "support": 95,
+        "consistent_range": [
+          5000.0,
+          5000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:1[site_town]",
+        "level": "南川市",
+        "version": 0,
+        "value": 5000.0,
+        "rows": 114,
+        "support": 99,
+        "consistent_range": [
+          5000.0,
+          5000.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:1[site_town]",
+        "level": "北原市",
+        "version": 0,
+        "value": 0.0,
+        "rows": 258,
+        "support": 230,
+        "consistent_range": [
+          0.0,
+          4.0
+        ],
+        "status": "range"
+      },
+      {
+        "term": "カルプ文字:height_mm[height_mm]",
+        "level": "600",
+        "version": 0,
+        "value": 1600.0,
+        "rows": 31,
+        "support": 31,
+        "consistent_range": [
+          1600.0,
+          1600.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:height_mm[height_mm]",
+        "level": "600",
+        "version": 1,
+        "value": 1635.0,
+        "rows": 8,
+        "support": 5,
+        "consistent_range": [
+          1634.5,
+          1635.5
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:height_mm[height_mm]",
+        "level": "400",
+        "version": 0,
+        "value": 1300.0,
+        "rows": 35,
+        "support": 31,
+        "consistent_range": [
+          1300.0,
+          1300.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:height_mm[height_mm]",
+        "level": "400",
+        "version": 1,
+        "value": 0.0,
+        "rows": 9,
+        "support": 0,
+        "status": "not_identifiable"
+      },
+      {
+        "term": "カルプ文字:height_mm[height_mm]",
+        "level": "800",
+        "version": 0,
+        "value": 1188.0,
+        "rows": 30,
+        "support": 28,
+        "consistent_range": [
+          1187.5,
+          1188.0
+        ],
+        "status": "range"
+      },
+      {
+        "term": "カルプ文字:height_mm[height_mm]",
+        "level": "800",
+        "version": 1,
+        "value": 1225.0,
+        "rows": 21,
+        "support": 16,
+        "consistent_range": [
+          1225.0,
+          1225.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:height_mm[height_mm]",
+        "level": "50",
+        "version": 0,
+        "value": -1350.0,
+        "rows": 39,
+        "support": 39,
+        "consistent_range": [
+          -1350.0,
+          -1350.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:height_mm[height_mm]",
+        "level": "50",
+        "version": 1,
+        "value": -1400.0,
+        "rows": 13,
+        "support": 11,
+        "consistent_range": [
+          -1400.0,
+          -1400.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:height_mm[height_mm]",
+        "level": "150",
+        "version": 0,
+        "value": 0.0,
+        "rows": 43,
+        "support": 40,
+        "consistent_range": [
+          0.0,
+          0.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:height_mm[height_mm]",
+        "level": "150",
+        "version": 1,
+        "value": 0.0,
+        "rows": 10,
+        "support": 8,
+        "consistent_range": [
+          0.0,
+          0.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:height_mm[height_mm]",
+        "level": "250",
+        "version": 0,
+        "value": 650.0,
+        "rows": 39,
+        "support": 38,
+        "consistent_range": [
+          650.0,
+          650.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:height_mm[height_mm]",
+        "level": "250",
+        "version": 1,
+        "value": 665.0,
+        "rows": 15,
+        "support": 13,
+        "consistent_range": [
+          665.0,
+          666.5
+        ],
+        "status": "range"
+      },
+      {
+        "term": "カルプ文字:height_mm[height_mm]",
+        "level": "500",
+        "version": 0,
+        "value": 1030.0,
+        "rows": 37,
+        "support": 34,
+        "consistent_range": [
+          1030.0,
+          1030.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:height_mm[height_mm]",
+        "level": "500",
+        "version": 1,
+        "value": 1060.0,
+        "rows": 17,
+        "support": 11,
+        "consistent_range": [
+          1060.0,
+          1060.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:height_mm[height_mm]",
+        "level": "100",
+        "version": 0,
+        "value": -1350.0,
+        "rows": 42,
+        "support": 38,
+        "consistent_range": [
+          -1350.0,
+          -1350.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:height_mm[height_mm]",
+        "level": "100",
+        "version": 1,
+        "value": -1400.0,
+        "rows": 14,
+        "support": 12,
+        "consistent_range": [
+          -1400.0,
+          -1400.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:height_mm[height_mm]",
+        "level": "300",
+        "version": 0,
+        "value": 650.0,
+        "rows": 38,
+        "support": 37,
+        "consistent_range": [
+          650.0,
+          650.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:height_mm[height_mm]",
+        "level": "300",
+        "version": 1,
+        "value": 665.0,
+        "rows": 19,
+        "support": 15,
+        "consistent_range": [
+          664.5,
+          666.5
+        ],
+        "status": "range"
+      },
+      {
+        "term": "カルプ文字:height_mm[height_mm]",
+        "level": "80",
+        "version": 0,
+        "value": -1350.0,
+        "rows": 41,
+        "support": 40,
+        "consistent_range": [
+          -1350.0,
+          -1350.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:height_mm[height_mm]",
+        "level": "80",
+        "version": 1,
+        "value": -1400.0,
+        "rows": 20,
+        "support": 14,
+        "consistent_range": [
+          -1400.0,
+          -1400.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:height_mm[height_mm]",
+        "level": "200",
+        "version": 0,
+        "value": 0.0,
+        "rows": 44,
+        "support": 42,
+        "consistent_range": [
+          0.0,
+          2.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "カルプ文字:height_mm[height_mm]",
+        "level": "200",
+        "version": 1,
+        "value": 0.0,
+        "rows": 22,
+        "support": 18,
+        "consistent_range": [
+          0.0,
+          0.0
+        ],
+        "status": "identified"
+      },
+      {
+        "term": "袖看板:qty[kw:remarks:既存撤去]",
+        "level": "1",
+        "version": 0,
+        "value": 10000.0,
+        "rows": 38,
+        "support": 6,
+        "consistent_range": [
+          10000.0,
+          10000.0
+        ],
+        "status": "identified"
+      }
+    ],
+    "stop": {
+      "threshold": 0.8,
+      "scope": "global",
+      "overall_rate": 0.7630705394190871,
+      "global_stop": true,
+      "segments_stopped": [
+        "インクジェット出力",
+        "袖看板"
+      ]
+    },
+    "rule_candidates": [],
+    "segment_rates": {
+      "アルミ複合板看板": [
+        746,
+        879
+      ],
+      "インクジェット出力": [
+        521,
+        673
+      ],
+      "カルプ文字": [
+        521,
+        587
+      ],
+      "袖看板": [
+        51,
+        271
+      ]
+    },
+    "parse_issues": [],
+    "config": {
+      "name": "dev-sign",
+      "columns": {
+        "id": "quote_no",
+        "date": "issue_date",
+        "customer": "customer_code",
+        "rep": "rep",
+        "amount": "amount",
+        "tax_label": "tax_label"
+      },
+      "segment": "item",
+      "customer_class": "if_(customer_code == '9999', '諸口', '口座')",
+      "revision_id_pattern": "^\\d{4}-\\d{3}-\\d+$",
+      "categorical": [
+        "thickness_mm",
+        "sides",
+        "media",
+        "laminate",
+        "finish",
+        "lighting",
+        "design",
+        "install",
+        "site_town"
+      ],
+      "numeric": [
+        "qty",
+        "area_m2",
+        "installed",
+        "install_qty",
+        "height_mm"
+      ],
+      "derived": {
+        "area_m2": "width_mm * height_mm / 1000000",
+        "area_total": "width_mm * height_mm * qty / 1000000",
+        "installed": "if_(install == '有', 1, 0)",
+        "install_qty": "if_(install == '有', qty, 0)",
+        "site_town": "regex(site, '^\\s*(.+?[市町村])', 1, '')"
+      },
+      "text": [
+        "remarks"
+      ],
+      "thresholds": [
+        "install_height_m",
+        "area_m2",
+        "width_mm"
+      ],
+      "keywords": [],
+      "features": [
+        "area_m2 * qty",
+        "height_mm * qty"
+      ],
+      "pack_steps": {},
+      "multiplier_keys": null,
+      "tax_rates": null,
+      "search": {
+        "penalty": 24.0,
+        "max_terms": 12,
+        "max_key_levels": 40,
+        "max_pair_levels": 80,
+        "max_feature_degree": 2,
+        "max_keywords": 40,
+        "min_keyword_df": 3,
+        "max_thresholds_per_column": 12,
+        "max_revisions": 3,
+        "outer_iterations": 3,
+        "min_customer_rows": 2,
+        "local_reliability_min_rows": 6,
+        "local_reliability_threshold": 0.5,
+        "work_budget": 120,
+        "time_budget_s": 3600,
+        "ordinal_keys_in_rich": false,
+        "rich_max_cols_per_quote": 1.0,
+        "ordinal_scope": "segment",
+        "plain_first": true,
+        "init": "rich",
+        "init_ridge": 0.0,
+        "init_terms": 12,
+        "anneal_forward": true,
+        "start": "rich",
+        "tier_discovery": true,
+        "additive_test": false,
+        "variants": [
+          {
+            "ordinal_keys_in_rich": true
+          },
+          {
+            "plain_first": false
+          },
+          {
+            "additive_test": true
+          },
+          {
+            "ordinal_keys_in_rich": true,
+            "additive_test": true
+          }
+        ],
+        "workers": 0
+      },
+      "stop_threshold": 0.8,
+      "notes": "Development config for devdata/sign (same column layout as the blind sign schema)."
+    },
+    "core_sha256": "c4cff0df0b072a20d7221267921da3f906b71933662dbd5b3089d36322337906",
+    "extensions": []
+  }
+}

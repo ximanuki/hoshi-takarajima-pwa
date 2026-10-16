@@ -1,0 +1,13 @@
+{
+  "name": "tenka-desk-data-gen",
+  "private": true,
+  "type": "module",
+  "description": "Deterministic generator for the fictional (架空) sample data of 転嫁デスク",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "gen": "node generate.ts",
+    "verify": "node verify.ts --regen"
+  }
+}

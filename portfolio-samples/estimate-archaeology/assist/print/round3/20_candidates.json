@@ -1,0 +1,25 @@
+{
+  "_comment": "Round 3 = round 2 + (a) unlabelled amounts read by the customer's tax-display convention (walk-in 一般 and private K customers: tax-inclusive; company C and agency D accounts: tax-exclusive; G stays open), (b) area/sheet candidates only for sheet-printed products and the per-name tier only for name cards (SCHEMA: kinds = number of people for cards), so that they do not duplicate total_qty in other segments, (c) the four default search variants with a larger deterministic work budget. The engine keeps a term only if more quotes reproduce to the yen.",
+  "text": ["note_tags"],
+  "keywords": ["#rush", "#design", "#fix", "#spot", "#band", "#proof", "片面PP", "角丸", "三つ折", "二つ折", "Z折", "中綴じ"],
+  "derived": {
+    "tax_label": "if_(isblank(tax_label), if_(regex(customer_code, '^(一般|K)', 1, '') != '', '税込', if_(regex(customer_code, '^([CD])[0-9]', 1, '') != '', '税抜', '')), tax_label)",
+    "a4eq": "if_(product == '名刺' or product == '封筒', 0, quantity * kinds * if_(size == 'A3', 2, if_(size == 'B4', 1.5, if_(size == 'B5', 0.75, if_(size == 'A5', 0.5, 1)))))",
+    "sheets": "if_(product == 'チラシ' or product == 'リーフレット', ceil(quantity / if_(size == 'A3', 4, if_(size == 'A4', 8, if_(size == 'B4', 8, 16)))) * kinds, 0)",
+    "persons_eff": "if_(product == '名刺', min(kinds, 5) + 0.9 * min(max(kinds - 5, 0), 5) + 0.8 * max(kinds - 10, 0), 0)"
+  },
+  "features": ["a4eq", "sheets", "bundles", "persons_eff", "persons_eff * quantity"],
+  "thresholds": ["a4eq"],
+  "search": {
+    "max_keywords": 0,
+    "max_feature_degree": 1,
+    "max_thresholds_per_column": 0,
+    "work_budget": 180,
+    "variants": [
+      {"ordinal_keys_in_rich": true},
+      {"plain_first": false},
+      {"additive_test": true},
+      {"ordinal_keys_in_rich": true, "additive_test": true}
+    ]
+  }
+}

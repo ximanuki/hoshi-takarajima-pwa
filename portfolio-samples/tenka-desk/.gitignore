@@ -1,0 +1,9 @@
+node_modules/
+dist/
+# 生成物（`cd data-gen && npm run gen` で同じものを作り直せる。約30MBあるのでコミットしない）
+public/sample/
+data-gen/truth/
+test-results/
+playwright-report/
+# 点検用のスクリーンショット（約18MB。docs/screenshots/ の公開用とは別）
+docs/review-screens/

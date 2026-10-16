@@ -9,7 +9,7 @@
     "prebuild": "npm run questions:build",
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "test": "vitest run",
+    "test": "vitest run --dir src",
     "test:golden": "vitest run src/utils/mission.test.ts src/utils/diagnostics.test.ts",
     "lint": "eslint .",
     "preview": "vite preview",

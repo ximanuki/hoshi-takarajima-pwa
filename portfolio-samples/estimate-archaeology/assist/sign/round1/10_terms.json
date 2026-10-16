@@ -1,0 +1,29 @@
+{
+  "_comment": "Round 1 (LLM analyst proposal; every term is only a candidate, the deterministic engine keeps it only if more quotes are reproduced to the yen). Generic terms read off quotes.csv and the frozen run's residuals: billed area (per-piece area rounded up to 0.1 m2, times quantity) and its tiers (volume discount); media x laminate key; standard-board yield for rigid boards (pieces per 3x6 / 4x8 sheet, sheets needed); eyelets for banners (one per 500 mm of edge unless the remarks say no eyelets); condition flags from the remarks that merge the wordings of one condition and drop the negated ones (rush, removal, disposal, site survey, night work, delivery); the site with the Hamamatsu ward dropped (wards were renamed/merged in 2024) as a key for travel fees. Search settings: fewer mined keywords (the flags above cover the conditions) and a larger wall-clock safety cap so that the deterministic work budget, not CPU contention, ends the search.",
+  "derived": {
+    "short_mm": "min(width_mm, height_mm) + 0 * width_mm",
+    "long_mm": "max(width_mm, height_mm) + 0 * width_mm",
+    "billed_m2": "ceil(area_m2, 0.1) * qty",
+    "media_lam": "concat(media, '/', laminate)",
+    "rush": "if_(contains(remarks, '特急', '至急'), '1', '0')",
+    "removal": "if_(contains(remarks, '撤去') and not contains(remarks, '撤去は別途'), 1, 0)",
+    "disposal": "if_(contains(remarks, '処分', '産廃') and not contains(remarks, '処分不要', '処分は先方'), 1, 0)",
+    "survey": "if_(contains(remarks, '現調', '現地調査') and not contains(remarks, '不要'), 1, 0)",
+    "night": "if_(contains(remarks, '夜間'), 1, 0)",
+    "delivery": "if_(contains(remarks, '配送'), 1, 0)",
+    "no_eyelets": "if_(contains(remarks, 'ハトメ不要', 'ハトメなし'), 1, 0)",
+    "site_place": "if_(site_town == '浜松市', concat('浜松市', regex(site, '区(.+)$', 1, '')), site_town)",
+    "yield36": "max(floor(910 / short_mm) * floor(1820 / long_mm), floor(910 / long_mm) * floor(1820 / short_mm))",
+    "yield48": "max(floor(1220 / short_mm) * floor(2440 / long_mm), floor(1220 / long_mm) * floor(2440 / short_mm))",
+    "rigid": "if_(item == 'アルミ複合板看板', 1, 0)",
+    "board36": "rigid * if_(yield36 > 0, ceil(qty / max(yield36, 1)), 0)",
+    "board48": "rigid * if_((yield36 == 0) and (yield48 > 0), ceil(qty / max(yield48, 1)), 0)",
+    "board_over": "rigid * if_(yield48 == 0, qty, 0)",
+    "eyelets": "if_((media == 'ターポリン') and (no_eyelets == 0), 2 * (ceil(width_mm / 500) + ceil(height_mm / 500)) * qty, 0)"
+  },
+  "categorical": ["media_lam", "site_place"],
+  "thresholds": ["billed_m2"],
+  "features": ["ceil(area_m2, 0.1) * qty", "board36", "board48", "board_over", "eyelets", "removal", "disposal", "survey", "night", "delivery"],
+  "multiplier_keys": ["rush"],
+  "search": {"max_keywords": 20, "time_budget_s": 10800}
+}

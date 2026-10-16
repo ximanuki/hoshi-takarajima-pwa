@@ -1,0 +1,34 @@
+# Python / tooling
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Downloaded embedding model (~450 MB) — fetched by `make setup` / Docker build
+models/
+
+# Generated, rebuildable artefacts (`make ingest`)
+var/
+*.sqlite
+*.sqlite-journal
+*.db
+
+# Local secrets
+.env
+.env.*
+!.env.example
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+
+# Kept on purpose: data/raw (source documents + manifest), data/eval, reports/

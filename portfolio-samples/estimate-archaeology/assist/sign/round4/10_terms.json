@@ -1,0 +1,62 @@
+{
+  "_comment": "Round 4 (LLM analyst proposal, verified by the engine). Round 3 plus two changes read off its residuals: (a) every search variant measures the first model on all quotes (plain_first false): the engine's 'plain' reference is the most common customer class, which here is the account customers (口座) whose prices carry customer rates 0.8-1.0, while the list price is the one-off customers' (諸口); in round 3 the plain_first=false variant reproduced 126 quotes against 88-109 for the others; (b) the explicit feature ceil(area_m2, 0.1) * qty is withdrawn: next to the config's area_m2 * qty it is nearly collinear (fits came out as -12000 x area + 13000 x rounded area), and the engine already tries rounding-up variants of area_m2 per piece itself. Everything else as in round 3 (site text normalised, site_town emptied, height_mm only for letters, threshold flags for remark conditions, billed-area tiers, board yield, eyelets, work_budget 240 G).",
+  "derived": {
+    "site_town": "''",
+    "short_mm": "min(width_mm, height_mm) + 0 * width_mm",
+    "long_mm": "max(width_mm, height_mm) + 0 * width_mm",
+    "billed_m2": "ceil(area_m2, 0.1) * qty",
+    "rush": "if_(contains(remarks, '特急', '至急'), 1, 0)",
+    "removal": "if_(contains(remarks, '撤去') and not contains(remarks, '撤去は別途'), 1, 0)",
+    "disposal": "if_(contains(remarks, '処分', '産廃') and not contains(remarks, '処分不要', '処分は先方'), 1, 0)",
+    "survey": "if_(contains(remarks, '現調', '現地調査') and not contains(remarks, '不要'), 1, 0)",
+    "night": "if_(contains(remarks, '夜間'), 1, 0)",
+    "delivery": "if_(contains(remarks, '配送'), 1, 0)",
+    "no_eyelets": "if_(contains(remarks, 'ハトメ不要', 'ハトメなし'), 1, 0)",
+    "yield36": "max(floor(910 / short_mm) * floor(1820 / long_mm), floor(910 / long_mm) * floor(1820 / short_mm))",
+    "yield48": "max(floor(1220 / short_mm) * floor(2440 / long_mm), floor(1220 / long_mm) * floor(2440 / short_mm))",
+    "rigid": "if_(item == 'アルミ複合板看板', 1, 0)",
+    "board36": "rigid * if_(yield36 > 0, ceil(qty / max(yield36, 1)), 0)",
+    "board48": "rigid * if_((yield36 == 0) and (yield48 > 0), ceil(qty / max(yield48, 1)), 0)",
+    "board_over": "rigid * if_(yield48 == 0, qty, 0)",
+    "eyelets": "if_((media == 'ターポリン') and (no_eyelets == 0), 2 * (ceil(width_mm / 500) + ceil(height_mm / 500)) * qty, 0)",
+    "site": "if_(contains(site, '浜松市'), concat('浜松市', regex(site, '区(.+)$', 1, '')), regex(site, '^\\s*((?:東京都|北海道|(?:京都|大阪)府|.{2,3}?県)?.+?[市区町村])', 1, ''))",
+    "height_mm": "if_(item == 'カルプ文字', height_mm, 0 / 0)"
+  },
+  "thresholds": [
+    "billed_m2",
+    "rush",
+    "removal",
+    "disposal",
+    "survey",
+    "night",
+    "delivery"
+  ],
+  "features": [
+    "board36",
+    "board48",
+    "board_over",
+    "eyelets"
+  ],
+  "search": {
+    "max_keywords": 30,
+    "time_budget_s": 10800,
+    "work_budget": 240,
+    "variants": [
+      {
+        "plain_first": false
+      },
+      {
+        "plain_first": false,
+        "ordinal_keys_in_rich": true
+      },
+      {
+        "plain_first": false,
+        "additive_test": true
+      },
+      {
+        "plain_first": false,
+        "init": "forward"
+      }
+    ]
+  }
+}

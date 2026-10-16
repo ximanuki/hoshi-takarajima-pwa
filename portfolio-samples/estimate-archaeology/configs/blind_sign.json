@@ -1,0 +1,53 @@
+{
+  "name": "blind-sign",
+  "notes": "Written from blind/sign/SCHEMA.md only (column meanings); no value of quotes.csv was looked at. Domain hints: area from width x height; カルプ文字 is priced per character by character height (no width); installation, mounting height and site location may carry fees; 9999 is the shared one-off customer code.",
+  "columns": {
+    "id": "quote_no",
+    "date": "issue_date",
+    "customer": "customer_code",
+    "rep": "rep",
+    "amount": "amount",
+    "tax_label": "tax_label"
+  },
+  "segment": "item",
+  "customer_class": "if_(customer_code == '9999', '諸口', '口座')",
+  "revision_id_pattern": "^\\d{4}-\\d{3}-\\d+$",
+  "derived": {
+    "area_m2": "width_mm * height_mm / 1000000",
+    "installed": "if_(install == '有', 1, 0)",
+    "install_qty": "if_(install == '有', qty, 0)",
+    "site_town": "regex(site, '^\\s*((?:東京都|北海道|(?:京都|大阪)府|.{2,3}?県)?.+?[市区町村])', 1, '')"
+  },
+  "categorical": [
+    "thickness_mm",
+    "sides",
+    "media",
+    "laminate",
+    "finish",
+    "lighting",
+    "design",
+    "install",
+    "site_town"
+  ],
+  "numeric": [
+    "qty",
+    "area_m2",
+    "installed",
+    "install_qty",
+    "height_mm"
+  ],
+  "text": [
+    "remarks",
+    "site"
+  ],
+  "thresholds": [
+    "install_height_m",
+    "area_m2",
+    "width_mm",
+    "height_mm"
+  ],
+  "features": [
+    "area_m2 * qty",
+    "height_mm * qty"
+  ]
+}

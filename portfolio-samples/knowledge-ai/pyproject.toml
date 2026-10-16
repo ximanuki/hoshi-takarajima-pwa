@@ -1,0 +1,56 @@
+[build-system]
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "knowledge-ai"
+version = "0.1.0"
+description = "AI総務さん: citation-first Japanese RAG over company rules (hybrid BM25 + dense retrieval, abstention, evaluation)"
+readme = "README.md"
+requires-python = ">=3.12"
+# Direct runtime dependencies are pinned exactly. The full transitive pin set
+# lives in requirements.lock (generated with `uv pip compile`).
+dependencies = [
+  "anthropic==1.11.0",
+  "fastapi==0.142.2",
+  "fastembed==0.8.1",
+  "huggingface-hub==1.33.0",
+  "numpy==2.5.3",
+  "pydantic==2.13.5",
+  "pypdf==6.19.0",
+  "uvicorn==0.54.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "httpx==0.28.1",   # required by fastapi.testclient
+  "pytest==9.1.1",
+  "ruff==0.16.10",
+]
+
+[project.scripts]
+kai = "knowledge_ai.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/knowledge_ai"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+markers = [
+  "slow: downloads/runs the real embedding model (deselect with -m 'not slow')",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "PTH", "N"]
+ignore = [
+  "RUF001",  # ambiguous unicode: Japanese full-width punctuation is intentional
+  "RUF002",
+  "RUF003",
+  "E501",    # line length is enforced by `ruff format`; long Japanese string literals are fine
+]
