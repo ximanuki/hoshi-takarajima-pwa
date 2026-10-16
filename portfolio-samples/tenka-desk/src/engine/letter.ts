@@ -13,7 +13,7 @@ import { type IsoDate, toWareki } from './dates.ts';
 import { EVIDENCE_TOPIC_JA, type EvidenceItem, type EvidenceTopic } from './evidence.ts';
 import { changeBp } from './money.ts';
 import type { PairProposal } from './proposal.ts';
-import { formatBp, formatYen, withCommas } from './text.ts';
+import { formatBp, withCommas } from './text.ts';
 import type { Company } from './types.ts';
 
 export type EffectiveBasis = '出荷分' | '受注分' | '納品分';
@@ -172,7 +172,7 @@ export function buildLetter(
     record,
     items,
     itemsTitle: '価格改定対象品目一覧',
-    itemsNotes: ['価格は税抜です。', '単価は表示の単位あたりの価格です（円）。', `改定率は現行単価に対する率です。合計欄の平均は直近12か月のご購入数量で加重しています（${formatYen(before)} → ${formatYen(after)}）。`],
+    itemsNotes: ['価格は税抜です。', '単価は表示の単位あたりの価格です（円）。', '改定率は現行単価に対する率です。記の平均は、直近12か月のご購入数量で加重した平均です。'],
     averageChangeBp,
     evidence: {
       heading: '参考資料（公表統計）',
