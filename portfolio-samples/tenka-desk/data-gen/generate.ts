@@ -642,7 +642,7 @@ function active(inj: Inj, d: string): boolean {
 }
 
 function chooseInjections(
-  customers: Customer[], products: Product[], ctx: Ctx, agreements: Map<string, Agreement>, specials: Special[],
+  customers: Customer[], ctx: Ctx, agreements: Map<string, Agreement>, specials: Special[],
   salesByPair: Map<string, Ev[]>,
 ): { byPair: Map<string, Inj[]>; tierWhole: Map<string, Inj>; all: Inj[] } {
   const rng = stream('inject');
@@ -651,7 +651,6 @@ function chooseInjections(
   const all: Inj[] = [];
   const used = new Set<string>();
   const wholeCust = new Set<string>();
-  const productBy = new Map(products.map((p) => [p.code, p]));
   const hasSpecial = (c: string, s: string): boolean => ctx.specials.has(pairKey(c, s));
   const events = (c: string, s: string): Ev[] => salesByPair.get(pairKey(c, s)) ?? [];
   const countFrom = (c: string, s: string, from: string, to: string | null = null): number =>
@@ -817,7 +816,6 @@ function chooseInjections(
     });
     tierN++;
   }
-  if (productBy.size === 0) fail('no products');
   return { byPair, tierWhole, all };
 }
 
@@ -1153,7 +1151,7 @@ function main(): void {
 
   const specials = buildSpecials(customers, ctx, salesByPair);
   const lowMarginPairs = new Set(specials.filter((s) => s.lowMargin).map((s) => pairKey(s.cust, s.sku)));
-  const inj = chooseInjections(customers, products, ctx, agreements, specials, salesByPair);
+  const inj = chooseInjections(customers, ctx, agreements, specials, salesByPair);
   priceHistory(histEvs, ctx, inj, lowMarginPairs);
 
   // next revision demo + 反映チェック month
@@ -1222,6 +1220,22 @@ function main(): void {
     salesLayouts: ['A', 'B'],
   }, null, 2)}\n`);
   files.push({ path: join(SAMPLE_DIR, 'demo_settings.json'), rows: 1 });
+
+  writeText(join(SAMPLE_DIR, 'README.md'), [
+    '# サンプルデータ(架空)',
+    '',
+    'このフォルダのファイルはすべて架空のデータです。実在の企業・団体・人物・取引とは関係ありません(名前が一致しても無関係です)。',
+    '1社(架空商事株式会社)の自社データという想定で、他社の価格データは含みません。',
+    '',
+    '`data-gen/generate.ts` が固定シードで作ります(`cd data-gen && npm run gen`)。何度作っても同じファイルになります。',
+    'ファイルと列の説明は `data-gen/README.md` にあります。',
+    '',
+    `- 得意先 ${customers.length}社 / 商品 ${withCommas(products.length)}点 / 特値 ${specials.length}件`,
+    `- 売上明細 ${HIST_START.slice(0, 7)}〜${HIST_END.slice(0, 7)}: ${withCommas(histEvs.length)}行(販売管理A形式・B形式で同じ内容)`,
+    `- 反映チェック用(next/): ${FOLLOW_MONTH.y}年${FOLLOW_MONTH.m}月分の売上明細 ${withCommas(followEvs.length)}行と、デモ用の新単価マスタ ${withCommas(masterRows.length)}行`,
+    '',
+  ].join('\n'));
+  files.push({ path: join(SAMPLE_DIR, 'README.md'), rows: 0 });
 
   w('rate_tiers.csv', ['掛率ランク', '名称', '標準掛率(%)', '下限(%)', '上限(%)', '説明'],
     TIERS.map((t) => [t.rank, t.label, (t.std / 10).toFixed(1), (t.min / 10).toFixed(1), (t.max / 10).toFixed(1), t.note]));

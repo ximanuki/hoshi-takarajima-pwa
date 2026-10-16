@@ -8,6 +8,6 @@
   },
   "scripts": {
     "gen": "node generate.ts",
-    "verify": "node verify.ts"
+    "verify": "node verify.ts --regen"
   }
 }

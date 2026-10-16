@@ -6,13 +6,17 @@
  *  2. the 特値 lists and the demo price masters agree between A and B;
  *  3. the diagnosis rules (lib/rules.ts) applied to the parsed files reproduce
  *     truth/lines.csv, truth/issues.csv and truth/followup_lines.csv exactly;
- *  4. every file still has the sha256 recorded in truth/summary.json.
+ *  4. every file still has the sha256 recorded in truth/summary.json;
+ *  5. with --regen: the generator is run again into a temporary directory and
+ *     every file must be byte-identical (determinism).
  *
- *   node data-gen/verify.ts [--root DIR]
+ *   node data-gen/verify.ts [--root DIR] [--regen]
  */
 
+import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -185,6 +189,27 @@ const summary = JSON.parse(read(T('summary.json'))) as { files: { path: string; 
 for (const f of summary.files) {
   const h = createHash('sha256').update(readFileSync(join(ROOT, f.path))).digest('hex');
   check(h === f.sha256, `sha256 changed: ${f.path}`);
+}
+
+/* ---------- determinism ---------- */
+if (process.argv.includes('--regen')) {
+  const tmp = mkdtempSync(join(tmpdir(), 'tenka-desk-regen-'));
+  try {
+    execFileSync(process.execPath, [...process.execArgv, join(HERE, 'generate.ts'), '--out', tmp], { stdio: 'ignore' });
+    let same = 0;
+    for (const f of summary.files) {
+      const a = readFileSync(join(ROOT, f.path));
+      const b = readFileSync(join(tmp, f.path));
+      check(a.equals(b), `regenerated file differs: ${f.path}`);
+      if (a.equals(b)) same++;
+    }
+    const sa = readFileSync(T('summary.json'));
+    const sb = readFileSync(join(tmp, 'data-gen', 'truth', 'summary.json'));
+    check(sa.equals(sb), 'regenerated summary.json differs');
+    console.log(`determinism: regenerated ${same}/${summary.files.length} files + summary.json byte-identical`);
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
 }
 
 /* ---------- report ---------- */
