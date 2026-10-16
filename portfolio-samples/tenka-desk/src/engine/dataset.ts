@@ -272,16 +272,17 @@ export class Dataset {
     return p ? [{ sku, price: p.listPrice, start: BEGINNING, end: null }] : [];
   }
 
+  /** Index of the row in force on the day (start <= day <= end), latest-starting first; -1 in a gap. */
   private listIndexAt(rows: readonly ListPriceRow[], date: IsoDate): number {
     let idx = -1;
     for (let i = 0; i < rows.length; i++) {
       const r = rows[i];
-      if (r && r.start <= date) idx = i;
+      if (r && covers(r, date)) idx = i;
     }
     return idx;
   }
 
-  /** 定価 in force for everyone on a day (null before the first row). */
+  /** 定価 in force for everyone on a day (null before the first row, after an ended row and in gaps). */
   listPriceAt(sku: string, date: IsoDate): number | null {
     const rows = this.listRows(sku);
     const i = this.listIndexAt(rows, date);
@@ -372,15 +373,15 @@ export class Dataset {
       .reverse();
   }
 
-  /** 原単価 (銭) on a day from the cost history, else the product master's. */
+  /**
+   * 原単価 (銭) on a day: the cost-history row covering the day (start <= day <= end),
+   * else the product master's. A day before the first row, after an ended row or in a
+   * gap never borrows another period's cost.
+   */
   costAt(sku: string, date: IsoDate): number | null {
-    const rows = this.costHistory.get(sku);
-    if (rows && rows.length > 0) {
-      let found: CostRow | null = null;
-      for (const r of rows) if (r.start <= date) found = r;
-      return (found ?? rows[0])?.costSen ?? null;
-    }
-    return this.products.get(sku)?.costSen ?? null;
+    let found: CostRow | null = null;
+    for (const r of this.costHistory.get(sku) ?? []) if (covers(r, date)) found = r;
+    return found?.costSen ?? this.products.get(sku)?.costSen ?? null;
   }
 
   /** The unit price the customer should pay: a valid 特値, else 定価 × 掛率. */

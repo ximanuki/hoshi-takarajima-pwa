@@ -104,6 +104,13 @@ describe('timestamps', () => {
     expect(parseTimestamp('2026-10-16T14:05:00+09:00')).toBe(t);
     expect(parseTimestamp('2026-10-16T14:05:00')).toBeNull();
     expect(parseTimestamp('2026-02-30T00:00:00Z')).toBeNull();
+    // An impossible offset is rejected instead of shifting the event by days
+    expect(parseTimestamp('2026-10-16T14:05:00+99:99')).toBeNull();
+    expect(parseTimestamp('2026-10-16T14:05:00+09:60')).toBeNull();
+    expect(parseTimestamp('2026-10-16T14:05:00+14:30')).toBeNull();
+    expect(parseTimestamp('2026-10-16T19:05:00+14:00')).toBe(parseTimestamp('2026-10-16T05:05:00Z'));
+    expect(parseTimestamp('2026-10-15T17:05:00-12:00')).toBe(parseTimestamp('2026-10-16T05:05:00Z'));
+    expect(parseTimestamp('2026-10-16T10:50:00+05:45')).toBe(parseTimestamp('2026-10-16T05:05:00Z'));
     expect(formatJstWareki(t as number)).toBe('令和8年10月16日 14:05');
     expect(jstDate(Date.UTC(2026, 9, 16, 16, 0))).toBe('2026-10-17');
   });

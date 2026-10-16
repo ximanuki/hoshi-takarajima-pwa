@@ -94,6 +94,25 @@ describe('expected price, 特値 and cost', () => {
     expect(ds.costShareOf('KG-1001')).toEqual({ material: 45, labor: 30, energy: 12, other: 13 });
   });
 
+  it('uses only history rows that cover the day (no borrowing across gaps or ends)', () => {
+    // 定価: 2024-04-01..2024-12-31, gap in 2025-01..03, then from 2025-04-01. 原単価 starts 2024-07-01 and ends 2025-01-31.
+    const gap = fixtureDataset({
+      listPriceHistory: [
+        { sku: 'DB-1001', price: 710, start: '2024-04-01', end: '2024-12-31' },
+        { sku: 'DB-1001', price: 770, start: REVISION, end: null },
+      ],
+      costHistory: [{ sku: 'DB-1001', costSen: 29323, start: '2024-07-01', end: '2025-01-31' }],
+    });
+    expect(gap.listPriceAt('DB-1001', '2024-12-31')).toBe(710);
+    expect(gap.listPriceAt('DB-1001', '2025-02-15')).toBeNull(); // in the gap, not the expired 710
+    expect(gap.applicableList('000001', 'DB-1001', '2025-02-15')).toBeNull();
+    expect(gap.listPriceAt('DB-1001', '2025-04-01')).toBe(770);
+    // before the first cost row and after its end: the product master's 原単価, not the history row
+    expect(gap.costAt('DB-1001', '2024-05-01')).toBe(31141);
+    expect(gap.costAt('DB-1001', '2024-08-01')).toBe(29323);
+    expect(gap.costAt('DB-1001', '2025-03-01')).toBe(31141);
+  });
+
   it('resolves codes written in any style', () => {
     expect(ds.resolveSku('ＤＢー１００１')).toBe('DB-1001');
     expect(ds.resolveSku('9999')).toBeNull();

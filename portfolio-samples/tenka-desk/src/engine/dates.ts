@@ -197,7 +197,11 @@ export function parseTimestamp(ts: string): number | null {
   let offsetMin = 0;
   if (tz !== 'Z') {
     const sign = tz.startsWith('-') ? -1 : 1;
-    offsetMin = sign * (Number(tz.slice(1, 3)) * 60 + Number(tz.slice(4, 6)));
+    const oh = Number(tz.slice(1, 3));
+    const om = Number(tz.slice(4, 6));
+    // Real offsets run from -12:00 to +14:00; anything else (e.g. "+99:99") is a typo, not a time zone.
+    if (om > 59 || oh * 60 + om > 14 * 60) return null;
+    offsetMin = sign * (oh * 60 + om);
   }
   const utc = Date.UTC(
     Number(y),
