@@ -753,7 +753,7 @@ function buildTemplateData(answers, config, receivedAt) {
   return Object.assign(answersToMap(answers), {
     店舗名: config.shopName,
     署名: config.signature,
-    受付番号: makeReceiptNo(receivedAt),
+    受付番号: makeReceiptNo(receivedAt, answersToMap(answers)),
     受付日時: formatDateJst(receivedAt),
   });
 }
@@ -923,12 +923,30 @@ function formatDateJst(v) {
   return `${t.y}/${t.mo}/${t.d} ${t.h}:${t.mi}`;
 }
 
-/** 受付番号: 受付日時（日本時間）から作る「20261006-090512」。行を並べ替えても変わらない */
-function makeReceiptNo(v) {
+/**
+ * 受付番号: 受付日時（日本時間）＋ 回答内容から作る3文字の記号「20261006-090512-K7Q」。
+ * 同じ秒に届いた別の送信とも、まず番号が重ならない（記号は約4.7万通り）。行を並べ替えても変わらない
+ */
+function makeReceiptNo(v, answers) {
   const d = toDate(v);
   if (!d) return '';
   const t = jstParts(d);
-  return `${t.y}${t.mo}${t.d}-${t.h}${t.mi}${t.s}`;
+  const base = `${t.y}${t.mo}${t.d}-${t.h}${t.mi}${t.s}`;
+  return answers ? `${base}-${receiptSuffix(answers)}` : base;
+}
+
+/** 回答内容のハッシュ（FNV-1a）を3文字の英数字にする */
+function receiptSuffix(answers) {
+  const text = Object.keys(answers)
+    .sort()
+    .map((k) => `${k}=${answerToString(answers[k])}`)
+    .join('\n');
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return (h % 46656).toString(36).toUpperCase().padStart(3, '0');
 }
 
 /** スプレッドシートの特定のシート・行を開くリンク */
@@ -997,7 +1015,7 @@ function buildInquiryMessage(answers, opts) {
   const title = `【新着問い合わせ】${kind ? `${kind}／` : ''}${name ? `${name} 様` : 'お名前なし'}`;
   const head = o.receivedAt
     ? [
-        { label: '受付番号', value: makeReceiptNo(o.receivedAt) },
+        { label: '受付番号', value: makeReceiptNo(o.receivedAt, answersToMap(answers)) },
         { label: '受付日時', value: formatDateJst(o.receivedAt) },
       ]
     : [];

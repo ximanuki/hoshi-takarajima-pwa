@@ -221,7 +221,7 @@ function runInvoices(opts) {
 /** 1件分: PDF を作って Drive に保存し、送信または下書き作成して履歴に残す */
 function processInvoice(ss, inv, plan, ctx) {
   // 下書きを Gmail から手で送った場合などに備え、送信済みフォルダも確認する
-  if (wasSentInGmail(inv.number)) {
+  if (wasSentInGmail(inv.number, inv.email)) {
     appendHistory(ctx.historySheet, inv, `${STATUS.sent}（Gmailの送信済みで確認）`, '', '');
     return 'skipped';
   }
@@ -323,10 +323,13 @@ function savePdf(folder, blob) {
   return folder.createFile(blob);
 }
 
-/** Gmail の送信済みに、この請求書番号を含むメールがあるか */
-function wasSentInGmail(number) {
+/**
+ * Gmail の送信済みに、この取引先あての、この請求書番号を含むメールがあるか。
+ * 同じ Gmail で別のスプレッドシート（別の事業）が同じ番号を使っていても取り違えないよう、宛先も条件に入れる
+ */
+function wasSentInGmail(number, to) {
   try {
-    return GmailApp.search(`in:sent "${number}"`, 0, 1).length > 0;
+    return GmailApp.search(`in:sent to:${to} "${number}"`, 0, 1).length > 0;
   } catch (e) {
     return false; // 検索できなくても送信履歴シートでの確認は済んでいる
   }
@@ -1085,6 +1088,7 @@ function pad2(n) {
 if (typeof module !== 'undefined') {
   module.exports = {
     CONFIG,
+    wasSentInGmail,
     MODE,
     STATUS,
     TPL,

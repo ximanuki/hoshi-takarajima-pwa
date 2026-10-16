@@ -1,7 +1,7 @@
 // node --test で実行する。Google のサービスを使わない関数だけを検証する。
 const test = require('node:test');
 const assert = require('node:assert');
-const {
+const { wasSentInGmail,
   MODE,
   planInvoices,
   collectLines,
@@ -546,4 +546,14 @@ test('namesFromSelection は選んだ行の取引先名を重複・見出し・�
   const rows = [['取引先名', '敬称'], ['甲', '御中'], ['', ''], ['乙', '様'], ['甲', '御中']];
   assert.deepStrictEqual(namesFromSelection(rows, 0), ['甲', '乙']);
   assert.deepStrictEqual(namesFromSelection([[new Date(), ' 丙 ']], 1), ['丙']);
+});
+
+test('wasSentInGmail は請求書番号だけでなく宛先でも絞って、送信済みフォルダを探す', (t) => {
+  const queries = [];
+  globalThis.GmailApp = { search: (q) => (queries.push(q), q.includes('to:a@example.com') ? [{}] : []) };
+  t.after(() => delete globalThis.GmailApp);
+  assert.strictEqual(wasSentInGmail('INV-202609-001', 'a@example.com'), true);
+  // 同じ番号でも、別の取引先（別のスプレッドシートの請求書）あての送信は数えない
+  assert.strictEqual(wasSentInGmail('INV-202609-001', 'b@example.com'), false);
+  assert.deepStrictEqual(queries, ['in:sent to:a@example.com "INV-202609-001"', 'in:sent to:b@example.com "INV-202609-001"']);
 });

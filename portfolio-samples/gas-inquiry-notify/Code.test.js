@@ -134,7 +134,7 @@ test('buildTemplateData は回答に 店舗名・署名・受付番号・受付�
   assert.strictEqual(data['お名前'], '山田 太郎');
   assert.strictEqual(data['店舗名'], 'カフェ星');
   assert.strictEqual(data['署名'], '--\nカフェ星');
-  assert.strictEqual(data['受付番号'], '20261006-090512');
+  assert.strictEqual(data['受付番号'], '20261006-090512-MFA');
   assert.strictEqual(data['受付日時'], '2026/10/06 09:05');
 });
 
@@ -305,6 +305,16 @@ test('formatDateJst / makeReceiptNo は実行環境のタイムゾーンに関�
   assert.strictEqual(makeReceiptNo(null), '');
 });
 
+test('makeReceiptNo は同じ秒に届いた別の送信と番号が重ならず、同じ内容なら同じ番号になる', () => {
+  const at = jst('2026-10-06T09:05:12');
+  const a = makeReceiptNo(at, { お名前: '山田 太郎', 内容: '予約したい' });
+  const b = makeReceiptNo(at, { お名前: '佐藤 花子', 内容: '予約したい' });
+  assert.match(a, /^20261006-090512-[0-9A-Z]{3}$/);
+  assert.notStrictEqual(a, b);
+  // 項目の順番が違っても同じ番号（行を並べ替えても再計算で変わらない）
+  assert.strictEqual(makeReceiptNo(at, { 内容: '予約したい', お名前: '山田 太郎' }), a);
+});
+
 test('sheetLink はシートと行を開くリンクを作る', () => {
   assert.strictEqual(sheetLink('https://docs.google.com/spreadsheets/d/x/edit#gid=9', 0, 5), 'https://docs.google.com/spreadsheets/d/x/edit#gid=0&range=A5');
   assert.strictEqual(sheetLink('https://docs.google.com/spreadsheets/d/x/edit', 12), 'https://docs.google.com/spreadsheets/d/x/edit#gid=12');
@@ -366,7 +376,7 @@ test('buildReminderMessage は件数・経過時間・担当・行番号を並�
 test('buildInquiryMessage はタイトル・受付番号・回答を並べる', () => {
   assert.strictEqual(message.title, '【新着問い合わせ】予約／山田 太郎 様');
   assert.deepStrictEqual(message.fields.slice(0, 3), [
-    { label: '受付番号', value: '20261006-090512' },
+    { label: '受付番号', value: '20261006-090512-MFA' },
     { label: '受付日時', value: '2026/10/06 09:05' },
     { label: 'お名前', value: '山田 太郎' },
   ]);
@@ -779,7 +789,7 @@ test('[モック] フォーム送信 → 自動返信 → Slack/Discord/Chatwork
   assert.strictEqual(mail.to, 'taro@example.com'); // 全角で入力されても半角に直して送る
   assert.strictEqual(mail.bcc, 'owner@example.com');
   assert.strictEqual(mail.name, 'サンプル商店');
-  assert.strictEqual(mail.subject, '【サンプル商店】ご予約のお問い合わせを受け付けました（受付番号 20261006-090512）');
+  assert.strictEqual(mail.subject, '【サンプル商店】ご予約のお問い合わせを受け付けました（受付番号 20261006-090512-WT2）');
   assert.match(mail.body, /^山田 太郎 様\n/);
   assert.match(mail.body, /■ご希望日時：10月10日 14:00/);
   assert.match(mail.body, /カットの予約をお願いします。/);
