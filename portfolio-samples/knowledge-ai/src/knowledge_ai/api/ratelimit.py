@@ -76,7 +76,9 @@ class RateLimiter:
             if self.per_minute > 0 and len(window) >= self.per_minute:
                 return Decision(False, max(1, int(60 - (now - window[0])) + 1), "minute")
             window.append(now)
-            self._ip_day[ip] = self._ip_day.get(ip, 0) + 1
+            if self.per_ip_daily > 0:
+                # 上限が無効なら IP ごとの日次件数は使わないので、記録もしない（増え続けないように）
+                self._ip_day[ip] = self._ip_day.get(ip, 0) + 1
             self._day_total += 1
             if len(self._windows) > _MAX_TRACKED_IPS:
                 # 1分より古い記録は全 IP について捨て、空になった IP は追跡をやめる

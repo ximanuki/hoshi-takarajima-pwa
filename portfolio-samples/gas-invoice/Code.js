@@ -891,9 +891,22 @@ function truncYen(x) {
   return x < 0 ? 0 - abs : abs; // 0 - 0 は -0 にならない
 }
 
+/**
+ * ある瞬間が CONFIG.timezone（日本時間）で何年何月何日かを、スクリプトの時刻の0時の Date にして返す。
+ * Code.js だけを貼り付けた場合など、スクリプトのタイムゾーンが日本時間でないと、
+ * 日本時間の10月1日0時が UTC では9月30日になり、月の判定がずれるのを防ぐ
+ */
+function civilDate(d) {
+  const parts = {};
+  new Intl.DateTimeFormat('en-US', { timeZone: CONFIG.timezone, year: 'numeric', month: 'numeric', day: 'numeric' })
+    .formatToParts(d)
+    .forEach((p) => (parts[p.type] = Number(p.value)));
+  return new Date(parts.year, parts.month - 1, parts.day);
+}
+
 /** 日付セル（Date）または「2026/09/30」「2026-09-30」「2026年9月30日」を Date にする */
 function toDate(v) {
-  if (Object.prototype.toString.call(v) === '[object Date]') return isNaN(v.getTime()) ? null : v;
+  if (Object.prototype.toString.call(v) === '[object Date]') return isNaN(v.getTime()) ? null : civilDate(v);
   const s = toHalfWidth(str(v));
   const m = s.match(/^(\d{4})[/\-.年](\d{1,2})[/\-.月](\d{1,2})日?$/);
   if (!m) return null;
@@ -908,7 +921,8 @@ function isInMonth(date, year, month) {
 
 /** 実行日から見た対象月。offset = 0 で今月、-1 で先月 */
 function targetMonth(now, offset) {
-  const d = new Date(now.getFullYear(), now.getMonth() + (offset || 0), 1);
+  const today = civilDate(now);
+  const d = new Date(today.getFullYear(), today.getMonth() + (offset || 0), 1);
   return { year: d.getFullYear(), month: d.getMonth() + 1 };
 }
 

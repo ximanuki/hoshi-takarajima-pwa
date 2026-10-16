@@ -1,7 +1,7 @@
 // node --test で実行する。Google のサービスを使わない関数だけを検証する。
 const test = require('node:test');
 const assert = require('node:assert');
-const { wasSentInGmail,
+const { isInMonth, wasSentInGmail,
   MODE,
   planInvoices,
   collectLines,
@@ -37,6 +37,9 @@ const { wasSentInGmail,
   formatDateJa,
 } = require('./Code.js');
 
+/** 日本時間のその日時を表す Date（スプレッドシートの日付セルは日本時間の0時として届く） */
+const jst = (y, mo, d, h = 0, mi = 0) => new Date(Date.UTC(y, mo, d, h - 9, mi));
+
 // ---- テスト用のシートの中身（1行目の見出しは除いた状態。設定シートだけは見出しごと読む） ----
 
 const settingsRows = [
@@ -60,14 +63,14 @@ const clientRows = [
 
 // 行番号は 2 行目から
 const detailRows = [
-  [new Date(2026, 8, 3), '山田 太郎', 'ロゴデザイン', 1, 50000, '10%'], // 2
-  [new Date(2026, 8, 5), '株式会社サンプル商事', 'Web保守', 1, 1005, '10%'], // 3
-  [new Date(2026, 8, 6), '株式会社サンプル商事', '修正作業', 1, 1005, 0.1], // 4 パーセント表示のセルは 0.1 で届く
-  [new Date(2026, 8, 7), '株式会社サンプル商事', '会議用 菓子', 1, 1010, '8%'], // 5
+  [jst(2026, 8, 3), '山田 太郎', 'ロゴデザイン', 1, 50000, '10%'], // 2
+  [jst(2026, 8, 5), '株式会社サンプル商事', 'Web保守', 1, 1005, '10%'], // 3
+  [jst(2026, 8, 6), '株式会社サンプル商事', '修正作業', 1, 1005, 0.1], // 4 パーセント表示のセルは 0.1 で届く
+  [jst(2026, 8, 7), '株式会社サンプル商事', '会議用 菓子', 1, 1010, '8%'], // 5
   ['2026/09/08', '株式会社サンプル商事', '会議用 飲料', 1, '1,010', '８％'], // 6 文字の日付・全角
-  [new Date(2026, 8, 30, 23, 59), '株式会社サンプル商事', '収入印紙（立替）', 1, 500, '非課税'], // 7 月末の夜
-  [new Date(2026, 9, 1), '株式会社サンプル商事', '翌月分', 1, 99999, '10%'], // 8 対象外
-  [new Date(2026, 7, 31), '山田 太郎', '前月分', 1, 99999, '10%'], // 9 対象外
+  [jst(2026, 8, 30, 23, 59), '株式会社サンプル商事', '収入印紙（立替）', 1, 500, '非課税'], // 7 月末の夜
+  [jst(2026, 9, 1), '株式会社サンプル商事', '翌月分', 1, 99999, '10%'], // 8 対象外
+  [jst(2026, 7, 31), '山田 太郎', '前月分', 1, 99999, '10%'], // 9 対象外
   ['', '', '', '', '', ''], // 10 空行
 ];
 
@@ -123,7 +126,7 @@ test('税率別内訳は使った税率だけを 10% → 8% → 非課税 の順
 });
 
 test('明細欄の行は軽減税率の品目に ※ をつけ、税率を表示する', () => {
-  const d = new Date(2026, 8, 7);
+  const d = jst(2026, 8, 7);
   const rows = invoiceItemRows([
     { date: d, item: '菓子', qty: 2, price: 540, rate: 8, amount: 1080 },
     { date: d, item: '保守', qty: 1, price: 1000, rate: 10, amount: 1000 },
@@ -183,10 +186,10 @@ test('collectLines は対象月の明細だけを取り出す（月末の夜は�
 
 test('collectLines は対象月の不正な行を行番号つきのエラーにする（他の月の行は見ない）', () => {
   const rows = [
-    [new Date(2026, 8, 1), '株式会社サンプル商事', '', 'いち', 1000, '5%'], // 2
+    [jst(2026, 8, 1), '株式会社サンプル商事', '', 'いち', 1000, '5%'], // 2
     ['2026/13/01', '山田 太郎', '作業', 1, 1000, '10%'], // 3 日付が読めない
-    [new Date(2026, 7, 1), '', '', 'x', 'x', 'x'], // 4 先月なので見ない
-    [new Date(2026, 8, 30), '', '', '', '', ''], // 5 日付だけの行は空行扱い
+    [jst(2026, 7, 1), '', '', 'x', 'x', 'x'], // 4 先月なので見ない
+    [jst(2026, 8, 30), '', '', '', '', ''], // 5 日付だけの行は空行扱い
   ];
   const { lines, errors } = collectLines(rows, 2026, 9);
   assert.strictEqual(lines.length, 0);
@@ -212,10 +215,10 @@ test('toDate は Date と各種の文字の日付を読み、ありえない日�
 
 test('groupByClient は取引先シートの順に並べ、明細は日付順にする', () => {
   const lines = [
-    { rowNo: 5, client: '乙', date: new Date(2026, 8, 2) },
-    { rowNo: 2, client: '甲', date: new Date(2026, 8, 9) },
-    { rowNo: 3, client: '甲', date: new Date(2026, 8, 1) },
-    { rowNo: 4, client: '未登録', date: new Date(2026, 8, 1) },
+    { rowNo: 5, client: '乙', date: jst(2026, 8, 2) },
+    { rowNo: 2, client: '甲', date: jst(2026, 8, 9) },
+    { rowNo: 3, client: '甲', date: jst(2026, 8, 1) },
+    { rowNo: 4, client: '未登録', date: jst(2026, 8, 1) },
   ];
   const groups = groupByClient(lines, ['甲', '乙']);
   assert.deepStrictEqual(
@@ -308,8 +311,8 @@ test('支払期限は空欄なら翌月末（年またぎ・うるう年も）�
 });
 
 test('targetMonth は今月・先月を返す（1月の先月は前年12月）', () => {
-  assert.deepStrictEqual(targetMonth(new Date(2026, 9, 6), 0), { year: 2026, month: 10 });
-  assert.deepStrictEqual(targetMonth(new Date(2026, 9, 31), -1), { year: 2026, month: 9 });
+  assert.deepStrictEqual(targetMonth(jst(2026, 9, 6), 0), { year: 2026, month: 10 });
+  assert.deepStrictEqual(targetMonth(jst(2026, 9, 31), -1), { year: 2026, month: 9 });
   assert.deepStrictEqual(targetMonth(new Date(2027, 0, 15), -1), { year: 2026, month: 12 });
 });
 
@@ -435,7 +438,7 @@ test('planInvoices は送信済みの請求書に印をつけ、確認文から�
 });
 
 test('planInvoices は未登録の取引先・メールの誤り・重複をエラーにする', () => {
-  const rows = [...detailRows, [new Date(2026, 8, 10), '未登録株式会社', '作業', 1, 1000, '10%']]; // 11行目
+  const rows = [...detailRows, [jst(2026, 8, 10), '未登録株式会社', '作業', 1, 1000, '10%']]; // 11行目
   const clients = [...clientRows.slice(0, 1), ['山田 太郎', '様', 'taro@'], ['山田 太郎', '様', 'x@example.com']];
   const p = planInvoices({ settingsRows, clientRows: clients, detailRows: rows, historyRows: [], year: 2026, month: 9 });
   assert.deepStrictEqual(p.errors, [
@@ -446,7 +449,7 @@ test('planInvoices は未登録の取引先・メールの誤り・重複をエ�
 });
 
 test('選択した取引先だけ作るときは、他の取引先の入力ミスでは止めない', () => {
-  const rows = [...detailRows, [new Date(2026, 8, 10), '合同会社ミライ', '作業', 'x', 1000, '10%']];
+  const rows = [...detailRows, [jst(2026, 8, 10), '合同会社ミライ', '作業', 'x', 1000, '10%']];
   assert.strictEqual(planInvoices({ settingsRows, clientRows, detailRows: rows, historyRows: [], year: 2026, month: 9 }).errors.length, 1);
 
   const p = planInvoices({
@@ -556,4 +559,14 @@ test('wasSentInGmail は請求書番号だけでなく宛先でも絞って、�
   // 同じ番号でも、別の取引先（別のスプレッドシートの請求書）あての送信は数えない
   assert.strictEqual(wasSentInGmail('INV-202609-001', 'b@example.com'), false);
   assert.deepStrictEqual(queries, ['in:sent to:a@example.com "INV-202609-001"', 'in:sent to:b@example.com "INV-202609-001"']);
+});
+
+test('日付セルは日本時間の日付として月を判定する（スクリプトのタイムゾーンが日本時間でなくても）', () => {
+  // 日本時間 2026-10-01 00:00 のセル。UTC では 9月30日 15:00
+  const tokyoMidnightOct1 = new Date(Date.UTC(2026, 8, 30, 15, 0, 0));
+  const d = toDate(tokyoMidnightOct1);
+  assert.strictEqual(isInMonth(d, 2026, 10), true);
+  assert.strictEqual(isInMonth(d, 2026, 9), false);
+  // 実行時刻も日本時間の「今日」で月を決める（UTC 9/30 20:00 = 日本時間 10/1 05:00）
+  assert.deepStrictEqual(targetMonth(new Date(Date.UTC(2026, 8, 30, 20, 0, 0)), 0), { year: 2026, month: 10 });
 });

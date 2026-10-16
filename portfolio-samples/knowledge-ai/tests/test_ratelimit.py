@@ -59,3 +59,12 @@ def test_tracking_cap_evicts_ips_whose_requests_have_expired(monkeypatch):
     clock.t += 61  # a, b, c are now older than the one-minute window
     assert rl.check("d").allowed  # 4 tracked > cap of 3: stale ones must be dropped
     assert set(rl._windows) == {"d"}
+
+
+def test_per_ip_daily_counts_are_not_kept_when_that_cap_is_disabled():
+    clock = Clock(at(2026, 10, 6, 12))
+    rl = RateLimiter(per_minute=5, per_ip_daily=0, daily_cap=1000, clock=clock)
+    for i in range(50):
+        assert rl.check(f"10.0.0.{i}").allowed
+    assert rl._ip_day == {}
+    assert rl.used_today == 50
