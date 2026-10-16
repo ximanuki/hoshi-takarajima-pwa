@@ -126,3 +126,23 @@ describe('timestamps', () => {
     expect(jstDate(Date.UTC(2026, 9, 16, 16, 0))).toBe('2026-10-17');
   });
 });
+
+describe('parseDateLoose: dates with a time part or an era mark with 年月日', () => {
+  it.each([
+    ['2026/10/01 0:00:00', '2026-10-01'],
+    ['2025/4/1 9:00', '2025-04-01'],
+    ['2025-04-01T00:00:00+09:00', '2025-04-01'],
+    ['2025-04-01 00:00:00.000', '2025-04-01'],
+    ['R7年4月1日', '2025-04-01'],
+    ['令和7年4月1日(火)', '2025-04-01'],
+    ['h31年4月30日', '2019-04-30'],
+  ] as const)('%s -> %s', (raw, iso) => {
+    expect(parseDateLoose(raw)).toBe(iso);
+  });
+
+  it('does not take the day for a time', () => {
+    expect(parseDateLoose('2026/10/010:00:00')).toBeNull();
+    expect(parseDateLoose('R0/04/01')).toBeNull();
+    expect(parseDateLoose('R00年4月1日')).toBeNull();
+  });
+});

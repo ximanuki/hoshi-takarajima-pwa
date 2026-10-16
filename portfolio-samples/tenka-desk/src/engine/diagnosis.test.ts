@@ -85,10 +85,36 @@ describe('diagnoseLine: leaks', () => {
     const under = check({ cust: '000001', rawSku: 'DB-1001', date: D, unitPrice: 530 });
     expect(under.leak).toBe('rate_out_of_tier');
     expect(under.tier).toMatchObject({ minPrice: 539, maxPrice: 577 });
+    // above the range: billed too much, which is not a profit leak
     const over = check({ cust: '000001', rawSku: 'DB-1001', date: D, unitPrice: 600, qty: 2 });
-    expect(over.leak).toBe('rate_out_of_tier');
+    expect(over.leak).toBeNull();
+    expect(over.status).toBe('overcharge');
+    expect(over.flags).toContain('rate_out_of_tier');
     expect(over.shortfallYen).toBe(-92);
     expect(explainLine(over).join('')).toContain('上回っています');
+    expect(explainLine(over).join('')).toContain('利益漏れではない');
+  });
+
+  it('a bill at the old, higher 定価 after a 定価 cut is an overcharge, not a 反映漏れ', () => {
+    const base = fixtureInput();
+    const cut = new Dataset({
+      ...base,
+      listPriceHistory: [
+        { sku: 'DB-1001', price: 800, start: '2024-04-01', end: '2025-03-31' },
+        { sku: 'DB-1001', price: 770, start: REVISION, end: null },
+      ],
+    });
+    // 800 × 72% = 576 (old) vs 770 × 72% = 554 (new)
+    const lines = [line({ cust: '000001', rawSku: 'DB-1001', date: D, unitPrice: 576, qty: 10 })];
+    const r = diagnose(cut, lines);
+    const d = r.lines[0];
+    expect(d?.status).toBe('overcharge');
+    expect(d?.leak).toBeNull();
+    expect(d?.oldPrice).toBeNull();
+    expect(r.findings).toHaveLength(0);
+    expect(r.summary.every((s) => s.pairs === 0 && s.lines === 0)).toBe(true);
+    expect(r.customers).toHaveLength(0);
+    expect(r.overcharges).toMatchObject({ lines: 1, pairs: 1, customers: 1, amountYen: 220 });
   });
 
   it('粗利下限割れ on a correctly billed line', () => {
@@ -107,11 +133,30 @@ describe('diagnoseLine: leaks', () => {
   });
 
   it('価格差（原因不明）: differs for no known reason', () => {
-    const d = check({ cust: '000001', rawSku: 'DB-1001', date: D, unitPrice: 560 });
+    // inside the rank range (539〜577) but below the expected 554
+    const d = check({ cust: '000001', rawSku: 'DB-1001', date: D, unitPrice: 545 });
     expect(d.status).toBe('price_mismatch');
     expect(d.mismatch).toBe(true);
-    expect(d.shortfallYen).toBe(-60);
+    expect(d.shortfallYen).toBe(90);
     expect(explainLine(d).join('')).toContain('どれにも当てはまりません');
+    // above the expected price: shown for checking, never as a shortfall
+    const over = check({ cust: '000001', rawSku: 'DB-1001', date: D, unitPrice: 560 });
+    expect(over.status).toBe('overcharge');
+    expect(over.shortfallYen).toBe(-60);
+  });
+
+  it('reads a stated discount only next to the discount word, with the set rounding', () => {
+    expect(
+      check({ cust: '000001', rawSku: 'DB-1001', date: D, unitPrice: 537, remark: '送料5%引き当て' }).status,
+    ).toBe('leak');
+    expect(
+      check({ cust: '000001', rawSku: 'DB-1001', date: D, unitPrice: 526, remark: '値引なし(5%は来期)' })
+        .status,
+    ).toBe('leak');
+    // 554 × 0.97 = 537.38: only the 切り捨て result 537 matches, not 538
+    expect(
+      check({ cust: '000001', rawSku: 'DB-1001', date: D, unitPrice: 538, remark: '数量値引3%' }).status,
+    ).not.toBe('ok_volume_discount');
   });
 });
 

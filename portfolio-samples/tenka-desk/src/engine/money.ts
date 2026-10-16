@@ -46,10 +46,19 @@ export function priceAtRate(listYen: number, ratePm: number, mode: Rounding = 'f
   return divide(listYen * ratePm, 1000, mode);
 }
 
-/** Percentage as basis points: 5.18 -> 518. Rounds to the nearest 0.01%. */
+/**
+ * Percentage as basis points: 5.18 -> 518. Rounds to the nearest 0.01%, half away
+ * from zero, on the decimal digits the user typed (1.005 -> 101, 0.145 -> 15), not
+ * on the binary float (where 1.005 × 100 = 100.4999…).
+ */
 export function pctToBp(pct: number): number {
   if (!Number.isFinite(pct)) throw new RangeError(`not a percentage: ${pct}`);
-  return Math.round(pct * 100);
+  const m = /^(-?)(\d+)(?:\.(\d+))?$/.exec(String(pct));
+  if (!m) return Math.round(pct * 100); // exponent notation: tiny or huge values
+  const [, sign = '', whole = '', frac = ''] = m;
+  let bp = Number(whole) * 100 + Number(frac.padEnd(2, '0').slice(0, 2));
+  if ((frac[2] ?? '0') >= '5') bp += 1;
+  return sign && bp !== 0 ? -bp : bp;
 }
 
 /** (a − b) / b in basis points, rounded half away from zero. b must be > 0. */

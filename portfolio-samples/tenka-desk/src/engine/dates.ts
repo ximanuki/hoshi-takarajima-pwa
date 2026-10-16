@@ -57,13 +57,22 @@ function ymdOrNull(y: number, m: number, d: number): IsoDate | null {
  * a real calendar date. Accepts:
  *  - 和暦 "R07/04/01", "R7.4.1", "H31-04-30", "令和7年4月1日", "令和元年5月1日", "令7.4.1"
  *  - 西暦 "20250401", "2025/4/1", "2025-04-01", "2025.4.1", "2025年4月1日"
+ *  - with a time part, as Excel and some systems write it: "2026/10/01 0:00:00",
+ *    "2025/4/1 9:00", "2025-04-01T00:00:00+09:00" (the time is ignored)
+ *  - with a weekday: "令和7年4月1日(火)"
  */
 export function parseDateLoose(raw: string): IsoDate | null {
-  const s = raw.normalize('NFKC').replace(/\s/g, '');
+  const s = raw
+    .normalize('NFKC')
+    .trim()
+    .replace(/(?:T|\s+)\d{1,2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?$/, '')
+    .replace(/\s/g, '')
+    .replace(/\([月火水木金土日]\)$/, '');
   if (s === '') return null;
   let m =
     /^(令和|平成|昭和|大正|明治|[RHSTMrhstm令平昭大明])\.?(元|\d{1,2})[./-](\d{1,2})[./-](\d{1,2})$/.exec(s);
-  if (!m) m = /^(令和|平成|昭和|大正|明治|[令平昭大明])(元|\d{1,2})年(\d{1,2})月(\d{1,2})日$/.exec(s);
+  if (!m)
+    m = /^(令和|平成|昭和|大正|明治|[RHSTMrhstm令平昭大明])(元|\d{1,2})年(\d{1,2})月(\d{1,2})日$/.exec(s);
   if (m) {
     const era = ERA_BY_NAME.get((m[1] ?? '').toUpperCase());
     if (!era) return null;

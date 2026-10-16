@@ -87,6 +87,24 @@ function buildSjisTable(): Map<string, number> {
   return table;
 }
 
+/**
+ * Characters that CP932 (Windows, Excel) writes with a code the WHATWG decoder
+ * table does not give back, or that macOS and Japanese input methods type in
+ * place of the CP932 character. Without these, ordinary names such as
+ * "紙コップ 10〜20個入" (WAVE DASH) or "幅12−18mm" (MINUS SIGN) could not be saved.
+ */
+const SJIS_EXTRA: ReadonlyMap<number, number> = new Map([
+  [0x2212, 0x817c], // − MINUS SIGN -> － (the WHATWG encoder maps it the same way)
+  [0x301c, 0x8160], // 〜 WAVE DASH -> ～
+  [0x2016, 0x8161], // ‖ DOUBLE VERTICAL LINE -> ∥
+  [0x2014, 0x815c], // — EM DASH -> ―
+  [0x00a2, 0x8191], // ¢ -> ￠
+  [0x00a3, 0x8192], // £ -> ￡
+  [0x00ac, 0x81ca], // ¬ -> ￢
+  // ¥ as 全角 ￥: 0x5C would come back as a backslash when the file is read again
+  [0x00a5, 0x818f],
+]);
+
 export class UnmappableCharacterError extends Error {
   readonly characters: string[];
   constructor(characters: string[]) {
@@ -111,8 +129,9 @@ export function encodeShiftJis(text: string, onUnmappable: 'error' | 'replace' =
       out.push(c);
     } else if (c >= 0xff61 && c <= 0xff9f) {
       out.push(c - 0xff61 + 0xa1); // 半角カナ
-    } else if (c === 0xa5) {
-      out.push(0x5c); // ¥
+    } else if (SJIS_EXTRA.has(c)) {
+      const code = SJIS_EXTRA.get(c) ?? 0x3f;
+      out.push(code >> 8, code & 0xff);
     } else if (c === 0x203e) {
       out.push(0x7e); // ‾
     } else {

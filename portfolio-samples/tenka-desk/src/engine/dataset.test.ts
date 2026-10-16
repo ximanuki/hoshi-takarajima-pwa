@@ -107,10 +107,54 @@ describe('expected price, 特値 and cost', () => {
     expect(gap.listPriceAt('DB-1001', '2025-02-15')).toBeNull(); // in the gap, not the expired 710
     expect(gap.applicableList('000001', 'DB-1001', '2025-02-15')).toBeNull();
     expect(gap.listPriceAt('DB-1001', '2025-04-01')).toBe(770);
-    // before the first cost row and after its end: the product master's 原単価, not the history row
-    expect(gap.costAt('DB-1001', '2024-05-01')).toBe(31141);
+    // before the first cost row and after its end: no cost (not today's master cost, not the history row)
+    expect(gap.costAt('DB-1001', '2024-05-01')).toBeNull();
     expect(gap.costAt('DB-1001', '2024-08-01')).toBe(29323);
-    expect(gap.costAt('DB-1001', '2025-03-01')).toBe(31141);
+    expect(gap.costAt('DB-1001', '2025-03-01')).toBeNull();
+    // a product without any cost history uses the product master
+    expect(gap.costAt('DB-1002', '2020-01-01')).toBe(20000);
+  });
+
+  it('flags an open-ended history row followed by a later one', () => {
+    const open = fixtureDataset({
+      listPriceHistory: [
+        { sku: 'DB-1001', price: 710, start: '2024-04-01', end: null },
+        { sku: 'DB-1001', price: 770, start: REVISION, end: null },
+      ],
+    });
+    expect(open.issues.some((i) => i.kind === 'overlapping_period' && i.ref === 'DB-1001')).toBe(true);
+  });
+
+  it('never treats a 定価 cut as a missed increase', () => {
+    const cut = fixtureDataset({
+      listPriceHistory: [
+        { sku: 'DB-1001', price: 800, start: '2024-04-01', end: '2025-03-31' },
+        { sku: 'DB-1001', price: 770, start: REVISION, end: null },
+      ],
+    });
+    expect(cut.applicableList('000001', 'DB-1001', '2025-05-10')?.previousPrice).toBeNull();
+    expect(fixtureDataset().applicableList('000001', 'DB-1001', '2025-05-10')?.previousPrice).toBe(710);
+  });
+
+  it('reports 合意状況 that had to be interpreted, and reads negations as not agreed', () => {
+    const neg = fixtureDataset({
+      revisions: [
+        {
+          date: REVISION,
+          label: '令和7年4月1日 定価改定',
+          agreements: [
+            agreement('000001', '合意に至らず', REVISION),
+            agreement('000002', '対象外（改定後に取引開始）', null),
+          ],
+        },
+      ],
+    });
+    const a = neg.applicableList('000001', 'DB-1001', '2025-05-10');
+    expect(a?.basis).toBe('kept_declined');
+    expect(a?.price).toBe(710);
+    const notes = neg.issues.filter((i) => i.kind === 'interpreted_agreement_status');
+    expect(notes.map((i) => i.ref)).toEqual(['000001']);
+    expect(notes[0]?.message).toContain('「見送り」として扱いました');
   });
 
   it('merges agreement files that share a revision date (e.g. one per branch)', () => {

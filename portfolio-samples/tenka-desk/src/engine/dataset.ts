@@ -8,6 +8,7 @@
  */
 
 import type { IsoDate } from './dates.ts';
+import { AGREEMENT_KIND_JA, isPlainAgreementStatus } from './importers.ts';
 import { priceAtRate } from './money.ts';
 import { codeKey } from './text.ts';
 import {
@@ -53,6 +54,7 @@ export type DatasetIssueKind =
   | 'unknown_customer'
   | 'overlapping_period'
   | 'unknown_agreement_status'
+  | 'interpreted_agreement_status'
   | 'conflicting_agreement'
   | 'cost_share_missing';
 
@@ -84,8 +86,9 @@ export interface ApplicableList {
   revision: Revision | null;
   agreement: RevisionAgreement | null;
   /**
-   * The customer's previous 定価, when they should already have moved to `price`.
-   * A bill at this old 定価 × 掛率 is a 反映漏れ.
+   * The customer's previous, lower 定価, when they should already have moved up to
+   * `price`. A bill at this old 定価 × 掛率 is a 反映漏れ. Null after a 定価 cut:
+   * billing the old, higher price is an overcharge, not a profit leak.
    */
   previousPrice: number | null;
   /** start date of the 定価 the customer should be on (for explanations) */
@@ -229,6 +232,12 @@ export class Dataset {
             `合意状況「${ag.status}」を判別できないため、改定を適用したものとして扱います`,
             ag.cust,
           );
+        } else if (!isPlainAgreementStatus(ag.status)) {
+          this.issue(
+            'interpreted_agreement_status',
+            `合意状況「${ag.status}」を「${AGREEMENT_KIND_JA[ag.kind]}」として扱いました（得意先 ${ag.cust}）。違う場合はファイルの表記を「合意」「一部合意」「協議中」「見送り」などに直してください`,
+            ag.cust,
+          );
         }
       }
     }
@@ -266,7 +275,7 @@ export class Dataset {
       for (let i = 1; i < sorted.length; i++) {
         const prev = sorted[i - 1];
         const cur = sorted[i];
-        if (prev && cur && prev.end !== null && prev.end >= cur.start) {
+        if (prev && cur && (prev.end === null || prev.end >= cur.start)) {
           this.issue(
             'overlapping_period',
             `${label}の履歴の期間が重なっています: ${sku}（${cur.start}〜）`,
@@ -383,7 +392,7 @@ export class Dataset {
       basis: 'current',
       revision: rev?.revision ?? null,
       agreement: ag,
-      previousPrice: before.price !== row.price ? before.price : null,
+      previousPrice: before.price < row.price ? before.price : null,
       since,
     };
   }
@@ -403,14 +412,17 @@ export class Dataset {
   }
 
   /**
-   * 原単価 (銭) on a day: the cost-history row covering the day (start <= day <= end),
-   * else the product master's. A day before the first row, after an ended row or in a
-   * gap never borrows another period's cost.
+   * 原単価 (銭) on a day: the cost-history row covering the day (start <= day <= end).
+   * A product without any cost history uses the product master's cost. A product with
+   * history has no cost on a day before the first row, after an ended row or in a gap
+   * (null): it never borrows another period's cost, like listPriceAt.
    */
   costAt(sku: string, date: IsoDate): number | null {
+    const rows = this.costHistory.get(sku);
+    if (!rows || rows.length === 0) return this.products.get(sku)?.costSen ?? null;
     let found: CostRow | null = null;
-    for (const r of this.costHistory.get(sku) ?? []) if (covers(r, date)) found = r;
-    return found?.costSen ?? this.products.get(sku)?.costSen ?? null;
+    for (const r of rows) if (covers(r, date)) found = r;
+    return found?.costSen ?? null;
   }
 
   /** The unit price the customer should pay: a valid 特値, else 定価 × 掛率. */

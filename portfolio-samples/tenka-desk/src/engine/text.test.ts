@@ -141,3 +141,42 @@ describe('remarks', () => {
     expect(isSampleRemark('至急')).toBe(false);
   });
 });
+
+describe('values from Excel and sales systems', () => {
+  it.each([
+    ['10.00', 10],
+    ['¥700', 700],
+    ['￥700', 700],
+    ['¥1,234', 1234],
+    ['\\700', 700],
+    ['1234-', -1234],
+    ['1,234△', -1234],
+    ['-¥40', -40],
+  ] as const)('parseIntLoose(%s) = %d', (raw, v) => {
+    expect(parseIntLoose(raw)).toBe(v);
+  });
+
+  it('still refuses real decimals and stray signs', () => {
+    for (const raw of ['10.5', '1-2', '-', '--5', '-5-', '1e3', '0x4B0']) expect(parseIntLoose(raw), raw).toBeNull();
+    expect(parseScaled('¥1,234.50', 100)).toBe(123450);
+    expect(parseScaled('12.5-', 100)).toBe(-1250);
+    expect(parseScaled('-12.5-', 100)).toBeNull();
+  });
+});
+
+describe('parseRemarkDiscount: only a rate next to the discount word', () => {
+  it.each([
+    ['数量値引3%', 300],
+    ['数量値引き 3%', 300],
+    ['まとめ買い5%引', 500],
+    ['大口数量割引（５％）', 500],
+    ['1割引', 1000],
+    ['5%OFF', 500],
+    ['値引なし(5%は来期)', null],
+    ['送料5%引き当て', null],
+    ['値引対象外 5%', null],
+    ['5%は値引できません', null],
+  ] as const)('%s -> %s', (remark, bp) => {
+    expect(parseRemarkDiscount(remark)).toBe(bp);
+  });
+});

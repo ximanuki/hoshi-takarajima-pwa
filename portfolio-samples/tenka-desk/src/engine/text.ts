@@ -50,9 +50,14 @@ export function toFullWidth(s: string): string {
   return out;
 }
 
-/** "1,234" / "１，２３４" / "△1,234" / "▲12" / "-12" / "(12)" -> integer. Returns null on anything else. */
+/**
+ * Integer as sales systems and Excel print it: "1,234" / "１，２３４" / "¥1,234" /
+ * "￥700" / "1,234円" / "△1,234" / "▲12" / "-12" / "(12)" / "1234-" (trailing minus) /
+ * "10.00" (zero decimals). Returns null on anything else, e.g. "10.5".
+ * (A yen sign read from a Shift_JIS file can arrive as a backslash; it is dropped too.)
+ */
 export function parseIntLoose(raw: string): number | null {
-  let s = raw.normalize('NFKC').replace(/[,\s円]/g, '');
+  let s = raw.normalize('NFKC').replace(/[,\s円¥\\]/g, '');
   let neg = false;
   if (/^[△▲-]/.test(s)) {
     neg = true;
@@ -60,7 +65,11 @@ export function parseIntLoose(raw: string): number | null {
   } else if (/^\(.*\)$/.test(s)) {
     neg = true;
     s = s.slice(1, -1);
+  } else if (/[△▲-]$/.test(s)) {
+    neg = true;
+    s = s.slice(0, -1);
   }
+  if (/^\d+\.0*$/.test(s)) s = s.slice(0, s.indexOf('.'));
   if (!/^\d+$/.test(s)) return null;
   const v = Number(s);
   if (!Number.isSafeInteger(v)) return null;
@@ -73,10 +82,12 @@ export function parseIntLoose(raw: string): number | null {
  * More decimals than the scale allows are rejected rather than silently rounded.
  */
 export function parseScaled(raw: string, scale: 1 | 10 | 100 | 1000 | 10000): number | null {
-  const s = raw.normalize('NFKC').replace(/[,\s円%％]/g, '');
-  const m = /^([△▲-]?)(\d*)(?:\.(\d*))?$/.exec(s);
+  const s = raw.normalize('NFKC').replace(/[,\s円%％¥\\]/g, '');
+  const m = /^([△▲-]?)(\d*)(?:\.(\d*))?([△▲-]?)$/.exec(s);
   if (!m) return null;
-  const [, sign = '', intPart = '', frac = ''] = m;
+  const [, lead = '', intPart = '', frac = '', trail = ''] = m;
+  if (lead && trail) return null;
+  const sign = lead || trail;
   if (intPart === '' && frac === '') return null;
   const digits = String(scale).length - 1;
   if (frac.replace(/0+$/, '').length > digits) return null;
@@ -155,18 +166,22 @@ export function formatYen(yen: number): string {
 
 /**
  * Volume discount written in a remark, e.g. "数量値引3%", "数量値引き 3%",
- * "まとめ買い5%引", "大口数量割引(5%)", "1割引". Returns the discount in basis
+ * "まとめ買い5%引", "大口数量割引(5%)", "1割引". The rate must stand next to the
+ * discount word, so "送料5%引き当て" is not a discount; a remark that says there is
+ * none ("値引なし(5%は来期)") is not one either. Returns the discount in basis
  * points, or null when the remark does not state one.
  */
 export function parseRemarkDiscount(remark: string): number | null {
-  const r = remark.normalize('NFKC');
-  if (!/(値引|割引|引き|%引|%OFF|%オフ)/i.test(r)) return null;
-  const pct = /(\d+(?:\.\d+)?)\s*(?:%|パーセント)/.exec(r);
+  const r = remark.normalize('NFKC').replace(/\s/g, '');
+  if (/(なし|無し|ナシ|不可|対象外)/.test(r)) return null;
+  const pct =
+    /(?:値引き?|割引き?)[(（:：]?(\d+(?:\.\d+)?)(?:%|パーセント)/.exec(r) ??
+    /(\d+(?:\.\d+)?)(?:%|パーセント)(?:の)?(?:値引|割引|引(?!き?当)|OFF|オフ)/i.exec(r);
   if (pct?.[1]) {
     const bp = parseScaled(pct[1], 100);
     return bp !== null && bp > 0 && bp < 10000 ? bp : null;
   }
-  const wari = /(\d+)\s*割\s*引/.exec(r);
+  const wari = /(\d+)割引/.exec(r);
   if (wari?.[1]) {
     const bp = Number(wari[1]) * 1000;
     return bp > 0 && bp < 10000 ? bp : null;

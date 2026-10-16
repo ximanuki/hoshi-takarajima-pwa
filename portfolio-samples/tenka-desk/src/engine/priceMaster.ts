@@ -28,8 +28,12 @@ export function outcomesFromAgreements(rows: readonly RevisionAgreement[]): Map<
   const out = new Map<string, NegotiationOutcome>();
   for (const r of rows) {
     const kind = classifyAgreement(r.status);
+    // 一部合意は据え置くカテゴリが分かるときだけ合意として扱う（空なら全品目を新単価にしてしまう）
     const agreed =
-      (kind === 'agreed' || kind === 'agreed_later_date' || kind === 'partial') && r.effective !== null;
+      (kind === 'agreed' ||
+        kind === 'agreed_later_date' ||
+        (kind === 'partial' && r.excludedCategories.length > 0)) &&
+      r.effective !== null;
     out.set(r.cust, {
       cust: r.cust,
       agreed,
@@ -144,7 +148,9 @@ export function exportPriceMaster(
     text = toCsv(HEADER_A, body, { bom: encoding === 'utf-8', eol: '\r\n', quoteAll: true });
   } else {
     const body = rows.map((r) => [
-      String(Number(r.cust)),
+      // B形式 has no zero padding: drop the zeros customerKey adds (up to 6 digits) as text,
+      // so a longer code such as 0001234 keeps its zeros and very long codes keep every digit
+      r.cust.length > 6 ? r.cust : r.cust.replace(/^0+(?=\d)/, ''),
       r.sku ?? r.rawSku,
       toCompactDate(r.effective),
       String(r.newPrice),

@@ -62,3 +62,19 @@ describe('encodeShiftJis', () => {
     expect(decodeBytes(encodeShiftJis('𠮷野家', 'replace'), 'shift_jis').text).toBe('?野家');
   });
 });
+
+describe('Shift_JIS: characters typed on macOS or by an input method', () => {
+  it('writes the CP932 code for MINUS SIGN, WAVE DASH, EM DASH, ‖, ¢, £, ¬ and ¥', () => {
+    expect(hex(encodeShiftJis('−〜—‖¢£¬'))).toBe('81 7c 81 60 81 5c 81 61 81 91 81 92 81 ca');
+    // ¥ as 全角 ￥, so reading the file back does not give a backslash
+    expect(hex(encodeShiftJis('¥'))).toBe('81 8f');
+  });
+
+  it('saves ordinary names that used to fail, and reads them back', () => {
+    const names = ['紙コップ 10〜20個入', '幅12−18mm', 'ラベル ¥100'];
+    for (const n of names) {
+      const back = decodeBytes(encodeShiftJis(n), 'shift_jis').text;
+      expect(back.normalize('NFKC')).toBe(n.normalize('NFKC').replace('〜', '~').replace('−', '-'));
+    }
+  });
+});

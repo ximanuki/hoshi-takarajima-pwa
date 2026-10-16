@@ -10,6 +10,11 @@
  *  3. 掛け率ランク外 — billed outside 定価 × the customer's rank range (下限〜上限)
  *  4. otherwise 価格差（原因不明） for a person to look at
  *
+ * A bill above the expected price is never a profit leak: it is counted as
+ * 基準より高い請求 (overcharge) for a person to check, and left out of the leak
+ * amounts and rollups (billing the old, higher 定価 after a 定価 cut, or above the
+ * rank's upper limit).
+ *
  * Independently, every line is checked against the 粗利率の下限 (粗利下限割れ).
  * A line can carry several flags; its primary type follows the order above, with
  * 粗利下限割れ last. Excluded from the check: returns, free samples (単価0 with a
@@ -57,6 +62,7 @@ export type LineStatus =
   | 'ok_volume_discount'
   | 'leak'
   | 'price_mismatch'
+  | 'overcharge'
   | 'excluded_return'
   | 'excluded_sample'
   | 'excluded_non_product'
@@ -70,6 +76,7 @@ export const LINE_STATUS_JA: Record<LineStatus, string> = {
   ok_volume_discount: '数量値引（備考あり）',
   leak: '利益漏れの可能性',
   price_mismatch: '価格差（原因不明・要確認）',
+  overcharge: '基準より高い請求（要確認・漏れには含めない）',
   excluded_return: '対象外：返品',
   excluded_sample: '対象外：見本品（無償）',
   excluded_non_product: '対象外：商品マスタにないコード（運賃など）',
@@ -109,6 +116,8 @@ export interface LineDiagnosis {
   discountBp: number | null;
   /** the bill differs from the expected price for no known reason (要確認) */
   mismatch: boolean;
+  /** billed above the expected price with no stated reason: not a leak, shown for checking */
+  overcharge: boolean;
   /** leak types this line could have shown (used to tell customer-wide problems) */
   eligible: LeakType[];
 }
@@ -183,6 +192,18 @@ export interface DiagnosisResult {
   statusCounts: Record<LineStatus, number>;
   /** sales amount (positive lines, in the window) to put the impact in proportion */
   salesInWindowYen: number;
+  /** bills above the expected price (not leaks; shown for checking) */
+  overcharges: OverchargeSummary;
+}
+
+export interface OverchargeSummary {
+  lines: number;
+  pairs: number;
+  customers: number;
+  /** Σ (billed − expected) × qty over all lines */
+  amountYen: number;
+  /** the same over the window (直近12か月) */
+  amountInWindowYen: number;
 }
 
 const PRIMARY_ORDER: readonly LeakType[] = LEAK_TYPES;
@@ -204,6 +225,7 @@ function emptyDiagnosis(line: SalesLine, status: LineStatus): LineDiagnosis {
     floorBp: 0,
     discountBp: null,
     mismatch: false,
+    overcharge: false,
     eligible: [],
   };
 }
@@ -262,6 +284,7 @@ export function diagnoseLine(ds: Dataset, line: SalesLine): LineDiagnosis {
     floorBp,
     discountBp,
     mismatch: false,
+    overcharge: false,
     eligible,
   };
 
@@ -270,8 +293,8 @@ export function diagnoseLine(ds: Dataset, line: SalesLine): LineDiagnosis {
     explained =
       expected.kind === 'special' ? 'ok_special' : list.basis === 'current' ? 'ok' : 'ok_kept_price';
   } else if (discountBp !== null) {
-    const num = expected.price * (10000 - discountBp);
-    if ((['floor', 'round', 'ceil'] as const).some((m) => divide(num, 10000, m) === billed))
+    // the discounted price is rounded like every unit price (設定の単価の端数処理, default 切り捨て)
+    if (divide(expected.price * (10000 - discountBp), 10000, rounding) === billed)
       explained = 'ok_volume_discount';
   }
 
@@ -285,11 +308,14 @@ export function diagnoseLine(ds: Dataset, line: SalesLine): LineDiagnosis {
     if (tier && (billed < tier.minPrice || billed > tier.maxPrice)) d.flags.push('rate_out_of_tier');
   }
   if (below) d.flags.push('below_margin_floor');
+  d.overcharge = explained === null && billed > expected.price;
   d.mismatch = explained === null && d.flags.every((f) => f === 'below_margin_floor');
 
-  const primary = PRIMARY_ORDER.find((t) => d.flags.includes(t)) ?? null;
+  // billing above the expected price is not a leak: only the margin floor can still count
+  const leakFlags = d.overcharge ? d.flags.filter((f) => f === 'below_margin_floor') : d.flags;
+  const primary = PRIMARY_ORDER.find((t) => leakFlags.includes(t)) ?? null;
   if (primary === null) {
-    d.status = explained ?? 'price_mismatch';
+    d.status = explained ?? (d.overcharge ? 'overcharge' : 'price_mismatch');
     d.shortfallYen = explained === null ? (expected.price - billed) * line.qty : 0;
   } else {
     d.status = 'leak';
@@ -356,7 +382,11 @@ export function explainLine(d: LineDiagnosis): string[] {
       );
     }
   }
-  if (d.mismatch) {
+  if (d.overcharge) {
+    out.push(
+      `請求単価 ${formatYen(billed)} は基準単価 ${formatYen(e.price)} より高くなっています。定価の値下げが反映されていない、または取り決めと違う単価の可能性があります。利益漏れではないため影響額には含めませんが、過大な請求になっていないか確認してください。`,
+    );
+  } else if (d.mismatch) {
     out.push(
       `請求単価 ${formatYen(billed)} が基準単価 ${formatYen(e.price)} と一致しませんが、旧定価・期限切れの特値・掛率ランク外のどれにも当てはまりません。`,
     );
@@ -517,7 +547,24 @@ export function diagnose(
   });
 
   const customers = rollupCustomers(ds, findings, eligibleDates);
-  return { window: period, lines: results, findings, summary, customers, statusCounts, salesInWindowYen };
+  const over = results.filter((d) => d.status === 'overcharge');
+  const overcharges: OverchargeSummary = {
+    lines: over.length,
+    pairs: new Set(over.map((d) => pairKey(d.line.cust, d.line.sku ?? ''))).size,
+    customers: new Set(over.map((d) => d.line.cust)).size,
+    amountYen: over.reduce((s, d) => s - d.shortfallYen, 0),
+    amountInWindowYen: over.filter((d) => inWindow(d.line.date)).reduce((s, d) => s - d.shortfallYen, 0),
+  };
+  return {
+    window: period,
+    lines: results,
+    findings,
+    summary,
+    customers,
+    statusCounts,
+    salesInWindowYen,
+    overcharges,
+  };
 }
 
 /** Minimum items and share for "most of this customer's items": likely a customer-level cause. */

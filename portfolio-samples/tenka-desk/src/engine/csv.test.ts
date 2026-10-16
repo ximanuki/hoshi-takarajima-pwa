@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BOM, parseCsv, readTable, sniffDelimiter, toCsv } from './csv.ts';
+import { BOM, parseCsv, parseCsvLines, readTable, sniffDelimiter, toCsv } from './csv.ts';
 
 describe('parseCsv', () => {
   it('handles quotes, commas, doubled quotes and line breaks in fields', () => {
@@ -57,5 +57,30 @@ describe('toCsv', () => {
 
   it('refuses rows of the wrong width', () => {
     expect(() => toCsv(['a'], [['1', '2']], { bom: false, eol: '\n', quoteAll: false })).toThrow(RangeError);
+  });
+});
+
+describe('parseCsvLines: physical lines and unclosed quotes', () => {
+  it('gives the line each row starts on, counting blank lines and line breaks in quotes', () => {
+    const p = parseCsvLines('a,b\n\n\n1,2\n"x\ny",3\n4,5\n');
+    expect(p.lines).toEqual([1, 2, 3, 4, 5, 7]);
+  });
+
+  it('reads an unclosed quote as a character and says where it was', () => {
+    const text = `a,b\n"x,1\n${'1,2\n'.repeat(1000)}`;
+    const t = readTable(text);
+    expect(t.rows).toHaveLength(1001);
+    expect(t.rows[0]).toEqual(['"x', '1']);
+    expect(t.warnings).toEqual([{ line: 2, message: '2行目の「"」が閉じられていないため、ふつうの文字として読みました' }]);
+    expect(t.rowLines.slice(0, 3)).toEqual([2, 3, 4]);
+  });
+
+  it('drops rows whose cells are all blank (Excel leaves ",,,," rows)', () => {
+    const t = readTable('a,b\n1,2\n,\n , \n3,4\n,,\n');
+    expect(t.rows).toEqual([
+      ['1', '2'],
+      ['3', '4'],
+    ]);
+    expect(t.rowLines).toEqual([2, 5]);
   });
 });

@@ -124,12 +124,7 @@ export function checkFollowup(
       continue;
     }
     const disc = parseRemarkDiscount(line.remark);
-    if (
-      disc !== null &&
-      (['floor', 'round', 'ceil'] as const).some(
-        (mode) => divide(expected * (10000 - disc), 10000, mode) === billed,
-      )
-    ) {
+    if (disc !== null && divide(expected * (10000 - disc), 10000, ds.settings.unitRounding) === billed) {
       push({
         ...withMaster,
         status: 'ok_volume_discount',

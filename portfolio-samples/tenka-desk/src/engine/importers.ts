@@ -29,7 +29,7 @@ import type {
 } from './types.ts';
 
 export interface ImportIssue {
-  /** 1-based row in the table (the header is row 1) */
+  /** 1-based physical line in the file (the line a row starts on; blank lines and line breaks inside quotes count) */
   row: number;
   field?: string;
   message: string;
@@ -151,8 +151,9 @@ function run<T>(table: CsvTable, mapping: ColumnMapping, convert: (r: RowReader)
   const reader = new RowReader(mapping);
   const records: T[] = [];
   const width = table.header.length;
+  for (const w of table.warnings) reader.issues.push({ row: w.line, field: '*', message: w.message });
   table.rows.forEach((cells, i) => {
-    reader.start(cells, i + 2);
+    reader.start(cells, table.rowLines[i] ?? i + 2);
     if (cells.length !== width) {
       reader.fail('*', `列の数が見出しと違います（${cells.length}列／見出し${width}列）`);
       return;
@@ -367,12 +368,13 @@ export function importListPriceHistory(
   _spec: LayoutSpec,
   mapping: ColumnMapping,
 ): ImportResult<ListPriceRow> {
-  return run(table, mapping, (r) => ({
-    sku: r.text('sku'),
-    price: r.int('price'),
-    start: r.date('start'),
-    end: r.dateOrNull('end'),
-  }));
+  return run(table, mapping, (r) => {
+    const start = r.date('start');
+    const end = r.dateOrNull('end');
+    // 期間が逆さの行はどの日にも当たらないので、黙って使わずにエラーにする（特値と同じ）
+    if (r.ok && end !== null && end < start) r.fail('end', '終了日が開始日より前です', r.raw('end'));
+    return { sku: r.text('sku'), price: r.int('price'), start, end };
+  });
 }
 
 export function importCostHistory(
@@ -380,26 +382,97 @@ export function importCostHistory(
   _spec: LayoutSpec,
   mapping: ColumnMapping,
 ): ImportResult<CostRow> {
-  return run(table, mapping, (r) => ({
-    sku: r.text('sku'),
-    costSen: r.sen('cost'),
-    start: r.date('start'),
-    end: r.dateOrNull('end'),
-  }));
+  return run(table, mapping, (r) => {
+    const start = r.date('start');
+    const end = r.dateOrNull('end');
+    if (r.ok && end !== null && end < start) r.fail('end', '終了日が開始日より前です', r.raw('end'));
+    return { sku: r.text('sku'), costSen: r.sen('cost'), start, end };
+  });
 }
 
-/** Classify a free-text 合意状況 / 協議結果 into a fixed set of kinds. */
+const AGREE_WORD = '(?:合意|承諾|了承|受諾)';
+/** "不合意", "非合意": refused. */
+const AGREE_REFUSED = new RegExp(`(?:不|非)${AGREE_WORD}`);
+/** "合意に至らず", "合意できず", "承諾せず", "了承いただけず", "合意なし" …: no agreement. */
+const AGREE_NEGATED = new RegExp(
+  `${AGREE_WORD}(?:に|には)?(?:至ら|いたら|でき(?:ず|ない|なかった|ません)|せず|しない|しなかった|しません|な(?:し|い|かった)|無し|いただけ(?:ず|ない|なかった|ません)|頂け(?:ず|ない)|され(?:ず|ない|なかった)|不可|得られ(?:ず|ない))`,
+);
+/** "未合意", "合意予定", "合意見込み", "再協議": not (yet) agreed. */
+const AGREE_PENDING = new RegExp(`未${AGREE_WORD}|${AGREE_WORD}(?:の)?(?:予定|見込|見通し)|再協議|再交渉`);
+
+/**
+ * Status words read without interpretation. Anything else is classified from
+ * its wording and reported (see isPlainAgreementStatus), so a person can check
+ * how an unusual 合意状況 was read.
+ */
+const PLAIN_STATUS: Readonly<Record<string, AgreementKind>> = {
+  合意: 'agreed',
+  合意済: 'agreed',
+  合意済み: 'agreed',
+  承諾: 'agreed',
+  了承: 'agreed',
+  受諾: 'agreed',
+  '合意(適用日変更)': 'agreed_later_date',
+  一部合意: 'partial',
+  見送り: 'declined',
+  見送: 'declined',
+  不合意: 'declined',
+  辞退: 'declined',
+  協議中: 'negotiating',
+  交渉中: 'negotiating',
+  回答待ち: 'negotiating',
+  未回答: 'negotiating',
+  保留: 'negotiating',
+  検討中: 'negotiating',
+  対象外: 'not_applicable',
+};
+
+function statusKey(status: string): string {
+  return normalizeText(status).replace(/\s/g, '');
+}
+
+/**
+ * The status is one of the fixed words, possibly with a note in brackets that does
+ * not change how it is read ("対象外（改定後に取引開始）"): no free text had to be
+ * interpreted.
+ */
+export function isPlainAgreementStatus(status: string): boolean {
+  const k = statusKey(status);
+  if (k === '' || k in PLAIN_STATUS) return true;
+  const base = PLAIN_STATUS[k.replace(/\([^()]*\)$/, '')];
+  return base !== undefined && classifyAgreement(status) === base;
+}
+
+/**
+ * Classify a free-text 合意状況 / 協議結果 into a fixed set of kinds. Negations
+ * and future forms are read before the agreement words, so "合意に至らず",
+ * "未合意" or "合意予定" never count as agreed.
+ */
 export function classifyAgreement(status: string): AgreementKind {
-  const s = normalizeText(status);
+  const s = statusKey(status);
   if (s === '') return 'unknown';
+  const plain = PLAIN_STATUS[s];
+  if (plain) return plain;
   if (s.includes('対象外')) return 'not_applicable';
-  if (/(見送|拒否|不成立|不合意|辞退)/.test(s)) return 'declined';
-  if (s.includes('一部')) return 'partial';
+  if (AGREE_REFUSED.test(s) || AGREE_NEGATED.test(s)) return 'declined';
+  if (AGREE_PENDING.test(s)) return 'negotiating';
+  if (/(一部|部分)/.test(s)) return 'partial';
+  if (/(見送|拒否|不成立|辞退|断り)/.test(s)) return 'declined';
   if (/(協議中|交渉中|回答待|未回答|保留|検討中)/.test(s)) return 'negotiating';
-  if (/(合意|承諾|了承|受諾)/.test(s))
+  if (new RegExp(AGREE_WORD).test(s))
     return /(適用日変更|時期変更|延期|後ろ倒し)/.test(s) ? 'agreed_later_date' : 'agreed';
   return 'unknown';
 }
+
+export const AGREEMENT_KIND_JA: Record<AgreementKind, string> = {
+  agreed: '合意',
+  agreed_later_date: '合意（適用日変更）',
+  partial: '一部合意',
+  declined: '見送り',
+  negotiating: '協議中（未合意）',
+  not_applicable: '対象外',
+  unknown: '判別できない',
+};
 
 export function importAgreements(
   table: CsvTable,
@@ -408,12 +481,23 @@ export function importAgreements(
 ): ImportResult<RevisionAgreement> {
   return run(table, mapping, (r) => {
     const status = r.text('status');
+    const kind = classifyAgreement(status);
+    const excludedCategories = splitList(r.text('excluded'));
+    // 一部合意なのに据え置くカテゴリがないと、どこまで合意したか分からない。全面合意として扱うと
+    // 合意していない品目まで新単価になるので、この行は使わない（協議記録の一部合意と同じ扱い）
+    if (r.ok && kind === 'partial' && excludedCategories.length === 0) {
+      r.fail(
+        'excluded',
+        '一部合意ですが対象外カテゴリが空です。据え置くカテゴリを書いてください',
+        r.raw('excluded'),
+      );
+    }
     return {
       cust: customerKey(r.raw('cust')),
       status,
-      kind: classifyAgreement(status),
+      kind,
       effective: r.dateOrNull('effective'),
-      excludedCategories: splitList(r.text('excluded')),
+      excludedCategories,
       requestedOn: r.has('requestedOn') ? r.dateOrNull('requestedOn') : null,
       answeredOn: r.has('answeredOn') ? r.dateOrNull('answeredOn') : null,
       note: r.text('note'),

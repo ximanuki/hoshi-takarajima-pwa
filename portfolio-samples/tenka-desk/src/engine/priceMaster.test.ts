@@ -191,6 +191,27 @@ describe('exportPriceMaster', () => {
     expect(d.text).toBe(f.text);
   });
 
+  it('keeps the zeros of a customer code longer than the padding in layout B', () => {
+    const long = { ...(rows[0] as (typeof rows)[number]), cust: '0001234' };
+    const f = exportPriceMaster(ds, [long], 'B');
+    expect(f.text.split('\n')[1]?.startsWith('0001234,')).toBe(true);
+    const imp = importFile(f.fileName, f.bytes);
+    if (imp.data.kind !== 'priceMaster') throw new Error('kind');
+    expect(imp.data.result.records[0]?.cust).toBe('0001234');
+    const huge = { ...long, cust: '12345678901234567890' };
+    expect(exportPriceMaster(ds, [huge], 'B').text).toContain('12345678901234567890,');
+  });
+
+  it('saves names with 〜 and − as Shift_JIS', () => {
+    const named = fixtureDataset({
+      products: [...ds.products.values()].map((p) =>
+        p.code === 'DB-1001' ? { ...p, name: '紙コップ 10〜20個入 幅12−18mm' } : p,
+      ),
+    });
+    const f = exportPriceMaster(named, rows, 'A', { encoding: 'shift_jis' });
+    expect(decodeBytes(f.bytes, 'shift_jis').text).toContain('１０～２０個入');
+  });
+
   it('round-trips through the importer in both layouts', () => {
     const all = buildPriceMaster(pairs, outcomes);
     for (const layout of ['A', 'B'] as const) {
@@ -241,5 +262,38 @@ describe('exportPriceMaster', () => {
     ]);
     expect(idx.get('1|X')?.map((r) => r.effective)).toEqual(['2026-12-01', '2027-04-01']);
     expect(idx.size).toBe(1);
+  });
+});
+
+describe('outcomesFromAgreements', () => {
+  it('never puts a customer who did not agree into the new price master', () => {
+    const rows = ['合意に至らず', '未合意', '合意予定', '承諾せず', '合意'].map((status, i) => ({
+      cust: `00000${i + 1}`,
+      status,
+      kind: 'unknown' as const,
+      effective: '2026-12-01',
+      excludedCategories: [],
+      requestedOn: null,
+      answeredOn: null,
+      note: '',
+    }));
+    const o = outcomesFromAgreements(rows);
+    expect([...o.values()].map((x) => x.agreed)).toEqual([false, false, false, false, true]);
+  });
+
+  it('does not treat a 一部合意 without 対象外カテゴリ as agreed (it would export every product)', () => {
+    const row = (cust: string, excluded: string[]) => ({
+      cust,
+      status: '一部合意',
+      kind: 'partial' as const,
+      effective: '2026-12-01',
+      excludedCategories: excluded,
+      requestedOn: null,
+      answeredOn: null,
+      note: '',
+    });
+    const o = outcomesFromAgreements([row('000001', ['KS']), row('000002', [])]);
+    expect(o.get('000001')?.agreed).toBe(true);
+    expect(o.get('000002')?.agreed).toBe(false);
   });
 });

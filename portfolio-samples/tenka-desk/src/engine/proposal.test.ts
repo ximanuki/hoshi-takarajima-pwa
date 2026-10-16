@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { diagnose } from './diagnosis.ts';
 import {
+  ATTENTION_RULES,
+  billedCapPrice,
   collectPairVolumes,
   defaultGuardrails,
   type Guardrails,
@@ -193,5 +195,25 @@ describe('proposePairs', () => {
       currentPrice: 554,
     });
     expect(out.find((p) => p.cust === '000003')).toMatchObject({ ongoingLeak: null, systemPrice: 446 });
+  });
+
+  it('flags an increase above the cap counted from the price the customer is invoiced now', () => {
+    const leaking = ds.resolveLines([
+      line({ cust: '000001', rawSku: 'DB-1001', date: '2026-08-01', unitPrice: 511, qty: 40 }),
+    ]);
+    const vol = collectPairVolumes(leaking, W);
+    const input = { ...base, ongoingLeaks: ongoingBillingLeaks(diagnose(ds, leaking)) };
+    const capped = { ...guard, maxIncreaseBp: 1000 };
+    const out = proposePairs(ds, vol, proposeListPrices(ds, vol, input, capped), input, capped);
+    const p = out.find((x) => x.cust === '000001');
+    // 604 is within +10% of the agreed 554, but +18.2% of the invoiced 511
+    expect(p).toMatchObject({ status: 'proposed', newPrice: 604, systemPrice: 511 });
+    const hit = p?.guardrails.find((g) => g.rule === 'billed_increase_over_cap');
+    expect(hit?.message).toContain('511円');
+    expect(hit?.message).toContain('+18.2%');
+    expect(ATTENTION_RULES.has('billed_increase_over_cap')).toBe(true);
+    expect(billedCapPrice(511, 554, 1000)).toBe(562);
+    expect(billedCapPrice(554, 554, 1000)).toBeNull();
+    expect(billedCapPrice(511, 554, null)).toBeNull();
   });
 });

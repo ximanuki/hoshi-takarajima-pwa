@@ -10,7 +10,10 @@
  *    then round to the Japanese price grid (10/50/100円, optional ending).
  * 2. Unit price per customer × product (proposePairs): new 定価 × the customer's
  *    掛率, so every customer stays inside their 掛率ランク. Guardrails:
- *    - 値上げ率の上限: no customer's increase goes above the cap
+ *    - 値上げ率の上限: no customer's increase goes above the cap (against the
+ *      correct current price); when a billing leak is still going on and the
+ *      customer is invoiced less, an increase above the cap from the invoiced
+ *      price is flagged (billed_increase_over_cap)
  *    - 粗利率の下限: a price below the floor is raised to it when the cap and the
  *      rank range allow, otherwise flagged for a person to decide
  *    - 掛率ランク: a resulting price outside the rank range is flagged
@@ -32,7 +35,7 @@ import {
 } from './money.ts';
 import { roundPrice } from './rounding.ts';
 import type { ScenarioResult } from './scenario.ts';
-import { isSampleRemark } from './text.ts';
+import { formatRatioPct, isSampleRemark } from './text.ts';
 import type { NewListPrice, PriceRoundingRule, SalesLine } from './types.ts';
 
 export type ProposalMethod = 'keep_margin_rate' | 'pass_through_amount' | 'fixed_list';
@@ -256,7 +259,32 @@ export type GuardrailRule =
   | 'max_increase_capped'
   | 'margin_floor_raised'
   | 'margin_floor_unmet'
-  | 'tier_conflict';
+  | 'tier_conflict'
+  | 'billed_increase_over_cap';
+
+/** Guardrail hits a person has to decide on (counted as 要確認). */
+export const ATTENTION_RULES: ReadonlySet<GuardrailRule> = new Set([
+  'margin_floor_unmet',
+  'tier_conflict',
+  'billed_increase_over_cap',
+]);
+
+/**
+ * The highest new price within the cap counted from the price the customer is
+ * invoiced now, when that is below the correct price (an ongoing billing leak);
+ * null when there is no cap or no such gap.
+ */
+export function billedCapPrice(systemPrice: number, currentPrice: number, maxIncreaseBp: number | null): number | null {
+  if (maxIncreaseBp === null || systemPrice <= 0 || systemPrice >= currentPrice) return null;
+  return divFloor(systemPrice * (10000 + maxIncreaseBp), 10000);
+}
+
+export function billedOverCapHit(systemPrice: number, newPrice: number): GuardrailHit {
+  return {
+    rule: 'billed_increase_over_cap',
+    message: `今の請求単価 ${systemPrice}円 から見ると +${formatRatioPct(newPrice - systemPrice, systemPrice)} で、値上げ率の上限を超えます。請求の誤りを先に直すか、個別に判断してください`,
+  };
+}
 
 export interface GuardrailHit {
   rule: GuardrailRule;
@@ -415,6 +443,8 @@ export function proposePairs(
         message: `新しい単価が掛率ランクの範囲（${tierMin}〜${tierMax}円）の外です`,
       });
     }
+    const billedCap = billedCapPrice(base.systemPrice, currentPrice, guard.maxIncreaseBp);
+    if (billedCap !== null && newPrice > billedCap) hits.push(billedOverCapHit(base.systemPrice, newPrice));
     const changeYen = newPrice - currentPrice;
     const cb = currentPrice > 0 ? changeBp(newPrice, currentPrice) : 0;
     if (changeYen <= 0) {

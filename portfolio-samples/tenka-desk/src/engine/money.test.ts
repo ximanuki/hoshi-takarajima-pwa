@@ -47,6 +47,13 @@ describe('prices and rates', () => {
   it('converts percentages to basis points without float drift', () => {
     expect(pctToBp(5.18)).toBe(518);
     expect(pctToBp(0.1 + 0.2)).toBe(30);
+    // rounded on the digits typed, not on the binary float (1.005 × 100 = 100.4999…)
+    expect(pctToBp(1.005)).toBe(101);
+    expect(pctToBp(0.145)).toBe(15);
+    expect(pctToBp(99.996)).toBe(10000);
+    expect(pctToBp(-1.005)).toBe(-101);
+    expect(pctToBp(20)).toBe(2000);
+    expect(pctToBp(1e-7)).toBe(0);
     expect(() => pctToBp(Number.NaN)).toThrow();
   });
 

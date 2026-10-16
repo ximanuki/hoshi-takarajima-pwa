@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { encodeShiftJis, encodeUtf8 } from './encoding.ts';
-import { classifyAgreement, importFile, LayoutNotRecognisedError } from './importers.ts';
+import {
+  classifyAgreement,
+  importFile,
+  isPlainAgreementStatus,
+  LayoutNotRecognisedError,
+} from './importers.ts';
 import { layoutById } from './layouts.ts';
 import type { SalesLine } from './types.ts';
 
@@ -195,6 +200,40 @@ describe('other files', () => {
     expect(p.data.result.issues[0]?.message).toContain('100%');
   });
 
+  it('rejects 定価 and 原単価 history rows whose period ends before it starts', () => {
+    const lp = importFile(
+      'lp.csv',
+      '商品コード,定価(円),適用開始日,適用終了日\nDB-1001,710,2024-04-01,2025-03-31\nDB-1001,770,2025-04-01,2025-03-01\n',
+    );
+    if (lp.data.kind !== 'listPriceHistory') throw new Error(`kind ${lp.data.kind}`);
+    expect(lp.data.result.records).toHaveLength(1);
+    expect(lp.data.result.issues).toHaveLength(1);
+    expect(lp.data.result.issues[0]?.message).toContain('終了日が開始日より前です');
+    const ch = importFile(
+      'ch.csv',
+      '商品コード,原単価(円),適用開始日,適用終了日\nDB-1001,293.23,2025-04-01,2024-03-31\nDB-1001,311.41,2025-04-01,\n',
+    );
+    if (ch.data.kind !== 'costHistory') throw new Error(`kind ${ch.data.kind}`);
+    expect(ch.data.result.records.map((r) => r.costSen)).toEqual([31141]);
+    expect(ch.data.result.issues[0]?.message).toContain('終了日が開始日より前です');
+  });
+
+  it('rejects a 一部合意 row that names no 対象外カテゴリ (it would read as a full agreement)', () => {
+    const imp = importFile(
+      'a.csv',
+      [
+        '得意先コード,得意先名,申入日,回答日,合意状況,適用日,対象外カテゴリ,備考',
+        '001001,甲,2025-01-30,2025-03-05,一部合意,2025-04-01,KS;TP,',
+        '001002,乙,2025-01-30,2025-03-05,一部合意,2025-04-01,,据え置き品目は別途',
+        '001003,丙,2025-01-30,2025-03-05,合意,2025-04-01,,',
+      ].join('\n'),
+    );
+    if (imp.data.kind !== 'agreements') throw new Error(`kind ${imp.data.kind}`);
+    expect(imp.data.result.records.map((r) => r.cust)).toEqual(['001001', '001003']);
+    expect(imp.data.result.issues).toHaveLength(1);
+    expect(imp.data.result.issues[0]?.message).toContain('対象外カテゴリが空');
+  });
+
   it('classifies agreement statuses', () => {
     expect(classifyAgreement('合意')).toBe('agreed');
     expect(classifyAgreement('合意(適用日変更)')).toBe('agreed_later_date');
@@ -205,6 +244,95 @@ describe('other files', () => {
     expect(classifyAgreement('')).toBe('unknown');
     expect(classifyAgreement('保留中')).toBe('negotiating');
     expect(classifyAgreement('なんとも')).toBe('unknown');
+  });
+
+  it.each([
+    ['未合意', 'negotiating'],
+    ['合意に至らず', 'declined'],
+    ['合意には至らなかった', 'declined'],
+    ['合意できず', 'declined'],
+    ['承諾せず', 'declined'],
+    ['了承いただけず', 'declined'],
+    ['合意なし', 'declined'],
+    ['非合意', 'declined'],
+    ['不合意', 'declined'],
+    ['合意予定', 'negotiating'],
+    ['合意見込み', 'negotiating'],
+    ['再協議', 'negotiating'],
+    ['部分合意', 'partial'],
+    ['一部合意（緩衝材は見送り）', 'partial'],
+    ['合意済み', 'agreed'],
+    ['ご了承いただけました', 'agreed'],
+    ['合意（5/1適用予定）', 'agreed'],
+    ['合意（適用日変更）', 'agreed_later_date'],
+  ] as const)('reads %s as %s', (status, kind) => {
+    expect(classifyAgreement(status)).toBe(kind);
+  });
+
+  it('tells fixed status words from wording that had to be interpreted', () => {
+    for (const s of [
+      '合意',
+      '一部合意',
+      '見送り',
+      '協議中',
+      '合意(適用日変更)',
+      '対象外（改定後に取引開始）',
+      '',
+    ])
+      expect(isPlainAgreementStatus(s), s).toBe(true);
+    for (const s of ['合意に至らず', '未合意', '合意予定', '部分合意', '合意（一部見送り）'])
+      expect(isPlainAgreementStatus(s), s).toBe(false);
+  });
+
+  it('reads Excel-style values instead of dropping the row', () => {
+    const text = [
+      '伝票日付,伝票No,明細No,得意先CD,品番,数量,売単価,売上金額',
+      '2026/10/01 0:00:00,7,1,1001,DB-1001,10.00,¥700,"¥7,000"',
+      'R7年4月1日,7,2,1001,DB-1001,2,￥700,1400-',
+      '2025/4/1 9:00,7,3,1001,DB-1001,1,700,700',
+    ].join('\n');
+    const imp = importFile('x.csv', text, { spec: layoutById('sales-B') });
+    if (imp.data.kind !== 'sales') throw new Error('kind');
+    expect(imp.data.result.issues).toEqual([]);
+    expect(imp.data.result.records.map((r) => [r.date, r.qty, r.unitPrice, r.amount])).toEqual([
+      ['2026-10-01', 10, 700, 7000],
+      ['2025-04-01', 2, 700, -1400],
+      ['2025-04-01', 1, 700, 700],
+    ]);
+  });
+
+  it('reports an unclosed quote instead of losing the rest of the file', () => {
+    const rows = Array.from({ length: 1000 }, (_, i) => `2025030${(i % 9) + 1},${i},1,1001,DB-1001,5,554`);
+    const text = [
+      '伝票日付,伝票No,明細No,得意先CD,品番,数量,売単価',
+      '20250301,9,1,1001,"DB-1001,5,554',
+      ...rows,
+    ].join('\n');
+    const imp = importFile('x.csv', text, { spec: layoutById('sales-B') });
+    if (imp.data.kind !== 'sales') throw new Error('kind');
+    // the broken line is read with the quote as a character; the 1,000 lines after it are all kept
+    expect(imp.data.result.records).toHaveLength(1001);
+    expect(imp.data.result.records[0]?.rawSku).toBe('"DB-1001');
+    expect(
+      imp.data.result.issues.some((i) => i.row === 2 && i.message.includes('「"」が閉じられていない')),
+    ).toBe(true);
+  });
+
+  it('numbers problems by the physical line in the file', () => {
+    const text = [
+      '伝票日付,伝票No,明細No,得意先CD,品番,数量,売単価,摘要',
+      '',
+      '20250301,1,1,1001,DB-1001,5,554,"2行に',
+      'わたる摘要"',
+      '20250301,1,2,1001,DB-1001,x,554,',
+      ',,,,,,,',
+    ].join('\n');
+    const imp = importFile('x.csv', text, { spec: layoutById('sales-B') });
+    if (imp.data.kind !== 'sales') throw new Error('kind');
+    expect(imp.data.result.records[0]?.sourceRow).toBe(3);
+    expect(imp.data.result.issues).toEqual([
+      { row: 5, field: 'qty', message: '整数として読めません', value: 'x' },
+    ]);
   });
 
   it('imports with an explicit layout and manual column names', () => {
