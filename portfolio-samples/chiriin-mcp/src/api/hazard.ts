@@ -88,9 +88,10 @@ function toClass(layer: HazardLayer, entry: LegendEntry): HazardClass {
 
 /**
  * Adjacent tiles keyed by `"dx,dy"` (each -1, 0 or 1). `null` is a tile the portal returned 404 for
- * (no coloured pixel); a missing key is a tile that was not needed or could not be loaded.
+ * (no coloured pixel), `'failed'` a tile that was needed but could not be loaded, and a missing key a
+ * tile that was not needed.
  */
-export type NeighbourTiles = ReadonlyMap<string, DecodedImage | null>;
+export type NeighbourTiles = ReadonlyMap<string, DecodedImage | null | 'failed'>;
 
 /** Most frequent legend entry among the pixels in a square of the given radius (excluding the centre).
  * Pixels past the tile edge are read from the adjacent tile when it is available. */
@@ -102,8 +103,11 @@ function neighbourhood(
   neighbours?: NeighbourTiles,
 ): { entry: LegendEntry; distancePx: number } | undefined {
   const size = image?.width ?? TILE_SIZE;
-  const tileAt = (ox: number, oy: number): DecodedImage | null | undefined =>
-    ox === 0 && oy === 0 ? image : neighbours?.get(`${ox},${oy}`);
+  const tileAt = (ox: number, oy: number): DecodedImage | null | undefined => {
+    if (ox === 0 && oy === 0) return image;
+    const t = neighbours?.get(`${ox},${oy}`);
+    return t === 'failed' ? undefined : t;
+  };
   const counts = new Map<LegendEntry, { n: number; nearest: number }>();
   for (let dy = -radius; dy <= radius; dy++) {
     for (let dx = -radius; dx <= radius; dx++) {
@@ -145,11 +149,23 @@ export function evaluateLayerTile(
   const base = { id: layer.id, group: layer.group, nameJa: layer.nameJa, nameEn: layer.nameEn };
   const mpp = metersPerPixel(lat, pos.z);
   const radius = neighbourhoodRadius(layer);
+  // A needed adjacent tile that failed to load must not turn into a false "not in zone".
+  const missing = [...(neighbours?.values() ?? [])].includes('failed');
+  const notInZone = (): Omit<HazardLayerResult, 'tileUrl'> =>
+    missing
+      ? {
+          ...base,
+          status: 'error',
+          error:
+            '地点がタイルの境目の近くにあり、隣のタイルを取得できなかったため判定できません。時間をおいて再度お試しください。 / ' +
+            'The point is near a tile edge and an adjacent tile could not be loaded, so the layer could not be judged. Please try again later.',
+        }
+      : { ...base, status: 'not_in_zone' };
 
   if (!image) {
     // The point's own tile is empty, but near a tile edge the zone can start across the seam.
     const near = neighbourhood(null, pos, radius, layer.legend, neighbours);
-    if (!near) return { ...base, status: 'not_in_zone' };
+    if (!near) return notInZone();
     if (layer.pattern) return patternGapResult(base, layer, near.entry, radius, mpp);
     return nearbyResult(base, near, mpp);
   }
@@ -187,7 +203,7 @@ export function evaluateLayerTile(
       noteJa: `凡例にない色（${centreClass.hex}）が表示されています。重ねるハザードマップで確認してください。`,
     };
   }
-  return { ...base, status: 'not_in_zone' };
+  return notInZone();
 }
 
 type LayerBase = Pick<HazardLayerResult, 'id' | 'group' | 'nameJa' | 'nameEn'>;
@@ -264,16 +280,18 @@ export class HazardService {
     });
   }
 
-  /** Adjacent tiles needed when the point sits near a tile edge. A tile that fails to load is left out,
-   * so the lookup falls back to the point's own tile instead of failing. */
+  /** Adjacent tiles needed when the point sits near a tile edge. A tile that fails to load is marked
+   * `'failed'` so the layer cannot silently come out as "not in zone". */
   private async loadNeighbours(layer: HazardLayer, pos: TilePosition): Promise<NeighbourTiles> {
-    const map = new Map<string, DecodedImage | null>();
+    const map = new Map<string, DecodedImage | null | 'failed'>();
     await Promise.all(
       neighbourOffsets(pos, neighbourhoodRadius(layer)).map(async ([ox, oy]) => {
         try {
           map.set(`${ox},${oy}`, await this.loadTile(tileUrl(layer, pos.z, pos.x + ox, pos.y + oy)));
         } catch {
-          // Leave it out.
+          // Still judge from what did load: a stroke found elsewhere settles it; otherwise the layer
+          // reports an error rather than a false "not in zone".
+          map.set(`${ox},${oy}`, 'failed');
         }
       }),
     );

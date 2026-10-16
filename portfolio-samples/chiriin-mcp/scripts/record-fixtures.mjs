@@ -2,13 +2,18 @@
 // Re-records the HTTP fixtures used by the test suite (test/recorded/).
 //
 //   npm run build && npm run record-fixtures
+//   npm run build && npm run record-fixtures -- --missing-only
+//
+// With --missing-only, responses already in test/recorded/ are replayed as they
+// are and only URLs the code now requests for the first time are fetched live,
+// so existing fixtures (and the values the tests assert) stay unchanged.
 //
 // Every scenario below is executed through the real MCP server (in-memory
 // transport) with a fetch that performs the live request and saves the response,
 // so the recorded URLs are exactly the ones the code requests. Tests then replay
 // them with no network access.
 import { createHash } from 'node:crypto';
-import { mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
@@ -59,12 +64,25 @@ function fileNameFor(url, contentType, body) {
   return `${host}-${hash}.${ext}`;
 }
 
+const missingOnly = process.argv.includes('--missing-only');
+const manifestPath = join(outDir, 'manifest.json');
 mkdirSync(outDir, { recursive: true });
-for (const f of readdirSync(outDir)) rmSync(join(outDir, f));
+const previous =
+  missingOnly && existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : null;
+if (!missingOnly) for (const f of readdirSync(outDir)) rmSync(join(outDir, f));
 
-const manifest = {};
+const manifest = { ...(previous?.responses ?? {}) };
 const realFetch = globalThis.fetch;
 async function recordingFetch(url, init) {
+  const known = previous?.responses[url];
+  if (known) {
+    const body = readFileSync(join(outDir, known.file));
+    return new Response(known.status === 204 ? null : body, {
+      status: known.status,
+      headers: known.contentType ? { 'content-type': known.contentType } : {},
+    });
+  }
+  if (missingOnly) console.log(`fetch   ${url}`);
   const res = await realFetch(url, init);
   const body = new Uint8Array(await res.arrayBuffer());
   const contentType = res.headers.get('content-type');
@@ -94,6 +112,14 @@ await client.close();
 const sorted = Object.fromEntries(Object.entries(manifest).sort(([a], [b]) => a.localeCompare(b)));
 writeFileSync(
   join(outDir, 'manifest.json'),
-  `${JSON.stringify({ recordedAt: new Date().toISOString(), responses: sorted }, null, 2)}\n`,
+  `${JSON.stringify(
+    {
+      recordedAt: previous?.recordedAt ?? new Date().toISOString(),
+      ...(missingOnly ? { supplementedAt: new Date().toISOString() } : {}),
+      responses: sorted,
+    },
+    null,
+    2,
+  )}\n`,
 );
 console.log(`\nrecorded ${Object.keys(sorted).length} responses into ${outDir}`);

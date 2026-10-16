@@ -153,6 +153,19 @@ describe('evaluateLayerTile', () => {
     expect(r.status).toBe('in_zone');
   });
 
+  it('reports an error, not "not in zone", when a needed adjacent tile failed to load', () => {
+    const overflow = layer('house_collapse_overflow');
+    const stroke = [...(overflow.legend[0]?.rgb ?? [0, 0, 0]), 255] as [number, number, number, number];
+    const own = image(CLEAR);
+    const pos = at(30, 16);
+    const failed = evaluateLayerTile(overflow, own, pos, 35, new Map([['1,0', 'failed']]));
+    expect(failed.status).toBe('error');
+    // A stroke found in a tile that did load still settles it.
+    const other = image(CLEAR, [[27, 16, stroke]]);
+    const found = evaluateLayerTile(overflow, other, pos, 35, new Map([['1,0', 'failed']]));
+    expect(found.status).toBe('in_zone');
+  });
+
   it('asks for adjacent tiles only near the edges', () => {
     expect(neighbourOffsets(at(128, 128), 9)).toEqual([]);
     expect(neighbourOffsets(at(3, 250), 9)).toEqual([
