@@ -43,6 +43,8 @@ export interface AppPair extends PairProposal {
   override: number | null;
   /** a saved manual price that the current guardrails do not allow */
   overrideRejected: string | null;
+  /** limits for a manual price (from the engine's proposal) */
+  bounds: OverrideBounds;
 }
 
 export interface CustomerProposal {
@@ -196,18 +198,27 @@ export function applyOverrides(
   guard: Guardrails,
 ): AppPair[] {
   return pairs.map((p) => {
+    const bounds = overrideBounds(ds, p, guard);
     const base: AppPair = {
       ...p,
       enginePrice: p.newPrice,
       enginePriceStatus: p.status,
       override: null,
       overrideRejected: null,
+      bounds,
     };
     const o = overrides[pairKey(p.cust, p.sku)];
     if (o === undefined) return base;
-    const verdict = checkOverride(overrideBounds(ds, p, guard), o);
+    const verdict = checkOverride(bounds, o);
     if (!verdict.ok) return { ...base, overrideRejected: `手入力の単価 ${o}円 は使えません：${verdict.error}` };
-    return { ...withOverride(ds, p, o, guard), enginePrice: p.newPrice, enginePriceStatus: p.status, override: o, overrideRejected: null };
+    return {
+      ...withOverride(ds, p, o, guard),
+      enginePrice: p.newPrice,
+      enginePriceStatus: p.status,
+      override: o,
+      overrideRejected: null,
+      bounds,
+    };
   });
 }
 
