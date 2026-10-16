@@ -20,7 +20,7 @@ export function divFloor(a: number, b: number): number {
   if (b === 0) throw new RangeError('division by zero');
   const q = Math.trunc(a / b);
   const r = a - q * b;
-  return r !== 0 && (r < 0) !== (b < 0) ? q - 1 : q;
+  return r !== 0 && r < 0 !== b < 0 ? q - 1 : q;
 }
 
 /** ⌈a / b⌉ for integers (b ≠ 0). */

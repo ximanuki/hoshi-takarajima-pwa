@@ -1,5 +1,8 @@
 /** RFC 4180 CSV reader and writer, without dependencies. */
 
+/** U+FEFF byte order mark (written as a code point so it stays visible in the source). */
+export const BOM = String.fromCharCode(0xfeff);
+
 export interface CsvTable {
   header: string[];
   rows: string[][];
@@ -12,7 +15,7 @@ export interface CsvTable {
  * quotes. A final line break does not create an empty row.
  */
 export function parseCsv(text: string, delimiter: ',' | '\t' = ','): string[][] {
-  const s = text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
+  const s = text.startsWith(BOM) ? text.slice(1) : text;
   const rows: string[][] = [];
   let row: string[] = [];
   let cur = '';
@@ -91,7 +94,11 @@ function field(v: string | number, quoteAll: boolean): string {
 }
 
 /** Serialise a table. The text includes U+FEFF when bom is true. */
-export function toCsv(header: readonly string[], rows: readonly (readonly (string | number)[])[], opt: CsvWriteOptions): string {
+export function toCsv(
+  header: readonly string[],
+  rows: readonly (readonly (string | number)[])[],
+  opt: CsvWriteOptions,
+): string {
   const lines = [header.map((h) => field(h, opt.quoteAll)).join(',')];
   for (const r of rows) {
     if (r.length !== header.length) {
@@ -99,5 +106,5 @@ export function toCsv(header: readonly string[], rows: readonly (readonly (strin
     }
     lines.push(r.map((v) => field(v, opt.quoteAll)).join(','));
   }
-  return (opt.bom ? '﻿' : '') + lines.join(opt.eol) + opt.eol;
+  return (opt.bom ? BOM : '') + lines.join(opt.eol) + opt.eol;
 }

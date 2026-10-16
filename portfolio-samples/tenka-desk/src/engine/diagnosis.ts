@@ -28,7 +28,12 @@ import type { SalesLine, SpecialPrice } from './types.ts';
 
 export type LeakType = 'old_price' | 'expired_special' | 'rate_out_of_tier' | 'below_margin_floor';
 
-export const LEAK_TYPES: readonly LeakType[] = ['old_price', 'expired_special', 'rate_out_of_tier', 'below_margin_floor'];
+export const LEAK_TYPES: readonly LeakType[] = [
+  'old_price',
+  'expired_special',
+  'rate_out_of_tier',
+  'below_margin_floor',
+];
 
 export const LEAK_LABEL_JA: Record<LeakType, string> = {
   old_price: '反映漏れ（旧価格のまま）',
@@ -214,7 +219,8 @@ export function diagnoseLine(ds: Dataset, line: SalesLine): LineDiagnosis {
   const floorBp = ds.settings.marginFloorBp;
   const below = costSen !== null && isBelowMarginFloor(billed, costSen, floorBp);
   const floorPrice = costSen !== null ? marginFloorPrice(costSen, floorBp) : null;
-  const oldPrice = list.previousPrice !== null ? priceAtRate(list.previousPrice, expected.ratePm, rounding) : null;
+  const oldPrice =
+    list.previousPrice !== null ? priceAtRate(list.previousPrice, expected.ratePm, rounding) : null;
   const expiredList = ds.expiredSpecials(line.cust, sku, line.date);
   const discountBp = parseRemarkDiscount(line.remark);
 
@@ -243,10 +249,12 @@ export function diagnoseLine(ds: Dataset, line: SalesLine): LineDiagnosis {
 
   let explained: LineStatus | null = null;
   if (billed === expected.price) {
-    explained = expected.kind === 'special' ? 'ok_special' : list.basis === 'current' ? 'ok' : 'ok_kept_price';
+    explained =
+      expected.kind === 'special' ? 'ok_special' : list.basis === 'current' ? 'ok' : 'ok_kept_price';
   } else if (discountBp !== null) {
     const num = expected.price * (10000 - discountBp);
-    if ((['floor', 'round', 'ceil'] as const).some((m) => divide(num, 10000, m) === billed)) explained = 'ok_volume_discount';
+    if ((['floor', 'round', 'ceil'] as const).some((m) => divide(num, 10000, m) === billed))
+      explained = 'ok_volume_discount';
   }
 
   if (explained === null) {
@@ -314,7 +322,10 @@ export function explainLine(d: LineDiagnosis): string[] {
       );
     } else if (f === 'rate_out_of_tier' && d.tier) {
       const t = d.tier;
-      const dir = billed < t.minPrice ? `下限 ${formatYen(t.minPrice)} を下回っています` : `上限 ${formatYen(t.maxPrice)} を上回っています`;
+      const dir =
+        billed < t.minPrice
+          ? `下限 ${formatYen(t.minPrice)} を下回っています`
+          : `上限 ${formatYen(t.maxPrice)} を上回っています`;
       out.push(
         `請求単価 ${formatYen(billed)} は、定価 ${formatYen(e.list.price)} に掛率ランク${t.rank}の範囲（${formatPm(t.minPm)}〜${formatPm(t.maxPm)}）を掛けた ${formatYen(t.minPrice)}〜${formatYen(t.maxPrice)} の外で、${dir}。`,
       );
@@ -325,10 +336,14 @@ export function explainLine(d: LineDiagnosis): string[] {
     }
   }
   if (d.mismatch) {
-    out.push(`請求単価 ${formatYen(billed)} が基準単価 ${formatYen(e.price)} と一致しませんが、旧定価・期限切れの特値・掛率ランク外のどれにも当てはまりません。`);
+    out.push(
+      `請求単価 ${formatYen(billed)} が基準単価 ${formatYen(e.price)} と一致しませんが、旧定価・期限切れの特値・掛率ランク外のどれにも当てはまりません。`,
+    );
   }
   if (d.status === 'ok_volume_discount' && d.discountBp !== null) {
-    out.push(`備考に数量値引 ${formatBp(d.discountBp, 0)} の記載があり、基準単価から値引した単価と一致します。`);
+    out.push(
+      `備考に数量値引 ${formatBp(d.discountBp, 0)} の記載があり、基準単価から値引した単価と一致します。`,
+    );
   }
   out.push(basis);
   if (d.shortfallYen !== 0 && d.status !== 'ok_volume_discount') {
@@ -346,7 +361,11 @@ function emptyCounts(): Record<LineStatus, number> {
 }
 
 /** Diagnose a whole sales export and group the results. */
-export function diagnose(ds: Dataset, lines: readonly SalesLine[], options: DiagnosisOptions = {}): DiagnosisResult {
+export function diagnose(
+  ds: Dataset,
+  lines: readonly SalesLine[],
+  options: DiagnosisOptions = {},
+): DiagnosisResult {
   const resolved = ds.resolveLines(lines);
   let asOf = options.asOf;
   if (asOf === undefined) {
@@ -357,7 +376,15 @@ export function diagnose(ds: Dataset, lines: readonly SalesLine[], options: Diag
   const inWindow = (d: IsoDate) => d >= window.start && d <= window.end;
 
   const sorted = [...resolved].sort((a, b) =>
-    a.date !== b.date ? (a.date < b.date ? -1 : 1) : a.slip !== b.slip ? (a.slip < b.slip ? -1 : 1) : a.line - b.line,
+    a.date !== b.date
+      ? a.date < b.date
+        ? -1
+        : 1
+      : a.slip !== b.slip
+        ? a.slip < b.slip
+          ? -1
+          : 1
+        : a.line - b.line,
   );
   const results = sorted.map((l) => diagnoseLine(ds, l));
   const statusCounts = emptyCounts();
@@ -402,7 +429,10 @@ export function diagnose(ds: Dataset, lines: readonly SalesLine[], options: Diag
     const product = ds.products.get(acc.sku);
     const shortfallTotalYen = acc.items.reduce((s, x) => s + x.shortfallYen, 0);
     const annualImpactYen = windowItems.reduce((s, x) => s + x.shortfallYen, 0);
-    const direction = latest.tier && latest.line.unitPrice > latest.tier.maxPrice && acc.type === 'rate_out_of_tier' ? 'over' : 'under';
+    const direction =
+      latest.tier && latest.line.unitPrice > latest.tier.maxPrice && acc.type === 'rate_out_of_tier'
+        ? 'over'
+        : 'under';
     findings.push({
       id: '',
       type: acc.type,
@@ -434,7 +464,12 @@ export function diagnose(ds: Dataset, lines: readonly SalesLine[], options: Diag
       (a.cust < b.cust ? -1 : a.cust > b.cust ? 1 : 0) ||
       (a.sku < b.sku ? -1 : a.sku > b.sku ? 1 : 0),
   );
-  const prefix: Record<LeakType, string> = { old_price: 'REV', expired_special: 'SPX', rate_out_of_tier: 'TIER', below_margin_floor: 'MRG' };
+  const prefix: Record<LeakType, string> = {
+    old_price: 'REV',
+    expired_special: 'SPX',
+    rate_out_of_tier: 'TIER',
+    below_margin_floor: 'MRG',
+  };
   const counters = new Map<LeakType, number>();
   for (const f of findings) {
     const n = (counters.get(f.type) ?? 0) + 1;

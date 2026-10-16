@@ -45,7 +45,10 @@ export function decodeBytes(bytes: Uint8Array, encoding: TextEncodingName | 'aut
   if (det.encoding === 'utf-8' && startsWith(bytes, [0xef, 0xbb, 0xbf])) {
     body = bytes.subarray(3);
     bom = true;
-  } else if (det.encoding.startsWith('utf-16') && (startsWith(bytes, [0xff, 0xfe]) || startsWith(bytes, [0xfe, 0xff]))) {
+  } else if (
+    det.encoding.startsWith('utf-16') &&
+    (startsWith(bytes, [0xff, 0xfe]) || startsWith(bytes, [0xfe, 0xff]))
+  ) {
     body = bytes.subarray(2);
     bom = true;
   }
@@ -56,6 +59,7 @@ export function decodeBytes(bytes: Uint8Array, encoding: TextEncodingName | 'aut
 /* ---------- Shift_JIS encoder ---------- */
 
 let sjisTable: Map<string, number> | null = null;
+const REPLACEMENT_CHAR = String.fromCharCode(0xfffd);
 
 function buildSjisTable(): Map<string, number> {
   const dec = new TextDecoder('shift_jis');
@@ -73,7 +77,7 @@ function buildSjisTable(): Map<string, number> {
       pair[0] = lead;
       pair[1] = trail;
       const ch = dec.decode(pair);
-      if (ch.length !== 1 || ch === '�') continue;
+      if (ch.length !== 1 || ch === REPLACEMENT_CHAR) continue;
       const code = (lead << 8) | trail;
       if (lead === 0xed || lead === 0xee) deferred.push([ch, code]);
       else if (!table.has(ch)) table.set(ch, code);

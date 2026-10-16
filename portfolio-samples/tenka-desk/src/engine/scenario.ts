@@ -108,7 +108,8 @@ export function runScenario(ds: Dataset, input: ScenarioInput): ScenarioResult {
     }
     const byComponent = { ...ZERO };
     if (share) {
-      for (const c of COST_COMPONENTS) byComponent[c] = divRound(current * share[c] * appliedBp[c], 100 * 10000);
+      for (const c of COST_COMPONENTS)
+        byComponent[c] = divRound(current * share[c] * appliedBp[c], 100 * 10000);
     }
     const delta = byComponent.material + byComponent.labor + byComponent.energy + byComponent.other;
     items.set(sku, {

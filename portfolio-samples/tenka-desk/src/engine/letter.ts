@@ -100,7 +100,9 @@ export function buildLetter(
 ): LetterData {
   const customer = ds.customers.get(cust);
   if (!customer) throw new RangeError(`得意先 ${cust} が得意先マスタにありません`);
-  const mine = pairs.filter((p) => p.cust === cust && p.status === 'proposed').sort((a, b) => (a.sku < b.sku ? -1 : 1));
+  const mine = pairs
+    .filter((p) => p.cust === cust && p.status === 'proposed')
+    .sort((a, b) => (a.sku < b.sku ? -1 : 1));
   if (mine.length === 0) throw new EmptyLetterError(cust);
 
   const items: LetterItemRow[] = mine.map((p) => {
@@ -139,7 +141,10 @@ export function buildLetter(
       ? '価格改定の背景として、公表されている統計を参考資料として添付いたしました。ご不明な点やご意見がございましたら、ご遠慮なくお申し付けください。協議の機会を設けていただけましたら幸いです。'
       : 'ご不明な点やご意見がございましたら、ご遠慮なくお申し付けください。協議の機会を設けていただけましたら幸いです。',
   ];
-  if (options.replyBy) body.push(`誠に恐縮ではございますが、${toWareki(options.replyBy)}までにご回答をいただけましたら幸いです。`);
+  if (options.replyBy)
+    body.push(
+      `誠に恐縮ではございますが、${toWareki(options.replyBy)}までにご回答をいただけましたら幸いです。`,
+    );
   body.push('何卒事情をご賢察のうえ、ご理解を賜りますよう、よろしくお願い申し上げます。');
 
   const record = [
@@ -147,12 +152,18 @@ export function buildLetter(
     { label: '改定日', value: `${effectiveText}${options.basis}より` },
     {
       label: '改定率',
-      value: minBp === maxBp ? formatBp(minBp) : `平均 ${formatBp(averageChangeBp)}（品目により ${formatBp(minBp)}〜${formatBp(maxBp)}）`,
+      value:
+        minBp === maxBp
+          ? formatBp(minBp)
+          : `平均 ${formatBp(averageChangeBp)}（品目により ${formatBp(minBp)}〜${formatBp(maxBp)}）`,
     },
   ];
   if (options.contact) {
     const c = options.contact;
-    record.push({ label: 'お問い合わせ先', value: `${c.branch} ${c.person}${c.tel ? `（TEL ${c.tel}）` : ''}` });
+    record.push({
+      label: 'お問い合わせ先',
+      value: `${c.branch} ${c.person}${c.tel ? `（TEL ${c.tel}）` : ''}`,
+    });
   }
 
   const sources = [...new Set(evidence.map((e) => e.source.credit))];
@@ -165,18 +176,28 @@ export function buildLetter(
     effectiveDate: options.effectiveDate,
     effectiveDateText: effectiveText,
     addressee: { company: customer.name, department: customer.department, honorific: '御中' },
-    sender: { company: company.name, representative: company.representative, address: company.address, tel: company.tel },
+    sender: {
+      company: company.name,
+      representative: company.representative,
+      address: company.address,
+      tel: company.tel,
+    },
     salutation: '拝啓',
     body,
     complimentaryClose: '敬具',
     record,
     items,
     itemsTitle: '価格改定対象品目一覧',
-    itemsNotes: ['価格は税抜です。', '単価は表示の単位あたりの価格です（円）。', '改定率は現行単価に対する率です。記の平均は、直近12か月のご購入数量で加重した平均です。'],
+    itemsNotes: [
+      '価格は税抜です。',
+      '単価は表示の単位あたりの価格です（円）。',
+      '改定率は現行単価に対する率です。記の平均は、直近12か月のご購入数量で加重した平均です。',
+    ],
     averageChangeBp,
     evidence: {
       heading: '参考資料（公表統計）',
-      intro: '原材料・エネルギー・物流・人件費の動向を示す公表統計です。業界や地域全体の動きを示すもので、個々の取引条件をそのまま表すものではありません。',
+      intro:
+        '原材料・エネルギー・物流・人件費の動向を示す公表統計です。業界や地域全体の動きを示すもので、個々の取引条件をそのまま表すものではありません。',
       items: [...evidence],
       sources,
       disclaimer: [

@@ -71,7 +71,10 @@ export interface PairVolume {
  * Quantities bought per customer × product in a window (sales lines only:
  * no returns, free samples or non-product codes).
  */
-export function collectPairVolumes(lines: readonly SalesLine[], window: { start: IsoDate; end: IsoDate }): Map<string, PairVolume> {
+export function collectPairVolumes(
+  lines: readonly SalesLine[],
+  window: { start: IsoDate; end: IsoDate },
+): Map<string, PairVolume> {
   const out = new Map<string, PairVolume>();
   for (const l of lines) {
     if (l.sku === null || l.isReturn || l.qty <= 0) continue;
@@ -81,7 +84,15 @@ export function collectPairVolumes(lines: readonly SalesLine[], window: { start:
     const v = out.get(k);
     const amount = l.amount ?? l.unitPrice * l.qty;
     if (!v) {
-      out.set(k, { cust: l.cust, sku: l.sku, qty: l.qty, salesYen: amount, lines: 1, lastDate: l.date, lastBilledPrice: l.unitPrice });
+      out.set(k, {
+        cust: l.cust,
+        sku: l.sku,
+        qty: l.qty,
+        salesYen: amount,
+        lines: 1,
+        lastDate: l.date,
+        lastBilledPrice: l.unitPrice,
+      });
     } else {
       v.qty += l.qty;
       v.salesYen += amount;
@@ -140,7 +151,8 @@ export function proposeListPrices(
   input: ProposalInput,
   guard: Guardrails,
 ): Map<string, ListProposal> {
-  if (input.method !== 'fixed_list' && !input.scenario) throw new RangeError('この方法には原価シナリオが必要です');
+  if (input.method !== 'fixed_list' && !input.scenario)
+    throw new RangeError('この方法には原価シナリオが必要です');
   if (input.method === 'fixed_list' && !input.newListPrices) throw new RangeError('新定価表が必要です');
   const pt = input.passThroughBp ?? 10000;
   const fixed = new Map<string, number>();
@@ -182,7 +194,12 @@ export function proposeListPrices(
         rawSen = currentList * 100 + divCeil(deltaCost * 1000 * pt, weightedRatePm * 10000);
       }
     }
-    let newList = input.method === 'fixed_list' ? rawSen / 100 : rawSen > currentList * 100 ? roundPrice(rawSen, guard.listRounding) : currentList;
+    let newList =
+      input.method === 'fixed_list'
+        ? rawSen / 100
+        : rawSen > currentList * 100
+          ? roundPrice(rawSen, guard.listRounding)
+          : currentList;
     let capped = false;
     if (input.method !== 'fixed_list' && guard.maxIncreaseBp !== null) {
       const capSen = divFloor(currentList * (10000 + guard.maxIncreaseBp), 100);
@@ -208,14 +225,23 @@ export function proposeListPrices(
   return out;
 }
 
-export type GuardrailRule = 'max_increase_capped' | 'margin_floor_raised' | 'margin_floor_unmet' | 'tier_conflict';
+export type GuardrailRule =
+  | 'max_increase_capped'
+  | 'margin_floor_raised'
+  | 'margin_floor_unmet'
+  | 'tier_conflict';
 
 export interface GuardrailHit {
   rule: GuardrailRule;
   message: string;
 }
 
-export type ExclusionReason = 'special_price' | 'no_list_change' | 'no_increase' | 'below_min_increase' | 'no_price_basis';
+export type ExclusionReason =
+  | 'special_price'
+  | 'no_list_change'
+  | 'no_increase'
+  | 'below_min_increase'
+  | 'no_price_basis';
 
 export const EXCLUSION_REASON_JA: Record<ExclusionReason, string> = {
   special_price: '期間内の特値があるため個別に協議',
@@ -264,7 +290,9 @@ export function proposePairs(
   const rounding = ds.settings.unitRounding;
   const scope = input.customers ? new Set(input.customers) : null;
   const out: PairProposal[] = [];
-  const sortedVolumes = [...volumes.values()].sort((a, b) => (a.cust !== b.cust ? (a.cust < b.cust ? -1 : 1) : a.sku < b.sku ? -1 : 1));
+  const sortedVolumes = [...volumes.values()].sort((a, b) =>
+    a.cust !== b.cust ? (a.cust < b.cust ? -1 : 1) : a.sku < b.sku ? -1 : 1,
+  );
   for (const v of sortedVolumes) {
     if (scope && !scope.has(v.cust)) continue;
     const product = ds.products.get(v.sku);
@@ -315,25 +343,44 @@ export function proposePairs(
     const tier = ds.tierOf(v.cust);
     const tierMax = tier ? priceAtRate(newList, tier.maxPm, rounding) : null;
     const tierMin = tier ? priceAtRate(newList, tier.minPm, rounding) : null;
-    const capPrice = guard.maxIncreaseBp !== null ? divFloor(currentPrice * (10000 + guard.maxIncreaseBp), 10000) : null;
+    const capPrice =
+      guard.maxIncreaseBp !== null ? divFloor(currentPrice * (10000 + guard.maxIncreaseBp), 10000) : null;
     if (capPrice !== null && newPrice > capPrice) {
       newPrice = Math.max(currentPrice, capPrice);
       hits.push({ rule: 'max_increase_capped', message: `値上げ率の上限で ${capPrice}円 に抑えました` });
     }
-    if (cost.next > 0 && marginBp(newPrice, cost.next) !== null && (marginBp(newPrice, cost.next) ?? 0) < guard.marginFloorBp) {
+    if (
+      cost.next > 0 &&
+      marginBp(newPrice, cost.next) !== null &&
+      (marginBp(newPrice, cost.next) ?? 0) < guard.marginFloorBp
+    ) {
       const target = marginFloorPrice(cost.next, guard.marginFloorBp);
       const withinCap = capPrice === null || target <= capPrice;
       const withinTier = special !== null || tierMax === null || target <= tierMax;
       if (guard.raiseToMarginFloor && withinCap && withinTier) {
         newPrice = Math.max(newPrice, target);
-        hits.push({ rule: 'margin_floor_raised', message: `粗利率の下限を満たす ${target}円 に引き上げました` });
+        hits.push({
+          rule: 'margin_floor_raised',
+          message: `粗利率の下限を満たす ${target}円 に引き上げました`,
+        });
       } else {
         const why = !withinCap ? '値上げ率の上限' : !withinTier ? '掛率ランクの上限' : '設定';
-        hits.push({ rule: 'margin_floor_unmet', message: `${why}のため、粗利率の下限（${target}円 以上）に届きません。個別に判断してください` });
+        hits.push({
+          rule: 'margin_floor_unmet',
+          message: `${why}のため、粗利率の下限（${target}円 以上）に届きません。個別に判断してください`,
+        });
       }
     }
-    if (special === null && tierMin !== null && tierMax !== null && (newPrice < tierMin || newPrice > tierMax)) {
-      hits.push({ rule: 'tier_conflict', message: `新しい単価が掛率ランクの範囲（${tierMin}〜${tierMax}円）の外です` });
+    if (
+      special === null &&
+      tierMin !== null &&
+      tierMax !== null &&
+      (newPrice < tierMin || newPrice > tierMax)
+    ) {
+      hits.push({
+        rule: 'tier_conflict',
+        message: `新しい単価が掛率ランクの範囲（${tierMin}〜${tierMax}円）の外です`,
+      });
     }
     const changeYen = newPrice - currentPrice;
     const cb = currentPrice > 0 ? changeBp(newPrice, currentPrice) : 0;

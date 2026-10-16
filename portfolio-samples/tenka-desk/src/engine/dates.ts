@@ -61,7 +61,8 @@ function ymdOrNull(y: number, m: number, d: number): IsoDate | null {
 export function parseDateLoose(raw: string): IsoDate | null {
   const s = raw.normalize('NFKC').replace(/\s/g, '');
   if (s === '') return null;
-  let m = /^(令和|平成|昭和|大正|明治|[RHSTMrhstm令平昭大明])\.?(元|\d{1,2})[./-](\d{1,2})[./-](\d{1,2})$/.exec(s);
+  let m =
+    /^(令和|平成|昭和|大正|明治|[RHSTMrhstm令平昭大明])\.?(元|\d{1,2})[./-](\d{1,2})[./-](\d{1,2})$/.exec(s);
   if (!m) m = /^(令和|平成|昭和|大正|明治|[令平昭大明])(元|\d{1,2})年(\d{1,2})月(\d{1,2})日$/.exec(s);
   if (m) {
     const era = ERA_BY_NAME.get((m[1] ?? '').toUpperCase());
@@ -89,7 +90,9 @@ export function isoToUtcDate(iso: IsoDate): Date {
 }
 
 export function dayNumber(iso: IsoDate): number {
-  return Math.round(Date.UTC(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)) - 1, Number(iso.slice(8, 10))) / 86400000);
+  return Math.round(
+    Date.UTC(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)) - 1, Number(iso.slice(8, 10))) / 86400000,
+  );
 }
 
 export function fromDayNumber(n: number): IsoDate {
@@ -180,7 +183,9 @@ const JST_OFFSET_MIN = 9 * 60;
  * the time zone.
  */
 export function parseTimestamp(ts: string): number | null {
-  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{1,3}))?)?(Z|[+-]\d{2}:\d{2})$/.exec(ts);
+  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{1,3}))?)?(Z|[+-]\d{2}:\d{2})$/.exec(
+    ts,
+  );
   if (!m) return null;
   const [, y, mo, d, h, mi, s = '0', ms = '0', tz = 'Z'] = m;
   if (!isValidYmd(Number(y), Number(mo), Number(d))) return null;
@@ -190,7 +195,15 @@ export function parseTimestamp(ts: string): number | null {
     const sign = tz.startsWith('-') ? -1 : 1;
     offsetMin = sign * (Number(tz.slice(1, 3)) * 60 + Number(tz.slice(4, 6)));
   }
-  const utc = Date.UTC(Number(y), Number(mo) - 1, Number(d), Number(h), Number(mi), Number(s), Number(ms.padEnd(3, '0')));
+  const utc = Date.UTC(
+    Number(y),
+    Number(mo) - 1,
+    Number(d),
+    Number(h),
+    Number(mi),
+    Number(s),
+    Number(ms.padEnd(3, '0')),
+  );
   return utc - offsetMin * 60000;
 }
 

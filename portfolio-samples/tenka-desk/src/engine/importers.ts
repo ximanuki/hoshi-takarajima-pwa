@@ -63,11 +63,15 @@ class RowReader {
 
   fail(field: string, message: string, value?: string): void {
     this.failed = true;
-    this.issues.push(value === undefined ? { row: this.row, field, message } : { row: this.row, field, message, value });
+    this.issues.push(
+      value === undefined ? { row: this.row, field, message } : { row: this.row, field, message, value },
+    );
   }
 
   warn(field: string, message: string, value?: string): void {
-    this.issues.push(value === undefined ? { row: this.row, field, message } : { row: this.row, field, message, value });
+    this.issues.push(
+      value === undefined ? { row: this.row, field, message } : { row: this.row, field, message, value },
+    );
   }
 
   has(field: string): boolean {
@@ -168,7 +172,11 @@ function splitList(s: string): string[] {
 
 /* ---------- per kind ---------- */
 
-export function importSales(table: CsvTable, spec: LayoutSpec, mapping: ColumnMapping): ImportResult<SalesLine> {
+export function importSales(
+  table: CsvTable,
+  spec: LayoutSpec,
+  mapping: ColumnMapping,
+): ImportResult<SalesLine> {
   const returnValues = new Set((spec.returnValues ?? []).map(normalizeText));
   const priceTypes = spec.priceTypes ?? {};
   return run(table, mapping, (r) => {
@@ -207,7 +215,11 @@ export function importSales(table: CsvTable, spec: LayoutSpec, mapping: ColumnMa
   });
 }
 
-export function importSpecials(table: CsvTable, spec: LayoutSpec, mapping: ColumnMapping): ImportResult<SpecialPrice> {
+export function importSpecials(
+  table: CsvTable,
+  spec: LayoutSpec,
+  mapping: ColumnMapping,
+): ImportResult<SpecialPrice> {
   return run(table, mapping, (r) => {
     const rawSku = r.raw('sku').trim();
     const start = r.date('start');
@@ -226,7 +238,11 @@ export function importSpecials(table: CsvTable, spec: LayoutSpec, mapping: Colum
   });
 }
 
-export function importPriceMaster(table: CsvTable, _spec: LayoutSpec, mapping: ColumnMapping): ImportResult<PriceMasterRow> {
+export function importPriceMaster(
+  table: CsvTable,
+  _spec: LayoutSpec,
+  mapping: ColumnMapping,
+): ImportResult<PriceMasterRow> {
   return run(table, mapping, (r) => {
     const rawSku = r.raw('sku').trim();
     return {
@@ -241,7 +257,11 @@ export function importPriceMaster(table: CsvTable, _spec: LayoutSpec, mapping: C
   });
 }
 
-export function importCustomers(table: CsvTable, _spec: LayoutSpec, mapping: ColumnMapping): ImportResult<Customer> {
+export function importCustomers(
+  table: CsvTable,
+  _spec: LayoutSpec,
+  mapping: ColumnMapping,
+): ImportResult<Customer> {
   return run(table, mapping, (r) => ({
     code: customerKey(r.raw('code')),
     name: r.text('name'),
@@ -262,7 +282,12 @@ const NO_SHARE: CostShare = { material: 0, labor: 0, energy: 0, other: 0 };
 
 function readShare(r: RowReader): CostShare | null {
   if (!r.has('material')) return null;
-  const s = { material: r.int('material'), labor: r.int('labor'), energy: r.int('energy'), other: r.int('other') };
+  const s = {
+    material: r.int('material'),
+    labor: r.int('labor'),
+    energy: r.int('energy'),
+    other: r.int('other'),
+  };
   if (r.ok && s.material + s.labor + s.energy + s.other !== 100) {
     r.warn('material', '原価構成比の合計が100%ではありません');
   }
@@ -270,7 +295,11 @@ function readShare(r: RowReader): CostShare | null {
 }
 
 /** Products. When a row has no cost split, `costShare` is all zero and the dataset fills it from the category. */
-export function importProducts(table: CsvTable, _spec: LayoutSpec, mapping: ColumnMapping): ImportResult<Product> {
+export function importProducts(
+  table: CsvTable,
+  _spec: LayoutSpec,
+  mapping: ColumnMapping,
+): ImportResult<Product> {
   return run(table, mapping, (r) => {
     const code = r.text('code');
     return {
@@ -287,7 +316,11 @@ export function importProducts(table: CsvTable, _spec: LayoutSpec, mapping: Colu
   });
 }
 
-export function importRateTiers(table: CsvTable, _spec: LayoutSpec, mapping: ColumnMapping): ImportResult<RateTier> {
+export function importRateTiers(
+  table: CsvTable,
+  _spec: LayoutSpec,
+  mapping: ColumnMapping,
+): ImportResult<RateTier> {
   return run(table, mapping, (r) => {
     const t = {
       rank: r.text('rank'),
@@ -297,12 +330,17 @@ export function importRateTiers(table: CsvTable, _spec: LayoutSpec, mapping: Col
       maxPm: r.pm('max'),
       note: r.text('note'),
     };
-    if (r.ok && !(t.minPm <= t.standardPm && t.standardPm <= t.maxPm)) r.fail('min', '下限・標準・上限の順になっていません');
+    if (r.ok && !(t.minPm <= t.standardPm && t.standardPm <= t.maxPm))
+      r.fail('min', '下限・標準・上限の順になっていません');
     return t;
   });
 }
 
-export function importCategories(table: CsvTable, _spec: LayoutSpec, mapping: ColumnMapping): ImportResult<Category> {
+export function importCategories(
+  table: CsvTable,
+  _spec: LayoutSpec,
+  mapping: ColumnMapping,
+): ImportResult<Category> {
   return run(table, mapping, (r) => ({
     code: r.text('code'),
     name: r.text('name'),
@@ -311,16 +349,42 @@ export function importCategories(table: CsvTable, _spec: LayoutSpec, mapping: Co
   }));
 }
 
-export function importSuppliers(table: CsvTable, _spec: LayoutSpec, mapping: ColumnMapping): ImportResult<Supplier> {
-  return run(table, mapping, (r) => ({ code: r.text('code'), name: r.text('name'), categories: splitList(r.text('categories')) }));
+export function importSuppliers(
+  table: CsvTable,
+  _spec: LayoutSpec,
+  mapping: ColumnMapping,
+): ImportResult<Supplier> {
+  return run(table, mapping, (r) => ({
+    code: r.text('code'),
+    name: r.text('name'),
+    categories: splitList(r.text('categories')),
+  }));
 }
 
-export function importListPriceHistory(table: CsvTable, _spec: LayoutSpec, mapping: ColumnMapping): ImportResult<ListPriceRow> {
-  return run(table, mapping, (r) => ({ sku: r.text('sku'), price: r.int('price'), start: r.date('start'), end: r.dateOrNull('end') }));
+export function importListPriceHistory(
+  table: CsvTable,
+  _spec: LayoutSpec,
+  mapping: ColumnMapping,
+): ImportResult<ListPriceRow> {
+  return run(table, mapping, (r) => ({
+    sku: r.text('sku'),
+    price: r.int('price'),
+    start: r.date('start'),
+    end: r.dateOrNull('end'),
+  }));
 }
 
-export function importCostHistory(table: CsvTable, _spec: LayoutSpec, mapping: ColumnMapping): ImportResult<CostRow> {
-  return run(table, mapping, (r) => ({ sku: r.text('sku'), costSen: r.sen('cost'), start: r.date('start'), end: r.dateOrNull('end') }));
+export function importCostHistory(
+  table: CsvTable,
+  _spec: LayoutSpec,
+  mapping: ColumnMapping,
+): ImportResult<CostRow> {
+  return run(table, mapping, (r) => ({
+    sku: r.text('sku'),
+    costSen: r.sen('cost'),
+    start: r.date('start'),
+    end: r.dateOrNull('end'),
+  }));
 }
 
 /** Classify a free-text 合意状況 / 協議結果 into a fixed set of kinds. */
@@ -331,11 +395,16 @@ export function classifyAgreement(status: string): AgreementKind {
   if (/(見送|拒否|不成立|不合意|辞退)/.test(s)) return 'declined';
   if (s.includes('一部')) return 'partial';
   if (/(協議中|交渉中|回答待|未回答|保留|検討中)/.test(s)) return 'negotiating';
-  if (/(合意|承諾|了承|受諾)/.test(s)) return /(適用日変更|時期変更|延期|後ろ倒し)/.test(s) ? 'agreed_later_date' : 'agreed';
+  if (/(合意|承諾|了承|受諾)/.test(s))
+    return /(適用日変更|時期変更|延期|後ろ倒し)/.test(s) ? 'agreed_later_date' : 'agreed';
   return 'unknown';
 }
 
-export function importAgreements(table: CsvTable, _spec: LayoutSpec, mapping: ColumnMapping): ImportResult<RevisionAgreement> {
+export function importAgreements(
+  table: CsvTable,
+  _spec: LayoutSpec,
+  mapping: ColumnMapping,
+): ImportResult<RevisionAgreement> {
   return run(table, mapping, (r) => {
     const status = r.text('status');
     return {
@@ -351,7 +420,11 @@ export function importAgreements(table: CsvTable, _spec: LayoutSpec, mapping: Co
   });
 }
 
-export function importSupplierNotices(table: CsvTable, _spec: LayoutSpec, mapping: ColumnMapping): ImportResult<SupplierNotice> {
+export function importSupplierNotices(
+  table: CsvTable,
+  _spec: LayoutSpec,
+  mapping: ColumnMapping,
+): ImportResult<SupplierNotice> {
   return run(table, mapping, (r) => ({
     noticeDate: r.date('noticeDate'),
     supplier: r.text('supplier'),
@@ -365,7 +438,11 @@ export function importSupplierNotices(table: CsvTable, _spec: LayoutSpec, mappin
   }));
 }
 
-export function importNewListPrices(table: CsvTable, _spec: LayoutSpec, mapping: ColumnMapping): ImportResult<NewListPrice> {
+export function importNewListPrices(
+  table: CsvTable,
+  _spec: LayoutSpec,
+  mapping: ColumnMapping,
+): ImportResult<NewListPrice> {
   return run(table, mapping, (r) => ({
     sku: r.text('sku'),
     currentPrice: r.int('currentPrice'),
@@ -434,7 +511,9 @@ export class LayoutNotRecognisedError extends Error {
   readonly fileName: string;
   readonly header: string[];
   constructor(fileName: string, header: string[]) {
-    super(`${fileName}: 列の見出しからファイルの種類を判別できませんでした（${header.slice(0, 6).join(', ')} …）`);
+    super(
+      `${fileName}: 列の見出しからファイルの種類を判別できませんでした（${header.slice(0, 6).join(', ')} …）`,
+    );
     this.name = 'LayoutNotRecognisedError';
     this.fileName = fileName;
     this.header = header;
@@ -449,9 +528,17 @@ export class LayoutNotRecognisedError extends Error {
 export function importFile(
   name: string,
   data: Uint8Array | string,
-  options: { encoding?: TextEncodingName | 'auto'; kinds?: FileKind[]; spec?: LayoutSpec; columnOverrides?: Record<string, string> } = {},
+  options: {
+    encoding?: TextEncodingName | 'auto';
+    kinds?: FileKind[];
+    spec?: LayoutSpec;
+    columnOverrides?: Record<string, string>;
+  } = {},
 ): FileImport {
-  const decoded: DecodedText = typeof data === 'string' ? { text: data, encoding: 'utf-8', bom: false } : decodeBytes(data, options.encoding ?? 'auto');
+  const decoded: DecodedText =
+    typeof data === 'string'
+      ? { text: data, encoding: 'utf-8', bom: false }
+      : decodeBytes(data, options.encoding ?? 'auto');
   const table = readTable(decoded.text);
   let spec = options.spec;
   let mapping: ColumnMapping;

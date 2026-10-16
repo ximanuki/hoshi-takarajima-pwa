@@ -124,7 +124,10 @@ export class Dataset {
   readonly revisions: Revision[];
   readonly supplierNotices: SupplierNotice[];
   readonly issues: DatasetIssue[] = [];
-  private readonly revisionByDate = new Map<IsoDate, { revision: Revision; byCust: Map<string, RevisionAgreement> }>();
+  private readonly revisionByDate = new Map<
+    IsoDate,
+    { revision: Revision; byCust: Map<string, RevisionAgreement> }
+  >();
 
   constructor(input: DatasetInput) {
     this.settings = { ...DEFAULT_SETTINGS, ...input.settings };
@@ -134,7 +137,8 @@ export class Dataset {
     for (const s of input.suppliers ?? []) this.suppliers.set(s.code, s);
 
     for (const c of input.customers) {
-      if (this.customers.has(c.code)) this.issue('duplicate_code', `得意先コードが重複しています: ${c.code}`, c.code);
+      if (this.customers.has(c.code))
+        this.issue('duplicate_code', `得意先コードが重複しています: ${c.code}`, c.code);
       this.customers.set(c.code, c);
       const tier = this.tiers.get(c.rank);
       if (!tier) this.issue('unknown_rank', `掛率ランク「${c.rank}」が掛率ランク表にありません`, c.code);
@@ -144,12 +148,19 @@ export class Dataset {
     }
 
     for (const p of input.products) {
-      if (this.products.has(p.code)) this.issue('duplicate_code', `商品コードが重複しています: ${p.code}`, p.code);
+      if (this.products.has(p.code))
+        this.issue('duplicate_code', `商品コードが重複しています: ${p.code}`, p.code);
       const other = this.productByKey.get(p.key);
       if (other !== undefined && other !== p.code) {
-        this.issue('ambiguous_key', `商品コード ${other} と ${p.code} は表記ゆれを除くと同じになり、区別できません`, p.code);
+        this.issue(
+          'ambiguous_key',
+          `商品コード ${other} と ${p.code} は表記ゆれを除くと同じになり、区別できません`,
+          p.code,
+        );
       }
-      const share = isZeroShare(p.costShare) ? (this.categories.get(p.category)?.costShare ?? null) : p.costShare;
+      const share = isZeroShare(p.costShare)
+        ? (this.categories.get(p.category)?.costShare ?? null)
+        : p.costShare;
       if (share === null) this.issue('cost_share_missing', `原価構成比がありません: ${p.code}`, p.code);
       this.products.set(p.code, { ...p, costShare: share ?? p.costShare });
       this.productByKey.set(p.key, p.code);
@@ -164,7 +175,8 @@ export class Dataset {
         this.issue('unknown_product', `特値の商品コードが商品マスタにありません: ${sp.rawSku}`, sp.rawSku);
         continue;
       }
-      if (!this.customers.has(sp.cust)) this.issue('unknown_customer', `特値の得意先コードが得意先マスタにありません: ${sp.cust}`, sp.cust);
+      if (!this.customers.has(sp.cust))
+        this.issue('unknown_customer', `特値の得意先コードが得意先マスタにありません: ${sp.cust}`, sp.cust);
       const k = pairKey(sp.cust, sku);
       const list = this.specials.get(k) ?? [];
       list.push({ ...sp, sku });
@@ -188,7 +200,11 @@ export class Dataset {
       for (const ag of rev.agreements) {
         byCust.set(ag.cust, ag);
         if (ag.kind === 'unknown') {
-          this.issue('unknown_agreement_status', `合意状況「${ag.status}」を判別できないため、改定を適用したものとして扱います`, ag.cust);
+          this.issue(
+            'unknown_agreement_status',
+            `合意状況「${ag.status}」を判別できないため、改定を適用したものとして扱います`,
+            ag.cust,
+          );
         }
       }
       this.revisionByDate.set(rev.date, { revision: rev, byCust });
@@ -222,7 +238,11 @@ export class Dataset {
         const prev = sorted[i - 1];
         const cur = sorted[i];
         if (prev && cur && prev.end !== null && prev.end >= cur.start) {
-          this.issue('overlapping_period', `${label}の履歴の期間が重なっています: ${sku}（${cur.start}〜）`, sku);
+          this.issue(
+            'overlapping_period',
+            `${label}の履歴の期間が重なっています: ${sku}（${cur.start}〜）`,
+            sku,
+          );
         }
       }
       target.set(sku, sorted);
@@ -283,23 +303,50 @@ export class Dataset {
     return this.resolveList(rows, idx, cust, category, date);
   }
 
-  private resolveList(rows: readonly ListPriceRow[], idx: number, cust: string, category: string, date: IsoDate): ApplicableList {
+  private resolveList(
+    rows: readonly ListPriceRow[],
+    idx: number,
+    cust: string,
+    category: string,
+    date: IsoDate,
+  ): ApplicableList {
     const row = rows[idx] as ListPriceRow;
-    if (idx === 0) return { price: row.price, row, basis: 'current', revision: null, agreement: null, previousPrice: null, since: row.start };
+    if (idx === 0)
+      return {
+        price: row.price,
+        row,
+        basis: 'current',
+        revision: null,
+        agreement: null,
+        previousPrice: null,
+        since: row.start,
+      };
     const rev = this.revisionByDate.get(row.start);
     const ag = rev?.byCust.get(cust) ?? null;
     let kept: ListBasis | null = null;
     if (ag) {
       if (ag.kind === 'declined') kept = 'kept_declined';
       else if (ag.kind === 'negotiating') kept = 'kept_negotiating';
-      else if (ag.kind !== 'not_applicable' && ag.excludedCategories.includes(category)) kept = 'kept_excluded_category';
-      else if (ag.kind !== 'not_applicable' && ag.effective !== null && date < ag.effective) kept = 'kept_before_agreed_date';
+      else if (ag.kind !== 'not_applicable' && ag.excludedCategories.includes(category))
+        kept = 'kept_excluded_category';
+      else if (ag.kind !== 'not_applicable' && ag.effective !== null && date < ag.effective)
+        kept = 'kept_before_agreed_date';
     }
     const before = this.resolveList(rows, idx - 1, cust, category, date);
     if (kept !== null) {
-      return { ...before, row, basis: kept, revision: rev?.revision ?? null, agreement: ag, previousPrice: null };
+      return {
+        ...before,
+        row,
+        basis: kept,
+        revision: rev?.revision ?? null,
+        agreement: ag,
+        previousPrice: null,
+      };
     }
-    const since = ag && ag.kind !== 'not_applicable' && ag.effective !== null && ag.effective > row.start ? ag.effective : row.start;
+    const since =
+      ag && ag.kind !== 'not_applicable' && ag.effective !== null && ag.effective > row.start
+        ? ag.effective
+        : row.start;
     return {
       price: row.price,
       row,
@@ -320,7 +367,9 @@ export class Dataset {
 
   /** 特値 of the pair whose period ended before the day, latest first. */
   expiredSpecials(cust: string, sku: string, date: IsoDate): SpecialPrice[] {
-    return (this.specials.get(pairKey(cust, sku)) ?? []).filter((sp) => sp.end !== null && sp.end < date).reverse();
+    return (this.specials.get(pairKey(cust, sku)) ?? [])
+      .filter((sp) => sp.end !== null && sp.end < date)
+      .reverse();
   }
 
   /** 原単価 (銭) on a day from the cost history, else the product master's. */

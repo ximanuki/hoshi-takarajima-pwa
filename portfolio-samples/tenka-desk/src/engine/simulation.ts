@@ -68,7 +68,16 @@ interface Acc {
 }
 
 function newAcc(): Acc {
-  return { pairs: 0, proposed: 0, sales: 0, costUpSen: 0, requested: 0, expectedSen: 0, gpBeforeSen: 0, gpNoActionSen: 0 };
+  return {
+    pairs: 0,
+    proposed: 0,
+    sales: 0,
+    costUpSen: 0,
+    requested: 0,
+    expectedSen: 0,
+    gpBeforeSen: 0,
+    gpNoActionSen: 0,
+  };
 }
 
 /** Accepted share of the requested increase for one pair, in basis points. */
@@ -108,7 +117,10 @@ function toRow(key: string, a: Acc): SimulationRow {
   };
 }
 
-export function simulatePassThrough(pairs: readonly PairProposal[], options: SimulationOptions = {}): SimulationResult {
+export function simulatePassThrough(
+  pairs: readonly PairProposal[],
+  options: SimulationOptions = {},
+): SimulationResult {
   const def = options.defaultAcceptance ?? { kind: 'full' };
   const total = newAcc();
   const byCust = new Map<string, Acc>();
@@ -138,7 +150,9 @@ export function simulatePassThrough(pairs: readonly PairProposal[], options: Sim
   ];
   return {
     total: toRow('合計', total),
-    byCustomer: [...byCust.entries()].map(([k, a]) => toRow(k, a)).sort((a, b) => b.costIncreaseYen - a.costIncreaseYen || (a.key < b.key ? -1 : 1)),
+    byCustomer: [...byCust.entries()]
+      .map(([k, a]) => toRow(k, a))
+      .sort((a, b) => b.costIncreaseYen - a.costIncreaseYen || (a.key < b.key ? -1 : 1)),
     byCategory: [...byCat.entries()].map(([k, a]) => toRow(k, a)).sort((a, b) => (a.key < b.key ? -1 : 1)),
     assumptions,
   };

@@ -250,14 +250,24 @@ export const LAYOUTS: readonly LayoutSpec[] = [
     kind: 'listPriceHistory',
     variant: 'standard',
     label: '定価の履歴',
-    columns: [req('sku', '商品コード'), req('price', '定価(円)'), req('start', '適用開始日'), req('end', '適用終了日')],
+    columns: [
+      req('sku', '商品コード'),
+      req('price', '定価(円)'),
+      req('start', '適用開始日'),
+      req('end', '適用終了日'),
+    ],
   },
   {
     id: 'costHistory',
     kind: 'costHistory',
     variant: 'standard',
     label: '原単価の履歴',
-    columns: [req('sku', '商品コード'), req('cost', '原単価(円)'), req('start', '適用開始日'), req('end', '適用終了日')],
+    columns: [
+      req('sku', '商品コード'),
+      req('cost', '原単価(円)'),
+      req('start', '適用開始日'),
+      req('end', '適用終了日'),
+    ],
   },
   {
     id: 'agreements',
@@ -328,7 +338,11 @@ export interface MappingResult {
  * Map a header row to the fields of a layout. `overrides` gives extra header
  * names per field (manual mapping) and takes precedence over the built-in names.
  */
-export function mapColumns(header: readonly string[], spec: LayoutSpec, overrides: Record<string, string> = {}): MappingResult {
+export function mapColumns(
+  header: readonly string[],
+  spec: LayoutSpec,
+  overrides: Record<string, string> = {},
+): MappingResult {
   const index = new Map<string, number>();
   header.forEach((h, i) => {
     const k = normalizeHeader(h);
@@ -375,7 +389,9 @@ export function detectLayout(
     const result = mapColumns(header, spec);
     if (result.missingRequired.length === 0) candidates.push({ spec, result });
   }
-  candidates.sort((a, b) => b.result.matched - a.result.matched || a.result.unused.length - b.result.unused.length);
+  candidates.sort(
+    (a, b) => b.result.matched - a.result.matched || a.result.unused.length - b.result.unused.length,
+  );
   return { best: candidates[0] ?? null, candidates };
 }
 

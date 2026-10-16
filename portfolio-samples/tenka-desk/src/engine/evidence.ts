@@ -73,7 +73,8 @@ export interface StatsBundle {
 type Obj = Record<string, unknown>;
 
 function obj(v: unknown, what: string): Obj {
-  if (typeof v !== 'object' || v === null || Array.isArray(v)) throw new TypeError(`${what}: object expected`);
+  if (typeof v !== 'object' || v === null || Array.isArray(v))
+    throw new TypeError(`${what}: object expected`);
   return v as Obj;
 }
 function arr(v: unknown, what: string): unknown[] {
@@ -111,7 +112,8 @@ export function parseIndexDataset(json: unknown): IndexDataset {
       if (typeof v !== 'number' || !Number.isFinite(v)) throw new TypeError('series value must be a number');
       return v;
     });
-    if (values.length !== periods.length) throw new TypeError(`series ${s(so, 'code')}: values and periods differ in length`);
+    if (values.length !== periods.length)
+      throw new TypeError(`series ${s(so, 'code')}: values and periods differ in length`);
     return { code: s(so, 'code'), name: s(so, 'name_ja'), unit: s(so, 'unit_ja'), values };
   });
   return {
@@ -151,7 +153,12 @@ export function parseMinimumWage(json: unknown): MinimumWageDataset {
     national: arr(o['national_weighted_average'], 'national').map(mwValue),
     prefectures: arr(byPref['prefectures'], 'prefectures').map((x) => {
       const p = obj(x, 'prefecture');
-      return { code: s(p, 'code'), name: s(p, 'name_ja'), fullName: s(p, 'name_ja_full'), values: arr(p['values'], 'values').map(mwValue) };
+      return {
+        code: s(p, 'code'),
+        name: s(p, 'name_ja'),
+        fullName: s(p, 'name_ja_full'),
+        values: arr(p['values'], 'values').map(mwValue),
+      };
     }),
     notes: strings(o['notes_ja']),
     credit: s(o, 'credit_ja'),
@@ -266,7 +273,12 @@ function publisherShort(publisher: string): string {
   return publisher.replace(/\s.*$/, '');
 }
 
-function indexChange(ds: IndexDataset, code: string, basePeriod: string | undefined, topic: EvidenceTopic): EvidenceItem | null {
+function indexChange(
+  ds: IndexDataset,
+  code: string,
+  basePeriod: string | undefined,
+  topic: EvidenceTopic,
+): EvidenceItem | null {
   const series = ds.series.find((x) => x.code === code);
   if (!series || ds.periods.length === 0) return null;
   const lastIdx = ds.periods.length - 1;
@@ -294,8 +306,18 @@ function indexChange(ds: IndexDataset, code: string, basePeriod: string | undefi
       { label: '変化率（本ツールで計算）', value: `${bp >= 0 ? '+' : ''}${formatBp(bp)}` },
     ],
     computedByTool: true,
-    source: { publisher: ds.publisher, title: ds.title, url: ds.url, retrievedAt: ds.retrievedAt, credit: ds.credit },
-    chart: { label: title, unit: series.unit, points: ds.periods.map((p, i) => ({ period: p, value: series.values[i] as number })) },
+    source: {
+      publisher: ds.publisher,
+      title: ds.title,
+      url: ds.url,
+      retrievedAt: ds.retrievedAt,
+      credit: ds.credit,
+    },
+    chart: {
+      label: title,
+      unit: series.unit,
+      points: ds.periods.map((p, i) => ({ period: p, value: series.values[i] as number })),
+    },
   };
 }
 
@@ -311,14 +333,30 @@ function officialYoY(ds: IndexDataset, code: string): EvidenceItem | null {
     topic: 'general',
     title: `${title}（総平均・前年比）`,
     statement: `${publisherShort(ds.publisher)}「${statName(ds)}」によりますと、${toWarekiMonth(period)}の${title}（総平均）は前年同月比${v >= 0 ? '+' : ''}${v.toFixed(1)}％でございました。`,
-    figures: [{ label: `${toWarekiMonth(period)} 前年同月比`, value: `${v >= 0 ? '+' : ''}${v.toFixed(1)}%` }],
+    figures: [
+      { label: `${toWarekiMonth(period)} 前年同月比`, value: `${v >= 0 ? '+' : ''}${v.toFixed(1)}%` },
+    ],
     computedByTool: false,
-    source: { publisher: ds.publisher, title: ds.title, url: ds.url, retrievedAt: ds.retrievedAt, credit: ds.credit },
-    chart: { label: `${title} 総平均 前年比`, unit: series.unit, points: ds.periods.map((p, i) => ({ period: p, value: series.values[i] as number })) },
+    source: {
+      publisher: ds.publisher,
+      title: ds.title,
+      url: ds.url,
+      retrievedAt: ds.retrievedAt,
+      credit: ds.credit,
+    },
+    chart: {
+      label: `${title} 総平均 前年比`,
+      unit: series.unit,
+      points: ds.periods.map((p, i) => ({ period: p, value: series.values[i] as number })),
+    },
   };
 }
 
-function minimumWageItem(mw: MinimumWageDataset, asOf: IsoDate, prefecture: string | undefined): EvidenceItem | null {
+function minimumWageItem(
+  mw: MinimumWageDataset,
+  asOf: IsoDate,
+  prefecture: string | undefined,
+): EvidenceItem | null {
   const latest = mw.national[mw.national.length - 1];
   if (!latest) return null;
   const prev = mw.national.find((x) => x.fiscalYear === latest.fiscalYear - 1);
@@ -326,9 +364,16 @@ function minimumWageItem(mw: MinimumWageDataset, asOf: IsoDate, prefecture: stri
   const incPct = latest.increasePct;
   const fy = toWarekiFiscalYear(latest.fiscalYear);
   let statement = `厚生労働省「地域別最低賃金の全国一覧」によりますと、${fy}の地域別最低賃金（改定額）の全国加重平均は${withCommas(latest.yen)}円で`;
-  statement += incYen !== null ? `、前年度から${incYen}円${incPct !== null ? `（${incPct.toFixed(1)}％）` : ''}の引上げとなっております。` : 'ございます。';
+  statement +=
+    incYen !== null
+      ? `、前年度から${incYen}円${incPct !== null ? `（${incPct.toFixed(1)}％）` : ''}の引上げとなっております。`
+      : 'ございます。';
   const figures = [{ label: `${fy} 全国加重平均`, value: `${withCommas(latest.yen)}円` }];
-  if (incYen !== null) figures.push({ label: '前年度からの引上げ', value: `${incYen}円${incPct !== null ? `（${incPct.toFixed(1)}%）` : ''}` });
+  if (incYen !== null)
+    figures.push({
+      label: '前年度からの引上げ',
+      value: `${incYen}円${incPct !== null ? `（${incPct.toFixed(1)}%）` : ''}`,
+    });
   if (prefecture) {
     const p = mw.prefectures.find((x) => x.name === prefecture || x.fullName === prefecture);
     const v = p?.values[p.values.length - 1];
@@ -346,7 +391,13 @@ function minimumWageItem(mw: MinimumWageDataset, asOf: IsoDate, prefecture: stri
     statement,
     figures,
     computedByTool: false,
-    source: { publisher: mw.publisher, title: mw.title, url: mw.url, retrievedAt: mw.retrievedAt, credit: mw.credit },
+    source: {
+      publisher: mw.publisher,
+      title: mw.title,
+      url: mw.url,
+      retrievedAt: mw.retrievedAt,
+      credit: mw.credit,
+    },
     chart: {
       label: '地域別最低賃金 全国加重平均',
       unit: '円（時間額）',
@@ -369,8 +420,18 @@ function shuntoItem(sh: ShuntoDataset): EvidenceItem | null {
       { label: `${era} 妥結額`, value: `${withCommas(latest.settlementYen)}円` },
     ],
     computedByTool: false,
-    source: { publisher: sh.publisher, title: sh.title, url: sh.url, retrievedAt: sh.retrievedAt, credit: sh.credit },
-    chart: { label: '春季賃上げ率', unit: '％', points: sh.series.map((x) => ({ period: String(x.year), value: x.ratePct })) },
+    source: {
+      publisher: sh.publisher,
+      title: sh.title,
+      url: sh.url,
+      retrievedAt: sh.retrievedAt,
+      credit: sh.credit,
+    },
+    chart: {
+      label: '春季賃上げ率',
+      unit: '％',
+      points: sh.series.map((x) => ({ period: String(x.year), value: x.ratePct })),
+    },
   };
 }
 
@@ -380,12 +441,21 @@ const SPPI_FREIGHT_NAME = '道路貨物輸送';
 
 /** Evidence items for a letter, in the order: materials, energy, logistics, labour, general. */
 export function buildEvidence(stats: StatsBundle, options: EvidenceOptions): EvidenceItem[] {
-  const inc = { material: true, energy: true, logistics: true, labor: true, general: true, ...options.include };
+  const inc = {
+    material: true,
+    energy: true,
+    logistics: true,
+    labor: true,
+    general: true,
+    ...options.include,
+  };
   const out: EvidenceItem[] = [];
   const push = (x: EvidenceItem | null) => {
     if (x && !out.some((y) => y.id === x.id)) out.push(x);
   };
-  if (stats.cgpi && inc.material) for (const code of options.materialSeries) push(indexChange(stats.cgpi, code, options.basePeriod, 'material'));
+  if (stats.cgpi && inc.material)
+    for (const code of options.materialSeries)
+      push(indexChange(stats.cgpi, code, options.basePeriod, 'material'));
   if (stats.cgpi && inc.energy) {
     const e = stats.cgpi.series.find((x) => x.name === CGPI_ENERGY_NAME);
     if (e) push(indexChange(stats.cgpi, e.code, options.basePeriod, 'energy'));
@@ -394,7 +464,8 @@ export function buildEvidence(stats: StatsBundle, options: EvidenceOptions): Evi
     const f = stats.sppi.series.find((x) => x.name === SPPI_FREIGHT_NAME);
     if (f) push(indexChange(stats.sppi, f.code, options.basePeriod, 'logistics'));
   }
-  if (stats.minimumWage && inc.labor) push(minimumWageItem(stats.minimumWage, options.asOf, options.prefecture));
+  if (stats.minimumWage && inc.labor)
+    push(minimumWageItem(stats.minimumWage, options.asOf, options.prefecture));
   if (stats.shunto && inc.labor) push(shuntoItem(stats.shunto));
   if (stats.cgpi && inc.general) push(officialYoY(stats.cgpi, CGPI_TOTAL_YOY));
   return out;

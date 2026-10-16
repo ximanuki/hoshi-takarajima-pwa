@@ -23,7 +23,8 @@ export function roundPrice(valueSen: number, rule: PriceRoundingRule): number {
   const band = bandFor(valueSen, rule.bands);
   const unitSen = band.unit * 100;
   const ending = rule.ending ?? 0;
-  if (ending < 0 || ending >= band.unit) throw new RangeError(`ending ${ending} must be between 0 and ${band.unit - 1}`);
+  if (ending < 0 || ending >= band.unit)
+    throw new RangeError(`ending ${ending} must be between 0 and ${band.unit - 1}`);
   const endSen = ending * 100;
   const lowK = divFloor(valueSen - endSen, unitSen);
   const low = lowK * unitSen + endSen;

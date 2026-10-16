@@ -122,11 +122,16 @@ export function loadWorkspace(inputs: readonly InputFile[], options: WorkspaceOp
     if (date === undefined) {
       if (agreementFiles.length === 1 && inferred.length === 1) {
         date = inferred[0];
-        if (date !== undefined) notes.push(`${af.name} を ${toWareki(date)} の定価改定の合意状況として扱いました（定価の履歴から判断）。`);
+        if (date !== undefined)
+          notes.push(
+            `${af.name} を ${toWareki(date)} の定価改定の合意状況として扱いました（定価の履歴から判断）。`,
+          );
       }
     }
     if (date === undefined) {
-      notes.push(`${af.name}: どの定価改定の合意状況か決められないため、使っていません。改定日を指定してください。`);
+      notes.push(
+        `${af.name}: どの定価改定の合意状況か決められないため、使っていません。改定日を指定してください。`,
+      );
       continue;
     }
     revisions.push({ date, label: `${toWareki(date)} 定価改定`, agreements: af.rows });
@@ -199,7 +204,9 @@ export function settingsFromJson(json: unknown): Partial<Settings> {
 /** Company profile from a JSON object like public/sample/company.json. */
 export function companyFromJson(json: unknown): Company {
   const o = (typeof json === 'object' && json !== null ? json : {}) as Record<string, unknown>;
-  const branches = Array.isArray(o['branches']) ? o['branches'].filter((b): b is string => typeof b === 'string') : [];
+  const branches = Array.isArray(o['branches'])
+    ? o['branches'].filter((b): b is string => typeof b === 'string')
+    : [];
   return {
     name: str(o, 'name'),
     business: str(o, 'business'),

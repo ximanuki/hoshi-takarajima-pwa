@@ -34,12 +34,14 @@ export function customerKey(raw: string, width = 6): string {
   return digits.padStart(width, '0');
 }
 
+const IDEOGRAPHIC_SPACE = String.fromCharCode(0x3000);
+
 /** ASCII -> 全角 (space -> U+3000). Kana and kanji are left as they are. */
 export function toFullWidth(s: string): string {
   let out = '';
   for (const ch of s) {
     const c = ch.charCodeAt(0);
-    if (c === 0x20) out += '　';
+    if (c === 0x20) out += IDEOGRAPHIC_SPACE;
     else if (c >= 0x21 && c <= 0x7e) out += String.fromCharCode(c + 0xfee0);
     else out += ch;
   }
