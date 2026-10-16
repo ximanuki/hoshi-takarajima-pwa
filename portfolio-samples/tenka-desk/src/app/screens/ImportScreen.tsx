@@ -310,7 +310,9 @@ function DataNotes() {
             {ds.revisions.length > 0 ? ds.revisions.map((r) => r.label).join('、') : 'なし'}
           </p>
           {agreementFiles.map((f) => {
-            const current = app.settings.revisionDates[f.name] ?? '';
+            const current =
+              app.settings.revisionDates[f.name] ??
+              (agreementFiles.length === 1 && ds.revisions.length === 1 ? (ds.revisions[0]?.date ?? '') : '');
             return (
               <form
                 key={f.name}

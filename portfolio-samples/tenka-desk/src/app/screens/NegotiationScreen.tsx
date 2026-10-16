@@ -148,7 +148,7 @@ export function NegotiationScreen() {
 
   return (
     <>
-      <div className="no-print">
+      <div className="no-print stack">
         <PageHeader
           step={6}
           title="交渉の記録"

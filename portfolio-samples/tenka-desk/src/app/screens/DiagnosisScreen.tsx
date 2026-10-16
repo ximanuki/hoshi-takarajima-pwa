@@ -251,7 +251,7 @@ export function DiagnosisScreen() {
               {filtered.slice(0, shown).map((f) => (
                 <Fragment key={f.id}>
                   <tr className={open === f.id ? 'is-open' : ''}>
-                    <td>
+                    <td className="nowrap">
                       <button
                         type="button"
                         className="link-button"

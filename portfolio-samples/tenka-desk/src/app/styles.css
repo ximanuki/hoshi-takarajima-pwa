@@ -249,7 +249,8 @@ th.num {
   margin: 0 auto;
   padding: 24px;
 }
-.main > * + * {
+.main > * + *,
+.stack > * + * {
   margin-top: 16px;
 }
 

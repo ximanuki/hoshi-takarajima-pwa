@@ -162,7 +162,7 @@ export function LetterScreen() {
 
   return (
     <>
-      <div className="no-print">
+      <div className="no-print stack">
         <PageHeader
           step={5}
           title="申入書（価格改定のお願い）"
