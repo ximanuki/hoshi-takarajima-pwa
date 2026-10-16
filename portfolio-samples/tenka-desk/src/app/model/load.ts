@@ -14,6 +14,7 @@ import {
   type FileKind,
   type ImportIssue,
   type IsoDate,
+  importFile,
   LayoutNotRecognisedError,
   type LineDiagnosis,
   layoutById,
@@ -24,7 +25,6 @@ import {
   settingsFromJson,
   type Workspace,
   workspaceFromImports,
-  importFile,
 } from '../../engine/index.ts';
 import { encodingLabel } from '../format.ts';
 
@@ -245,7 +245,9 @@ export async function buildLoaded(sources: readonly SourceFile[], opts: LoadOpti
         info.header = e.header;
         files.push(info);
       } else {
-        files.push(emptyInfo(src.name, 'error', '読み込めません', e instanceof Error ? e.message : String(e)));
+        files.push(
+          emptyInfo(src.name, 'error', '読み込めません', e instanceof Error ? e.message : String(e)),
+        );
       }
     }
   }

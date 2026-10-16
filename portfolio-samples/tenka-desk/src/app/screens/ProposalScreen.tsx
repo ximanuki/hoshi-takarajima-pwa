@@ -64,21 +64,31 @@ export function ProposalScreen() {
         title="提案（得意先ごと）"
         lead={
           <p>
-            得意先 × 商品ごとの新しい単価です。新しい定価 × 得意先の掛率で計算するので、掛率ランクの関係はそのまま保たれます。単価は手で変えられますが、ガードレール（値上げ率の上限・掛率ランク）を外れる値は使えません。適用日：
+            得意先 × 商品ごとの新しい単価です。新しい定価 ×
+            得意先の掛率で計算するので、掛率ランクの関係はそのまま保たれます。単価は手で変えられますが、ガードレール（値上げ率の上限・掛率ランク）を外れる値は使えません。適用日：
             {wareki(proposal.effectiveDate)}
           </p>
         }
       />
       <div className="kpi-row">
-        <Kpi label="提案する得意先" value={`${num(customersWithItems)}社`} sub={`${num(proposedPairs.length)}組（得意先×商品）`} />
+        <Kpi
+          label="提案する得意先"
+          value={`${num(customersWithItems)}社`}
+          sub={`${num(proposedPairs.length)}組（得意先×商品）`}
+        />
         <Kpi label="値上げ額（年間・依頼どおり）" value={yen(requested)} emphasis />
-        <Kpi label="平均の改定率" value={base > 0 ? pctDelta(changeBp(base + requested, base)) : '—'} sub="直近12か月の数量で加重" />
+        <Kpi
+          label="平均の改定率"
+          value={base > 0 ? pctDelta(changeBp(base + requested, base)) : '—'}
+          sub="直近12か月の数量で加重"
+        />
         <Kpi label="要確認" value={`${num(attention)}組`} sub={`提案から外した組 ${num(excluded)}`} />
       </div>
       {rejectedOverrides.length > 0 && (
         <Notice tone="warning" title="手入力の単価のうち、今の設定では使えないものがあります">
           <p>
-            {num(rejectedOverrides.length)}組は提案単価に戻して計算しています。ガードレールを変えたときに起きます。下の一覧で確認してください。
+            {num(rejectedOverrides.length)}
+            組は提案単価に戻して計算しています。ガードレールを変えたときに起きます。下の一覧で確認してください。
           </p>
         </Notice>
       )}
@@ -97,7 +107,11 @@ export function ProposalScreen() {
             />
           </label>
           <label className="checkbox">
-            <input type="checkbox" checked={onlyAttention} onChange={(e) => setOnlyAttention(e.target.checked)} />
+            <input
+              type="checkbox"
+              checked={onlyAttention}
+              onChange={(e) => setOnlyAttention(e.target.checked)}
+            />
             要確認がある得意先だけ
           </label>
         </div>
@@ -178,8 +192,8 @@ export function ProposalScreen() {
 function CustomerPairs({ c }: { c: CustomerProposal }) {
   const { loaded } = useApp();
   const ds = loaded?.ws.dataset;
-  const pairs = [...c.pairs].sort(
-    (a, b) => (a.status === b.status ? b.changeYen * b.qty - a.changeYen * a.qty : a.status === 'proposed' ? -1 : 1),
+  const pairs = [...c.pairs].sort((a, b) =>
+    a.status === b.status ? b.changeYen * b.qty - a.changeYen * a.qty : a.status === 'proposed' ? -1 : 1,
   );
   return (
     <div className="pair-detail">
@@ -331,7 +345,11 @@ function PriceEditor({ p }: { p: AppPair }) {
         </button>
       )}
       {message && (
-        <span id={msgId} className={`block small ${message.tone === 'error' ? 'text-critical' : 'text-warning'}`} role="alert">
+        <span
+          id={msgId}
+          className={`block small ${message.tone === 'error' ? 'text-critical' : 'text-warning'}`}
+          role="alert"
+        >
           {message.text}
         </span>
       )}

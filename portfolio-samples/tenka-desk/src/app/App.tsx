@@ -56,7 +56,11 @@ function Shell() {
 
   return (
     <div className="app">
-      <button type="button" className="skip-link" onClick={() => mainRef.current?.querySelector('h1')?.focus()}>
+      <button
+        type="button"
+        className="skip-link"
+        onClick={() => mainRef.current?.querySelector('h1')?.focus()}
+      >
         本文へ移動
       </button>
       <header className="topbar no-print">
@@ -71,7 +75,11 @@ function Shell() {
             <Icon name="lock" size={16} />
             データはこのブラウザの中だけで処理し、外部に送信しません
           </p>
-          <button type="button" className="btn btn-small btn-danger-ghost" onClick={() => setConfirmClear(true)}>
+          <button
+            type="button"
+            className="btn btn-small btn-danger-ghost"
+            onClick={() => setConfirmClear(true)}
+          >
             <Icon name="trash" size={16} /> データを消す
           </button>
         </div>
@@ -120,7 +128,8 @@ function Shell() {
       </main>
       <footer className="footer no-print">
         <p>
-          {APP_NAME}は、価格協議の根拠資料づくりを支援するデモです。計算はすべて決まった式で行い、AIによる推定は使っていません。読み込んだデータはこのブラウザの中（IndexedDB）にだけ保存され、「データを消す」でいつでも消せます。
+          {APP_NAME}
+          は、価格協議の根拠資料づくりを支援するデモです。計算はすべて決まった式で行い、AIによる推定は使っていません。読み込んだデータはこのブラウザの中（IndexedDB）にだけ保存され、「データを消す」でいつでも消せます。
         </p>
         <p>
           サンプルデータの会社・得意先・商品・取引はすべて架空です。申入書の参考資料は公表統計の写しで、出典を表示しています。この画面の内容は一般的な情報で、法的な助言ではありません。

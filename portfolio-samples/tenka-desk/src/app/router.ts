@@ -37,7 +37,9 @@ export function navigate(id: RouteId, arg?: string | null): void {
 }
 
 export function useRoute(): Route {
-  const [route, setRoute] = useState<Route>(() => parseHash(window.location.hash) ?? { id: 'import', arg: null });
+  const [route, setRoute] = useState<Route>(
+    () => parseHash(window.location.hash) ?? { id: 'import', arg: null },
+  );
   useEffect(() => {
     const on = () => {
       const r = parseHash(window.location.hash);

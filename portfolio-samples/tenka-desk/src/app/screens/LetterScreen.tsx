@@ -4,8 +4,8 @@ import {
   buildEvidence,
   buildLetter,
   type Company,
-  EVIDENCE_TOPIC_JA,
   type EffectiveBasis,
+  EVIDENCE_TOPIC_JA,
   type EvidenceItem,
   type EvidenceTopic,
   type LetterData,
@@ -66,7 +66,8 @@ export function LetterScreen() {
     () => (proposal?.ok ? proposal.customers.filter((c) => c.proposedItems > 0) : []),
     [proposal],
   );
-  const cust = route.arg && candidates.some((c) => c.cust === route.arg) ? route.arg : (candidates[0]?.cust ?? null);
+  const cust =
+    route.arg && candidates.some((c) => c.cust === route.arg) ? route.arg : (candidates[0]?.cust ?? null);
   const [recorded, setRecorded] = useState<string | null>(null);
 
   const ds = loaded?.ws.dataset;
@@ -75,12 +76,16 @@ export function LetterScreen() {
 
   const letter = useMemo((): { data: LetterData; evidence: EvidenceItem[] } | { error: string } | null => {
     if (!ds || !proposal?.ok || !cust || !customer || !stats) return null;
-    const cats = new Set(proposal.pairs.filter((p) => p.cust === cust && p.status === 'proposed').map((p) => p.category));
+    const cats = new Set(
+      proposal.pairs.filter((p) => p.cust === cust && p.status === 'proposed').map((p) => p.category),
+    );
     const materialSeries: string[] = [];
     if (stats.bundle.cgpi) {
       for (const code of cats) {
         const cat = ds.categories.get(code);
-        if (cat) for (const s of seriesForCategory(cat, stats.bundle.cgpi)) if (!materialSeries.includes(s)) materialSeries.push(s);
+        if (cat)
+          for (const s of seriesForCategory(cat, stats.bundle.cgpi))
+            if (!materialSeries.includes(s)) materialSeries.push(s);
       }
     }
     const evidence = buildEvidence(stats.bundle, {
@@ -122,7 +127,8 @@ export function LetterScreen() {
         <PageHeader step={5} title="申入書（価格改定のお願い）" />
         <Notice tone="info" title="申入書を作れる得意先がありません">
           <p>
-            提案に値上げの品目がある得意先について作ります。<a href={href('scenario')}>シナリオ</a>を見直してください。
+            提案に値上げの品目がある得意先について作ります。<a href={href('scenario')}>シナリオ</a>
+            を見直してください。
           </p>
         </Notice>
       </>
@@ -211,7 +217,10 @@ export function LetterScreen() {
             </label>
             <label className="field">
               改定の基準
-              <select value={ls.basis} onChange={(e) => setLetter({ basis: e.target.value as EffectiveBasis })}>
+              <select
+                value={ls.basis}
+                onChange={(e) => setLetter({ basis: e.target.value as EffectiveBasis })}
+              >
                 <option value="出荷分">出荷分より</option>
                 <option value="受注分">受注分より</option>
                 <option value="納品分">納品分より</option>
@@ -221,7 +230,9 @@ export function LetterScreen() {
               ご回答のお願い
               <select
                 value={ls.replyDays ?? ''}
-                onChange={(e) => setLetter({ replyDays: e.target.value === '' ? null : Number(e.target.value) })}
+                onChange={(e) =>
+                  setLetter({ replyDays: e.target.value === '' ? null : Number(e.target.value) })
+                }
               >
                 <option value="">書かない</option>
                 <option value="14">発行日から2週間後</option>
@@ -265,7 +276,11 @@ export function LetterScreen() {
               ).map(([k, label]) => (
                 <label key={k} className="field">
                   {label}
-                  <input type="text" value={app.company[k]} onChange={(e) => setCompany({ [k]: e.target.value })} />
+                  <input
+                    type="text"
+                    value={app.company[k]}
+                    onChange={(e) => setCompany({ [k]: e.target.value })}
+                  />
                 </label>
               ))}
             </div>
@@ -437,7 +452,8 @@ function LetterSheets({ data }: { data: LetterData }) {
                   ))}
                 </dl>
                 <p className="evidence-source">
-                  出典：{e.source.publisher}「{e.source.title}」（{e.source.url}、{e.source.retrievedAt.slice(0, 10)}取得）
+                  出典：{e.source.publisher}「{e.source.title}」（{e.source.url}、
+                  {e.source.retrievedAt.slice(0, 10)}取得）
                 </p>
               </figure>
             ))}

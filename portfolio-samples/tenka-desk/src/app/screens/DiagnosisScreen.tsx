@@ -3,8 +3,8 @@ import {
   type Finding,
   LEAK_LABEL_JA,
   LEAK_TYPES,
-  LINE_STATUS_JA,
   type LeakType,
+  LINE_STATUS_JA,
   type LineStatus,
   toCompactDate,
   toCsv,
@@ -18,7 +18,8 @@ const TYPE_HELP: Record<LeakType, string> = {
   old_price: '定価改定のあと、合意どおりなら新しい単価のはずなのに、旧定価 × 掛率 のまま請求している行です。',
   expired_special: '特値（期間つきの得意先別単価）の期間が終わった後も、同じ単価で請求している行です。',
   rate_out_of_tier: '請求単価が、定価 × 得意先の掛率ランクの範囲（下限〜上限）の外にある行です。',
-  below_margin_floor: '粗利率が設定した下限を下回っている行です。請求ミスではありませんが、値上げの検討対象です。',
+  below_margin_floor:
+    '粗利率が設定した下限を下回っている行です。請求ミスではありませんが、値上げの検討対象です。',
 };
 
 const PAGE = 50;
@@ -41,7 +42,10 @@ export function DiagnosisScreen() {
       .filter(
         (f) =>
           q === '' ||
-          `${f.cust} ${f.custName} ${f.sku} ${f.itemName} ${f.id}`.normalize('NFKC').toLowerCase().includes(q),
+          `${f.cust} ${f.custName} ${f.sku} ${f.itemName} ${f.id}`
+            .normalize('NFKC')
+            .toLowerCase()
+            .includes(q),
       )
       .sort((a, b) => b.annualImpactYen - a.annualImpactYen || (a.id < b.id ? -1 : 1));
   }, [d, type, query, onlyOngoing]);
@@ -107,7 +111,8 @@ export function DiagnosisScreen() {
         title="診断（利益漏れ）"
         lead={
           <p>
-            売上明細の1行ごとに、取り決めどおりの単価（期間内の特値、または 定価 × 掛率）と比べました。影響額は直近12か月（
+            売上明細の1行ごとに、取り決めどおりの単価（期間内の特値、または 定価 ×
+            掛率）と比べました。影響額は直近12か月（
             {warekiRange(d.window.start, d.window.end)}）の実際の不足額で、予測ではありません。
           </p>
         }
@@ -162,8 +167,8 @@ export function DiagnosisScreen() {
         />
         <p className="small muted">
           粗利下限割れは請求ミスではなく、粗利率の下限（{loaded.ws.dataset.settings.marginFloorBp / 100}
-          %）を満たす単価との差です。1行に複数の問題があるときは、反映漏れ → 特値の期限切れ → 掛け率ランク外 → 粗利下限割れ
-          の順で1つに数えています。
+          %）を満たす単価との差です。1行に複数の問題があるときは、反映漏れ → 特値の期限切れ → 掛け率ランク外 →
+          粗利下限割れ の順で1つに数えています。
         </p>
       </section>
 
@@ -175,8 +180,9 @@ export function DiagnosisScreen() {
           <ul className="callout-list">
             {wholeCustomers.map((c) => (
               <li key={`${c.cust}-${c.type}`}>
-                <strong>{c.custName}</strong>（{c.cust}）：{LEAK_LABEL_JA[c.type]}が {num(c.eligiblePairs)}品目中{' '}
-                {num(c.affectedPairs)}品目（{warekiRange(c.firstDate, c.lastDate)}）・直近12か月 {yen(c.annualImpactYen)}
+                <strong>{c.custName}</strong>（{c.cust}）：{LEAK_LABEL_JA[c.type]}が {num(c.eligiblePairs)}
+                品目中 {num(c.affectedPairs)}品目（{warekiRange(c.firstDate, c.lastDate)}）・直近12か月{' '}
+                {yen(c.annualImpactYen)}
               </li>
             ))}
           </ul>

@@ -10,7 +10,8 @@ import { href } from '../router.ts';
 import { fetchSample, SAMPLE_OUTCOMES } from '../sample.ts';
 
 const CURRENT_PRICE_HELP: Record<ExportSettings['currentPrice'], string> = {
-  system: '販売管理が今請求している単価（請求ミスが続いている組は、その請求単価）。反映チェックで旧単価のままの請求を見つけるのに使います。',
+  system:
+    '販売管理が今請求している単価（請求ミスが続いている組は、その請求単価）。反映チェックで旧単価のままの請求を見つけるのに使います。',
   expected: '取り決めどおりの今の単価（特値、または 定価 × 掛率）。',
   last_billed: '売上明細で最後に請求した単価。',
 };
@@ -43,7 +44,11 @@ export function ExportScreen() {
 
   const save = (layout: 'A' | 'B') => {
     const out = exportPriceMaster(ds, rows, layout, { encoding: opts.encoding });
-    downloadFile(out.fileName, out.bytes, `text/csv;charset=${opts.encoding === 'shift_jis' ? 'shift_jis' : 'utf-8'}`);
+    downloadFile(
+      out.fileName,
+      out.bytes,
+      `text/csv;charset=${opts.encoding === 'shift_jis' ? 'shift_jis' : 'utf-8'}`,
+    );
   };
 
   const useSampleOutcomes = async () => {
@@ -126,7 +131,8 @@ export function ExportScreen() {
         {opts.outcomeSource === 'logs' && agreed === 0 && (
           <Notice tone="info" title="まだ合意した得意先がありません">
             <p>
-              <a href={href('negotiation')}>交渉の記録</a>で「合意」または「一部合意」を記録すると、ここに出てきます。
+              <a href={href('negotiation')}>交渉の記録</a>
+              で「合意」または「一部合意」を記録すると、ここに出てきます。
             </p>
           </Notice>
         )}
@@ -138,8 +144,19 @@ export function ExportScreen() {
             <legend>「現単価」の列</legend>
             {(['system', 'expected', 'last_billed'] as const).map((k) => (
               <label key={k} className="radio">
-                <input type="radio" name="current-price" checked={opts.currentPrice === k} onChange={() => setOpts({ currentPrice: k })} />
-                {{ system: '販売管理の今の単価（おすすめ）', expected: '取り決めどおりの単価', last_billed: '最後に請求した単価' }[k]}
+                <input
+                  type="radio"
+                  name="current-price"
+                  checked={opts.currentPrice === k}
+                  onChange={() => setOpts({ currentPrice: k })}
+                />
+                {
+                  {
+                    system: '販売管理の今の単価（おすすめ）',
+                    expected: '取り決めどおりの単価',
+                    last_billed: '最後に請求した単価',
+                  }[k]
+                }
                 <span className="block small muted">{CURRENT_PRICE_HELP[k]}</span>
               </label>
             ))}
@@ -147,7 +164,12 @@ export function ExportScreen() {
           <fieldset className="radio-group">
             <legend>文字コード</legend>
             <label className="radio">
-              <input type="radio" name="enc" checked={opts.encoding === 'utf-8'} onChange={() => setOpts({ encoding: 'utf-8' })} />
+              <input
+                type="radio"
+                name="enc"
+                checked={opts.encoding === 'utf-8'}
+                onChange={() => setOpts({ encoding: 'utf-8' })}
+              />
               UTF-8（A形式はBOM付き）
             </label>
             <label className="radio">
@@ -171,10 +193,20 @@ export function ExportScreen() {
           <Kpi label="値上げ額（年間・直近12か月の数量）" value={yen(yearly)} />
         </div>
         <div className="button-row">
-          <button type="button" className="btn btn-primary" disabled={rows.length === 0} onClick={() => save('A')}>
+          <button
+            type="button"
+            className="btn btn-primary"
+            disabled={rows.length === 0}
+            onClick={() => save('A')}
+          >
             <Icon name="download" /> 販売管理A形式で保存
           </button>
-          <button type="button" className="btn btn-primary" disabled={rows.length === 0} onClick={() => save('B')}>
+          <button
+            type="button"
+            className="btn btn-primary"
+            disabled={rows.length === 0}
+            onClick={() => save('B')}
+          >
             <Icon name="download" /> 販売管理B形式で保存
           </button>
         </div>
@@ -218,7 +250,9 @@ export function ExportScreen() {
             </table>
           </div>
         )}
-        {rows.length > 100 && <p className="small muted">先頭100行を表示しています（全{num(rows.length)}行）。</p>}
+        {rows.length > 100 && (
+          <p className="small muted">先頭100行を表示しています（全{num(rows.length)}行）。</p>
+        )}
         {rows.length > 0 && (
           <p className="button-row">
             <a className="btn" href={href('followup')}>

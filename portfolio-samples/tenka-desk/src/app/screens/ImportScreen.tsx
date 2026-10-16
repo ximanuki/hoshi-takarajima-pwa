@@ -58,7 +58,9 @@ export function ImportScreen() {
             onFiles={(files) => app.addFiles(files)}
           />
           {inputs?.source === 'sample' && (
-            <p className="muted small">ファイルを読み込むと、サンプルデータは外して自社のファイルだけで計算し直します。</p>
+            <p className="muted small">
+              ファイルを読み込むと、サンプルデータは外して自社のファイルだけで計算し直します。
+            </p>
           )}
         </Card>
       </div>
@@ -133,7 +135,11 @@ export function ImportScreen() {
             {mapping && (
               <ColumnMapper
                 file={loaded.files.find((f) => f.name === mapping) ?? null}
-                current={inputs?.source === 'upload' ? (inputs.files.find((f) => f.name === mapping)?.mapping ?? null) : null}
+                current={
+                  inputs?.source === 'upload'
+                    ? (inputs.files.find((f) => f.name === mapping)?.mapping ?? null)
+                    : null
+                }
                 onApply={async (choice) => {
                   await app.setMapping(mapping, choice);
                   setMappingFor(null);
@@ -150,7 +156,17 @@ export function ImportScreen() {
   );
 }
 
-function FileRow({ f, canEdit, onRemove, onMap }: { f: FileInfo; canEdit: boolean; onRemove: () => void; onMap: () => void }) {
+function FileRow({
+  f,
+  canEdit,
+  onRemove,
+  onMap,
+}: {
+  f: FileInfo;
+  canEdit: boolean;
+  onRemove: () => void;
+  onMap: () => void;
+}) {
   return (
     <tr>
       <td>
@@ -194,7 +210,12 @@ function FileRow({ f, canEdit, onRemove, onMap }: { f: FileInfo; canEdit: boolea
                 列を指定
               </button>
             )}
-            <button type="button" className="btn btn-small btn-ghost" onClick={onRemove} aria-label={`${f.name} を外す`}>
+            <button
+              type="button"
+              className="btn btn-small btn-ghost"
+              onClick={onRemove}
+              aria-label={`${f.name} を外す`}
+            >
               <Icon name="trash" size={16} /> 外す
             </button>
           </div>
@@ -229,7 +250,9 @@ function FileChecklist({ kinds }: { kinds: ReadonlySet<FileKind> }) {
               </span>
               <span>
                 <strong>{c.label}</strong>{' '}
-                <Badge tone={c.need === 'required' ? 'critical' : c.need === 'recommended' ? 'warning' : 'neutral'}>
+                <Badge
+                  tone={c.need === 'required' ? 'critical' : c.need === 'recommended' ? 'warning' : 'neutral'}
+                >
                   {c.need === 'required' ? '必須' : c.need === 'recommended' ? '推奨' : '任意'}
                 </Badge>{' '}
                 <span className="visually-hidden">{has ? '読み込み済み' : '未読み込み'}</span>
@@ -264,7 +287,8 @@ function DataNotes() {
       {loaded.duplicateLines > 0 && (
         <Notice tone="warning">
           <p>
-            同じ「伝票番号-行」の売上明細が複数のファイルに {num(loaded.duplicateLines)}行ありました。重複分は最初のファイルの行だけを使っています。
+            同じ「伝票番号-行」の売上明細が複数のファイルに {num(loaded.duplicateLines)}
+            行ありました。重複分は最初のファイルの行だけを使っています。
           </p>
         </Notice>
       )}
@@ -308,7 +332,9 @@ function DataNotes() {
                 <button type="submit" className="btn btn-small">
                   この日付で計算し直す
                 </button>
-                {current && assigned.has(current) && <span className="small muted">{toWareki(current)}として使用中</span>}
+                {current && assigned.has(current) && (
+                  <span className="small muted">{toWareki(current)}として使用中</span>
+                )}
               </form>
             );
           })}
@@ -414,7 +440,9 @@ function ColumnMapper({
         ))}
       </div>
       {missing.length > 0 && (
-        <p className="small text-critical">必須の項目が未指定です：{missing.map((c) => c.headers[0]).join('、')}</p>
+        <p className="small text-critical">
+          必須の項目が未指定です：{missing.map((c) => c.headers[0]).join('、')}
+        </p>
       )}
       <div className="button-row">
         <button

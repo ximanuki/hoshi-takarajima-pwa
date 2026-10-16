@@ -65,7 +65,9 @@ export async function fetchSample(name: string): Promise<Uint8Array> {
   return new Uint8Array(await res.arrayBuffer());
 }
 
-export async function fetchSampleFiles(names: readonly string[]): Promise<{ name: string; bytes: Uint8Array }[]> {
+export async function fetchSampleFiles(
+  names: readonly string[],
+): Promise<{ name: string; bytes: Uint8Array }[]> {
   return Promise.all(names.map(async (name) => ({ name, bytes: await fetchSample(name) })));
 }
 
@@ -116,8 +118,9 @@ export function loadStats(): Promise<StatsLoad> {
     if (mw) bundle.minimumWage = mw;
     if (shunto) bundle.shunto = shunto;
     let guideline: GuidelineInfo | null = null;
-    const g = (index as { guideline?: { title_ja?: unknown; url?: unknown; summary_ja?: unknown } } | undefined)
-      ?.guideline;
+    const g = (
+      index as { guideline?: { title_ja?: unknown; url?: unknown; summary_ja?: unknown } } | undefined
+    )?.guideline;
     if (g && typeof g.title_ja === 'string' && typeof g.url === 'string' && Array.isArray(g.summary_ja)) {
       guideline = {
         title: g.title_ja,

@@ -114,8 +114,7 @@ export function fillDemoOutcomes(
           return r.effective
             ? {
                 ...base,
-                summary:
-                  r.kind === 'agreed_later_date' ? '適用日を変更して合意' : '申入れどおり合意',
+                summary: r.kind === 'agreed_later_date' ? '適用日を変更して合意' : '申入れどおり合意',
                 status: '合意' as const,
                 terms: { effective: r.effective, excludedCategories: [], itemPrices: [] },
               }
@@ -134,7 +133,11 @@ export function fillDemoOutcomes(
               }
             : null;
         case 'declined':
-          return { ...base, summary: `今回は見送り${r.note ? `（${r.note}）` : ''}`, status: '見送り' as const };
+          return {
+            ...base,
+            summary: `今回は見送り${r.note ? `（${r.note}）` : ''}`,
+            status: '見送り' as const,
+          };
         case 'negotiating':
           return { ...base, summary: `協議中${r.note ? `（${r.note}）` : ''}`, status: '協議中' as const };
         default:

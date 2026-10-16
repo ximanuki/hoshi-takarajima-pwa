@@ -108,7 +108,8 @@ export function guardrailsFrom(ds: Dataset, g: GuardSettings): Guardrails {
 
 /** Checks that do not need the data: rounding units and the ending. */
 export function guardSettingsError(g: GuardSettings): string | null {
-  if (g.units.some((u) => !Number.isInteger(u) || u <= 0)) return '定価の丸め単位は1円以上の整数にしてください。';
+  if (g.units.some((u) => !Number.isInteger(u) || u <= 0))
+    return '定価の丸め単位は1円以上の整数にしてください。';
   if (g.ending !== null) {
     if (!Number.isInteger(g.ending) || g.ending < 0) return '末尾の指定は0以上の整数にしてください。';
     const smallest = Math.min(...g.units);
@@ -146,16 +147,25 @@ export function overrideBounds(ds: Dataset, p: PairProposal, guard: Guardrails):
 export type OverrideVerdict = { ok: true; warnings: string[] } | { ok: false; error: string };
 
 export function checkOverride(b: OverrideBounds, price: number): OverrideVerdict {
-  if (!Number.isSafeInteger(price) || price <= 0) return { ok: false, error: '1円以上の整数で入力してください。' };
+  if (!Number.isSafeInteger(price) || price <= 0)
+    return { ok: false, error: '1円以上の整数で入力してください。' };
   if (price < b.current)
-    return { ok: false, error: `現在の単価 ${b.current.toLocaleString('ja-JP')}円 より下げることはできません。` };
+    return {
+      ok: false,
+      error: `現在の単価 ${b.current.toLocaleString('ja-JP')}円 より下げることはできません。`,
+    };
   if (b.cap !== null && price > b.cap)
     return {
       ok: false,
       error: `値上げ率の上限を超えます（上限は ${b.cap.toLocaleString('ja-JP')}円）。`,
     };
   const warnings: string[] = [];
-  if (b.tierMin !== null && b.tierMax !== null && price > b.current && (price < b.tierMin || price > b.tierMax)) {
+  if (
+    b.tierMin !== null &&
+    b.tierMax !== null &&
+    price > b.current &&
+    (price < b.tierMin || price > b.tierMax)
+  ) {
     const msg = `掛率ランクの範囲（${b.tierMin.toLocaleString('ja-JP')}〜${b.tierMax.toLocaleString('ja-JP')}円）の外です。`;
     if (b.tierStrict) return { ok: false, error: msg };
     warnings.push(msg);
@@ -168,7 +178,12 @@ export function checkOverride(b: OverrideBounds, price: number): OverrideVerdict
 function withOverride(ds: Dataset, p: PairProposal, price: number, guard: Guardrails): PairProposal {
   const b = overrideBounds(ds, p, guard);
   const hits: GuardrailHit[] = [];
-  if (b.tierMin !== null && b.tierMax !== null && price > p.currentPrice && (price < b.tierMin || price > b.tierMax))
+  if (
+    b.tierMin !== null &&
+    b.tierMax !== null &&
+    price > p.currentPrice &&
+    (price < b.tierMin || price > b.tierMax)
+  )
     hits.push({
       rule: 'tier_conflict',
       message: `手入力の単価が掛率ランクの範囲（${b.tierMin}〜${b.tierMax}円）の外です`,
@@ -210,7 +225,8 @@ export function applyOverrides(
     const o = overrides[pairKey(p.cust, p.sku)];
     if (o === undefined) return base;
     const verdict = checkOverride(bounds, o);
-    if (!verdict.ok) return { ...base, overrideRejected: `手入力の単価 ${o}円 は使えません：${verdict.error}` };
+    if (!verdict.ok)
+      return { ...base, overrideRejected: `手入力の単価 ${o}円 は使えません：${verdict.error}` };
     return {
       ...withOverride(ds, p, o, guard),
       enginePrice: p.newPrice,
@@ -244,7 +260,8 @@ function summarise(ds: Dataset, pairs: AppPair[]): CustomerProposal[] {
         requested += p.changeYen * p.qty;
         base += p.currentPrice * p.qty;
       }
-      if (p.guardrails.some((h) => h.rule === 'margin_floor_unmet' || h.rule === 'tier_conflict')) attention++;
+      if (p.guardrails.some((h) => h.rule === 'margin_floor_unmet' || h.rule === 'tier_conflict'))
+        attention++;
     }
     out.push({
       cust,
@@ -272,7 +289,8 @@ export function computeProposal(
   overrides: Readonly<Record<string, number>>,
 ): ProposalResult {
   const ds = loaded.ws.dataset;
-  if (!loaded.diagnosis || !loaded.asOf) return { ok: false, error: '先に売上明細とマスタを読み込んでください。' };
+  if (!loaded.diagnosis || !loaded.asOf)
+    return { ok: false, error: '先に売上明細とマスタを読み込んでください。' };
   const guardError = guardSettingsError(guard);
   if (guardError) return { ok: false, error: guardError };
   const effectiveDate = scenario.effectiveDate ?? defaultEffectiveDate(loaded);

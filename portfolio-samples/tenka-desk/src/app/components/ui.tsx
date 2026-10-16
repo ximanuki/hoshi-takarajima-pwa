@@ -81,11 +81,27 @@ export function Kpi({
   );
 }
 
-export function Badge({ tone = 'neutral', children }: { tone?: 'neutral' | 'info' | 'warning' | 'critical' | 'good'; children: ReactNode }) {
+export function Badge({
+  tone = 'neutral',
+  children,
+}: {
+  tone?: 'neutral' | 'info' | 'warning' | 'critical' | 'good';
+  children: ReactNode;
+}) {
   return <span className={`badge badge-${tone}`}>{children}</span>;
 }
 
-export function PageHeader({ step, title, lead, actions }: { step?: number; title: string; lead?: ReactNode; actions?: ReactNode }) {
+export function PageHeader({
+  step,
+  title,
+  lead,
+  actions,
+}: {
+  step?: number;
+  title: string;
+  lead?: ReactNode;
+  actions?: ReactNode;
+}) {
   return (
     <header className="page-header">
       <div>
@@ -100,7 +116,17 @@ export function PageHeader({ step, title, lead, actions }: { step?: number; titl
   );
 }
 
-export function Card({ title, children, actions, className }: { title?: string; children: ReactNode; actions?: ReactNode; className?: string }) {
+export function Card({
+  title,
+  children,
+  actions,
+  className,
+}: {
+  title?: string;
+  children: ReactNode;
+  actions?: ReactNode;
+  className?: string;
+}) {
   const id = useId();
   return (
     <section className={`card${className ? ` ${className}` : ''}`} aria-labelledby={title ? id : undefined}>

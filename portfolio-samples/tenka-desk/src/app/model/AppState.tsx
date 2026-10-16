@@ -19,9 +19,9 @@ import {
   appendEvent,
   type Company,
   type IsoDate,
+  NegotiationError,
   type NegotiationEventDraft,
   type NegotiationLog,
-  NegotiationError,
   type SimulationResult,
   simulatePassThrough,
 } from '../../engine/index.ts';
@@ -85,7 +85,14 @@ export function useApp(): AppContextValue {
   return v;
 }
 
-const EMPTY_COMPANY: Company = { name: '', business: '', address: '', tel: '', representative: '', branches: [] };
+const EMPTY_COMPANY: Company = {
+  name: '',
+  business: '',
+  address: '',
+  tel: '',
+  representative: '',
+  branches: [],
+};
 
 function useDebounced<T>(value: T, ms: number): T {
   const [v, setV] = useState(value);
@@ -171,7 +178,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setSettings(restored);
         settingsRef.current = restored;
         if (l) setLogs(l);
-        if (f) setFollowupState({ ...NO_FOLLOWUP, ...f, masterSource: f.masterSource ?? (f.masterFile ? 'file' : 'built') });
+        if (f)
+          setFollowupState({
+            ...NO_FOLLOWUP,
+            ...f,
+            masterSource: f.masterSource ?? (f.masterFile ? 'file' : 'built'),
+          });
         if (o) setOutcomesFileState(o);
         savedInputs = i ?? null;
       } catch {
@@ -277,7 +289,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const setRevisionDate = useCallback(
     async (file: string, date: IsoDate) => {
-      const next = { ...settingsRef.current, revisionDates: { ...settingsRef.current.revisionDates, [file]: date } };
+      const next = {
+        ...settingsRef.current,
+        revisionDates: { ...settingsRef.current.revisionDates, [file]: date },
+      };
       setSettings(next);
       settingsRef.current = next;
       await rebuild(sourcesRef.current, inputs?.source === 'sample', next);
@@ -358,7 +373,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   );
   const calc = useDebounced(calcInput, 250);
   const computing =
-    calc.scenario !== settings.scenario || calc.guard !== settings.guard || calc.overrides !== settings.overrides;
+    calc.scenario !== settings.scenario ||
+    calc.guard !== settings.guard ||
+    calc.overrides !== settings.overrides;
   const proposal = useMemo(
     () => (loaded?.diagnosis ? computeProposal(loaded, calc.scenario, calc.guard, calc.overrides) : null),
     [loaded, calc],

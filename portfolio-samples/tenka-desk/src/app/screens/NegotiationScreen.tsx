@@ -40,16 +40,28 @@ export function NegotiationScreen() {
   const route = useRoute();
   const { loaded, proposal, logs } = app;
   const [query, setQuery] = useState('');
-  const [message, setMessage] = useState<{ tone: 'good' | 'warning' | 'critical'; text: string } | null>(null);
+  const [message, setMessage] = useState<{ tone: 'good' | 'warning' | 'critical'; text: string } | null>(
+    null,
+  );
 
   const customers = useMemo(() => {
     if (!proposal?.ok || !loaded) return [];
     const withItems = proposal.customers.filter((c) => c.proposedItems > 0);
     const extra = Object.keys(logs)
       .filter((c) => !proposal.customerByCode.get(c)?.proposedItems)
-      .map((c) => ({ cust: c, name: loaded.ws.dataset.customers.get(c)?.name ?? c, proposedItems: 0, requestedYen: 0 }));
+      .map((c) => ({
+        cust: c,
+        name: loaded.ws.dataset.customers.get(c)?.name ?? c,
+        proposedItems: 0,
+        requestedYen: 0,
+      }));
     return [
-      ...withItems.map((c) => ({ cust: c.cust, name: c.name, proposedItems: c.proposedItems, requestedYen: c.requestedYen })),
+      ...withItems.map((c) => ({
+        cust: c.cust,
+        name: c.name,
+        proposedItems: c.proposedItems,
+        requestedYen: c.requestedYen,
+      })),
       ...extra,
     ];
   }, [proposal, loaded, logs]);
@@ -93,7 +105,11 @@ export function NegotiationScreen() {
   };
 
   const exportAll = () => {
-    const json = JSON.stringify({ format: 'tenka-desk-negotiation-logs', version: 1, logs: Object.values(logs) }, null, 1);
+    const json = JSON.stringify(
+      { format: 'tenka-desk-negotiation-logs', version: 1, logs: Object.values(logs) },
+      null,
+      1,
+    );
     downloadFile(`協議記録_${toCompactDate(todayJst())}.json`, json, 'application/json');
   };
 
@@ -148,7 +164,12 @@ export function NegotiationScreen() {
                   サンプルの協議結果（架空）で埋める
                 </button>
               )}
-              <button type="button" className="btn" onClick={exportAll} disabled={Object.keys(logs).length === 0}>
+              <button
+                type="button"
+                className="btn"
+                onClick={exportAll}
+                disabled={Object.keys(logs).length === 0}
+              >
                 <Icon name="download" /> 記録を保存（JSON）
               </button>
               <label className="btn">
@@ -174,7 +195,12 @@ export function NegotiationScreen() {
         <div className="filters">
           <label className="field field-inline">
             <span>得意先を探す</span>
-            <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="名前・コード" />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="名前・コード"
+            />
           </label>
         </div>
         <div className="kanban" aria-label="状況ごとの得意先">
@@ -201,7 +227,9 @@ export function NegotiationScreen() {
                       </a>
                     </li>
                   ))}
-                  {list.length > 200 && <li className="small muted">ほか{num(list.length - 200)}社（検索で絞り込めます）</li>}
+                  {list.length > 200 && (
+                    <li className="small muted">ほか{num(list.length - 200)}社（検索で絞り込めます）</li>
+                  )}
                 </ul>
               </section>
             );
@@ -217,7 +245,15 @@ export function NegotiationScreen() {
   );
 }
 
-const KINDS: NegotiationEventKind[] = ['meeting', 'call', 'email', 'customer_reply', 'letter_sent', 'note', 'correction'];
+const KINDS: NegotiationEventKind[] = [
+  'meeting',
+  'call',
+  'email',
+  'customer_reply',
+  'letter_sent',
+  'note',
+  'correction',
+];
 
 function CustomerLog({ cust }: { cust: string }) {
   const app = useApp();
@@ -228,7 +264,9 @@ function CustomerLog({ cust }: { cust: string }) {
   const verify = verifyLog(log);
   const rows = recordRows(log);
   const proposalCust = app.proposal?.ok ? app.proposal.customerByCode.get(cust) : undefined;
-  const categories = [...new Set((proposalCust?.pairs ?? []).filter((p) => p.status === 'proposed').map((p) => p.category))];
+  const categories = [
+    ...new Set((proposalCust?.pairs ?? []).filter((p) => p.status === 'proposed').map((p) => p.category)),
+  ];
   const effectiveDefault = app.proposal?.ok ? app.proposal.effectiveDate : todayJst();
 
   const [kind, setKind] = useState<NegotiationEventKind>('meeting');
@@ -289,7 +327,12 @@ function CustomerLog({ cust }: { cust: string }) {
             <a className="btn btn-small" href={href('letter', cust)}>
               申入書
             </a>
-            <button type="button" className="btn btn-small" onClick={printLog} disabled={log.events.length === 0}>
+            <button
+              type="button"
+              className="btn btn-small"
+              onClick={printLog}
+              disabled={log.events.length === 0}
+            >
               <Icon name="print" size={16} /> 記録を印刷・PDF
             </button>
             <button
@@ -297,7 +340,11 @@ function CustomerLog({ cust }: { cust: string }) {
               className="btn btn-small"
               disabled={log.events.length === 0}
               onClick={() =>
-                downloadFile(`協議記録_${cust}_${toCompactDate(todayJst())}.csv`, logToCsv(log), 'text/csv;charset=utf-8')
+                downloadFile(
+                  `協議記録_${cust}_${toCompactDate(todayJst())}.csv`,
+                  logToCsv(log),
+                  'text/csv;charset=utf-8',
+                )
               }
             >
               <Icon name="download" size={16} /> CSV
@@ -320,7 +367,8 @@ function CustomerLog({ cust }: { cust: string }) {
           {log.events.length > 0 &&
             (verify.ok ? (
               <span className="text-good small">
-                <Icon name="check" size={16} /> 記録のつながりを確認しました（{log.events.length}件・変更なし）
+                <Icon name="check" size={16} /> 記録のつながりを確認しました（{log.events.length}
+                件・変更なし）
               </span>
             ) : (
               <span className="text-critical small">
@@ -335,7 +383,8 @@ function CustomerLog({ cust }: { cust: string }) {
         </div>
         {status !== '申入れ前' && (
           <p className="small muted">
-            次に進める状況：{allowedNextStatuses(status).join('・')}（合意・一部合意・見送りの後でも、協議中に戻せます）
+            次に進める状況：{allowedNextStatuses(status).join('・')}
+            （合意・一部合意・見送りの後でも、協議中に戻せます）
           </p>
         )}
 
@@ -404,7 +453,10 @@ function CustomerLog({ cust }: { cust: string }) {
             </label>
             <label className="field">
               状況の変更
-              <select value={nextStatus} onChange={(e) => setNextStatus(e.target.value as NegotiationStatus | '')}>
+              <select
+                value={nextStatus}
+                onChange={(e) => setNextStatus(e.target.value as NegotiationStatus | '')}
+              >
                 <option value="">変更しない</option>
                 {options.map((s) => (
                   <option key={s} value={s}>
@@ -429,7 +481,13 @@ function CustomerLog({ cust }: { cust: string }) {
           </div>
           <label className="field">
             要旨
-            <input type="text" required value={summary} onChange={(e) => setSummary(e.target.value)} placeholder="例：購買部と面談。改定率について説明" />
+            <input
+              type="text"
+              required
+              value={summary}
+              onChange={(e) => setSummary(e.target.value)}
+              placeholder="例：購買部と面談。改定率について説明"
+            />
           </label>
           <label className="field">
             詳細
@@ -440,17 +498,26 @@ function CustomerLog({ cust }: { cust: string }) {
               <legend>合意内容</legend>
               <label className="field field-inline">
                 <span>適用日</span>
-                <input type="date" required value={effective} onChange={(e) => setEffective(e.target.value)} />
+                <input
+                  type="date"
+                  required
+                  value={effective}
+                  onChange={(e) => setEffective(e.target.value)}
+                />
               </label>
               {categories.length > 0 && (
                 <div className="topic-row">
-                  <span className="small">据え置くカテゴリ{nextStatus === '一部合意' ? '（一部合意では1つ以上）' : ''}：</span>
+                  <span className="small">
+                    据え置くカテゴリ{nextStatus === '一部合意' ? '（一部合意では1つ以上）' : ''}：
+                  </span>
                   {categories.map((c) => (
                     <label key={c} className="checkbox">
                       <input
                         type="checkbox"
                         checked={kept.includes(c)}
-                        onChange={(e) => setKept(e.target.checked ? [...kept, c] : kept.filter((x) => x !== c))}
+                        onChange={(e) =>
+                          setKept(e.target.checked ? [...kept, c] : kept.filter((x) => x !== c))
+                        }
                       />
                       {ds?.categories.get(c)?.name ?? c}
                     </label>
@@ -525,7 +592,8 @@ function CustomerLog({ cust }: { cust: string }) {
           </tbody>
         </table>
         <p className="small">
-          この記録は追記のみの形式で作成しています。確認コードは各記録の SHA-256 の先頭12桁で、前の記録のコードを含めて計算しています。
+          この記録は追記のみの形式で作成しています。確認コードは各記録の SHA-256
+          の先頭12桁で、前の記録のコードを含めて計算しています。
         </p>
       </section>
       <div className="no-print">

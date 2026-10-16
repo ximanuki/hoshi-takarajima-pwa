@@ -6,7 +6,9 @@ import { Icon } from './ui.tsx';
 
 export async function readFiles(list: FileList | readonly File[]): Promise<SourceFile[]> {
   const files = Array.from(list);
-  return Promise.all(files.map(async (f) => ({ name: f.name, bytes: new Uint8Array(await f.arrayBuffer()) })));
+  return Promise.all(
+    files.map(async (f) => ({ name: f.name, bytes: new Uint8Array(await f.arrayBuffer()) })),
+  );
 }
 
 export function DropZone({

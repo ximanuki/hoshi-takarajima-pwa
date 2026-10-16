@@ -34,7 +34,9 @@ export function FollowupScreen() {
     if (!ds || !followup.salesFile) return null;
     try {
       const master =
-        followup.masterSource === 'file' && followup.masterFile ? readPriceMasterFile(followup.masterFile) : built.rows;
+        followup.masterSource === 'file' && followup.masterFile
+          ? readPriceMasterFile(followup.masterFile)
+          : built.rows;
       if (master.length === 0) return { ok: false, error: '新単価マスタが空です。' };
       const sales = readSalesFile(followup.salesFile);
       const result = checkFollowup(ds, master, ds.resolveLines(sales.lines));
@@ -70,7 +72,9 @@ export function FollowupScreen() {
 
   const flagged =
     computed?.ok === true
-      ? computed.result.lines.filter((x) => x.status === 'still_old_price' || (showOther && x.status === 'other_diff'))
+      ? computed.result.lines.filter(
+          (x) => x.status === 'still_old_price' || (showOther && x.status === 'other_diff'),
+        )
       : [];
 
   const exportCsv = () => {
@@ -92,7 +96,20 @@ export function FollowupScreen() {
         x.explanation,
       ]);
     const csv = toCsv(
-      ['売上日', '伝票番号-行', '得意先コード', '得意先名', '商品コード', '商品名', '数量', '請求単価', '新単価マスタの単価', '不足額', '判定', '説明'],
+      [
+        '売上日',
+        '伝票番号-行',
+        '得意先コード',
+        '得意先名',
+        '商品コード',
+        '商品名',
+        '数量',
+        '請求単価',
+        '新単価マスタの単価',
+        '不足額',
+        '判定',
+        '説明',
+      ],
       rows,
       { bom: true, eol: '\r\n', quoteAll: false },
     );
@@ -208,8 +225,8 @@ export function FollowupScreen() {
         <>
           <Card title="結果">
             <p className="small muted">
-              売上明細 {num(r.lines.length)}行{period ? `（${warekiRange(period.first, period.last)}）` : ''}・新単価マスタ{' '}
-              {num(computed.master.length)}行で確認しました。
+              売上明細 {num(r.lines.length)}行{period ? `（${warekiRange(period.first, period.last)}）` : ''}
+              ・新単価マスタ {num(computed.master.length)}行で確認しました。
               {computed.salesIssues > 0 && ` 読めなかった行が${num(computed.salesIssues)}行あります。`}
             </p>
             <div className="kpi-row">
@@ -315,7 +332,9 @@ export function FollowupScreen() {
                           <span className="muted small block">{x.line.id}</span>
                         </td>
                         <td>
-                          {x.line.sku ? (ds.products.get(x.line.sku)?.name ?? x.line.itemName) : x.line.itemName}
+                          {x.line.sku
+                            ? (ds.products.get(x.line.sku)?.name ?? x.line.itemName)
+                            : x.line.itemName}
                           <span className="muted small block">{x.line.sku ?? x.line.rawSku}</span>
                         </td>
                         <td className="num">{num(x.line.qty)}</td>

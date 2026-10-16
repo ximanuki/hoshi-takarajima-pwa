@@ -107,7 +107,9 @@ export function LineChart({
       const every = Math.max(1, Math.ceil(points.length / 6));
       for (let i = points.length - 1; i >= 0; i -= every) xTicks.unshift(i);
     }
-    const path = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${y(p.value).toFixed(1)}`).join('');
+    const path = points
+      .map((p, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${y(p.value).toFixed(1)}`)
+      .join('');
     return { ticks, x, y, xTicks, monthly, path, decimals: decimalsOf(step) };
   }, [points]);
 
@@ -163,7 +165,13 @@ export function LineChart({
         {geo.ticks.map((t) => (
           <g key={t}>
             <line className="chart-grid" x1={PAD.left} x2={W - PAD.right} y1={geo.y(t)} y2={geo.y(t)} />
-            <text className="chart-tick" x={PAD.left - 6} y={geo.y(t)} textAnchor="end" dominantBaseline="middle">
+            <text
+              className="chart-tick"
+              x={PAD.left - 6}
+              y={geo.y(t)}
+              textAnchor="end"
+              dominantBaseline="middle"
+            >
               {t.toFixed(geo.decimals)}
             </text>
           </g>
@@ -175,7 +183,12 @@ export function LineChart({
         ))}
         <path className="chart-line" d={geo.path} />
         <circle className="chart-dot" cx={geo.x(last)} cy={geo.y(lastPoint.value)} r={4} />
-        <text className="chart-endlabel" x={geo.x(last) + 8} y={geo.y(lastPoint.value)} dominantBaseline="middle">
+        <text
+          className="chart-endlabel"
+          x={geo.x(last) + 8}
+          y={geo.y(lastPoint.value)}
+          dominantBaseline="middle"
+        >
           {format(lastPoint.value)}
         </text>
         {ap && active !== null && (

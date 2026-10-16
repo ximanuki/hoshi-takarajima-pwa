@@ -86,7 +86,8 @@ export function ScenarioScreen() {
   const g = settings.guard;
   const setSc = (patch: Partial<ScenarioSettings>) =>
     app.updateSettings((s) => ({ ...s, scenario: { ...s.scenario, ...patch } }));
-  const setG = (patch: Partial<GuardSettings>) => app.updateSettings((s) => ({ ...s, guard: { ...s.guard, ...patch } }));
+  const setG = (patch: Partial<GuardSettings>) =>
+    app.updateSettings((s) => ({ ...s, guard: { ...s.guard, ...patch } }));
   const setShock = (c: CostComponent, v: number) => setSc({ shock: { ...sc.shock, [c]: v } });
   const setCatShock = (cat: string, c: CostComponent, raw: string) => {
     const next = { ...sc.categoryShocks };
@@ -124,11 +125,21 @@ export function ScenarioScreen() {
         <div className="split-main">
           <Card title="原価の上昇">
             {COST_COMPONENTS.map((c) => (
-              <PctSlider key={c} label={COST_COMPONENT_JA[c]} value={sc.shock[c]} onChange={(v) => setShock(c, v)} />
+              <PctSlider
+                key={c}
+                label={COST_COMPONENT_JA[c]}
+                value={sc.shock[c]}
+                onChange={(v) => setShock(c, v)}
+              />
             ))}
             <label className="checkbox">
-              <input type="checkbox" checked={sc.useNotices} onChange={(e) => setSc({ useNotices: e.target.checked })} />
-              仕入先の値上げ通知（予定）がある商品は、通知の改定率を使う（{noticeSuppliers}社・{notices.length.toLocaleString('ja-JP')}
+              <input
+                type="checkbox"
+                checked={sc.useNotices}
+                onChange={(e) => setSc({ useNotices: e.target.checked })}
+              />
+              仕入先の値上げ通知（予定）がある商品は、通知の改定率を使う（{noticeSuppliers}社・
+              {notices.length.toLocaleString('ja-JP')}
               品目）
             </label>
             <details className="details">
@@ -152,7 +163,8 @@ export function ScenarioScreen() {
                         <th scope="row">
                           {cat.name}
                           <span className="muted small block">
-                            構成比 {cat.costShare.material}/{cat.costShare.labor}/{cat.costShare.energy}/{cat.costShare.other}
+                            構成比 {cat.costShare.material}/{cat.costShare.labor}/{cat.costShare.energy}/
+                            {cat.costShare.other}
                           </span>
                         </th>
                         {COST_COMPONENTS.map((c) => (
@@ -218,7 +230,8 @@ export function ScenarioScreen() {
                 />
               </label>
               <p className="small muted">
-                {wareki(effective)}から。現在の単価と原価は {wareki(loaded.asOf)} 時点（売上明細の最終月の末日）です。
+                {wareki(effective)}から。現在の単価と原価は {wareki(loaded.asOf)}{' '}
+                時点（売上明細の最終月の末日）です。
               </p>
             </div>
           </Card>
@@ -226,7 +239,11 @@ export function ScenarioScreen() {
           <Card title="ガードレール（守る条件）">
             <div className="form-grid">
               <label className="checkbox">
-                <input type="checkbox" checked={g.capEnabled} onChange={(e) => setG({ capEnabled: e.target.checked })} />
+                <input
+                  type="checkbox"
+                  checked={g.capEnabled}
+                  onChange={(e) => setG({ capEnabled: e.target.checked })}
+                />
                 値上げ率に上限を設ける
               </label>
               {g.capEnabled && (
@@ -318,7 +335,9 @@ export function ScenarioScreen() {
                     末尾をそろえる
                     <select
                       value={g.ending ?? ''}
-                      onChange={(e) => setG({ ending: e.target.value === '' ? null : Number(e.target.value) })}
+                      onChange={(e) =>
+                        setG({ ending: e.target.value === '' ? null : Number(e.target.value) })
+                      }
                     >
                       <option value="">そろえない</option>
                       {[0, 5, 8, 9, 80, 90, 98].map((v) => (
@@ -329,7 +348,9 @@ export function ScenarioScreen() {
                     </select>
                   </label>
                 </div>
-                <p className="small muted">定価は通常、1,000円未満は10円、1万円未満は50円、それ以上は100円単位にそろえます。</p>
+                <p className="small muted">
+                  定価は通常、1,000円未満は10円、1万円未満は50円、それ以上は100円単位にそろえます。
+                </p>
               </fieldset>
             </div>
           </Card>
@@ -370,7 +391,12 @@ export function ScenarioScreen() {
                 <BarList
                   caption="粗利の比較（年間）"
                   rows={[
-                    { key: 'before', label: '今の粗利', value: t.grossProfitBeforeYen, display: yen(t.grossProfitBeforeYen) },
+                    {
+                      key: 'before',
+                      label: '今の粗利',
+                      value: t.grossProfitBeforeYen,
+                      display: yen(t.grossProfitBeforeYen),
+                    },
                     {
                       key: 'none',
                       label: '値上げしない場合',
