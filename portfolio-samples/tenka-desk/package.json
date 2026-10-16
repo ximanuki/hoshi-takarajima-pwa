@@ -1,0 +1,36 @@
+{
+  "name": "tenka-desk",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "転嫁デスク（仮称）: 価格協議の根拠資料づくりを支援するデモ。データはすべてブラウザ内で処理します。",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -p tsconfig.json && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "sample": "cd data-gen && npm run gen",
+    "evaluate": "node scripts/evaluate.ts"
+  },
+  "dependencies": {
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.15",
+    "@types/node": "22.20.4",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "typescript": "7.0.2",
+    "vite": "8.3.1",
+    "vitest": "5.0.5"
+  }
+}
