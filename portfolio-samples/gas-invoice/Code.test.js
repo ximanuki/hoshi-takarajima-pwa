@@ -576,7 +576,7 @@ test('日付セルは日本時間の日付として月を判定する（スク�
 
 // ---- 確認ダイアログのあとの読み直し（ui.alert の間は LockService のロックが保たれないため） ----
 
-test('keepConfirmedTargets は確認したときと同じ内容の請求書だけを残す', () => {
+test('keepConfirmedTargets は確認したときと PDF・メールの中身が同じ請求書だけを残す', () => {
   const confirmedPlan = plan();
   const confirmedTargets = orderTargetsForRun(confirmedPlan.invoices, []);
   assert.deepStrictEqual(confirmedTargets.map((i) => i.number), ['INV-202609-001', 'INV-202609-002']);
@@ -595,6 +595,30 @@ test('keepConfirmedTargets は確認したときと同じ内容の請求書だ�
   r = keepConfirmedTargets(confirmedPlan, confirmedTargets, amountChanged, orderTargetsForRun(amountChanged.invoices, []));
   assert.deepStrictEqual(r.targets.map((i) => i.client), ['株式会社サンプル商事']);
   assert.deepStrictEqual(r.changed.map((i) => i.client), ['山田 太郎']);
+
+  // 合計は同じまま、山田さんの明細の品目と数量・単価が入れ替わった（50,000円 × 1 → 25,000円 × 2）
+  const swapped = detailRows.map((row) => (row[2] === 'ロゴデザイン' ? [row[0], row[1], '名刺デザイン', 2, 25000, row[5]] : row));
+  const sameTotal = plan({ detailRows: swapped });
+  r = keepConfirmedTargets(confirmedPlan, confirmedTargets, sameTotal, orderTargetsForRun(sameTotal.invoices, []));
+  assert.strictEqual(sameTotal.invoices.find((i) => i.client === '山田 太郎').totals.total, confirmedTargets[1].totals.total);
+  assert.deepStrictEqual(r.changed.map((i) => i.client), ['山田 太郎']);
+  assert.deepStrictEqual(r.targets.map((i) => i.client), ['株式会社サンプル商事']);
+
+  // 振込先（PDF に載る）や件名テンプレが変わったら、全件を作らない
+  for (const [name, value] of [['振込先', '別の銀行 本店 普通 7654321'], ['件名テンプレ', '【ご請求】{請求書番号}']]) {
+    const edited = settingsRows.map((row) => (row[0] === name ? [name, value, ''] : row));
+    const p = plan({ settingsRows: edited });
+    r = keepConfirmedTargets(confirmedPlan, confirmedTargets, p, orderTargetsForRun(p.invoices, []));
+    assert.deepStrictEqual(r.targets, [], name);
+    assert.strictEqual(r.changed.length, 2, name);
+  }
+
+  // 明細シートを並べ替えただけ（行番号が変わっただけ）なら、同じ内容として作る
+  const reordered = [detailRows[1], detailRows[0], ...detailRows.slice(2)];
+  const sorted = plan({ detailRows: reordered });
+  r = keepConfirmedTargets(confirmedPlan, confirmedTargets, sorted, orderTargetsForRun(sorted.invoices, []));
+  assert.strictEqual(r.targets.length, 2);
+  assert.deepStrictEqual(r.changed, []);
 
   // 「下書き」で確認したのに、その後「送信」に変えられた → 何も作らない
   const toSend = settingsRows.map((row) => (row[0] === '送信モード' ? ['送信モード', '送信', ''] : row));

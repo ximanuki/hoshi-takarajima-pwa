@@ -780,11 +780,13 @@ function orderTargets(invoices, historyRows) {
 }
 
 /**
- * ロックを取ってから読み直した請求書のうち、確認ダイアログで見せた内容（送信モード・番号・宛先・敬称・金額）のままのものだけを作る。
+ * ロックを取ってから読み直した請求書のうち、確認したときと PDF・メールの中身がまったく同じものだけを作る。
+ * 比べるのは送信モード、番号・宛先・敬称、明細の各行（日付・品目・数量・単価・税率）と金額、件名・本文・ファイル名、
+ * 発行日・期限、PDF に載る自社情報（自社名・住所・登録番号・振込先・備考）。合計が同じでも明細が入れ替わっていれば作らない。
  * 確認している間に対象から外れたもの（ほかの実行で送信済みになった等）は gone、内容が変わったものや新しく増えたものは changed に入れ、どちらも作らない
  */
 function keepConfirmedTargets(confirmedPlan, confirmedTargets, freshPlan, freshTargets) {
-  const key = (plan, inv) => JSON.stringify([plan.mode, inv.number, inv.client, inv.honorific, inv.email, inv.totals.total]);
+  const key = (plan, inv) => invoiceFingerprint(plan, inv);
   const confirmedKeys = new Set(confirmedTargets.map((inv) => key(confirmedPlan, inv)));
   const freshNumbers = new Set(freshTargets.map((inv) => inv.number));
   return {
@@ -792,6 +794,19 @@ function keepConfirmedTargets(confirmedPlan, confirmedTargets, freshPlan, freshT
     gone: confirmedTargets.filter((inv) => !freshNumbers.has(inv.number)),
     changed: freshTargets.filter((inv) => !confirmedKeys.has(key(freshPlan, inv))),
   };
+}
+
+/** 1通の請求書について、PDF とメールに出る内容をすべて並べた文字列（同じなら同じ請求書・同じメールになる） */
+function invoiceFingerprint(plan, inv) {
+  const s = plan.settings;
+  return JSON.stringify([
+    plan.mode,
+    [s.companyName, s.address, s.registrationNo, s.bank, s.remarks],
+    [inv.number, inv.client, inv.honorific, inv.email, inv.subject, inv.body, inv.fileName],
+    [inv.issueDate, inv.dueDate].map((d) => (d ? d.getTime() : null)),
+    inv.lines.map((l) => [l.date ? l.date.getTime() : null, l.item, l.qty, l.price, l.rate, l.amount]), // 行番号は含めない（並べ替えだけなら同じ）
+    inv.totals,
+  ]);
 }
 
 /** 確認のあとで外れた・変わったため作らなかった請求書の説明 */
@@ -802,7 +817,7 @@ function staleTargetLines(gone, changed) {
   }
   if (changed && changed.length) {
     lines.push(
-      `確認のあとで金額・宛先・送信モードが変わったか、新しく増えたため作っていません: ${changed.map((inv) => inv.client).join('、')}`,
+      `確認のあとで内容（明細・金額・宛先・件名・本文・自社情報・送信モード）が変わったか、新しく増えたため作っていません: ${changed.map((inv) => inv.client).join('、')}`,
       '内容を確かめて、もう一度実行してください。',
     );
   }
