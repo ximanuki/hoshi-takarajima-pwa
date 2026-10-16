@@ -66,7 +66,7 @@ npm run dev        # development server
 
 - **All data stays in the browser.** There is no server, and nothing sends file contents anywhere. The UI says so on every screen.
 - The built page carries a Content Security Policy (`connect-src 'self'` and more), so the browser itself blocks requests to any other origin. The app only loads static files from its own location (the app, the sample data and the statistics snapshot). No web fonts, analytics or third-party CDNs. The E2E test checks that not a single request goes to another origin.
-- Data is kept in the browser's IndexedDB (loaded files, settings, manual prices, negotiation logs). **データを消す** (delete data) in the header removes all of it. The sample data is not stored; it is read again on each visit.
+- Data is kept in the browser's IndexedDB (loaded files, settings, manual prices, negotiation logs). **データを消す** (delete data) in the header removes all of it. The sample data is not stored; it is read again on each visit. Negotiation logs, outcome files and follow-up inputs are kept separately for the sample and for your own data, so an "agreed" recorded while trying the sample never attaches to one of your customers with the same code.
 - Single-company data only: there is no feature to load or compare other companies' prices (a competition-law precaution).
 - Exported files (CSV, JSON) are created in the browser and saved directly.
 
