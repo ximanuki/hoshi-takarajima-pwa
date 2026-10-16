@@ -79,6 +79,10 @@ class RateLimiter:
             self._ip_day[ip] = self._ip_day.get(ip, 0) + 1
             self._day_total += 1
             if len(self._windows) > _MAX_TRACKED_IPS:
+                # 1分より古い記録は全 IP について捨て、空になった IP は追跡をやめる
+                for w in self._windows.values():
+                    while w and now - w[0] >= 60:
+                        w.popleft()
                 self._windows = {k: v for k, v in self._windows.items() if v}
             return Decision(True)
 

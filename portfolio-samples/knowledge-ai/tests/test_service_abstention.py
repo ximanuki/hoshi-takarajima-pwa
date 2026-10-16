@@ -74,6 +74,49 @@ def test_unverifiable_quote_is_dropped_and_markers_renumbered(make_service, retr
     assert [c.marker for c in result.citations] == [1]
     assert "[2]" not in result.answer and "[1]" in result.answer
     assert result.citations[0].quote.endswith("支給する。")
+    # 検証できなかった出典の主張は、印だけでなく文ごと消える
+    assert "5万円" not in result.answer
+    assert "3,000円" in result.answer
+
+
+def test_sentence_whose_only_citation_failed_drops_its_unique_verified_source(
+    make_service, retriever
+):
+    hits = retriever.search("在宅勤務手当はいくらですか", k=3).hits
+    real = next(h for h in hits if "在宅勤務手当" in h.chunk.text)
+    idx = hits.index(real)
+    # 1文目は検証できる出典[1]と検証できない出典[2]の両方を持つので文ごと落ち、
+    # [1]は2文目にも出てくるので残る。番号は1から振り直される。
+    draft = ProviderAnswer(
+        True,
+        "手当は5万円です[1][2]。月額3,000円を支給します。[1]",
+        [
+            DraftCitation(idx, "在宅勤務手当として、月額3,000円を支給する。"),
+            DraftCitation(idx, "在宅勤務手当として5万円を支給する。"),  # hallucinated quote
+        ],
+    )
+    result = make_service(provider=SpyProvider(draft)).ask("在宅勤務手当はいくらですか")
+    assert not result.abstained
+    assert "5万円" not in result.answer
+    assert result.answer == "月額3,000円を支給します。[1]"
+    assert [c.marker for c in result.citations] == [1]
+
+
+def test_answer_whose_every_cited_sentence_failed_becomes_an_abstention(make_service, retriever):
+    hits = retriever.search("在宅勤務手当はいくらですか", k=3).hits
+    real = next(h for h in hits if "在宅勤務手当" in h.chunk.text)
+    idx = hits.index(real)
+    draft = ProviderAnswer(
+        True,
+        "手当は5万円です[1][2]。",
+        [
+            DraftCitation(idx, "在宅勤務手当として、月額3,000円を支給する。"),
+            DraftCitation(idx, "在宅勤務手当として5万円を支給する。"),  # hallucinated quote
+        ],
+    )
+    result = make_service(provider=SpyProvider(draft)).ask("在宅勤務手当はいくらですか")
+    assert result.abstained
+    assert result.abstain_reason == "no_verified_citation"
 
 
 def test_answer_with_no_verified_citation_becomes_an_abstention(make_service):

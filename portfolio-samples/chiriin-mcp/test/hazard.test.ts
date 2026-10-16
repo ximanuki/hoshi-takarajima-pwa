@@ -65,7 +65,8 @@ describe('legend definitions', () => {
     expect(depthGuideJa(0.5)).toContain('床下');
     expect(depthGuideJa(3)).toContain('1階の床上');
     expect(depthGuideJa(5)).toContain('2階の床上');
-    expect(depthGuideJa(null)).toContain('5階以上');
+    expect(depthGuideJa(20)).toContain('4〜7階');
+    expect(depthGuideJa(null)).toContain('7階以上');
     expect(depthGuideJa(undefined)).toBeUndefined();
   });
 });

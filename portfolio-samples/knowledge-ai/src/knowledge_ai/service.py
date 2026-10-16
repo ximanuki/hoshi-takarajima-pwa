@@ -35,6 +35,8 @@ from knowledge_ai.text import MatchIndex
 log = logging.getLogger(__name__)
 
 _MARKER = re.compile(r"[\[［]\s*(\d+)\s*[\]］]")
+# 文の区切り。句点の直後に付いた出典の印（「…です。[1]」）は、その文に含める
+_SENTENCE = re.compile(r"[^。！？!?\n]*(?:[。！？!?]+(?:\s*[\[［]\s*\d+\s*[\]］])*|\n|$)")
 
 
 @dataclass
@@ -246,11 +248,25 @@ class AnswerService:
         if not citations:
             return ABSTAIN_MESSAGE, [], "no_verified_citation", unverified
 
-        def renumber(m: re.Match[str]) -> str:
-            new = mapping.get(int(m.group(1)))
-            return f"[{new}]" if new else ""
+        # 検証できない出典が付いた文は、出典の印だけでなく主張ごと落とす
+        kept = [
+            s
+            for s in _SENTENCE.findall(draft.text)
+            if all(int(n) in mapping for n in _MARKER.findall(s))
+        ]
+        referenced = sorted({mapping[int(n)] for s in kept for n in _MARKER.findall(s)})
+        if not referenced:
+            return ABSTAIN_MESSAGE, [], "no_verified_citation", unverified
+        # 落とした文にしか出てこない出典は外し、残った出典を1から振り直す
+        final = {old: new for new, old in enumerate(referenced, start=1)}
+        citations = [
+            c.model_copy(update={"marker": final[c.marker]}) for c in citations if c.marker in final
+        ]
 
-        text = _MARKER.sub(renumber, draft.text).strip()
+        def renumber(m: re.Match[str]) -> str:
+            return f"[{final[mapping[int(m.group(1))]]}]"
+
+        text = _MARKER.sub(renumber, "".join(kept)).strip()
         return text, citations, None, unverified
 
 

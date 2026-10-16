@@ -296,8 +296,9 @@ export function tileUrl(layer: HazardLayer, z: number, x: number, y: number): st
 /** Rough building-floor guide for a depth class (assumes ~3 m per storey). */
 export function depthGuideJa(max: number | null | undefined): string | undefined {
   if (max === undefined) return undefined;
-  if (max === null || max > 20) return '目安: 5階以上まで浸水';
-  if (max > 10) return '目安: 4〜5階程度まで浸水';
+  // 10m で4階の床、20m で7階付近に届く（1階あたり約3m）
+  if (max === null || max > 20) return '目安: 7階以上まで浸水';
+  if (max > 10) return '目安: 4〜7階程度まで浸水';
   if (max > 5) return '目安: 2階の天井〜3階程度まで浸水';
   if (max > 3) return '目安: 2階の床上まで浸水';
   if (max > 0.5) return '目安: 1階の床上浸水（1階の天井付近まで）';

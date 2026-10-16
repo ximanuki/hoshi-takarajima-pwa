@@ -805,6 +805,22 @@ test('[モック] フォーム送信 → 自動返信 → Slack/Discord/Chatwork
   assert.strictEqual(env.fetches.length, 3);
 });
 
+test('[モック] 設定名の回答シートが無くても、ほかのフォームの回答シートへの送信は無視する', (t) => {
+  // 英語環境のスプレッドシート: 回答シートは「Form Responses 1」、別のフォームが「Form Responses 2」につながっている
+  const resp = new FakeSheet('Form Responses 1', [FORM_HEADERS], 0);
+  const other = new FakeSheet('Form Responses 2', [FORM_HEADERS], 7);
+  const ss = new FakeSpreadsheet([resp, other]);
+  const env = installGas(ss, {});
+  t.after(() => env.restore());
+  G.setupAll();
+
+  G.onFormSubmit(submit(other, customer, jst('2026-10-06T09:05:12')));
+  assert.strictEqual(env.mails.length, 0); // 別のフォームの送信には返信しない
+
+  G.onFormSubmit(submit(resp, customer, jst('2026-10-06T09:06:00')));
+  assert.strictEqual(env.mails.length, 1); // 見つけた回答シートの送信には返信する
+});
+
 test('[モック] 1つの通知先が失敗しても、ほかの通知と返信は続ける', (t) => {
   const { ss, resp, env } = setupShop(t);
   enableAllChats(ss);

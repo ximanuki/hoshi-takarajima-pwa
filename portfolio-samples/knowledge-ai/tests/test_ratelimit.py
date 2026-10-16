@@ -46,3 +46,16 @@ def test_per_ip_and_global_daily_caps_reset_at_local_midnight():
 def test_zero_disables_a_limit():
     rl = RateLimiter(per_minute=0, per_ip_daily=0, daily_cap=0, clock=Clock(0.0))
     assert all(rl.check("a").allowed for _ in range(50))
+
+
+def test_tracking_cap_evicts_ips_whose_requests_have_expired(monkeypatch):
+    from knowledge_ai.api import ratelimit
+
+    monkeypatch.setattr(ratelimit, "_MAX_TRACKED_IPS", 3)
+    clock = Clock(at(2026, 10, 6, 12))
+    rl = RateLimiter(per_minute=5, per_ip_daily=100, daily_cap=1000, clock=clock)
+    for ip in ("a", "b", "c"):
+        assert rl.check(ip).allowed
+    clock.t += 61  # a, b, c are now older than the one-minute window
+    assert rl.check("d").allowed  # 4 tracked > cap of 3: stale ones must be dropped
+    assert set(rl._windows) == {"d"}

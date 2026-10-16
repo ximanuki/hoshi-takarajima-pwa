@@ -308,8 +308,10 @@ function onFormSubmit(e) {
   const ss = SpreadsheetApp.getActive();
   const config = loadConfig(ss);
   const sheet = e.range.getSheet();
-  // 同じスプレッドシートに別のフォームもつながっている場合は、設定した回答シート以外を無視する
-  if (ss.getSheetByName(config.responseSheet) && sheet.getName() !== config.responseSheet) return;
+  // 同じスプレッドシートに別のフォームもつながっている場合は、設定した回答シート以外を無視する。
+  // 設定名のシートが無いとき（英語環境で「Form Responses 1」になっている等）も、getResponseSheet で見つけたシートと比べる
+  const target = getResponseSheet(ss, config);
+  if (target && sheet.getSheetId() !== target.getSheetId()) return;
   const row = e.range.getRow();
 
   // 管理列の準備と「処理済みか」の確認はロックして行う（同時送信・トリガーの二重起動で二重送信しないため）
