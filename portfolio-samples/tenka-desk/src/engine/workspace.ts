@@ -229,5 +229,6 @@ export function companyFromJson(json: unknown): Company {
     tel: str(o, 'tel'),
     representative: str(o, 'representative'),
     branches,
+    ...(str(o, 'prefecture') ? { prefecture: str(o, 'prefecture') } : {}),
   };
 }

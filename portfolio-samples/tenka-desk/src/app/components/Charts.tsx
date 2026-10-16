@@ -57,9 +57,9 @@ function decimalsOf(step: number): number {
   return s.includes('.') ? (s.split('.')[1]?.length ?? 0) : 0;
 }
 
-function periodLabel(period: string): string {
+function periodLabel(period: string, unit: '年' | '年度' = '年'): string {
   if (/^\d{4}-\d{2}$/.test(period)) return `${period.slice(0, 4)}年${Number(period.slice(5, 7))}月`;
-  return `${period}年`;
+  return `${period}${unit}`;
 }
 
 const PAD = { top: 14, right: 60, bottom: 26, left: 44 };
@@ -71,10 +71,13 @@ export function LineChart({
   format = (v) => v.toLocaleString('ja-JP'),
   width: W = 560,
   height: H = 220,
+  periodUnit = '年',
 }: {
   points: readonly LinePoint[];
   title: string;
   unit: string;
+  /** yearly periods are calendar years (年) or fiscal years (年度) */
+  periodUnit?: '年' | '年度';
   format?: (v: number) => string;
   /** size of the drawing in SVG units; text keeps its size, so a smaller drawing reads larger when scaled down */
   width?: number;
@@ -106,7 +109,8 @@ export function LineChart({
         if (p.period.endsWith('-01')) xTicks.push(i);
       });
     } else {
-      const every = Math.max(1, Math.ceil(points.length / 6));
+      // yearly labels ("2026年度") are wide: at most about 4–5 of them
+      const every = Math.max(1, Math.ceil(points.length / 4));
       for (let i = points.length - 1; i >= 0; i -= every) xTicks.unshift(i);
     }
     const path = points
@@ -139,7 +143,7 @@ export function LineChart({
   const ap = active !== null ? points[active] : undefined;
   const xTickLabel = (i: number) => {
     const p = points[i] as LinePoint;
-    return geo.monthly ? `${p.period.slice(0, 4)}年` : `${p.period}`;
+    return geo.monthly ? `${p.period.slice(0, 4)}年` : periodLabel(p.period, periodUnit);
   };
 
   return (
@@ -148,7 +152,7 @@ export function LineChart({
         ref={svgRef}
         viewBox={`0 0 ${W} ${H}`}
         role="img"
-        aria-label={`${title}（${unit}）。${periodLabel(first.period)} ${format(first.value)} から ${periodLabel(lastPoint.period)} ${format(lastPoint.value)}。各時点の値は下の表で読めます。`}
+        aria-label={`${title}（${unit}）。${periodLabel(first.period, periodUnit)} ${format(first.value)} から ${periodLabel(lastPoint.period, periodUnit)} ${format(lastPoint.value)}。各時点の値は下の表で読めます。`}
         onPointerMove={pick}
         onPointerLeave={() => setActive(null)}
       >
@@ -198,7 +202,7 @@ export function LineChart({
           }}
         >
           <strong className="num">{format(ap.value)}</strong>
-          <span>{periodLabel(ap.period)}</span>
+          <span>{periodLabel(ap.period, periodUnit)}</span>
         </div>
       )}
       <details className="chart-table no-print">
@@ -219,7 +223,7 @@ export function LineChart({
             <tbody>
               {points.map((p) => (
                 <tr key={p.period}>
-                  <th scope="row">{periodLabel(p.period)}</th>
+                  <th scope="row">{periodLabel(p.period, periodUnit)}</th>
                   <td className="num">{format(p.value)}</td>
                 </tr>
               ))}

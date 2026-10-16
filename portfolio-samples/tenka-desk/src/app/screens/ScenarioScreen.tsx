@@ -1,18 +1,73 @@
-import { useId } from 'react';
+import { useId, useState } from 'react';
 import {
   COST_COMPONENT_JA,
   COST_COMPONENTS,
   type CostComponent,
   PROPOSAL_METHOD_JA,
   type ProposalMethod,
+  parseScaled,
   type Rounding,
 } from '../../engine/index.ts';
 import { BarList } from '../components/Charts.tsx';
 import { Card, Kpi, NeedsData, Notice, PageHeader } from '../components/ui.tsx';
-import { pct, ratio, wareki, yen } from '../format.ts';
+import { pct, ratio, wareki, yen, yenDelta } from '../format.ts';
 import { useApp } from '../model/AppState.tsx';
-import { defaultEffectiveDate } from '../model/proposal.ts';
-import type { GuardSettings, ScenarioSettings } from '../model/settings.ts';
+import { acceptanceFromLogs } from '../model/negotiation.ts';
+import { defaultEffectiveDate, newListEffective } from '../model/proposal.ts';
+import { DEFAULT_SCENARIO, type GuardSettings, type ScenarioSettings } from '../model/settings.ts';
+
+/** A category's own rate (%): typed freely (全角数字 too), checked when it is committed. */
+function CatShockInput({
+  label,
+  value,
+  placeholder,
+  onCommit,
+}: {
+  label: string;
+  value: number | undefined;
+  placeholder: string;
+  onCommit: (v: number | null) => void;
+}) {
+  const [draft, setDraft] = useState<string | null>(null);
+  const [bad, setBad] = useState(false);
+  const commit = () => {
+    if (draft === null) return;
+    if (draft.trim() === '') {
+      onCommit(null);
+      setDraft(null);
+      setBad(false);
+      return;
+    }
+    const bp = parseScaled(draft, 100);
+    if (bp === null || bp < 0 || bp > 10000) {
+      setBad(true);
+      return;
+    }
+    onCommit(bp / 100);
+    setDraft(null);
+    setBad(false);
+  };
+  return (
+    <input
+      className="input-narrow"
+      type="text"
+      inputMode="decimal"
+      aria-label={label}
+      aria-invalid={bad}
+      title={bad ? '0〜100の数で入力してください' : undefined}
+      placeholder={placeholder}
+      value={draft ?? (value === undefined ? '' : String(value))}
+      onChange={(e) => {
+        setDraft(e.target.value);
+        setBad(false);
+      }}
+      onBlur={commit}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') commit();
+      }}
+    />
+  );
+}
 
 function PctSlider({
   label,
@@ -89,15 +144,11 @@ export function ScenarioScreen() {
   const setG = (patch: Partial<GuardSettings>) =>
     app.updateSettings((s) => ({ ...s, guard: { ...s.guard, ...patch } }));
   const setShock = (c: CostComponent, v: number) => setSc({ shock: { ...sc.shock, [c]: v } });
-  const setCatShock = (cat: string, c: CostComponent, raw: string) => {
+  const setCatShock = (cat: string, c: CostComponent, v: number | null) => {
     const next = { ...sc.categoryShocks };
     const row = { ...next[cat] };
-    if (raw.trim() === '') delete row[c];
-    else {
-      const v = Number(raw);
-      if (!Number.isFinite(v)) return;
-      row[c] = v;
-    }
+    if (v === null) delete row[c];
+    else row[c] = v;
     if (Object.keys(row).length === 0) delete next[cat];
     else next[cat] = row;
     setSc({ categoryShocks: next });
@@ -105,10 +156,22 @@ export function ScenarioScreen() {
   const asOf = loaded.asOf ?? '';
   const notices = ds.supplierNotices.filter((n) => n.status === '予定' && n.effective > asOf);
   const noticeSuppliers = new Set(notices.map((n) => n.supplier)).size;
-  const effective = sc.effectiveDate ?? defaultEffectiveDate(loaded) ?? '';
+  const effective = sc.effectiveDate ?? defaultEffectiveDate(loaded, sc.method) ?? '';
+  const listDate = newListEffective(loaded);
   const t = simulation?.total;
   const costBase = t ? t.salesYen - t.grossProfitBeforeYen : 0;
   const floorDefault = ds.settings.marginFloorBp / 100;
+  const demoShock = COST_COMPONENTS.every((c) => sc.shock[c] === DEFAULT_SCENARIO.shock[c]);
+  const answered = acceptanceFromLogs(app.logs).size > 0;
+  const showExpected = answered || sc.acceptancePct !== 100;
+  // 値上げ額 = 原価の上昇額 + 粗利率の下限までの引き上げ + その他（定価の端数の切り上げなど）
+  const floorRaiseYen =
+    proposal?.ok === true
+      ? proposal.pairs
+          .filter((p) => p.status === 'proposed')
+          .reduce((s, p) => s + (p.floorRaiseYen ?? 0) * p.qty, 0)
+      : 0;
+  const otherYen = t ? t.requestedIncreaseYen - t.costIncreaseYen - floorRaiseYen : 0;
 
   return (
     <>
@@ -121,9 +184,31 @@ export function ScenarioScreen() {
           </p>
         }
       />
+      {t && (
+        <div className="scenario-sticky" aria-hidden="true">
+          <span>
+            原価の上昇額 <strong className="num">{yen(t.costIncreaseYen)}</strong>
+          </span>
+          <span>
+            値上げ額 <strong className="num">{yen(t.requestedIncreaseYen)}</strong>
+          </span>
+          <span>
+            転嫁率 <strong className="num">{pct(t.passThroughRequestedBp)}</strong>
+          </span>
+          {app.computing && <span className="muted">計算しています…</span>}
+        </div>
+      )}
       <div className="split">
         <div className="split-main">
           <Card title="原価の上昇">
+            <p className="small muted">
+              初期値（原材料8%・労務費5%・エネルギー10%）はデモ用の仮の値で、統計や他社の動向にもとづくものではありません。自社の仕入・人件費の実績で決めてください。
+            </p>
+            {!loaded.isSample && demoShock && (
+              <Notice tone="warning" title="上昇率がデモ用の初期値のままです">
+                <p>自社の原価がどれだけ上がっているかに合わせて、下の値を変えてください。</p>
+              </Notice>
+            )}
             {COST_COMPONENTS.map((c) => (
               <PctSlider
                 key={c}
@@ -169,16 +254,11 @@ export function ScenarioScreen() {
                         </th>
                         {COST_COMPONENTS.map((c) => (
                           <td key={c} className="num">
-                            <input
-                              className="input-narrow"
-                              type="number"
-                              step={0.5}
-                              min={0}
-                              max={100}
-                              aria-label={`${cat.name} の${COST_COMPONENT_JA[c]}（%）`}
+                            <CatShockInput
+                              label={`${cat.name} の${COST_COMPONENT_JA[c]}（%）`}
                               placeholder={String(sc.shock[c])}
-                              value={sc.categoryShocks[cat.code]?.[c] ?? ''}
-                              onChange={(e) => setCatShock(cat.code, c, e.target.value)}
+                              value={sc.categoryShocks[cat.code]?.[c]}
+                              onCommit={(v) => setCatShock(cat.code, c, v)}
                             />
                           </td>
                         ))}
@@ -234,6 +314,21 @@ export function ScenarioScreen() {
                 時点（売上明細の最終月の末日）です。
               </p>
             </div>
+            {sc.method === 'fixed_list' && listDate && effective !== listDate && (
+              <Notice tone="warning" title="適用日が新定価表の適用日と違います">
+                <p>
+                  新定価表の適用日は {wareki(listDate)} です。申入書と新単価マスタには {wareki(effective)}{' '}
+                  と入ります。
+                  <button
+                    type="button"
+                    className="btn btn-small"
+                    onClick={() => setSc({ effectiveDate: listDate })}
+                  >
+                    新定価表の日付にする
+                  </button>
+                </p>
+              </Notice>
+            )}
           </Card>
 
           <Card title="ガードレール（守る条件）">
@@ -349,7 +444,7 @@ export function ScenarioScreen() {
                   </label>
                 </div>
                 <p className="small muted">
-                  定価は通常、1,000円未満は10円、1万円未満は50円、それ以上は100円単位にそろえます。
+                  初期設定では、1,000円未満は10円、1万円未満は50円、それ以上は100円単位にそろえます（変更できます）。
                 </p>
               </fieldset>
             </div>
@@ -382,12 +477,38 @@ export function ScenarioScreen() {
                     sub={`${t.proposedPairs.toLocaleString('ja-JP')}組に提案`}
                   />
                   <Kpi label="転嫁率（依頼どおり）" value={pct(t.passThroughRequestedBp)} emphasis />
-                  <Kpi
-                    label="転嫁率（見込み）"
-                    value={pct(t.passThroughExpectedBp)}
-                    sub="協議記録の回答と、下の受け入れ見込みから"
-                  />
+                  {showExpected ? (
+                    <Kpi
+                      label="転嫁率（見込み）"
+                      value={pct(t.passThroughExpectedBp)}
+                      sub="協議記録の回答と、下の受け入れ見込みから"
+                    />
+                  ) : (
+                    <Kpi
+                      label="転嫁率（見込み）"
+                      value="—"
+                      sub="協議記録に回答が入るか、受け入れの見込みを100%未満にすると表示します"
+                    />
+                  )}
                 </div>
+                <dl className="breakdown" aria-label="値上げ額の内訳">
+                  <div>
+                    <dt>原価の上昇額</dt>
+                    <dd className="num">{yen(t.costIncreaseYen)}</dd>
+                  </div>
+                  <div>
+                    <dt>粗利率の下限までの引き上げ</dt>
+                    <dd className="num">{yenDelta(floorRaiseYen)}</dd>
+                  </div>
+                  <div>
+                    <dt>その他（定価の端数の切り上げ、粗利率を保つ分、外した品目など）</dt>
+                    <dd className="num">{yenDelta(otherYen)}</dd>
+                  </div>
+                  <div className="breakdown-total">
+                    <dt>値上げ額（依頼どおり）</dt>
+                    <dd className="num">{yen(t.requestedIncreaseYen)}</dd>
+                  </div>
+                </dl>
                 <BarList
                   caption="粗利の比較（年間）"
                   rows={[

@@ -5,8 +5,11 @@
 
 import { useMemo } from 'react';
 import {
+  AGREEMENT_KIND_JA,
   buildPriceMaster,
+  classifyAgreement,
   importFile,
+  isPlainAgreementStatus,
   type NegotiationOutcome,
   outcomesFromAgreements,
   type PriceMasterRow,
@@ -28,6 +31,8 @@ export interface MasterBuild {
   outcomes: Map<string, NegotiationOutcome>;
   source: 'logs' | 'file';
   error: string | null;
+  /** 協議結果 wording that had to be interpreted ("得意先 001001「合意に至らず」→ 見送り") */
+  interpreted: string[];
 }
 
 /** New price master rows from the current proposal and the agreed outcomes. */
@@ -38,16 +43,23 @@ export function usePriceMaster(): MasterBuild {
   return useMemo(() => {
     let outcomes = new Map<string, NegotiationOutcome>();
     let error: string | null = null;
+    const interpreted: string[] = [];
     if (source === 'logs') outcomes = outcomesFromLogs(logs);
     else if (outcomesFile) {
       try {
-        outcomes = outcomesFromAgreements(readOutcomesFile(outcomesFile));
+        const records = readOutcomesFile(outcomesFile);
+        outcomes = outcomesFromAgreements(records);
+        for (const r of records)
+          if (!isPlainAgreementStatus(r.status))
+            interpreted.push(
+              `得意先 ${r.cust}「${r.status}」→ ${AGREEMENT_KIND_JA[classifyAgreement(r.status)]}`,
+            );
       } catch (e) {
         error = e instanceof Error ? e.message : String(e);
       }
     }
     const rows = proposal?.ok ? buildPriceMaster(proposal.pairs, outcomes, { currentPrice }) : [];
-    return { rows, outcomes, source, error };
+    return { rows, outcomes, source, error, interpreted };
   }, [proposal, logs, source, outcomesFile, currentPrice]);
 }
 

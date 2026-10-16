@@ -589,7 +589,38 @@ export interface FileImport {
   decoded: DecodedText;
   table: CsvTable;
   spec: LayoutSpec;
+  /** field -> column index used */
+  mapping: ColumnMapping;
   data: ImportedData;
+}
+
+/** The file is not CSV text the app can read (empty, or an Excel workbook); retrying with other columns cannot help. */
+export class UnreadableFileError extends Error {
+  readonly fileName: string;
+  constructor(fileName: string, message: string) {
+    super(`${fileName}: ${message}`);
+    this.name = 'UnreadableFileError';
+    this.fileName = fileName;
+  }
+}
+
+function startsWithBytes(b: Uint8Array, prefix: readonly number[]): boolean {
+  return prefix.every((x, i) => b[i] === x);
+}
+
+/** Refuse files that are certainly not CSV, with a message that says what to do. */
+function checkReadable(name: string, data: Uint8Array | string): void {
+  if (typeof data === 'string' ? data.trim() === '' : data.length === 0)
+    throw new UnreadableFileError(name, 'ファイルが空です。書き出しの手順をもう一度確かめてください。');
+  if (typeof data === 'string') return;
+  const excel =
+    startsWithBytes(data, [0x50, 0x4b, 0x03, 0x04]) || // .xlsx (ZIP)
+    startsWithBytes(data, [0xd0, 0xcf, 0x11, 0xe0]); // .xls (OLE)
+  if (excel)
+    throw new UnreadableFileError(
+      name,
+      'Excel形式（.xlsx / .xls）は読めません。Excelで「CSV UTF-8（コンマ区切り）」として保存し直してください。',
+    );
 }
 
 export class LayoutNotRecognisedError extends Error {
@@ -618,11 +649,17 @@ export interface ImportOptions {
 }
 
 export function importFile(name: string, data: Uint8Array | string, options: ImportOptions = {}): FileImport {
+  checkReadable(name, data);
   const decoded: DecodedText =
     typeof data === 'string'
       ? { text: data, encoding: 'utf-8', bom: false }
       : decodeBytes(data, options.encoding ?? 'auto');
   const table = readTable(decoded.text);
+  if (
+    table.header.length === 0 ||
+    (table.header.length === 1 && table.rows.length === 0 && table.header[0] === '')
+  )
+    throw new UnreadableFileError(name, 'ファイルが空です。書き出しの手順をもう一度確かめてください。');
   let spec = options.spec;
   let mapping: ColumnMapping;
   if (spec) {
@@ -637,5 +674,5 @@ export function importFile(name: string, data: Uint8Array | string, options: Imp
     spec = best.spec;
     mapping = best.result.mapping;
   }
-  return { name, decoded, table, spec, data: importWithLayout(table, spec, mapping) };
+  return { name, decoded, table, spec, mapping, data: importWithLayout(table, spec, mapping) };
 }

@@ -1,6 +1,8 @@
 /** Small shared UI pieces. */
 
 import { type ReactNode, useEffect, useId, useRef } from 'react';
+import { useApp } from '../model/AppState.tsx';
+import { FILE_CHECKS } from '../model/load.ts';
 
 type IconName = 'lock' | 'alert' | 'info' | 'check' | 'download' | 'print' | 'upload' | 'trash' | 'arrow';
 
@@ -145,8 +147,39 @@ export function Card({
   );
 }
 
-/** Shown on a screen that needs data the user has not loaded yet. */
+/** 架空 label printed on every sheet made from the sample data. */
+export const SAMPLE_TAG = 'サンプル（架空データ）— 実在の企業・取引とは関係ありません';
+
+export function SampleTag({ sample }: { sample: boolean }) {
+  return sample ? <p className="sheet-sample">{SAMPLE_TAG}</p> : null;
+}
+
+/**
+ * Shown on a screen that needs data the user has not loaded yet. When some files
+ * are loaded but the diagnosis cannot run, it names the files still missing.
+ */
 export function NeedsData({ what = '売上明細とマスタ' }: { what?: string }) {
+  const { loaded } = useApp();
+  if (loaded) {
+    const missing = FILE_CHECKS.filter((c) => c.need === 'required' && !loaded.kinds.has(c.kind));
+    return (
+      <Notice
+        tone="warning"
+        title={
+          missing.length > 0
+            ? `診断に必要なファイルが足りません：${missing.map((c) => c.label).join('・')}`
+            : '読み込んだファイルでは診断できません'
+        }
+      >
+        <p>
+          {missing.length > 0
+            ? '売上明細・得意先マスタ・商品マスタがそろうと、この画面を使えます。'
+            : '売上明細の行を1行も読めていない可能性があります。取り込みの画面で、ファイルごとの確認事項を見てください。'}{' '}
+          <a href="#/import">取り込みに戻る</a>
+        </p>
+      </Notice>
+    );
+  }
   return (
     <Notice tone="info" title="データがまだありません">
       <p>

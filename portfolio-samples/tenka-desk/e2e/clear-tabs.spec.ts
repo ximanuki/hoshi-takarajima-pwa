@@ -10,10 +10,16 @@ const ROWS = '56,328行';
 async function loadSample(page: Page) {
   await page.goto('./#/import');
   await page.getByRole('button', { name: 'サンプルデータで試す（A形式）' }).click();
-  await expect(page.getByText(ROWS)).toBeVisible({ timeout: 120_000 });
+  // a loaded sample goes straight on to the diagnosis
+  await expect(page.getByTestId('leak-total')).toBeVisible({ timeout: 120_000 });
+  await page.goto('./#/import');
+  await expect(page.getByText(ROWS)).toBeVisible({ timeout: 30_000 });
 }
 
-test('「データを消す」 erases the data even while another tab has the app open', async ({ page, context }) => {
+test('「データを消す」 erases the data even while another tab has the app open', async ({
+  page,
+  context,
+}) => {
   await loadSample(page);
 
   // a second tab restores the same data from this browser
@@ -32,7 +38,9 @@ test('「データを消す」 erases the data even while another tab has the ap
   // and nothing comes back after reloading either tab
   for (const p of [page, other]) {
     await p.reload();
-    await expect(p.getByRole('button', { name: 'サンプルデータで試す（A形式）' })).toBeEnabled({ timeout: 30_000 });
+    await expect(p.getByRole('button', { name: 'サンプルデータで試す（A形式）' })).toBeEnabled({
+      timeout: 30_000,
+    });
     await expect(p.getByText(ROWS)).toHaveCount(0);
   }
 });

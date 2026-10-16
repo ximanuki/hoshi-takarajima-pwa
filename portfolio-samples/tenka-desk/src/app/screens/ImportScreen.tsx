@@ -1,5 +1,5 @@
 import { useId, useMemo, useState } from 'react';
-import { type FileKind, LAYOUTS, mapColumns, toWareki } from '../../engine/index.ts';
+import { type FileKind, LAYOUTS, mapColumns, pctToBp, toWareki } from '../../engine/index.ts';
 import { DropZone } from '../components/DropZone.tsx';
 import { Badge, Card, Icon, Kpi, Notice, PageHeader } from '../components/ui.tsx';
 import { num, warekiRange } from '../format.ts';
@@ -47,7 +47,7 @@ export function ImportScreen() {
             </button>
           </div>
           <p className="muted small">
-            A形式は全角の商品コードと和暦の日付、B形式は半角カナと品番の書きゆれ入りです。中身は同じで、どちらを読んでも同じ結果になります。
+            A形式は全角の商品コードと和暦の日付、B形式は半角カナと品番の書きゆれ入りです。中身は同じで、どちらを読んでも同じ結果になります。読み込みが終わると「診断」の画面に進みます。
           </p>
         </Card>
         <Card title="自社のファイルを読み込む">
@@ -119,6 +119,9 @@ export function ImportScreen() {
                     <th scope="col" className="num">
                       読めなかった行
                     </th>
+                    <th scope="col" className="num">
+                      確認事項
+                    </th>
                     {inputs?.source === 'upload' && <th scope="col">操作</th>}
                   </tr>
                 </thead>
@@ -176,11 +179,12 @@ function FileRow({
         <span className="filename">{f.name}</span>
         {f.issueCount > 0 && (
           <details className="issues">
-            <summary>読めなかった行を見る（{num(f.issueCount)}件）</summary>
+            <summary>確認事項を見る（{num(f.issueCount)}件）</summary>
             <ul>
               {f.issues.map((i) => (
                 <li key={`${i.row}-${i.field ?? ''}-${i.message}`}>
-                  {i.row}行目{i.field ? `「${i.field}」` : ''}：{i.message}
+                  {i.row}行目
+                  {i.field && i.field !== '*' ? `「${f.fieldLabels[i.field] ?? i.field}」` : ''}：{i.message}
                   {i.value !== undefined ? `（${i.value}）` : ''}
                 </li>
               ))}
@@ -204,6 +208,7 @@ function FileRow({
       </td>
       <td>{f.encoding || '—'}</td>
       <td className="num">{f.status === 'ok' ? num(f.rows) : '—'}</td>
+      <td className="num">{f.status === 'ok' ? num(f.skippedRows) : '—'}</td>
       <td className="num">{f.status === 'ok' ? num(f.issueCount) : '—'}</td>
       {canEdit && (
         <td>
@@ -276,6 +281,7 @@ function DataNotes() {
     app.settings.diagnosisFloorPct === null ? '' : String(app.settings.diagnosisFloorPct),
   );
   const [dates, setDates] = useState<Record<string, string>>({});
+  const [floorError, setFloorError] = useState<string | null>(null);
   if (!loaded) return null;
   const ds = loaded.ws.dataset;
   const agreementFiles = loaded.files.filter((f) => f.kind === 'agreements');
@@ -349,8 +355,12 @@ function DataNotes() {
         className="inline-form"
         onSubmit={(e) => {
           e.preventDefault();
-          const v = floor.trim() === '' ? null : Number(floor);
-          if (v === null || (Number.isFinite(v) && v >= 0 && v < 100)) app.setDiagnosisFloor(v);
+          const v = floor.trim() === '' ? null : Number(floor.normalize('NFKC'));
+          // checked in the engine's unit (0.01%): 99.996% would round to 100%, which no price can meet
+          if (v === null || (Number.isFinite(v) && v >= 0 && pctToBp(v) < 10000)) {
+            setFloorError(null);
+            app.setDiagnosisFloor(v);
+          } else setFloorError('0以上100未満の数（%）で入力してください。');
         }}
       >
         <label>
@@ -370,6 +380,11 @@ function DataNotes() {
           この下限で診断し直す
         </button>
         <span className="small muted">いまの下限：{ds.settings.marginFloorBp / 100}%</span>
+        {floorError && (
+          <span className="small text-critical" role="alert">
+            {floorError}
+          </span>
+        )}
       </form>
     </Card>
   );

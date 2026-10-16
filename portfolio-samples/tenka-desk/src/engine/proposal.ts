@@ -142,7 +142,7 @@ export interface ProposalInput {
 
 /**
  * Customer × product pairs whose latest checked line is still a billing leak
- * (反映漏れ, 特値の期限切れ, 掛け率ランク外). 粗利下限割れ is not a billing error.
+ * (反映漏れ, 特値の期限切れ, 掛率ランク外). 粗利下限割れ is not a billing error.
  */
 export function ongoingBillingLeaks(result: DiagnosisResult): Map<string, LeakType> {
   const out = new Map<string, LeakType>();
@@ -274,7 +274,11 @@ export const ATTENTION_RULES: ReadonlySet<GuardrailRule> = new Set([
  * invoiced now, when that is below the correct price (an ongoing billing leak);
  * null when there is no cap or no such gap.
  */
-export function billedCapPrice(systemPrice: number, currentPrice: number, maxIncreaseBp: number | null): number | null {
+export function billedCapPrice(
+  systemPrice: number,
+  currentPrice: number,
+  maxIncreaseBp: number | null,
+): number | null {
   if (maxIncreaseBp === null || systemPrice <= 0 || systemPrice >= currentPrice) return null;
   return divFloor(systemPrice * (10000 + maxIncreaseBp), 10000);
 }
@@ -339,6 +343,8 @@ export interface PairProposal {
   qty: number;
   salesYen: number;
   guardrails: GuardrailHit[];
+  /** part of the per-unit increase that only raises the price to the 粗利率の下限 (0 when none) */
+  floorRaiseYen?: number;
 }
 
 /** New unit price per customer × product bought in the period (直近12か月). Excluded pairs are kept, with newPrice = currentPrice. */
@@ -405,6 +411,7 @@ export function proposePairs(
       ? Math.max(special.price, divFloor(special.price * newList, expected.list.price))
       : priceAtRate(newList, customer.ratePm, rounding);
     const hits: GuardrailHit[] = [];
+    let floorRaise = 0;
     const tier = ds.tierOf(v.cust);
     const tierMax = tier ? priceAtRate(newList, tier.maxPm, rounding) : null;
     const tierMin = tier ? priceAtRate(newList, tier.minPm, rounding) : null;
@@ -419,6 +426,7 @@ export function proposePairs(
       const withinCap = capPrice === null || target <= capPrice;
       const withinTier = special !== null || tierMax === null || target <= tierMax;
       if (guard.raiseToMarginFloor && withinCap && withinTier) {
+        floorRaise = Math.max(0, target - newPrice);
         newPrice = Math.max(newPrice, target);
         hits.push({
           rule: 'margin_floor_raised',
@@ -463,6 +471,7 @@ export function proposePairs(
       changeBp: cb,
       marginNewBp: marginBp(newPrice, cost.next),
       guardrails: hits,
+      floorRaiseYen: Math.min(floorRaise, changeYen),
     });
   }
   return out;

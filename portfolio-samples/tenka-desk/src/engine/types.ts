@@ -195,6 +195,11 @@ export interface Company {
   tel: string;
   representative: string;
   branches: string[];
+  /**
+   * Prefecture where the company's own staff work (e.g. "大阪府"): the minimum wage
+   * quoted in the letter is this one, never the customer's. Optional.
+   */
+  prefecture?: string;
 }
 
 /** One band of 定価 rounding: values below `below` 円 round to multiples of `unit` 円. */

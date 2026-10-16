@@ -51,8 +51,12 @@ export interface FileInfo {
   encoding: string;
   rows: number;
   records: number;
+  /** rows that could not be read and were left out (rows − records) */
+  skippedRows: number;
   issues: ImportIssue[];
   issueCount: number;
+  /** field key -> the column header it was read from (for messages) */
+  fieldLabels: Record<string, string>;
   header: string[];
   error: string | null;
   mapped: boolean;
@@ -90,7 +94,7 @@ export const FILE_CHECKS: readonly FileCheck[] = [
     kind: 'specials',
     label: '特値一覧',
     need: 'recommended',
-    why: 'ないと、期間内の特値が「掛け率ランク外」に見え、期限切れの特値は見つけられません。架空データで試すと、掛け率ランク外として出た行の約9割がこの誤検出でした。',
+    why: 'ないと、期間内の特値が「掛率ランク外」に見え、期限切れの特値は見つけられません。架空データで試すと、掛率ランク外として出た行の約9割がこの誤検出でした。',
   },
   {
     kind: 'listPriceHistory',
@@ -102,7 +106,7 @@ export const FILE_CHECKS: readonly FileCheck[] = [
     kind: 'rateTiers',
     label: '掛率ランク',
     need: 'recommended',
-    why: 'ないと「掛け率ランク外」を判定できず、提案でもランクの範囲を確かめられません。',
+    why: 'ないと「掛率ランク外」を判定できず、提案でもランクの範囲を確かめられません。',
   },
   {
     kind: 'costHistory',
@@ -160,6 +164,15 @@ export interface LoadOptions {
 
 const yieldToBrowser = () => new Promise<void>((r) => setTimeout(r, 0));
 
+function fieldLabelsOf(f: FileImport): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const col of f.spec.columns) {
+    const i = f.mapping[col.field] ?? -1;
+    out[col.field] = (i >= 0 ? f.table.header[i] : undefined) || (col.headers[0] ?? col.field);
+  }
+  return out;
+}
+
 function fileInfoFromImport(f: FileImport, mapped: boolean): FileInfo {
   const issues = f.data.result.issues;
   return {
@@ -170,8 +183,10 @@ function fileInfoFromImport(f: FileImport, mapped: boolean): FileInfo {
     encoding: encodingLabel(f.decoded.encoding, f.decoded.bom),
     rows: f.table.rows.length,
     records: f.data.result.records.length,
+    skippedRows: f.table.rows.length - f.data.result.records.length,
     issues: issues.slice(0, 50),
     issueCount: issues.length,
+    fieldLabels: fieldLabelsOf(f),
     header: f.table.header,
     error: null,
     mapped,
@@ -187,8 +202,10 @@ function emptyInfo(name: string, status: FileStatus, label: string, error: strin
     encoding: '',
     rows: 0,
     records: 0,
+    skippedRows: 0,
     issues: [],
     issueCount: 0,
+    fieldLabels: {},
     header: [],
     error,
     mapped: false,
@@ -255,7 +272,11 @@ export async function buildLoaded(sources: readonly SourceFile[], opts: LoadOpti
   progress('マスタと履歴をまとめています…');
   await yieldToBrowser();
   const settings: Partial<Settings> = { ...dataSettings };
-  if (opts.diagnosisFloorPct !== null) settings.marginFloorBp = pctToBp(opts.diagnosisFloorPct);
+  if (opts.diagnosisFloorPct !== null) {
+    const bp = pctToBp(opts.diagnosisFloorPct);
+    // a floor of 100% or more has no price that meets it: keep the data's own setting
+    if (bp >= 0 && bp < 10000) settings.marginFloorBp = bp;
+  }
   const ws = workspaceFromImports(imports, {
     settings,
     ...(company ? { company } : {}),

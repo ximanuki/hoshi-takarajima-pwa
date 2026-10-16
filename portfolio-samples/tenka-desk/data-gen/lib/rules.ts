@@ -65,7 +65,7 @@ export const LABEL_JA: Record<string, string> = {
   ok_non_product: '商品以外(運賃)',
   leak_old_price: '反映漏れ(旧価格のまま)',
   leak_expired_special: '特値の期限切れ',
-  leak_rate_out_of_tier: '掛け率ランク外',
+  leak_rate_out_of_tier: '掛率ランク外',
   leak_below_margin_floor: '粗利下限割れ',
   unexplained: '原因不明の価格差',
   ok_new_price: '新価格で請求',

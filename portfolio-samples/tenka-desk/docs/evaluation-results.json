@@ -388,5 +388,84 @@
       "onlyInRebuilt": 0,
       "onlyInSample": 0
     }
+  },
+  "followupOnExportedMaster": [
+    {
+      "layout": "A",
+      "encoding": "utf-8",
+      "rowsWritten": 2748,
+      "rowsReadBack": 2748,
+      "importIssues": 0,
+      "stillOldPrice": {
+        "tp": 79,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1,
+        "recall": 1
+      },
+      "labelAgreement": {
+        "agree": 2770,
+        "of": 2770
+      },
+      "engineShortfallYen": 343144
+    },
+    {
+      "layout": "B",
+      "encoding": "utf-8",
+      "rowsWritten": 2748,
+      "rowsReadBack": 2748,
+      "importIssues": 0,
+      "stillOldPrice": {
+        "tp": 79,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1,
+        "recall": 1
+      },
+      "labelAgreement": {
+        "agree": 2770,
+        "of": 2770
+      },
+      "engineShortfallYen": 343144
+    },
+    {
+      "layout": "A",
+      "encoding": "shift_jis",
+      "rowsWritten": 2748,
+      "rowsReadBack": 2748,
+      "importIssues": 0,
+      "stillOldPrice": {
+        "tp": 79,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1,
+        "recall": 1
+      },
+      "labelAgreement": {
+        "agree": 2770,
+        "of": 2770
+      },
+      "engineShortfallYen": 343144
+    }
+  ],
+  "messySample": {
+    "lines": 18,
+    "linesRead": 18,
+    "importIssues": 0,
+    "encoding": "shift_jis",
+    "labelAgreement": {
+      "agree": 18,
+      "of": 18
+    },
+    "leakOrUnexplained": {
+      "tp": 5,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1
+    },
+    "overchargeLines": 2,
+    "interpretedAgreementStatuses": 4,
+    "differences": []
   }
 }

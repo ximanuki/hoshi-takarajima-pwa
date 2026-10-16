@@ -120,3 +120,28 @@ describe('manual prices (overrides)', () => {
     expect(p?.newPrice).toBe(p?.enginePrice);
   });
 });
+
+describe('manual prices of a pair whose customer is invoiced less (ongoing billing leak)', () => {
+  const { pairs, guard } = pairsWith(DEFAULT_GUARD);
+  const a = pairs.find((p) => p.cust === '000001' && p.sku === 'DB-1001') as PairProposal;
+  const leaking: PairProposal = { ...a, ongoingLeak: 'old_price', systemPrice: 511, lastBilledPrice: 511 };
+
+  it('warns, and flags for a person, above the cap counted from the invoiced price', () => {
+    const b = overrideBounds(ds, leaking, guard);
+    // 511 × 1.20 = 613
+    expect(b).toMatchObject({ billed: 511, billedCap: 613 });
+    expect(checkOverride(b, 612)).toEqual({ ok: true, warnings: [] });
+    expect(checkOverride(b, 620)).toMatchObject({
+      ok: true,
+      warnings: [expect.stringContaining('今の請求単価 511円')],
+    });
+    const out = applyOverrides(ds, [leaking], { [pairKey('000001', 'DB-1001')]: 620 }, guard);
+    expect(out[0]?.guardrails.map((g) => g.rule)).toContain('billed_increase_over_cap');
+    expect(overrideBounds(ds, a, guard).billed).toBeNull();
+  });
+
+  it('refuses a margin floor of 100% or more', () => {
+    expect(guardSettingsError({ ...DEFAULT_GUARD, marginFloorPct: 99.996 })).toContain('100%未満');
+    expect(guardSettingsError({ ...DEFAULT_GUARD, marginFloorPct: 99.99 })).toBeNull();
+  });
+});

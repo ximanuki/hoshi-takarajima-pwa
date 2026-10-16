@@ -17,6 +17,8 @@ import type { PriceMasterRow, RevisionAgreement } from './types.ts';
 export interface NegotiationOutcome {
   cust: string;
   agreed: boolean;
+  /** 一部合意 (some categories kept at the old price) */
+  partial?: boolean;
   effective: IsoDate | null;
   excludedCategories: string[];
   /** agreed unit prices that differ from the proposal */
@@ -37,6 +39,7 @@ export function outcomesFromAgreements(rows: readonly RevisionAgreement[]): Map<
     out.set(r.cust, {
       cust: r.cust,
       agreed,
+      partial: agreed && kind === 'partial',
       effective: r.effective,
       excludedCategories: [...r.excludedCategories],
       itemPrices: new Map(),
@@ -53,6 +56,7 @@ export function outcomeFromLog(log: NegotiationLog): NegotiationOutcome | null {
   return {
     cust: log.cust,
     agreed: true,
+    partial: s === '一部合意',
     effective: terms.effective,
     excludedCategories: [...terms.excludedCategories],
     itemPrices: new Map(terms.itemPrices.map((x) => [x.sku, x.price])),
@@ -128,7 +132,12 @@ export function exportPriceMaster(
   ds: Dataset,
   rows: readonly PriceMasterRow[],
   layout: 'A' | 'B',
-  options: { encoding?: 'utf-8' | 'shift_jis'; fileName?: string } = {},
+  options: {
+    encoding?: 'utf-8' | 'shift_jis';
+    fileName?: string;
+    /** Shift_JIS only: characters it cannot hold stop the export ('error', default) or become '?' */
+    onUnmappable?: 'error' | 'replace';
+  } = {},
 ): ExportedFile {
   const encoding = options.encoding ?? 'utf-8';
   let text: string;
@@ -163,7 +172,7 @@ export function exportPriceMaster(
   const fileName = options.fileName ?? `price_master_${layout}_${stamp}.csv`;
   const bytes =
     encoding === 'shift_jis'
-      ? encodeShiftJis(text.startsWith(BOM) ? text.slice(1) : text)
+      ? encodeShiftJis(text.startsWith(BOM) ? text.slice(1) : text, options.onUnmappable ?? 'error')
       : encodeUtf8(text.startsWith(BOM) ? text.slice(1) : text, text.startsWith(BOM));
   return { fileName, text, bytes, encoding };
 }

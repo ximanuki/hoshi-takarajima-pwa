@@ -938,6 +938,68 @@ legend {
   max-height: 460px;
   overflow-y: auto;
 }
+/* 品目ごとの提案: the product name keeps a readable width; the table scrolls sideways instead */
+.proposal-items .product-cell {
+  min-width: 13em;
+}
+.narrow-only {
+  display: none;
+}
+td.badges .badge {
+  white-space: nowrap;
+}
+.type-badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.empty-row {
+  padding: 16px;
+  text-align: center;
+}
+.status-table {
+  max-width: 32em;
+}
+.next-step {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.next-step p {
+  flex: 1 1 28em;
+  margin: 0;
+}
+.breakdown {
+  margin: 0;
+  font-size: 13px;
+}
+.breakdown div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 3px 0;
+  border-bottom: 1px dashed var(--line);
+}
+.breakdown dd {
+  margin: 0;
+  white-space: nowrap;
+}
+.breakdown .breakdown-total {
+  border-bottom: 0;
+  font-weight: 700;
+}
+.scenario-sticky {
+  display: none;
+}
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -1106,11 +1168,28 @@ legend {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
+  flex-wrap: wrap;
+  gap: 2px 6px;
   margin: 0;
   padding: 10px 10px 8px;
   font-size: 13px;
   border-bottom: 1px solid var(--line);
+}
+.kanban-sum {
+  flex-basis: 100%;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muted);
+}
+.kanban-empty {
+  padding: 6px 2px;
+}
+.negotiation-total {
+  margin: 0;
+  font-size: 14px;
+}
+.negotiation-total strong {
+  font-size: 18px;
 }
 .kanban-list {
   margin: 0;
@@ -1210,12 +1289,72 @@ legend {
 
 .letter-controls {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) auto repeat(4, minmax(0, 1fr));
+  grid-template-columns: auto repeat(4, minmax(0, 1fr));
   gap: 12px;
   align-items: end;
 }
+/* the customer picker gets its own row, so long names and the amount line are never cut */
+.letter-controls > .letter-customer {
+  grid-column: 1 / -1;
+  max-width: 40em;
+}
+.letter-customer-sub {
+  font-weight: 400;
+}
+.block-full {
+  flex-basis: 100%;
+  margin: 0;
+}
+.checkbox.is-disabled {
+  color: var(--ink-2);
+  opacity: 0.6;
+}
+.paragraph-editor {
+  display: grid;
+  gap: 12px;
+}
+.paragraph-editor textarea {
+  width: 100%;
+  font: inherit;
+  font-weight: 400;
+}
+.paragraph-editor .btn {
+  justify-self: start;
+}
+.send-check {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+.send-check .h3 {
+  margin-top: 0;
+}
+.plain-list {
+  margin: 0 0 6px;
+  padding: 0;
+  list-style: none;
+}
+.plain-list li + li {
+  margin-top: 4px;
+}
 .sample-note {
   text-align: center;
+}
+.sheet-sample {
+  margin: 0 0 8px;
+  padding: 2px 8px;
+  border: 1px dashed #8a1c1c;
+  color: #8a1c1c;
+  font-family: var(--font-sans, sans-serif);
+  font-size: 8.5pt;
+  text-align: center;
+  text-indent: 0;
+}
+.billed-price {
+  display: block;
+  font-size: 7.5pt;
+  color: #333;
 }
 .sheets {
   display: flex;
@@ -1492,11 +1631,26 @@ legend {
   .split-side {
     position: static;
   }
+  /* results come below the inputs: keep the three key numbers in view while moving a slider */
+  .scenario-sticky {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 18px;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    padding: 8px 14px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 8px rgba(20, 20, 18, 0.08);
+    font-size: 13px;
+  }
+  .scenario-sticky strong {
+    font-size: 16px;
+  }
   .letter-controls {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-  .letter-controls > .field:first-child {
-    grid-column: 1 / -1;
   }
 }
 @media screen and (max-width: 900px) {
@@ -1507,7 +1661,18 @@ legend {
     padding: 10px 16px;
   }
   .steps ol {
-    padding: 8px 16px;
+    flex-wrap: wrap;
+    padding: 6px 12px;
+  }
+  .step {
+    padding: 5px 7px;
+    gap: 6px;
+  }
+  .wide-only {
+    display: none;
+  }
+  .narrow-only {
+    display: block;
   }
   .grid-2,
   .form-grid-2,
@@ -1545,9 +1710,65 @@ legend {
 
 /* ---------- print (A4) ---------- */
 
+/*
+ * Page numbers and running heads are printed in the page margins. When a page
+ * margin box is defined, Chromium leaves out its own header and footer (title,
+ * URL, date). The 別紙 and 参考資料 carry their name on every page, so a
+ * continuation page still says what it is; sample data says 架空 on every page.
+ */
 @page {
   size: A4;
   margin: 16mm 16mm 14mm;
+  @bottom-right {
+    content: counter(page) " / " counter(pages);
+    font-size: 8pt;
+    color: #555;
+  }
+}
+@page items {
+  @top-right {
+    content: "別紙\3000 価格改定対象品目一覧";
+    font-size: 8pt;
+    color: #555;
+  }
+}
+@page evidence {
+  @top-right {
+    content: "参考資料（公表統計）";
+    font-size: 8pt;
+    color: #555;
+  }
+}
+@page letter-sample {
+  @bottom-left {
+    content: "サンプル（架空データ）— 実在の企業・取引とは関係ありません";
+    font-size: 8pt;
+    color: #8a1c1c;
+  }
+}
+@page items-sample {
+  @top-right {
+    content: "別紙\3000 価格改定対象品目一覧";
+    font-size: 8pt;
+    color: #555;
+  }
+  @bottom-left {
+    content: "サンプル（架空データ）— 実在の企業・取引とは関係ありません";
+    font-size: 8pt;
+    color: #8a1c1c;
+  }
+}
+@page evidence-sample {
+  @top-right {
+    content: "参考資料（公表統計）";
+    font-size: 8pt;
+    color: #555;
+  }
+  @bottom-left {
+    content: "サンプル（架空データ）— 実在の企業・取引とは関係ありません";
+    font-size: 8pt;
+    color: #8a1c1c;
+  }
 }
 
 @media print {
@@ -1592,6 +1813,22 @@ legend {
   .sheet:last-child {
     break-after: auto;
     page-break-after: auto;
+  }
+  .sheet.items {
+    page: items;
+  }
+  .sheet.evidence {
+    page: evidence;
+  }
+  .is-sample .sheet.letter,
+  .log-print.is-sample {
+    page: letter-sample;
+  }
+  .is-sample .sheet.items {
+    page: items-sample;
+  }
+  .is-sample .sheet.evidence {
+    page: evidence-sample;
   }
   .items-table thead {
     display: table-header-group;

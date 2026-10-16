@@ -2,6 +2,7 @@ import { Fragment, useMemo, useState } from 'react';
 import {
   type Finding,
   LEAK_LABEL_JA,
+  LEAK_SHORT_JA,
   LEAK_TYPES,
   type LeakType,
   LINE_STATUS_JA,
@@ -13,6 +14,7 @@ import { BarList } from '../components/Charts.tsx';
 import { Badge, Card, downloadFile, Icon, NeedsData, Notice, PageHeader } from '../components/ui.tsx';
 import { num, ratio, wareki, warekiRange, yen } from '../format.ts';
 import { useApp } from '../model/AppState.tsx';
+import { href } from '../router.ts';
 
 const TYPE_HELP: Record<LeakType, string> = {
   old_price: '定価改定のあと、合意どおりなら新しい単価のはずなのに、旧定価 × 掛率 のまま請求している行です。',
@@ -60,6 +62,12 @@ export function DiagnosisScreen() {
   }
 
   const total = d.summary.reduce((s, x) => s + x.annualImpactYen, 0);
+  const resetFilters = () => {
+    setType('all');
+    setQuery('');
+    setOnlyOngoing(false);
+    setShown(PAGE);
+  };
   const wholeCustomers = d.customers.filter((c) => c.wholeCustomer);
   const kinds = loaded.kinds;
   const counts = Object.entries(d.statusCounts).filter(([, n]) => n > 0) as [LineStatus, number][];
@@ -132,7 +140,7 @@ export function DiagnosisScreen() {
       )}
       {!kinds.has('specials') && (
         <Notice tone="warning" title="特値一覧が読み込まれていません">
-          <p>期間内の特値も「掛け率ランク外」として表示され、期限切れの特値は見つけられません。</p>
+          <p>期間内の特値も「掛率ランク外」として表示され、期限切れの特値は見つけられません。</p>
         </Notice>
       )}
       {!kinds.has('listPriceHistory') && (
@@ -167,10 +175,29 @@ export function DiagnosisScreen() {
         />
         <p className="small muted">
           粗利下限割れは請求ミスではなく、粗利率の下限（{loaded.ws.dataset.settings.marginFloorBp / 100}
-          %）を満たす単価との差です。1行に複数の問題があるときは、反映漏れ → 特値の期限切れ → 掛け率ランク外 →
+          %）を満たす単価との差です。1行に複数の問題があるときは、反映漏れ → 特値の期限切れ → 掛率ランク外 →
           粗利下限割れ の順で1つに数えています。
         </p>
+        <div className="next-step">
+          <p className="small">
+            請求ミス（反映漏れ・特値の期限切れ・掛率ランク外）は、取り決めどおりの単価に直すものです。原価の上昇分は、次のシナリオで値上げとして申し入れます。提案画面では、請求ミスの可能性がある品目に印が付きます。
+          </p>
+          <a className="btn btn-primary" href={href('scenario')}>
+            次へ：値上げのシナリオを作る <Icon name="arrow" />
+          </a>
+        </div>
       </section>
+
+      {d.overcharges.lines > 0 && (
+        <Notice tone="info" title="取り決めより高く請求している行があります（利益漏れには含めていません）">
+          <p>
+            {num(d.overcharges.lines)}行（{num(d.overcharges.pairs)}組・{num(d.overcharges.customers)}
+            社）、直近12か月で
+            {yen(d.overcharges.amountInWindowYen)}
+            多く請求しています。定価の値下げが反映されていない、またはランクの上限を超えた単価の可能性があります。得意先への過大な請求になっていないか確認してください。下の「全行の判定の内訳」の「基準より高い請求」の行です。
+          </p>
+        </Notice>
+      )}
 
       {wholeCustomers.length > 0 && (
         <Card title="得意先単位で起きている可能性があるもの">
@@ -248,6 +275,16 @@ export function DiagnosisScreen() {
               </tr>
             </thead>
             <tbody>
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={8} className="empty-row">
+                    <span>条件に合う漏れはありません。</span>{' '}
+                    <button type="button" className="btn btn-small" onClick={resetFilters}>
+                      絞り込みを解除
+                    </button>
+                  </td>
+                </tr>
+              )}
               {filtered.slice(0, shown).map((f) => (
                 <Fragment key={f.id}>
                   <tr className={open === f.id ? 'is-open' : ''}>
@@ -262,7 +299,11 @@ export function DiagnosisScreen() {
                         {f.id}
                       </button>
                     </td>
-                    <td>{LEAK_LABEL_JA[f.type]}</td>
+                    <td>
+                      <span className="type-badge" title={LEAK_LABEL_JA[f.type]}>
+                        {LEAK_SHORT_JA[f.type]}
+                      </span>
+                    </td>
                     <td>
                       {f.custName}
                       <span className="muted small block">{f.cust}</span>
@@ -302,7 +343,7 @@ export function DiagnosisScreen() {
       </Card>
 
       <Card title="全行の判定の内訳">
-        <div className="table-wrap">
+        <div className="table-wrap status-table">
           <table className="table compact">
             <thead>
               <tr>
@@ -322,9 +363,11 @@ export function DiagnosisScreen() {
             </tbody>
           </table>
         </div>
-        <p className="small muted">
-          「価格差（原因不明・要確認）」は、取り決めの単価と違うのに、旧定価・期限切れの特値・掛率ランク外のどれにも当てはまらない行です。担当者が個別に確認してください。
-        </p>
+        {d.statusCounts.price_mismatch > 0 && (
+          <p className="small muted">
+            「価格差（原因不明・要確認）」は、取り決めの単価より安いのに、旧定価・期限切れの特値・掛率ランク外のどれにも当てはまらない行です。担当者が個別に確認してください。
+          </p>
+        )}
       </Card>
     </>
   );

@@ -8,12 +8,18 @@
  *  - inside the customer's 掛率ランク at the new 定価, unless the proposal itself
  *    already could not stay inside (then only a warning)
  *  - below the 粗利率の下限 is allowed but flagged for a person to decide
+ *  - above the cap counted from the price the customer is invoiced now (an
+ *    ongoing billing leak) is allowed but flagged, like the engine's proposal
  */
 
 import {
+  ATTENTION_RULES,
+  billedCapPrice,
+  billedOverCapHit,
   changeBp,
   type Dataset,
   divFloor,
+  divRound,
   type GuardrailHit,
   type Guardrails,
   type IsoDate,
@@ -24,6 +30,7 @@ import {
   ongoingBillingLeaks,
   type PairProposal,
   type ProposalInput,
+  type ProposalMethod,
   pairKey,
   priceAtRate,
   proposeListPrices,
@@ -82,7 +89,21 @@ export interface ProposalOk {
 
 export type ProposalResult = ProposalOk | { ok: false; error: string };
 
-export function defaultEffectiveDate(loaded: Loaded): IsoDate | null {
+/** The 適用日 of the loaded new 定価 table, when all its rows share one date. */
+export function newListEffective(loaded: Loaded): IsoDate | null {
+  const dates = new Set(loaded.ws.newListPrices.map((n) => n.effective));
+  return dates.size === 1 ? ([...dates][0] ?? null) : null;
+}
+
+/**
+ * Default 適用日: with 「新定価表を使う」, the table's own 適用日; else the demo's next
+ * revision, else the 1st of the month after next.
+ */
+export function defaultEffectiveDate(loaded: Loaded, method?: ProposalMethod): IsoDate | null {
+  if (method === 'fixed_list') {
+    const d = newListEffective(loaded);
+    if (d) return d;
+  }
   if (loaded.demoNextRevision) return loaded.demoNextRevision;
   return loaded.asOf ? firstOfMonthAfter(loaded.asOf, 2) : null;
 }
@@ -117,6 +138,8 @@ export function guardSettingsError(g: GuardSettings): string | null {
       return `末尾の指定（${g.ending}円）は、いちばん小さい丸め単位（${smallest}円）より小さくしてください。`;
   }
   if (g.capEnabled && !(g.maxIncreasePct > 0)) return '値上げ率の上限は0%より大きくしてください。';
+  if (g.marginFloorPct !== null && !(toBp(g.marginFloorPct) >= 0 && toBp(g.marginFloorPct) < 10000))
+    return '粗利率の下限は0%以上100%未満にしてください。';
   return null;
 }
 
@@ -128,6 +151,10 @@ export interface OverrideBounds {
   /** the tier range must hold (the proposal itself stays inside it) */
   tierStrict: boolean;
   floor: number | null;
+  /** price the customer is invoiced now, when an ongoing billing leak keeps it below `current` */
+  billed: number | null;
+  /** the cap counted from `billed` (above it: allowed, with a warning) */
+  billedCap: number | null;
 }
 
 export function overrideBounds(ds: Dataset, p: PairProposal, guard: Guardrails): OverrideBounds {
@@ -141,6 +168,8 @@ export function overrideBounds(ds: Dataset, p: PairProposal, guard: Guardrails):
     tierMax: tier ? priceAtRate(p.newList, tier.maxPm, rounding) : null,
     tierStrict: tier !== null && !p.guardrails.some((h) => h.rule === 'tier_conflict'),
     floor: p.costNewSen > 0 ? marginFloorPrice(p.costNewSen, guard.marginFloorBp) : null,
+    billed: p.systemPrice < p.currentPrice ? p.systemPrice : null,
+    billedCap: billedCapPrice(p.systemPrice, p.currentPrice, guard.maxIncreaseBp),
   };
 }
 
@@ -172,6 +201,10 @@ export function checkOverride(b: OverrideBounds, price: number): OverrideVerdict
   }
   if (b.floor !== null && price < b.floor)
     warnings.push(`粗利率の下限（${b.floor.toLocaleString('ja-JP')}円 以上）に届きません。`);
+  if (b.billed !== null && b.billedCap !== null && price > b.billedCap)
+    warnings.push(
+      `今の請求単価 ${b.billed.toLocaleString('ja-JP')}円 から見ると値上げ率の上限を超えます（${b.billedCap.toLocaleString('ja-JP')}円 まで）。`,
+    );
   return { ok: true, warnings };
 }
 
@@ -193,6 +226,8 @@ function withOverride(ds: Dataset, p: PairProposal, price: number, guard: Guardr
       rule: 'margin_floor_unmet',
       message: `手入力の単価は粗利率の下限（${b.floor ?? '-'}円 以上）に届きません。個別に判断してください`,
     });
+  if (b.billed !== null && b.billedCap !== null && price > b.billedCap)
+    hits.push(billedOverCapHit(b.billed, price));
   const changeYen = price - p.currentPrice;
   return {
     ...p,
@@ -203,6 +238,8 @@ function withOverride(ds: Dataset, p: PairProposal, price: number, guard: Guardr
     changeBp: changeYen > 0 && p.currentPrice > 0 ? changeBp(price, p.currentPrice) : 0,
     marginNewBp: marginBp(changeYen > 0 ? price : p.currentPrice, p.costNewSen),
     guardrails: hits,
+    // a manual price is the user's own: none of it is counted as the automatic floor raise
+    floorRaiseYen: 0,
   };
 }
 
@@ -260,8 +297,7 @@ function summarise(ds: Dataset, pairs: AppPair[]): CustomerProposal[] {
         requested += p.changeYen * p.qty;
         base += p.currentPrice * p.qty;
       }
-      if (p.guardrails.some((h) => h.rule === 'margin_floor_unmet' || h.rule === 'tier_conflict'))
-        attention++;
+      if (p.guardrails.some((h) => ATTENTION_RULES.has(h.rule))) attention++;
     }
     out.push({
       cust,
@@ -273,7 +309,7 @@ function summarise(ds: Dataset, pairs: AppPair[]): CustomerProposal[] {
       requestedYen: requested,
       baseYen: base,
       changeBp: base > 0 ? changeBp(base + requested, base) : null,
-      costIncreaseYen: Math.round(costUpSen / 100),
+      costIncreaseYen: divRound(costUpSen, 100),
       attention,
       overrides: list.filter((p) => p.override !== null).length,
       ongoingLeaks: list.filter((p) => p.ongoingLeak !== null).length,
@@ -293,7 +329,7 @@ export function computeProposal(
     return { ok: false, error: '先に売上明細とマスタを読み込んでください。' };
   const guardError = guardSettingsError(guard);
   if (guardError) return { ok: false, error: guardError };
-  const effectiveDate = scenario.effectiveDate ?? defaultEffectiveDate(loaded);
+  const effectiveDate = scenario.effectiveDate ?? defaultEffectiveDate(loaded, scenario.method);
   if (!effectiveDate) return { ok: false, error: '適用日を決められません。' };
   if (scenario.method === 'fixed_list' && loaded.ws.newListPrices.length === 0)
     return { ok: false, error: '「新定価表を使う」には、新定価表のファイルを読み込んでください。' };

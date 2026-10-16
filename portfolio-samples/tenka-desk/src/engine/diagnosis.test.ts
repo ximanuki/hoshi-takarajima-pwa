@@ -81,7 +81,7 @@ describe('diagnoseLine: leaks', () => {
     expect(explainLine(d).join('')).toContain('令和7年3月31日');
   });
 
-  it('掛け率ランク外: below or above the rank range of 定価', () => {
+  it('掛率ランク外: below or above the rank range of 定価', () => {
     const under = check({ cust: '000001', rawSku: 'DB-1001', date: D, unitPrice: 530 });
     expect(under.leak).toBe('rate_out_of_tier');
     expect(under.tier).toMatchObject({ minPrice: 539, maxPrice: 577 });

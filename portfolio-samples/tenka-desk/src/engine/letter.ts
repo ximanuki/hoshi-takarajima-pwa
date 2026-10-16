@@ -10,13 +10,39 @@
 
 import type { Dataset } from './dataset.ts';
 import { type IsoDate, toWareki } from './dates.ts';
-import { EVIDENCE_TOPIC_JA, type EvidenceItem, type EvidenceTopic } from './evidence.ts';
+import { COMPUTED_LABEL, EVIDENCE_TOPIC_JA, type EvidenceItem, type EvidenceTopic } from './evidence.ts';
 import { changeBp } from './money.ts';
 import type { PairProposal } from './proposal.ts';
 import { formatRatioPct, withCommas } from './text.ts';
 import type { Company } from './types.ts';
 
 export type EffectiveBasis = '出荷分' | '受注分' | '納品分';
+
+/** Reasons for the increase the letter may name (from the cost scenario, not from the statistics). */
+export type LetterCause = 'material' | 'purchase' | 'energy' | 'logistics' | 'labor' | 'other';
+
+export const LETTER_CAUSE_JA: Record<LetterCause, string> = {
+  material: '原材料価格',
+  purchase: '仕入価格',
+  energy: 'エネルギー価格',
+  logistics: '物流費',
+  labor: '人件費',
+  other: '諸経費',
+};
+
+const CAUSE_ORDER: readonly LetterCause[] = ['material', 'purchase', 'energy', 'logistics', 'labor', 'other'];
+
+/** Paragraphs of the body, in order; each can be replaced by the user's own text. */
+export type LetterParagraphId = 'greeting' | 'reason' | 'request' | 'evidence' | 'reply' | 'closing';
+
+export const LETTER_PARAGRAPH_JA: Record<LetterParagraphId, string> = {
+  greeting: '前文（あいさつ）',
+  reason: '値上げの理由と自社の取組み',
+  request: 'お願い（改定日）',
+  evidence: '参考資料・協議のお願い',
+  reply: 'ご回答期限',
+  closing: '結び',
+};
 
 export interface LetterOptions {
   issueDate: IsoDate;
@@ -26,6 +52,15 @@ export interface LetterOptions {
   contact?: { branch: string; person: string; tel?: string };
   title?: string;
   documentNo?: string;
+  /**
+   * The cost increases the company actually has (e.g. the non-zero components of
+   * its cost scenario). Without them the reasons follow the evidence topics.
+   */
+  causes?: readonly LetterCause[];
+  /** the user's own text for some paragraphs (a blank text keeps the generated one) */
+  paragraphs?: Partial<Record<LetterParagraphId, string>>;
+  /** label of figures computed from published values (default 「弊社算出」) */
+  computedLabel?: string;
 }
 
 export interface LetterItemRow {
@@ -40,6 +75,13 @@ export interface LetterItemRow {
   newPriceText: string;
   changeText: string;
   rateText: string;
+  /**
+   * The price the customer is invoiced now, when an ongoing billing error keeps it
+   * below the 現行単価 shown (null otherwise), so the letter does not quietly state a
+   * price their invoices do not show.
+   */
+  billedPrice: number | null;
+  billedPriceText: string | null;
 }
 
 export interface LetterData {
@@ -54,6 +96,8 @@ export interface LetterData {
   sender: { company: string; representative: string; address: string; tel: string };
   salutation: '拝啓';
   body: string[];
+  /** the same paragraphs with their ids (body[i] is paragraphs[i].text) */
+  paragraphs: { id: LetterParagraphId; text: string; edited: boolean }[];
   complimentaryClose: '敬具';
   /** 記 */
   record: { label: string; value: string }[];
@@ -78,12 +122,20 @@ export class EmptyLetterError extends Error {
   }
 }
 
-function causeText(topics: Set<EvidenceTopic>): string {
-  const order: EvidenceTopic[] = ['material', 'energy', 'logistics', 'labor'];
-  const names = order.filter((t) => topics.has(t)).map((t) => EVIDENCE_TOPIC_JA[t]);
-  if (names.length === 0) return '諸経費';
+function joinJa(names: readonly string[]): string {
+  if (names.length === 0) return '';
   if (names.length === 1) return names[0] as string;
   return `${names.slice(0, -1).join('、')}や${names[names.length - 1]}`;
+}
+
+function causeText(causes: readonly LetterCause[] | undefined, topics: Set<EvidenceTopic>): string {
+  if (causes !== undefined) {
+    const names = CAUSE_ORDER.filter((c) => causes.includes(c)).map((c) => LETTER_CAUSE_JA[c]);
+    return names.length > 0 ? joinJa(names) : '諸経費';
+  }
+  const order: EvidenceTopic[] = ['material', 'energy', 'logistics', 'labor'];
+  const names = order.filter((t) => topics.has(t)).map((t) => EVIDENCE_TOPIC_JA[t]);
+  return names.length > 0 ? joinJa(names) : '諸経費';
 }
 
 /**
@@ -119,6 +171,9 @@ export function buildLetter(
       newPriceText: withCommas(p.newPrice),
       changeText: `+${withCommas(p.changeYen)}`,
       rateText: `+${formatRatioPct(p.changeYen, p.currentPrice)}`,
+      billedPrice: p.ongoingLeak !== null && p.systemPrice < p.currentPrice ? p.systemPrice : null,
+      billedPriceText:
+        p.ongoingLeak !== null && p.systemPrice < p.currentPrice ? withCommas(p.systemPrice) : null,
     };
   });
   let before = 0;
@@ -137,19 +192,44 @@ export function buildLetter(
 
   const effectiveText = toWareki(options.effectiveDate);
   const topics = new Set(evidence.map((e) => e.topic));
-  const body = [
-    '時下ますますご清栄のこととお慶び申し上げます。平素は格別のお引き立てを賜り、厚く御礼申し上げます。',
-    `さて、弊社では、${causeText(topics)}の上昇に対し、業務の効率化や経費の削減に努め、価格の維持に取り組んでまいりました。しかしながら、これらの上昇は弊社の努力だけでは吸収しきれない状況となっております。`,
-    `つきましては、誠に心苦しいお願いではございますが、${effectiveText}${options.basis}より、別紙のとおり価格を改定させていただきたく、お願い申し上げます。`,
-    evidence.length > 0
-      ? '価格改定の背景として、公表されている統計を参考資料として添付いたしました。ご不明な点やご意見がございましたら、ご遠慮なくお申し付けください。協議の機会を設けていただけましたら幸いです。'
-      : 'ご不明な点やご意見がございましたら、ご遠慮なくお申し付けください。協議の機会を設けていただけましたら幸いです。',
+  const ask = options.contact
+    ? 'ご不明な点やご意見がございましたら、下記担当までお問い合わせください。'
+    : 'ご不明な点やご意見がございましたら、ご遠慮なくお申し付けください。';
+  const generated: [LetterParagraphId, string][] = [
+    [
+      'greeting',
+      '時下ますますご清栄のこととお慶び申し上げます。平素は格別のお引き立てを賜り、厚く御礼申し上げます。',
+    ],
+    [
+      'reason',
+      `さて、弊社では、${causeText(options.causes, topics)}の上昇に対し、業務の効率化や経費の削減に努め、価格の維持に取り組んでまいりました。しかしながら、これらの上昇は弊社の努力だけでは吸収しきれない状況となっております。`,
+    ],
+    [
+      'request',
+      `つきましては、誠に心苦しいお願いではございますが、${effectiveText}${options.basis}より、別紙のとおり価格を改定させていただきたく、お願い申し上げます。`,
+    ],
+    [
+      'evidence',
+      evidence.length > 0
+        ? `価格改定の背景を示す公表統計を、参考資料として添付いたしました。${ask}協議の機会を設けていただけましたら幸いです。`
+        : `${ask}協議の機会を設けていただけましたら幸いです。`,
+    ],
   ];
   if (options.replyBy)
-    body.push(
-      `誠に恐縮ではございますが、${toWareki(options.replyBy)}までにご回答をいただけましたら幸いです。`,
-    );
-  body.push('何卒事情をご賢察のうえ、ご理解を賜りますよう、よろしくお願い申し上げます。');
+    generated.push([
+      'reply',
+      `誠に恐縮ではございますが、${toWareki(options.replyBy)}までにご回答を賜りますようお願い申し上げます。`,
+    ]);
+  generated.push(['closing', '何卒事情をご賢察のうえ、ご理解を賜りますよう、よろしくお願い申し上げます。']);
+  const paragraphs = generated.map(([id, text]) => {
+    const own = options.paragraphs?.[id]?.trim();
+    return own ? { id, text: own, edited: true } : { id, text, edited: false };
+  });
+  const body = paragraphs.map((p) => p.text);
+  const label = options.computedLabel ?? COMPUTED_LABEL;
+  const shownTopics = (['material', 'energy', 'logistics', 'labor', 'general'] as const).filter((t) =>
+    topics.has(t),
+  );
 
   const record = [
     { label: '改定内容', value: `別紙「価格改定対象品目一覧」のとおり（${items.length}品目）` },
@@ -171,6 +251,7 @@ export function buildLetter(
   }
 
   const sources = [...new Set(evidence.map((e) => e.source.credit))];
+  const billedItems = items.filter((i) => i.billedPrice !== null).length;
   return {
     customerCode: cust,
     title: options.title ?? '価格改定のお願い',
@@ -188,6 +269,7 @@ export function buildLetter(
     },
     salutation: '拝啓',
     body,
+    paragraphs,
     complimentaryClose: '敬具',
     record,
     items,
@@ -196,16 +278,22 @@ export function buildLetter(
       '価格は税抜です。',
       '単価は表示の単位あたりの価格です（円）。',
       '改定率は現行単価に対する率です。記の平均は、直近12か月のご購入数量で加重した平均です。',
+      ...(billedItems > 0
+        ? [
+            '※印の品目は、現在のご請求単価（※の後に記載）が、お取り決めの現行単価と異なっております。この点は担当者よりあらためてご説明いたします。',
+          ]
+        : []),
     ],
     averageChangeBp,
     evidence: {
       heading: '参考資料（公表統計）',
-      intro:
-        '原材料・エネルギー・物流・人件費の動向を示す公表統計です。業界や地域全体の動きを示すもので、個々の取引条件をそのまま表すものではありません。',
+      intro: `${shownTopics.map((t) => EVIDENCE_TOPIC_JA[t]).join('・')}の動向を示す公表統計です。業界や地域全体の動きを示すもので、個々の取引条件をそのまま表すものではありません。`,
       items: [...evidence],
       sources,
       disclaimer: [
-        '「本ツールで計算」とある変化率は、公表値から計算したものです。',
+        ...(evidence.some((e) => e.computedByTool)
+          ? [`「${label}」とある数値は、公表値をもとに弊社で計算したものです。`]
+          : []),
         '統計の最新月は速報値で、後に改定されることがあります。',
       ],
     },

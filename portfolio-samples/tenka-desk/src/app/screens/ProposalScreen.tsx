@@ -1,5 +1,13 @@
 import { Fragment, useMemo, useState } from 'react';
-import { changeBp, EXCLUSION_REASON_JA, LEAK_LABEL_JA, pairKey } from '../../engine/index.ts';
+import {
+  ATTENTION_RULES,
+  changeBp,
+  EXCLUSION_REASON_JA,
+  LEAK_LABEL_JA,
+  pairKey,
+  parseIntLoose,
+  withCommas,
+} from '../../engine/index.ts';
 import { Badge, Card, Kpi, NeedsData, Notice, PageHeader } from '../components/ui.tsx';
 import { num, pct, pctDelta, wareki, yen } from '../format.ts';
 import { useApp } from '../model/AppState.tsx';
@@ -78,11 +86,11 @@ export function ProposalScreen() {
         />
         <Kpi label="値上げ額（年間・依頼どおり）" value={yen(requested)} emphasis />
         <Kpi
-          label="平均の改定率"
+          label="平均の改定率（全得意先）"
           value={base > 0 ? pctDelta(changeBp(base + requested, base)) : '—'}
-          sub="直近12か月の数量で加重"
+          sub="直近12か月の数量で加重。得意先ごとの率は下の表"
         />
-        <Kpi label="要確認" value={`${num(attention)}組`} sub={`提案から外した組 ${num(excluded)}`} />
+        <Kpi label="要確認" value={`${num(attention)}組`} sub={`提案から外した ${num(excluded)}組`} />
       </div>
       {rejectedOverrides.length > 0 && (
         <Notice tone="warning" title="手入力の単価のうち、今の設定では使えないものがあります">
@@ -121,7 +129,6 @@ export function ProposalScreen() {
             <thead>
               <tr>
                 <th scope="col">得意先</th>
-                <th scope="col">ランク</th>
                 <th scope="col" className="num">
                   提案品目
                 </th>
@@ -148,16 +155,14 @@ export function ProposalScreen() {
                       >
                         {c.name}
                       </button>
-                      <span className="muted small block">{c.cust}</span>
-                    </td>
-                    <td>
-                      {c.rank}
-                      <span className="muted small block">{(c.ratePm / 10).toFixed(1)}%</span>
+                      <span className="muted small block">
+                        {c.cust}・ランク{c.rank}（{(c.ratePm / 10).toFixed(1)}%）
+                      </span>
                     </td>
                     <td className="num">{num(c.proposedItems)}</td>
                     <td className="num">{yen(c.requestedYen)}</td>
                     <td className="num">{pctDelta(c.changeBp)}</td>
-                    <td>
+                    <td className="badges">
                       {c.attention > 0 && <Badge tone="warning">要確認 {c.attention}</Badge>}{' '}
                       {c.ongoingLeaks > 0 && <Badge tone="critical">請求ミスの可能性 {c.ongoingLeaks}</Badge>}{' '}
                       {c.overrides > 0 && <Badge tone="info">手入力 {c.overrides}</Badge>}
@@ -166,7 +171,7 @@ export function ProposalScreen() {
                   </tr>
                   {open === c.cust && (
                     <tr className="detail-row">
-                      <td colSpan={7}>
+                      <td colSpan={6}>
                         <CustomerPairs c={c} />
                       </td>
                     </tr>
@@ -195,6 +200,14 @@ function CustomerPairs({ c }: { c: CustomerProposal }) {
   const pairs = [...c.pairs].sort((a, b) =>
     a.status === b.status ? b.changeYen * b.qty - a.changeYen * a.qty : a.status === 'proposed' ? -1 : 1,
   );
+  // the メモ column only when some row has something to say
+  const hasMemo = pairs.some(
+    (p) =>
+      (p.status === 'excluded' && p.excludedReason) ||
+      p.guardrails.length > 0 ||
+      p.ongoingLeak ||
+      p.overrideRejected,
+  );
   return (
     <div className="pair-detail">
       <div className="button-row">
@@ -209,7 +222,7 @@ function CustomerPairs({ c }: { c: CustomerProposal }) {
         </span>
       </div>
       <div className="table-wrap scroll-y">
-        <table className="table compact">
+        <table className="table compact proposal-items">
           <caption className="visually-hidden">{c.name} の品目ごとの提案</caption>
           <thead>
             <tr>
@@ -220,7 +233,7 @@ function CustomerPairs({ c }: { c: CustomerProposal }) {
               <th scope="col" className="num">
                 現単価
               </th>
-              <th scope="col" className="num">
+              <th scope="col" className="num wide-only">
                 定価（現→新）
               </th>
               <th scope="col" className="num">
@@ -229,52 +242,59 @@ function CustomerPairs({ c }: { c: CustomerProposal }) {
               <th scope="col" className="num">
                 改定率
               </th>
-              <th scope="col" className="num">
-                粗利率（今→据置→新）
+              <th scope="col" className="num wide-only">
+                粗利率（現在→値上げなし→改定後）
               </th>
-              <th scope="col">メモ</th>
+              {hasMemo && <th scope="col">メモ</th>}
             </tr>
           </thead>
           <tbody>
             {pairs.map((p) => (
               <tr key={p.sku} className={p.status === 'excluded' ? 'is-muted' : ''}>
-                <td>
+                <td className="product-cell">
                   {ds?.products.get(p.sku)?.name ?? p.sku}
                   <span className="muted small block">
                     {p.sku}・{ds?.categories.get(p.category)?.name ?? p.category}
                   </span>
+                  <span className="muted small block narrow-only">
+                    定価 {yen(p.currentList)}→{yen(p.newList)}・粗利率 {pct(p.marginCurrentBp)}→
+                    {pct(p.marginNoActionBp)}→{pct(p.marginNewBp)}
+                  </span>
                 </td>
                 <td className="num">{num(p.qty)}</td>
                 <td className="num">{yen(p.currentPrice)}</td>
-                <td className="num nowrap">
+                <td className="num nowrap wide-only">
                   {yen(p.currentList)} → {yen(p.newList)}
                 </td>
                 <td className="num">
                   <PriceEditor p={p} />
                 </td>
                 <td className="num">{p.status === 'proposed' ? pctDelta(p.changeBp) : '—'}</td>
-                <td className="num nowrap">
+                <td className="num nowrap wide-only">
                   {pct(p.marginCurrentBp)} → {pct(p.marginNoActionBp)} → {pct(p.marginNewBp)}
                 </td>
-                <td className="memo">
-                  {p.status === 'excluded' && p.excludedReason && (
-                    <span className="block">{EXCLUSION_REASON_JA[p.excludedReason]}</span>
-                  )}
-                  {p.guardrails.map((h) => (
-                    <span
-                      key={h.rule + h.message}
-                      className={`block ${h.rule === 'margin_floor_unmet' || h.rule === 'tier_conflict' ? 'text-warning' : ''}`}
-                    >
-                      {h.message}
-                    </span>
-                  ))}
-                  {p.ongoingLeak && (
-                    <span className="block text-critical">
-                      請求ミスの可能性（{LEAK_LABEL_JA[p.ongoingLeak]}）：今の請求は {yen(p.lastBilledPrice)}
-                    </span>
-                  )}
-                  {p.overrideRejected && <span className="block text-warning">{p.overrideRejected}</span>}
-                </td>
+                {hasMemo && (
+                  <td className="memo">
+                    {p.status === 'excluded' && p.excludedReason && (
+                      <span className="block">{EXCLUSION_REASON_JA[p.excludedReason]}</span>
+                    )}
+                    {p.guardrails.map((h) => (
+                      <span
+                        key={h.rule + h.message}
+                        className={`block ${ATTENTION_RULES.has(h.rule) ? 'text-warning' : ''}`}
+                      >
+                        {h.message}
+                      </span>
+                    ))}
+                    {p.ongoingLeak && (
+                      <span className="block text-critical">
+                        請求ミスの可能性（{LEAK_LABEL_JA[p.ongoingLeak]}）：今の請求は{' '}
+                        {yen(p.lastBilledPrice)}
+                      </span>
+                    )}
+                    {p.overrideRejected && <span className="block text-warning">{p.overrideRejected}</span>}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
@@ -288,12 +308,18 @@ function PriceEditor({ p }: { p: AppPair }) {
   const app = useApp();
   const shownPrice = p.status === 'proposed' ? p.newPrice : p.currentPrice;
   const [draft, setDraft] = useState<string | null>(null);
+  const [focused, setFocused] = useState(false);
   const [message, setMessage] = useState<{ tone: 'error' | 'warning'; text: string } | null>(null);
   const key = pairKey(p.cust, p.sku);
   const msgId = `msg-${key.replace(/[^A-Za-z0-9]/g, '-')}`;
   const apply = () => {
     if (draft === null) return;
-    const v = Number(draft.replace(/[,，\s円¥]/g, ''));
+    // same reading as the importers: 全角数字, commas, ¥ / 円; "1e3" or "0x4B0" are not prices
+    const v = parseIntLoose(draft);
+    if (v === null || !/^[\d,，\s円¥￥０-９]+$/.test(draft.trim())) {
+      setMessage({ tone: 'error', text: '数字で入力してください（例：1,200）。' });
+      return;
+    }
     const verdict = checkOverride(p.bounds, v);
     if (!verdict.ok) {
       setMessage({ tone: 'error', text: verdict.error });
@@ -332,9 +358,11 @@ function PriceEditor({ p }: { p: AppPair }) {
         aria-label={`新単価（${p.sku}）`}
         aria-describedby={message ? msgId : undefined}
         aria-invalid={message?.tone === 'error'}
-        value={draft ?? String(shownPrice)}
+        value={draft ?? (focused ? String(shownPrice) : `¥${withCommas(shownPrice)}`)}
+        onFocus={() => setFocused(true)}
         onChange={(e) => setDraft(e.target.value)}
         onBlur={() => {
+          setFocused(false);
           if (draft !== null && draft !== String(shownPrice)) apply();
           else setDraft(null);
         }}

@@ -20,14 +20,14 @@ The UI is in Japanese.
 | 2 | 診断 (Diagnosis) | Compares every line with the agreed unit price (a valid special price, else list price × the customer's rate) and finds **unreflected increases** (still billed at the old price), **expired special prices**, **prices outside the customer's rate tier** and **margins below the floor**. The summary comes first (yearly impact in yen by type); each customer × product finding drills down to a plain-Japanese explanation and the sales lines behind it. Customer-wide problems (e.g. a wrong customer master) are called out. |
 | 3 | シナリオ (Scenario) | Sliders for raw material, labour, energy and other cost increases, applied through each product's cost structure; supplier price notices can replace the model. Guardrails: maximum increase, minimum increase, margin floor, special-price handling, list-price rounding (10/50/100 yen, endings). Simulates the pass-through rate and the recovered gross profit. |
 | 4 | 提案 (Proposal) | New unit price per customer × product, computed as new list price × the customer's rate, so rate tiers stay consistent. Prices can be edited, but values below the current price, above the cap or outside the rate tier are refused (below the margin floor is allowed with a warning). |
-| 5 | 申入書 (Letter) | A formal "request for a price revision" per customer: Japanese era dates, 拝啓〜敬具, 記〜以上, an appendix with the customer's items, and an evidence section with charts of public statistics. Prints to A4 PDF from the browser. The company's own cost breakdown is never shown. |
-| 6 | 交渉 (Negotiation) | Kanban by status (before request → requested → negotiating → agreed / partly agreed / declined) and a per-customer log. The log is **append-only**: entries cannot be edited or deleted (mistakes are fixed by appending a correction). Each entry carries a SHA-256 chained to the previous one, so later changes are detected. Print to PDF, CSV and JSON export. |
+| 5 | 申入書 (Letter) | A formal "request for a price revision" per customer: Japanese era dates, 拝啓〜敬具, 記〜以上, an appendix with the customer's items, and an evidence section with charts of public statistics. Prints to A4 PDF from the browser, with page numbers, the appendix name on every appendix page, and 「サンプル（架空データ）」 on every page of the sample. Body paragraphs can be rewritten, and a pre-send checklist is shown. The company's own cost breakdown is never shown. |
+| 6 | 交渉 (Negotiation) | Kanban by status (before request → requested → negotiating → agreed / partly agreed / declined) and a per-customer log. The log is **append-only** in the app: entries cannot be edited or deleted on screen (mistakes are fixed by appending a correction). Each entry carries a SHA-256 chained to the previous one, so changing an entry in the middle is detected; a completely rebuilt chain is not, and it is no trusted timestamp (the screen and the printout say so). Print to PDF, CSV and JSON export. |
 | 7 | 書き出し (Export) | The agreed new prices as an effective-dated price master CSV in layout A or B (UTF-8 or Shift_JIS). |
 | 8 | 反映チェック (Follow-up) | Reads a later sales export and lists lines still billed at the old price after the effective date. |
 
 ## The demo story (fictional sample data)
 
-1. On 取り込み press **サンプルデータで試す（A形式）**. 300 customers, 2,000 products and 56,328 sales lines (Oct 2024–Sep 2026) are read and diagnosed in about 3 seconds (headless Chromium in the development environment).
+1. On 取り込み press **サンプルデータで試す（A形式）**. 300 customers, 2,000 products and 56,328 sales lines (Oct 2024–Sep 2026) are read and diagnosed in about 3 seconds (headless Chromium in the development environment); the app then moves on to 診断 by itself.
 2. 診断: profit leaks over the last 12 months total **¥4,598,211** (unreflected increases ¥2,204,568 / expired special prices ¥983,733 / outside the rate tier ¥1,211,016 / below the margin floor ¥198,894). Four customers with a customer-wide problem are flagged.
 3. シナリオ: set the cost increases and guardrails. With the defaults (material 8%, labour 5%, energy 10%, supplier notices on, cap 20%) the requested pass-through rate is about 112%.
 4. 提案: review and adjust the increase per customer and item.
@@ -57,7 +57,7 @@ npm run dev        # development server
 | Command | What it does |
 |---|---|
 | `npm run build` | Type-checks and writes `dist/`. Paths are relative (`base: './'`), so the build works from any folder or subpath. If the sample data exists, it is copied to `dist/sample/`. |
-| `npm test` | Unit tests (Vitest): 209 tests for the engine and the app logic |
+| `npm test` | Unit tests (Vitest): 328 tests for the engine, the app logic, the hand-written messy sample (`scripts/messy-sample/`) and the wording rules |
 | `npm run lint` / `npm run typecheck` | Biome / TypeScript |
 | `npm run e2e` | Builds, then walks the demo story with Playwright and saves screenshots to `docs/screenshots/`. `dist/` is served under the subpath `/tenka-desk/`. Needs the sample data and Playwright's Chromium (`npx playwright install chromium` if missing). |
 | `npm run evaluate` | Scores the leak detection against the sample data's ground truth ([docs/evaluation.md](docs/evaluation.md), Japanese). |
@@ -77,7 +77,7 @@ npm run dev        # development server
 - **Scenario**: unit cost × cost share × increase, summed over the components; a supplier's notice can replace it.
 - **Proposal**: three ways to set the new list price — keep the gross profit amount (default: the cost increase divided by the buyers' average rate is added to the list price), keep the margin rate (list price raised by the cost increase rate), or use a new list price table. List prices are rounded to 10 yen below 1,000, 50 yen below 10,000 and 100 yen above (configurable).
 - **Pass-through rate** = price increase ÷ cost increase. Rounding list prices up and raising prices to the margin floor can push it above 100%; keeping the margin rate pushes it well above (sample defaults: about 112% keep amount, 159% keep rate, 107% new list table). The UI explains this. Quantities are assumed equal to the last 12 months.
-- **Letter evidence**: snapshots of public statistics (corporate goods price index, services producer price index, regional minimum wages, spring wage settlements) with source and retrieval date. Rates of change the source does not publish are marked 「本ツールで計算」 (computed by this tool).
+- **Letter evidence**: snapshots of public statistics (corporate goods price index, services producer price index, regional minimum wages, spring wage settlements) with source and retrieval date. Rates of change the source does not publish are marked 「弊社算出」 (computed by the sender), since the letter goes out in the company's name. Retrieval dates are shown as the Japanese-calendar date in Japan time; statistics that fell or stayed flat are left out; a minimum wage by prefecture is quoted only for the sender's own prefecture, never the customer's. The reasons in the body follow the cost components the scenario raises, and each paragraph can be rewritten.
 - **Negotiation log**: each entry's check code is a SHA-256 that includes the previous entry's code, so a changed or removed entry breaks the chain. A completely rebuilt chain would not be detected, so this is not a substitute for a trusted third-party timestamp.
 
 ## Evaluation (on self-made fictional data)
@@ -94,6 +94,8 @@ Details in [docs/evaluation.md](docs/evaluation.md) (Japanese). **These figures 
 - 56,328 sales lines; last 12 months Oct 2025–Sep 2026. Layouts A and B give identical results on every line.
 - Optional files matter: without the previous revision's agreements, precision for unreflected increases drops to 44.4%; without the special-price list, precision for "outside the tier" drops to 11.2%. The Import and Diagnosis screens therefore warn when these files are missing.
 - Follow-up check (December 2026, 2,770 lines): all 79 lines still at the old price found with no false positives (¥343,144, equal to the truth).
+- With the price master the engine itself exports (layouts A and B, and Shift_JIS) read back in, the follow-up check finds the same 79 lines.
+- Besides the generated sample, a small hand-written "messy" sample (Shift_JIS, Excel-style dates and quantities, 「合意に至らず」/「未合意」, a list-price cut, billing above the rank, a sales file without 原単価; 18 lines) gets the expected label on all 18 lines. It was written by the same author, so it is not an independent check either.
 - The E2E test also checks the ¥4,598,211 total and the 79 lines / ¥343,144 on screen.
 
 ## Limits
@@ -111,7 +113,8 @@ Details in [docs/evaluation.md](docs/evaluation.md) (Japanese). **These figures 
 This is a public portfolio repository, so:
 
 - What it is: **"helps prepare the supporting material for price negotiations"** (価格協議の根拠資料づくりを支援).
-- Never used: "AI-optimal price" (AI最適価格), guarantees of legal compliance (e.g. 取適法対応を保証), "first in the industry" (業界初). `src/app/wording.test.ts` checks the UI source for them.
+- Never used: "AI-optimal price" (AI最適価格), guarantees of legal compliance (e.g. 取適法対応を保証), "first in the industry" (業界初).
+- `src/app/wording.test.ts` checks the screens, the letter and evidence templates (the `src/` sources), the READMEs and the notes shipped with the statistics (`public/stats/`) for claims of complying with a law (対応・準拠・適合・遵守), 「適法」, "first / only / No.1" and the like. It looks for fixed patterns, so it cannot catch every paraphrase.
 - Sample data is labelled fictional (架空) wherever it appears.
 - Legal topics stay at the level of general information; no legal advice.
 - Statistics always show their source; figures computed by the tool are marked as such.

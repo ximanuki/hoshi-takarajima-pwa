@@ -71,7 +71,9 @@ describe('parseCsvLines: physical lines and unclosed quotes', () => {
     const t = readTable(text);
     expect(t.rows).toHaveLength(1001);
     expect(t.rows[0]).toEqual(['"x', '1']);
-    expect(t.warnings).toEqual([{ line: 2, message: '2行目の「"」が閉じられていないため、ふつうの文字として読みました' }]);
+    expect(t.warnings).toEqual([
+      { line: 2, message: '2行目の「"」が閉じられていないため、ふつうの文字として読みました' },
+    ]);
     expect(t.rowLines.slice(0, 3)).toEqual([2, 3, 4]);
   });
 

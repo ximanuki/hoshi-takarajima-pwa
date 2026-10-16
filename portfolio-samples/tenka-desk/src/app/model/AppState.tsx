@@ -25,6 +25,7 @@ import {
   type SimulationResult,
   simulatePassThrough,
 } from '../../engine/index.ts';
+import { href } from '../router.ts';
 import { fetchSampleFiles, type SampleLayout, sampleFileNames } from '../sample.ts';
 import { clearAllStorage, idbGet, idbSet, onClearedElsewhere } from '../storage.ts';
 import { buildLoaded, type ColumnChoice, type Loaded, type SourceFile } from './load.ts';
@@ -182,8 +183,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setOutcomesFileState(o ?? null);
   }, []);
 
+  /** Read the files and diagnose; resolves to true when this build finished with a diagnosis. */
   const rebuild = useCallback(
-    async (sources: SourceFile[], isSample: boolean, s: AppSettings = settingsRef.current) => {
+    async (
+      sources: SourceFile[],
+      isSample: boolean,
+      s: AppSettings = settingsRef.current,
+    ): Promise<boolean> => {
       const seq = ++buildSeq.current;
       sourcesRef.current = sources;
       setError(null);
@@ -191,7 +197,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         // 読み込み中に最後のファイルを外したとき: 古い読み込みは seq が古いので busy を消せない。ここで消す
         setLoaded(null);
         setBusy(null);
-        return;
+        return false;
       }
       setBusy('ファイルを読み込んでいます…');
       try {
@@ -204,11 +210,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
           },
         });
         if (seq === buildSeq.current) setLoaded(result);
+        return seq === buildSeq.current && result.diagnosis !== null;
       } catch (e) {
         if (seq === buildSeq.current) {
           setLoaded(null);
           setError(e instanceof Error ? e.message : String(e));
         }
+        return false;
       } finally {
         if (seq === buildSeq.current) setBusy(null);
       }
@@ -300,7 +308,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const next = { ...settingsRef.current, company: null, overrides: {}, revisionDates: {} };
         setSettings(next);
         settingsRef.current = next;
-        await rebuild(files, true, next);
+        // the story goes on with the diagnosis (the screen moves its focus to the new heading)
+        if (await rebuild(files, true, next)) window.location.hash = href('diagnosis');
       } catch (e) {
         setBusy(null);
         setError(e instanceof Error ? e.message : String(e));

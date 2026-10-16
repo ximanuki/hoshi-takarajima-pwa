@@ -35,7 +35,8 @@ async function statusCounts(page: Page): Promise<Record<string, number>> {
 async function loadSample(page: Page) {
   await page.goto('./#/import');
   await page.getByRole('button', { name: 'サンプルデータで試す（A形式）' }).click();
-  await expect(page.getByRole('link', { name: /診断を見る/ })).toBeVisible({ timeout: 120_000 });
+  // a loaded sample goes straight on to the diagnosis
+  await expect(page.getByTestId('leak-total')).toBeVisible({ timeout: 120_000 });
 }
 
 test('sample 協議記録 never carry over to uploaded data, and come back with the sample', async ({ page }) => {

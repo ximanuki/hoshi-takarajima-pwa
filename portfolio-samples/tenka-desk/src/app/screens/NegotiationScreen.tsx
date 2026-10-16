@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   allowedNextStatuses,
   currentStatus,
@@ -19,12 +19,25 @@ import {
   verifyLog,
 } from '../../engine/index.ts';
 import { readFiles } from '../components/DropZone.tsx';
-import { Badge, Card, downloadFile, Icon, NeedsData, Notice, PageHeader } from '../components/ui.tsx';
-import { nowJst, num, todayJst, yen } from '../format.ts';
+import {
+  Badge,
+  Card,
+  downloadFile,
+  Icon,
+  NeedsData,
+  Notice,
+  PageHeader,
+  SampleTag,
+} from '../components/ui.tsx';
+import { manYen, nowJst, num, ratio, todayJst, yen } from '../format.ts';
 import { useApp } from '../model/AppState.tsx';
-import { fillDemoOutcomes, logOf, statusOf } from '../model/negotiation.ts';
+import { agreedIncreaseYen, fillDemoOutcomes, logOf, statusOf } from '../model/negotiation.ts';
 import { href, navigate, useRoute } from '../router.ts';
 import { fetchSample, SAMPLE_OUTCOMES } from '../sample.ts';
+
+/** What the hash chain can and cannot show (said on screen and on paper alike). */
+const CHAIN_LIMIT =
+  '記録全体を作り直した場合は検出できず、第三者による時刻の証明（タイムスタンプ）でもありません。';
 
 const STATUS_TONE: Record<NegotiationStatus, 'neutral' | 'info' | 'warning' | 'good' | 'critical'> = {
   申入れ前: 'neutral',
@@ -75,6 +88,12 @@ export function NegotiationScreen() {
     }
     return by;
   }, [customers, logs, query]);
+
+  const totals = useMemo(() => {
+    if (!proposal?.ok) return null;
+    const requested = proposal.customers.reduce((s, c) => s + c.requestedYen, 0);
+    return { requested, agreed: agreedIncreaseYen(logs, proposal.pairs) };
+  }, [proposal, logs]);
 
   if (!loaded?.diagnosis || !proposal?.ok) {
     return (
@@ -154,7 +173,8 @@ export function NegotiationScreen() {
           title="交渉の記録"
           lead={
             <p>
-              得意先ごとの交渉の状況と協議記録です。記録は追記だけで、書き換えや削除はできません。誤りは「訂正」として追記します。各記録は前の記録の確認コード（SHA-256）とつながっていて、後から変えると検出できます。
+              得意先ごとの交渉の状況と協議記録です。記録は追記だけで、画面から書き換えや削除はできません。誤りは「訂正」として追記します。各記録は前の記録の確認コード（SHA-256）とつながっていて、途中の記録だけを書き換えると検出できます。ただし
+              {CHAIN_LIMIT}
             </p>
           }
           actions={
@@ -203,16 +223,26 @@ export function NegotiationScreen() {
             />
           </label>
         </div>
+        {totals && (
+          <p className="negotiation-total" data-testid="agreed-total">
+            合意・一部合意の値上げ額（年間）<strong className="num">{yen(totals.agreed)}</strong>／依頼額{' '}
+            {yen(totals.requested)}（{ratio(totals.agreed, totals.requested)}）
+            <span className="small muted">　一部合意は、据え置いたカテゴリを除いた額です。</span>
+          </p>
+        )}
         <section className="kanban" aria-label="状況ごとの得意先">
           {NEGOTIATION_STATUSES.map((s) => {
             const list = columns.get(s) ?? [];
+            const sum = list.reduce((t, c) => t + c.requestedYen, 0);
             return (
               <section key={s} className="kanban-col" aria-labelledby={`col-${s}`}>
                 <h2 className="kanban-head" id={`col-${s}`}>
                   <Badge tone={STATUS_TONE[s]}>{s}</Badge>
                   <span className="num">{num(list.length)}社</span>
+                  {sum > 0 && <span className="num kanban-sum">依頼 {manYen(sum)}</span>}
                 </h2>
                 <ul className="kanban-list">
+                  {list.length === 0 && <li className="small muted kanban-empty">該当なし</li>}
                   {list.slice(0, 200).map((c) => (
                     <li key={c.cust}>
                       <a
@@ -257,6 +287,22 @@ const KINDS: NegotiationEventKind[] = [
 
 function CustomerLog({ cust }: { cust: string }) {
   const app = useApp();
+  const anchor = useRef<HTMLDivElement>(null);
+  // the record opens below the board: bring it into view and move the focus to its heading
+  // (after the frame, so the screen's own scroll-to-top on navigation does not undo it)
+  useEffect(() => {
+    const id = requestAnimationFrame(() => {
+      const el = anchor.current;
+      if (!el) return;
+      el.scrollIntoView({ block: 'start' });
+      const h = el.querySelector<HTMLElement>('h2');
+      if (h) {
+        h.tabIndex = -1;
+        h.focus({ preventScroll: true });
+      }
+    });
+    return () => cancelAnimationFrame(id);
+  }, []);
   const ds = app.loaded?.ws.dataset;
   const customer = ds?.customers.get(cust);
   const log = logOf(app.logs, cust);
@@ -317,8 +363,9 @@ function CustomerLog({ cust }: { cust: string }) {
     document.title = old;
   };
 
+  const sample = app.loaded?.isSample ?? false;
   return (
-    <>
+    <div ref={anchor} className="log-anchor">
       <Card
         title={`${customer?.name ?? cust}（${cust}）`}
         className="no-print"
@@ -370,8 +417,7 @@ function CustomerLog({ cust }: { cust: string }) {
           {log.events.length > 0 &&
             (verify.ok ? (
               <span className="text-good small">
-                <Icon name="check" size={16} /> 記録のつながりを確認しました（{log.events.length}
-                件・変更なし）
+                <Icon name="check" size={16} /> 記録のつながりに矛盾はありません（{log.events.length}件）
               </span>
             ) : (
               <span className="text-critical small">
@@ -548,14 +594,15 @@ function CustomerLog({ cust }: { cust: string }) {
         </form>
       </Card>
 
-      <section className="print-only log-print">
+      <section className={`print-only log-print${sample ? ' is-sample' : ''}`}>
+        <SampleTag sample={sample} />
         <h1>価格協議の記録</h1>
         <p>
           得意先：{customer?.name ?? cust}（{cust}）　今の状況：{status}　出力日：{toWareki(todayJst())}
         </p>
         <p>
           {verify.ok
-            ? `記録のつながりを確認しました（${log.events.length}件・後からの変更は見つかりませんでした）。`
+            ? `記録のつながりに矛盾は見つかりませんでした（${log.events.length}件。この端末で作成・確認したもの）。`
             : `記録の確認でエラーがあります：${verify.seq}件目 ${verify.reason}`}
         </p>
         <table className="items-table">
@@ -595,10 +642,11 @@ function CustomerLog({ cust }: { cust: string }) {
           </tbody>
         </table>
         <p className="small">
-          この記録は追記のみの形式で作成しています。確認コードは各記録の SHA-256
-          の先頭12桁で、前の記録のコードを含めて計算しています。
+          この記録は、画面からは追記だけができる形式で作成しています。確認コードは各記録の SHA-256
+          の先頭12桁で、前の記録のコードを含めて計算しています。途中の記録だけを書き換えると検出できますが、
+          {CHAIN_LIMIT}
         </p>
       </section>
-    </>
+    </div>
   );
 }

@@ -6,6 +6,7 @@
 
 import {
   type Acceptance,
+  acceptedShareBp,
   appendEvent,
   createLog,
   currentStatus,
@@ -15,6 +16,7 @@ import {
   type NegotiationOutcome,
   type NegotiationStatus,
   outcomeFromLog,
+  type PairProposal,
   type RevisionAgreement,
   toJstTimestamp,
 } from '../../engine/index.ts';
@@ -47,6 +49,22 @@ export function acceptanceFromLogs(logs: Logs): Map<string, Acceptance> {
     }
   }
   return out;
+}
+
+/**
+ * Yearly increase agreed so far (年間, at the last 12 months' quantities): the
+ * requested increase of customers at 合意, and of 一部合意 without the kept categories.
+ */
+export function agreedIncreaseYen(logs: Logs, pairs: readonly PairProposal[]): number {
+  const acc = acceptanceFromLogs(logs);
+  let sum = 0;
+  for (const p of pairs) {
+    if (p.status !== 'proposed') continue;
+    const a = acc.get(p.cust);
+    if (a && (a.kind === 'full' || a.kind === 'partial') && acceptedShareBp(a, p.category) === 10000)
+      sum += p.changeYen * p.qty;
+  }
+  return sum;
 }
 
 /** Outcomes of every customer whose current status is 合意 or 一部合意. */

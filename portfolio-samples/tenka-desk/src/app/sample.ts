@@ -80,6 +80,7 @@ export interface GuidelineInfo {
 export interface StatsLoad {
   bundle: StatsBundle;
   guideline: GuidelineInfo | null;
+  /** statistics that could not be read, in plain words (e.g. 「国内企業物価指数（日本銀行）」) */
   errors: string[];
 }
 
@@ -92,17 +93,26 @@ async function getJson(path: string): Promise<unknown> {
   return res.json();
 }
 
-/** The bundled snapshots of public statistics (read once). */
-export function loadStats(): Promise<StatsLoad> {
-  if (statsPromise) return statsPromise;
+/** What each file holds, for messages. */
+const STAT_NAMES: Record<string, string> = {
+  'stats/cgpi.json': '国内企業物価指数（日本銀行）',
+  'stats/sppi.json': '企業向けサービス価格指数（日本銀行）',
+  'stats/minimum-wage.json': '地域別最低賃金（厚生労働省）',
+  'stats/shunto.json': '民間主要企業の春季賃上げ状況（厚生労働省）',
+  'stats/index.json': '公表統計の一覧と指針の要点',
+};
+
+/** The bundled snapshots of public statistics (read once; `retry` reads them again). */
+export function loadStats(retry = false): Promise<StatsLoad> {
+  if (statsPromise && !retry) return statsPromise;
   statsPromise = (async () => {
     const errors: string[] = [];
     const bundle: StatsBundle = {};
     const tryLoad = async <T>(path: string, parse: (j: unknown) => T): Promise<T | undefined> => {
       try {
         return parse(await getJson(path));
-      } catch (e) {
-        errors.push(`${path}: ${e instanceof Error ? e.message : String(e)}`);
+      } catch {
+        errors.push(STAT_NAMES[path] ?? path);
         return undefined;
       }
     };

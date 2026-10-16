@@ -32,10 +32,12 @@ async function go(page: Page, label: string) {
   await expect(page.getByRole('heading', { level: 1 })).toContainText(label.slice(0, 2));
 }
 
+/** Load the sample (架空); the app then moves on to the diagnosis by itself, with the focus on its heading. */
 async function loadSample(page: Page) {
   await page.goto('./');
   await page.getByRole('button', { name: 'サンプルデータで試す（A形式）' }).click();
-  await expect(page.getByRole('link', { name: /診断を見る/ })).toBeVisible({ timeout: 120_000 });
+  await expect(page.getByTestId('leak-total')).toBeVisible({ timeout: 120_000 });
+  await expect(page.getByRole('heading', { level: 1, name: '診断（利益漏れ）' })).toBeFocused();
 }
 
 test('demo story with the sample data (架空)', async ({ page }, info) => {
@@ -47,12 +49,14 @@ test('demo story with the sample data (架空)', async ({ page }, info) => {
   await expect(page.getByRole('heading', { level: 1, name: '取り込み' })).toBeVisible();
   await expect(page.getByText('データはこのブラウザの中だけで処理し、外部に送信しません')).toBeVisible();
   await loadSample(page);
+  await go(page, '取り込み');
   await expect(page.getByText('56,328行')).toBeVisible();
   await page.screenshot({ path: join(SHOTS, '01-import.png') });
 
   // 2. 診断: summary first, then the evidence of one finding
   await page.getByRole('link', { name: /診断を見る/ }).click();
   await expect(page.getByTestId('leak-total')).toHaveText('¥4,598,211');
+  await expect(page.getByRole('link', { name: /次へ：値上げのシナリオを作る/ })).toBeVisible();
   await expect(page.getByText('¥2,204,568')).toBeVisible();
   await page.screenshot({ path: join(SHOTS, '02-diagnosis.png') });
   await page.getByText(/^反映漏れ（旧価格のまま）（211）$/).click();
@@ -76,7 +80,8 @@ test('demo story with the sample data (架空)', async ({ page }, info) => {
   const customerName = (await firstCustomer.textContent()) ?? '';
   await firstCustomer.click();
   const price = page.getByRole('textbox', { name: /^新単価/ }).first();
-  const proposed = Number(await price.inputValue());
+  // shown as "¥4,237" until focused
+  const proposed = Number((await price.inputValue()).replace(/[^\d]/g, ''));
   await price.fill('9999999');
   await price.press('Enter');
   await expect(page.getByRole('alert').filter({ hasText: '値上げ率の上限を超えます' })).toBeVisible();
@@ -96,6 +101,11 @@ test('demo story with the sample data (架空)', async ({ page }, info) => {
   await expect(letter).toContainText('令和8年12月1日出荷分より');
   await expect(letter).toContainText(customerName);
   await expect(letter.locator('.evidence-item svg').first()).toBeVisible();
+  // written in the sender's voice, marked 架空 on every sheet, no API credit addressed to the customer
+  await expect(letter.locator('.sheet-sample')).toHaveCount(3);
+  await expect(letter).toContainText('弊社算出');
+  await expect(letter).not.toContainText('本ツール');
+  await expect(letter).not.toContainText('このサービス');
   await page.screenshot({ path: join(SHOTS, '06-letter.png') });
   await letter
     .locator('.sheet')
@@ -122,12 +132,19 @@ test('demo story with the sample data (架空)', async ({ page }, info) => {
     .getByRole('link', { name: new RegExp(customerName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) })
     .click();
   await expect(page.getByRole('list', { name: '協議記録' })).toContainText('申入書送付');
+  // the record opens below the board: it is scrolled into view and its heading has the focus
+  await expect(
+    page.getByRole('heading', {
+      level: 2,
+      name: new RegExp(`^${customerName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}（`),
+    }),
+  ).toBeFocused();
   await page.getByLabel('要旨').fill('購買部と面談。改定率と根拠資料を説明');
   await page.getByLabel('先方の出席者・担当者').fill('購買部 課長');
   await page.getByLabel('状況の変更').selectOption('協議中');
   await page.getByRole('button', { name: '追記する' }).click();
   await expect(page.getByText('記録を追加しました。', { exact: true })).toBeVisible();
-  await expect(page.getByText('記録のつながりを確認しました（2件・変更なし）')).toBeVisible();
+  await expect(page.getByText('記録のつながりに矛盾はありません（2件）')).toBeVisible();
   await page.screenshot({ path: join(SHOTS, '07-negotiation.png'), fullPage: true });
   await page.emulateMedia({ media: 'print' });
   await expect(page.getByRole('heading', { name: '価格協議の記録' })).toBeVisible();
@@ -186,7 +203,21 @@ test('tablet width: no sideways scrolling', async ({ page }) => {
     await go(page, label);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow, `${label}: page wider than the screen`).toBeLessThanOrEqual(0);
+    const steps = await page.evaluate(() => {
+      const el = document.querySelector('.steps');
+      return el ? el.scrollWidth - el.clientWidth : 0;
+    });
+    expect(steps, `${label}: step navigation cut off`).toBeLessThanOrEqual(0);
     if (label === '診断') await page.screenshot({ path: join(SHOTS, '10-tablet-diagnosis.png') });
+    if (label === '提案') {
+      // product names stay readable in the item table
+      await page.locator('table tbody tr').first().getByRole('button').click();
+      const width = await page
+        .locator('.proposal-items .product-cell')
+        .first()
+        .evaluate((el) => el.clientWidth);
+      expect(width).toBeGreaterThanOrEqual(150);
+    }
   }
   expect(seen.foreign).toEqual([]);
   expect(seen.errors).toEqual([]);

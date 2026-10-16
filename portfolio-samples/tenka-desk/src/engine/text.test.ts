@@ -157,7 +157,8 @@ describe('values from Excel and sales systems', () => {
   });
 
   it('still refuses real decimals and stray signs', () => {
-    for (const raw of ['10.5', '1-2', '-', '--5', '-5-', '1e3', '0x4B0']) expect(parseIntLoose(raw), raw).toBeNull();
+    for (const raw of ['10.5', '1-2', '-', '--5', '-5-', '1e3', '0x4B0'])
+      expect(parseIntLoose(raw), raw).toBeNull();
     expect(parseScaled('¥1,234.50', 100)).toBe(123450);
     expect(parseScaled('12.5-', 100)).toBe(-1250);
     expect(parseScaled('-12.5-', 100)).toBeNull();

@@ -698,7 +698,7 @@ function chooseInjections(
     }
   });
 
-  // 2) 掛け率ランク外, whole customer: wrong 掛率 in the 販売管理's customer master
+  // 2) 掛率ランク外, whole customer: wrong 掛率 in the 販売管理's customer master
   const tierWholeCands = stable.filter(
     (c) => ['B', 'C'].includes(c.rank) && c.size !== '小' && rev1Std(c) && !c.registered && !wholeCust.has(c.code),
   );
@@ -778,7 +778,7 @@ function chooseInjections(
     expN++;
   }
 
-  // 5) 掛け率ランク外, single customer × SKU (手入力の単価)
+  // 5) 掛率ランク外, single customer × SKU (手入力の単価)
   const tierCands: { c: Customer; p: Product; from: string }[] = [];
   const starts = monthStarts('2025-01-01', '2026-03-01');
   for (const c of customers) {

@@ -7,7 +7,7 @@
  *
  *  1. 反映漏れ — billed at the previous 定価 × 掛率 after the customer should have moved
  *  2. 特値の期限切れ — billed at a 特値 whose period has ended
- *  3. 掛け率ランク外 — billed outside 定価 × the customer's rank range (下限〜上限)
+ *  3. 掛率ランク外 — billed outside 定価 × the customer's rank range (下限〜上限)
  *  4. otherwise 価格差（原因不明） for a person to look at
  *
  * A bill above the expected price is never a profit leak: it is counted as
@@ -51,7 +51,15 @@ export const LEAK_TYPES: readonly LeakType[] = [
 export const LEAK_LABEL_JA: Record<LeakType, string> = {
   old_price: '反映漏れ（旧価格のまま）',
   expired_special: '特値の期限切れ',
-  rate_out_of_tier: '掛け率ランク外',
+  rate_out_of_tier: '掛率ランク外',
+  below_margin_floor: '粗利下限割れ',
+};
+
+/** Short labels for tables (the long ones explain; these fit one line). */
+export const LEAK_SHORT_JA: Record<LeakType, string> = {
+  old_price: '反映漏れ',
+  expired_special: '特値期限切れ',
+  rate_out_of_tier: '掛率ランク外',
   below_margin_floor: '粗利下限割れ',
 };
 
@@ -146,7 +154,7 @@ export interface Finding {
   shortfallTotalYen: number;
   /** 年間影響額: shortfall over the window (直近12か月) */
   annualImpactYen: number;
-  /** for 掛け率ランク外: billed below the range (under) or above it (over) */
+  /** for 掛率ランク外: billed below the range (under) or above it (over) */
   direction: 'under' | 'over';
   explanation: string[];
   latest: LineDiagnosis;

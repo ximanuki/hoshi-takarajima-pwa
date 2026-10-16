@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   checkFollowup,
   FOLLOWUP_STATUS_JA,
@@ -18,6 +18,9 @@ import { fetchSample, sampleFollowupNames } from '../sample.ts';
 
 const PAGE = 100;
 
+/** "next/sales_A_202612.csv" -> "sales_A_202612.csv" (the folder is an internal detail). */
+const baseName = (name: string) => name.replace(/^.*\//, '');
+
 export function FollowupScreen() {
   const app = useApp();
   const { loaded, followup } = app;
@@ -27,6 +30,9 @@ export function FollowupScreen() {
   const [sampleError, setSampleError] = useState<string | null>(null);
 
   const ds = loaded?.ws.dataset;
+  const resultRef = useRef<HTMLDivElement>(null);
+  /** set when the user starts a check, so the result is brought into view once it is there */
+  const [scrollPending, setScrollPending] = useState(false);
   const computed = useMemo(():
     | { ok: true; result: FollowupResult; master: PriceMasterRow[]; salesIssues: number }
     | { ok: false; error: string }
@@ -45,6 +51,14 @@ export function FollowupScreen() {
       return { ok: false, error: e instanceof Error ? e.message : String(e) };
     }
   }, [ds, followup, built.rows]);
+
+  const ready = computed?.ok === true;
+  useEffect(() => {
+    if (!scrollPending || !ready) return;
+    setScrollPending(false);
+    const id = requestAnimationFrame(() => resultRef.current?.scrollIntoView({ block: 'start' }));
+    return () => cancelAnimationFrame(id);
+  }, [scrollPending, ready]);
 
   if (!loaded || !ds || ds.customers.size === 0) {
     return (
@@ -65,6 +79,7 @@ export function FollowupScreen() {
         masterFile: { name: names.master, bytes: master },
         salesFile: { name: names.sales, bytes: sales },
       });
+      setScrollPending(true);
     } catch (e) {
       setSampleError(e instanceof Error ? e.message : String(e));
     }
@@ -168,7 +183,8 @@ export function FollowupScreen() {
                 disabled={followup.masterFile === null}
                 onChange={() => app.setFollowup({ ...followup, masterSource: 'file' })}
               />
-              ファイル：{followup.masterFile?.name ?? '（下から読み込んでください）'}
+              ファイル：
+              {followup.masterFile ? baseName(followup.masterFile.name) : '（下から読み込んでください）'}
             </label>
           </fieldset>
           <DropZone
@@ -177,7 +193,10 @@ export function FollowupScreen() {
             hint="得意先別単価マスタ（A形式・B形式）"
             onFiles={(files) => {
               const f = files[0];
-              if (f) app.setFollowup({ ...followup, masterSource: 'file', masterFile: f });
+              if (f) {
+                app.setFollowup({ ...followup, masterSource: 'file', masterFile: f });
+                setScrollPending(true);
+              }
             }}
           />
           {built.rows.length === 0 && followup.masterSource === 'built' && (
@@ -187,14 +206,19 @@ export function FollowupScreen() {
           )}
         </Card>
         <Card title="2. 切り替え後の売上明細">
-          {followup.salesFile && <p className="small">読み込み中：{followup.salesFile.name}</p>}
+          {followup.salesFile && (
+            <p className="small">読み込んだファイル：{baseName(followup.salesFile.name)}</p>
+          )}
           <DropZone
             multiple={false}
             label="売上明細のCSVをドロップ"
             hint="販売管理A形式・B形式"
             onFiles={(files) => {
               const f = files[0];
-              if (f) app.setFollowup({ ...followup, salesFile: f });
+              if (f) {
+                app.setFollowup({ ...followup, salesFile: f });
+                setScrollPending(true);
+              }
             }}
           />
           {loaded.isSample && (
@@ -203,7 +227,8 @@ export function FollowupScreen() {
                 サンプル（令和8年12月分・架空）で試す
               </button>
               <p className="small muted">
-                デモ用の新単価マスタ（令和8年12月1日適用）と、12月分の売上明細2,770行（どちらも架空）を読み込みます。
+                12月分の売上明細2,770行と、<strong>書き出し画面の結果とは別の</strong>
+                デモ用の新単価マスタ（2,748行・令和8年12月1日適用）を読み込みます（どちらも架空）。書き出しで作ったマスタで確かめるときは、試したあとで左の「書き出しで作った新単価マスタ」を選んでください。
               </p>
             </div>
           )}
@@ -222,11 +247,15 @@ export function FollowupScreen() {
       )}
 
       {r && computed?.ok && (
-        <>
+        <div ref={resultRef} className="stack">
           <Card title="結果">
             <p className="small muted">
               売上明細 {num(r.lines.length)}行{period ? `（${warekiRange(period.first, period.last)}）` : ''}
-              ・新単価マスタ {num(computed.master.length)}行で確認しました。
+              ・新単価マスタ {num(computed.master.length)}行（
+              {followup.masterSource === 'file' && followup.masterFile
+                ? `ファイル：${baseName(followup.masterFile.name)}`
+                : '書き出しで作ったもの'}
+              ）で確認しました。
               {computed.salesIssues > 0 && ` 読めなかった行が${num(computed.salesIssues)}行あります。`}
             </p>
             <div className="kpi-row">
@@ -354,7 +383,7 @@ export function FollowupScreen() {
               </button>
             )}
           </Card>
-        </>
+        </div>
       )}
     </>
   );

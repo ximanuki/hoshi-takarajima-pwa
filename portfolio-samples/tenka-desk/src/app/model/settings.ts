@@ -9,6 +9,8 @@ import {
   type EffectiveBasis,
   type EvidenceTopic,
   type IsoDate,
+  type LetterCause,
+  type LetterParagraphId,
   type ProposalMethod,
   pctToBp,
   type Rounding,
@@ -53,6 +55,10 @@ export interface LetterSettings {
   replyDays: number | null;
   documentPrefix: string;
   topics: Record<EvidenceTopic, boolean>;
+  /** reasons named in the body; null = the components the cost scenario raises */
+  causes: LetterCause[] | null;
+  /** the user's own text for body paragraphs (empty = the generated text) */
+  paragraphs: Partial<Record<LetterParagraphId, string>>;
 }
 
 export interface ExportSettings {
@@ -105,6 +111,8 @@ export const DEFAULT_LETTER: LetterSettings = {
   replyDays: 21,
   documentPrefix: '',
   topics: { material: true, energy: true, logistics: true, labor: true, general: true },
+  causes: null,
+  paragraphs: {},
 };
 
 export const DEFAULT_EXPORT: ExportSettings = {
@@ -136,7 +144,12 @@ export function restoreSettings(saved: unknown): AppSettings {
     version: 1,
     scenario: { ...d.scenario, ...s.scenario, shock: { ...d.scenario.shock, ...s.scenario?.shock } },
     guard: { ...d.guard, ...s.guard },
-    letter: { ...d.letter, ...s.letter, topics: { ...d.letter.topics, ...s.letter?.topics } },
+    letter: {
+      ...d.letter,
+      ...s.letter,
+      topics: { ...d.letter.topics, ...s.letter?.topics },
+      paragraphs: { ...s.letter?.paragraphs },
+    },
     exportOpts: { ...d.exportOpts, ...s.exportOpts },
     overrides: { ...s.overrides },
     company: s.company ?? null,

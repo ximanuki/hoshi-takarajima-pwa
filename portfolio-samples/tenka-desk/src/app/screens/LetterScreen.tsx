@@ -1,43 +1,56 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   addDays,
-  buildEvidence,
   buildLetter,
   type Company,
   type EffectiveBasis,
   EVIDENCE_TOPIC_JA,
   type EvidenceItem,
   type EvidenceTopic,
+  LETTER_CAUSE_JA,
+  LETTER_PARAGRAPH_JA,
+  type LetterCause,
   type LetterData,
-  seriesForCategory,
   toWareki,
 } from '../../engine/index.ts';
 import { LineChart } from '../components/Charts.tsx';
-import { Card, Icon, NeedsData, Notice, PageHeader } from '../components/ui.tsx';
-import { nowJst, num, todayJst, yen } from '../format.ts';
+import { Badge, Card, Icon, NeedsData, Notice, PageHeader, SampleTag } from '../components/ui.tsx';
+import { nowJst, num, pct, todayJst, yen } from '../format.ts';
 import { useApp } from '../model/AppState.tsx';
+import {
+  allowedTopics,
+  LETTER_CAUSES,
+  letterEvidence,
+  passThroughOf,
+  scenarioCauses,
+} from '../model/letter.ts';
 import { statusOf } from '../model/negotiation.ts';
 import { href, navigate, useRoute } from '../router.ts';
 import { loadStats, type StatsLoad } from '../sample.ts';
 
 const TOPICS: EvidenceTopic[] = ['material', 'energy', 'logistics', 'labor', 'general'];
 
-function useStats(): StatsLoad | null {
+function useStats(): { stats: StatsLoad | null; retry: () => void } {
   const [stats, setStats] = useState<StatsLoad | null>(null);
+  const [attempt, setAttempt] = useState(0);
   useEffect(() => {
     let alive = true;
-    loadStats()
+    loadStats(attempt > 0)
       .then((s) => {
         if (alive) setStats(s);
       })
       .catch(() => {
-        if (alive) setStats({ bundle: {}, guideline: null, errors: ['公表統計を読み込めませんでした'] });
+        if (alive) setStats({ bundle: {}, guideline: null, errors: ['公表統計'] });
       });
     return () => {
       alive = false;
     };
+  }, [attempt]);
+  const retry = useCallback(() => {
+    setStats(null);
+    setAttempt((a) => a + 1);
   }, []);
-  return stats;
+  return { stats, retry };
 }
 
 /** Decimals the series is published with (0–2), so every point is shown the same way. */
@@ -59,7 +72,7 @@ function chartFormat(unit: string, points: readonly { value: number }[]): (v: nu
 export function LetterScreen() {
   const app = useApp();
   const route = useRoute();
-  const stats = useStats();
+  const { stats, retry } = useStats();
   const { loaded, proposal, settings } = app;
   const ls = settings.letter;
   const candidates = useMemo(
@@ -69,33 +82,31 @@ export function LetterScreen() {
   const cust =
     route.arg && candidates.some((c) => c.cust === route.arg) ? route.arg : (candidates[0]?.cust ?? null);
   const [recorded, setRecorded] = useState<string | null>(null);
+  const [checked, setChecked] = useState<Record<string, boolean>>({});
 
   const ds = loaded?.ws.dataset;
   const customer = cust && ds ? ds.customers.get(cust) : undefined;
   const issueDate = ls.issueDate ?? todayJst();
+  const asOf = loaded?.asOf ?? '';
+  const hasNotices = useMemo(
+    () => (ds ? ds.supplierNotices.some((n) => n.status === '予定' && n.effective > asOf) : false),
+    [ds, asOf],
+  );
+  const fromScenario = useMemo(
+    () => scenarioCauses(settings.scenario, hasNotices),
+    [settings.scenario, hasNotices],
+  );
+  const causes = ls.causes ?? fromScenario;
+  const allowed = allowedTopics(causes);
 
-  const letter = useMemo((): { data: LetterData; evidence: EvidenceItem[] } | { error: string } | null => {
+  const letter = useMemo(():
+    | { data: LetterData; evidence: EvidenceItem[]; notRising: EvidenceItem[] }
+    | { error: string }
+    | null => {
     if (!ds || !proposal?.ok || !cust || !customer || !stats) return null;
-    const cats = new Set(
-      proposal.pairs.filter((p) => p.cust === cust && p.status === 'proposed').map((p) => p.category),
-    );
-    const materialSeries: string[] = [];
-    if (stats.bundle.cgpi) {
-      for (const code of cats) {
-        const cat = ds.categories.get(code);
-        if (cat)
-          for (const s of seriesForCategory(cat, stats.bundle.cgpi))
-            if (!materialSeries.includes(s)) materialSeries.push(s);
-      }
-    }
-    const evidence = buildEvidence(stats.bundle, {
-      asOf: issueDate,
-      materialSeries,
-      prefecture: customer.prefecture,
-      include: ls.topics,
-    });
+    const ev = letterEvidence(stats.bundle, ds, cust, proposal.pairs, app.company, ls, causes, issueDate);
     try {
-      const data = buildLetter(ds, cust, proposal.pairs, evidence, app.company, {
+      const data = buildLetter(ds, cust, proposal.pairs, ev.items, app.company, {
         issueDate,
         effectiveDate: proposal.effectiveDate,
         basis: ls.basis,
@@ -106,12 +117,14 @@ export function LetterScreen() {
           ...(app.company.tel ? { tel: app.company.tel } : {}),
         },
         ...(ls.documentPrefix.trim() ? { documentNo: `${ls.documentPrefix.trim()}-${cust}` } : {}),
+        causes,
+        paragraphs: ls.paragraphs,
       });
-      return { data, evidence };
+      return { data, evidence: ev.items, notRising: ev.notRising };
     } catch (e) {
       return { error: e instanceof Error ? e.message : String(e) };
     }
-  }, [ds, proposal, cust, customer, stats, issueDate, ls, app.company]);
+  }, [ds, proposal, cust, customer, stats, issueDate, ls, app.company, causes]);
 
   if (!loaded?.diagnosis || !proposal) {
     return (
@@ -136,12 +149,27 @@ export function LetterScreen() {
   }
 
   const idx = candidates.findIndex((c) => c.cust === cust);
+  const current = candidates[idx];
   const setLetter = (patch: Partial<typeof ls>) =>
     app.updateSettings((s) => ({ ...s, letter: { ...s.letter, ...patch } }));
   const setCompany = (patch: Partial<Company>) =>
     app.updateSettings((s) => ({ ...s, company: { ...app.company, ...patch } }));
   const status = statusOf(app.logs, cust);
-  const items = candidates[idx]?.proposedItems ?? 0;
+  const items = current?.proposedItems ?? 0;
+  const pass = passThroughOf(proposal.pairs, cust);
+  const billedItems =
+    letter && 'data' in letter ? letter.data.items.filter((i) => i.billedPrice !== null) : [];
+  const prefectures = stats?.bundle.minimumWage?.prefectures.map((p) => p.fullName) ?? [];
+  const toggleCause = (c: LetterCause, on: boolean) => {
+    const next = LETTER_CAUSES.filter((x) => (x === c ? on : causes.includes(x)));
+    setLetter({ causes: next });
+  };
+  const CHECKS = [
+    `本文の値上げの理由（${causes.length > 0 ? causes.map((c) => LETTER_CAUSE_JA[c]).join('・') : '諸経費'}）と、「業務の効率化や経費の削減に努め」という取組みの記載が、自社の実情と合っている`,
+    '別紙の品目・現行単価・改定後単価を確認した',
+    '参考資料の統計が最新の公表値か、出典の取得日を見て確認した',
+  ];
+  const done = CHECKS.filter((c) => checked[c]).length;
 
   const print = () => {
     const old = document.title;
@@ -179,16 +207,20 @@ export function LetterScreen() {
         />
         <Card>
           <div className="letter-controls">
-            <label className="field">
-              得意先（{num(candidates.length)}社）
-              <select value={cust} onChange={(e) => navigate('letter', e.target.value)}>
+            <div className="field letter-customer">
+              <label htmlFor="letter-customer">得意先（{num(candidates.length)}社）</label>
+              <select id="letter-customer" value={cust} onChange={(e) => navigate('letter', e.target.value)}>
                 {candidates.map((c) => (
                   <option key={c.cust} value={c.cust}>
-                    {c.name}（{c.cust}・{c.proposedItems}品目・{yen(c.requestedYen)}）
+                    {c.name}（{c.cust}）{c.proposedItems}品目
                   </option>
                 ))}
               </select>
-            </label>
+              <span className="small muted letter-customer-sub">
+                値上げ額（年間）{yen(current?.requestedYen ?? 0)}・転嫁率 {pct(pass.bp)}（原価の上昇額{' '}
+                {yen(pass.costIncreaseYen)}）
+              </span>
+            </div>
             <div className="button-row tight">
               <button
                 type="button"
@@ -250,19 +282,108 @@ export function LetterScreen() {
               />
             </label>
           </div>
+          {pass.bp !== null && pass.bp > 10000 && (
+            <Notice tone="info" title={`この得意先への依頼額は、原価の上昇額の ${pct(pass.bp)} です`}>
+              <p>
+                定価の端数の切り上げや、粗利率の下限までの引き上げを含むため、原価の上昇分より大きくなっています。本文は「原価の上昇を吸収しきれない」という書き方です。依頼の大きさと本文が合っているか確認してください。
+              </p>
+            </Notice>
+          )}
+          {billedItems.length > 0 && (
+            <Notice tone="warning" title={`${billedItems.length}品目は、今の請求単価が現行単価と違います`}>
+              <p>
+                請求ミスの可能性がある品目です（<a href={href('proposal', cust)}>提案</a>
+                で確認できます）。別紙では、該当する品目に※印と今の請求単価を示し、担当者から説明すると書いています。送る前に、請求の扱いを決めてください。
+              </p>
+            </Notice>
+          )}
+          <fieldset className="topic-row">
+            <legend>本文に書く値上げの理由</legend>
+            {LETTER_CAUSES.map((c) => (
+              <label key={c} className="checkbox">
+                <input
+                  type="checkbox"
+                  checked={causes.includes(c)}
+                  onChange={(e) => toggleCause(c, e.target.checked)}
+                />
+                {LETTER_CAUSE_JA[c]}
+              </label>
+            ))}
+            {ls.causes !== null && (
+              <button
+                type="button"
+                className="btn btn-tiny btn-ghost"
+                onClick={() => setLetter({ causes: null })}
+              >
+                シナリオに合わせる
+              </button>
+            )}
+            <p className="small muted block-full">
+              初期値は、シナリオで上がるとした費目です（原材料・エネルギー・労務費・その他、仕入先の値上げ通知）。自社で実際に上がっている費目だけを選んでください。
+            </p>
+          </fieldset>
           <fieldset className="topic-row">
             <legend>参考資料に入れる統計</legend>
             {TOPICS.map((t) => (
-              <label key={t} className="checkbox">
+              <label key={t} className={`checkbox${allowed.has(t) ? '' : ' is-disabled'}`}>
                 <input
                   type="checkbox"
-                  checked={ls.topics[t]}
+                  checked={ls.topics[t] && allowed.has(t)}
+                  disabled={!allowed.has(t)}
                   onChange={(e) => setLetter({ topics: { ...ls.topics, [t]: e.target.checked } })}
                 />
                 {EVIDENCE_TOPIC_JA[t]}
               </label>
             ))}
+            {TOPICS.some((t) => !allowed.has(t)) && (
+              <p className="small muted block-full">
+                値上げの理由に選んでいない費目の統計は入れません（本文の理由と参考資料をそろえるため）。
+              </p>
+            )}
           </fieldset>
+          {letter && 'notRising' in letter && letter.notRising.length > 0 && (
+            <p className="small muted">
+              下がった・横ばいの統計は参考資料から外しました：
+              {letter.notRising.map((e) => e.title).join('、')}
+            </p>
+          )}
+          <details className="details">
+            <summary>本文を編集する</summary>
+            <p className="small muted">
+              書き換えた段落は、どの得意先の申入書にも使います（日付も書き換えた文のままになります）。空にすると、自動の文に戻ります。
+            </p>
+            {letter && 'data' in letter && (
+              <div className="paragraph-editor">
+                {letter.data.paragraphs.map((p) => (
+                  <label key={p.id} className="field">
+                    <span>
+                      {LETTER_PARAGRAPH_JA[p.id]}
+                      {p.edited && <Badge tone="info">書き換え済み</Badge>}
+                    </span>
+                    <textarea
+                      rows={3}
+                      value={ls.paragraphs[p.id] ?? p.text}
+                      onChange={(e) =>
+                        setLetter({ paragraphs: { ...ls.paragraphs, [p.id]: e.target.value } })
+                      }
+                    />
+                    {p.edited && (
+                      <button
+                        type="button"
+                        className="btn btn-tiny btn-ghost"
+                        onClick={() => {
+                          const { [p.id]: _drop, ...rest } = ls.paragraphs;
+                          setLetter({ paragraphs: rest });
+                        }}
+                      >
+                        自動の文に戻す
+                      </button>
+                    )}
+                  </label>
+                ))}
+              </div>
+            )}
+          </details>
           <details className="details">
             <summary>差出人（自社）の情報</summary>
             <div className="form-grid-2">
@@ -283,8 +404,44 @@ export function LetterScreen() {
                   />
                 </label>
               ))}
+              <label className="field">
+                従業員が働く都道府県（最低賃金の引用に使います）
+                <select
+                  value={app.company.prefecture ?? ''}
+                  onChange={(e) => setCompany({ prefecture: e.target.value })}
+                >
+                  <option value="">書かない（全国加重平均だけ）</option>
+                  {prefectures.map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
+                </select>
+              </label>
             </div>
           </details>
+          <section className="send-check" aria-label="送る前の確認">
+            <h2 className="h3">
+              送る前の確認（{done}/{CHECKS.length}）
+            </h2>
+            <ul className="plain-list">
+              {CHECKS.map((c) => (
+                <li key={c}>
+                  <label className="checkbox">
+                    <input
+                      type="checkbox"
+                      checked={checked[c] ?? false}
+                      onChange={(e) => setChecked({ ...checked, [c]: e.target.checked })}
+                    />
+                    {c}
+                  </label>
+                </li>
+              ))}
+            </ul>
+            <p className="small muted">
+              印刷の画面で「ヘッダーとフッター」をオフにすると、URLや日付が紙に入りません（ページ番号は申入書の側で入れます）。
+            </p>
+          </section>
           <div className="button-row">
             <button type="button" className="btn" onClick={record}>
               協議記録に「申入書送付」を記録
@@ -309,15 +466,21 @@ export function LetterScreen() {
             <Notice tone="warning" title="一部の公表統計を読み込めませんでした">
               <ul className="small">
                 {stats.errors.map((e) => (
-                  <li key={e}>{e}</li>
+                  <li key={e}>{e}を読み込めませんでした。</li>
                 ))}
               </ul>
+              <p className="small">参考資料からこの統計を外して作っています。</p>
+              <p>
+                <button type="button" className="btn btn-small" onClick={retry}>
+                  もう一度読み込む
+                </button>
+              </p>
             </Notice>
           )}
         </Card>
         {loaded.isSample && (
           <p className="small muted sample-note">
-            この申入書は架空のサンプルデータから作ったものです。会社名・得意先名・価格はすべて架空です。
+            この申入書は架空のサンプルデータから作ったものです。会社名・得意先名・価格はすべて架空で、印刷にも「サンプル（架空データ）」と入ります。
           </p>
         )}
       </div>
@@ -328,21 +491,24 @@ export function LetterScreen() {
           <p>{letter.error}</p>
         </Notice>
       )}
-      {letter && 'data' in letter && <LetterSheets data={letter.data} />}
+      {letter && 'data' in letter && <LetterSheets data={letter.data} sample={loaded.isSample} />}
     </>
   );
 }
 
-function LetterSheets({ data }: { data: LetterData }) {
+function LetterSheets({ data, sample }: { data: LetterData; sample: boolean }) {
+  const fictional = sample ? '（架空）' : '';
   return (
-    <div className="sheets" data-testid="letter">
+    <div className={`sheets${sample ? ' is-sample' : ''}`} data-testid="letter">
       <article className="sheet letter" aria-label="申入書">
+        <SampleTag sample={sample} />
         <div className="letter-meta">
           {data.documentNo && <p>{data.documentNo}</p>}
           <p>{data.issueDateText}</p>
         </div>
         <p className="letter-to">
           {data.addressee.company}
+          {fictional}
           <br />
           {data.addressee.department && <span>{data.addressee.department}　</span>}
           {data.addressee.honorific}
@@ -354,9 +520,9 @@ function LetterSheets({ data }: { data: LetterData }) {
           {data.sender.tel && <p className="small">TEL {data.sender.tel}</p>}
         </div>
         <h2 className="letter-title">{data.title}</h2>
-        {data.body.map((p, i) => (
-          <p key={p} className={i === 0 ? 'letter-para letter-first' : 'letter-para'}>
-            {i === 0 ? `${data.salutation}　${p}` : p}
+        {data.paragraphs.map((p, i) => (
+          <p key={p.id} className={i === 0 ? 'letter-para letter-first' : 'letter-para'}>
+            {i === 0 ? `${data.salutation}　${p.text}` : p.text}
           </p>
         ))}
         <p className="letter-close">{data.complimentaryClose}</p>
@@ -372,11 +538,13 @@ function LetterSheets({ data }: { data: LetterData }) {
         <p className="letter-ijo">以上</p>
       </article>
 
-      <article className="sheet" aria-label="別紙 価格改定対象品目一覧">
+      <article className="sheet items" aria-label="別紙 価格改定対象品目一覧">
+        <SampleTag sample={sample} />
         <p className="sheet-tag">別紙</p>
         <h2 className="sheet-title">{data.itemsTitle}</h2>
         <p className="sheet-to">
-          {data.addressee.company} {data.addressee.honorific}　／　{data.effectiveDateText}より
+          {data.addressee.company}
+          {fictional} {data.addressee.honorific}　／　{data.effectiveDateText}より
         </p>
         <table className="items-table">
           <thead>
@@ -406,7 +574,12 @@ function LetterSheets({ data }: { data: LetterData }) {
                 <td className="nowrap">{it.sku}</td>
                 <td>{it.name}</td>
                 <td className="nowrap">{it.unit}</td>
-                <td className="num">{it.currentPriceText}</td>
+                <td className="num">
+                  {it.currentPriceText}
+                  {it.billedPriceText !== null && (
+                    <span className="billed-price">※ご請求 {it.billedPriceText}</span>
+                  )}
+                </td>
                 <td className="num">{it.newPriceText}</td>
                 <td className="num">{it.changeText}</td>
                 <td className="num">{it.rateText}</td>
@@ -423,6 +596,7 @@ function LetterSheets({ data }: { data: LetterData }) {
 
       {data.evidence.items.length > 0 && (
         <article className="sheet evidence" aria-label={data.evidence.heading}>
+          <SampleTag sample={sample} />
           <p className="sheet-tag">参考資料</p>
           <h2 className="sheet-title">{data.evidence.heading}</h2>
           <p className="sheet-intro">{data.evidence.intro}</p>
@@ -438,6 +612,7 @@ function LetterSheets({ data }: { data: LetterData }) {
                     points={e.chart.points}
                     title={e.chart.label}
                     unit={e.chart.unit}
+                    periodUnit={e.chart.periodUnit ?? '年'}
                     format={chartFormat(e.chart.unit, e.chart.points)}
                     width={380}
                     height={190}
@@ -452,10 +627,7 @@ function LetterSheets({ data }: { data: LetterData }) {
                     </div>
                   ))}
                 </dl>
-                <p className="evidence-source">
-                  出典：{e.source.publisher}「{e.source.title}」（{e.source.url}、
-                  {e.source.retrievedAt.slice(0, 10)}取得）
-                </p>
+                <p className="evidence-source">{e.source.line}</p>
               </figure>
             ))}
           </div>
@@ -463,11 +635,6 @@ function LetterSheets({ data }: { data: LetterData }) {
             <ul>
               {data.evidence.disclaimer.map((d) => (
                 <li key={d}>{d}</li>
-              ))}
-            </ul>
-            <ul className="credits">
-              {data.evidence.sources.map((s) => (
-                <li key={s}>{s}</li>
               ))}
             </ul>
           </div>

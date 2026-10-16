@@ -51,12 +51,14 @@ const evidence: EvidenceItem[] = [
     statement: '…',
     figures: [],
     computedByTool: true,
+    trend: 'up',
     source: {
       publisher: '日本銀行 調査統計局',
       title: '国内企業物価指数',
       url: 'https://example.invalid',
       retrievedAt: '',
       credit: '出典：日本銀行',
+      line: '出典：日本銀行',
     },
     chart: null,
   },
@@ -67,12 +69,14 @@ const evidence: EvidenceItem[] = [
     statement: '…',
     figures: [],
     computedByTool: false,
+    trend: 'up',
     source: {
       publisher: '厚生労働省',
       title: '地域別最低賃金',
       url: 'https://example.invalid',
       retrievedAt: '',
       credit: '出典：厚生労働省（加工して作成）',
+      line: '出典：厚生労働省（加工して作成）',
     },
     chart: null,
   },
@@ -108,8 +112,10 @@ describe('buildLetter', () => {
     const body = letter.body.join('\n');
     expect(body).toContain('原材料価格や人件費の上昇');
     expect(body).toContain('令和8年12月1日出荷分より、別紙のとおり価格を改定');
-    expect(body).toContain('令和8年11月13日までにご回答');
-    expect(body).toContain('参考資料として添付');
+    expect(body).toContain('令和8年11月13日までにご回答を賜りますようお願い申し上げます');
+    expect(body).toContain('公表統計を、参考資料として添付いたしました');
+    // 「幸いです」 closes one sentence only
+    expect(body.match(/幸いです/g)).toHaveLength(1);
     expect(body).not.toMatch(/原単価|原価構成|AI|保証/);
   });
 
@@ -139,7 +145,50 @@ describe('buildLetter', () => {
   it('carries the evidence with its credit lines', () => {
     expect(letter.evidence.items).toHaveLength(2);
     expect(letter.evidence.sources).toEqual(['出典：日本銀行', '出典：厚生労働省（加工して作成）']);
-    expect(letter.evidence.disclaimer.join('')).toContain('本ツールで計算');
+    expect(letter.evidence.disclaimer.join('')).toContain(
+      '「弊社算出」とある数値は、公表値をもとに弊社で計算したもの',
+    );
+    expect(letter.evidence.disclaimer.join('')).not.toContain('本ツール');
+    expect(letter.evidence.intro.startsWith('原材料価格・人件費の動向を示す公表統計です')).toBe(true);
+  });
+
+  it('names only the cost increases the company has, and keeps the user’s own paragraphs', () => {
+    const own = buildLetter(ds, '000001', pairs, evidence, company, {
+      ...options,
+      causes: ['material', 'energy'],
+      paragraphs: { reason: '弊社では、原材料価格の上昇が続いております。', closing: '  ' },
+    });
+    expect(own.paragraphs.find((p) => p.id === 'reason')).toEqual({
+      id: 'reason',
+      text: '弊社では、原材料価格の上昇が続いております。',
+      edited: true,
+    });
+    expect(own.paragraphs.find((p) => p.id === 'closing')?.edited).toBe(false);
+    const generated = buildLetter(ds, '000001', pairs, evidence, company, {
+      ...options,
+      causes: ['material', 'energy'],
+    });
+    expect(generated.body.join('')).toContain('原材料価格やエネルギー価格の上昇');
+    expect(generated.body.join('')).not.toContain('人件費');
+    expect(
+      buildLetter(ds, '000001', pairs, evidence, company, { ...options, causes: [] }).body.join(''),
+    ).toContain('諸経費の上昇');
+  });
+
+  it('marks items whose invoiced price differs from the 現行単価 shown', () => {
+    const leaking = pairs.map((p) =>
+      p.sku === 'DB-1001'
+        ? { ...p, ongoingLeak: 'old_price' as const, systemPrice: 511, lastBilledPrice: 511 }
+        : p,
+    );
+    const l = buildLetter(ds, '000001', leaking, evidence, company, options);
+    expect(l.items.find((i) => i.sku === 'DB-1001')).toMatchObject({
+      billedPrice: 511,
+      billedPriceText: '511',
+    });
+    expect(l.items.find((i) => i.sku === 'KG-1001')?.billedPrice).toBeNull();
+    expect(l.itemsNotes.join('')).toContain('※印の品目は、現在のご請求単価');
+    expect(letter.itemsNotes.join('')).not.toContain('※印');
   });
 
   it('refuses a customer with nothing to raise or unknown', () => {
@@ -154,7 +203,7 @@ describe('buildLetter', () => {
       basis: '納品分',
     });
     expect(plain.body.join('')).toContain('諸経費の上昇');
-    expect(plain.body.join('')).not.toContain('ご回答をいただけましたら');
+    expect(plain.body.join('')).not.toContain('ご回答を賜りますよう');
     expect(plain.record).toHaveLength(3);
   });
 });

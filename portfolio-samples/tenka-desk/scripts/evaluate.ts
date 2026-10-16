@@ -10,6 +10,13 @@
  * written rules, so the scores show that the engine is consistent with those
  * rules on synthetic data. They are not an estimate of accuracy on real data.
  * The "ablation" runs show how much the result depends on optional input files.
+ *
+ * Two checks go beyond the generator's own vocabulary:
+ *  - the hand-written "messy" sample (scripts/messy-sample/): a Shift_JIS export
+ *    with Excel-style values, negated 合意状況, a 定価 cut, billing above the rank,
+ *    a sales file without 原単価 and an unexplained difference, scored separately;
+ *  - the 反映チェック on a price master the engine exported itself and read back
+ *    (exportPriceMaster → importFile), in both layouts and in Shift_JIS.
  */
 
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
@@ -22,6 +29,7 @@ import {
   type DiagnosisResult,
   defaultGuardrails,
   diagnose,
+  exportPriceMaster,
   type InputFile,
   importFile,
   LEAK_TYPES,
@@ -246,6 +254,10 @@ function followup(layout: 'A' | 'B') {
   const sales = ws.sales.get(`next/sales_${layout}_202612.csv`) ?? [];
   return checkFollowup(ws.dataset, master, sales);
 }
+function followupSales(layout: 'A' | 'B') {
+  const ws = loadWorkspace([...MASTERS, `next/sales_${layout}_202612.csv`].map(file), { settings });
+  return { ds: ws.dataset, sales: ws.sales.get(`next/sales_${layout}_202612.csv`) ?? [] };
+}
 const fuA = followup('A');
 const fuB = followup('B');
 const fuBById = new Map(fuB.lines.map((x) => [x.line.id, x.status]));
@@ -345,6 +357,111 @@ const priceMasterRebuild = {
   currentPriceExpected: compareMaster(buildPriceMaster(pairs, outcomes, { currentPrice: 'expected' })),
 };
 
+/* ---------- 5. 反映チェック on the price master the engine exported and read back ---------- */
+
+const decemberA = followupSales('A');
+function roundTrip(layout: 'A' | 'B', encoding: 'utf-8' | 'shift_jis') {
+  const built = buildPriceMaster(pairs, outcomes, { currentPrice: 'system' });
+  const file = exportPriceMaster(ds, built, layout, { encoding });
+  const back = importFile(file.fileName, file.bytes);
+  if (back.data.kind !== 'priceMaster')
+    throw new Error('the exported master was not read back as a price master');
+  const master = back.data.result.records.map((r) => ({ ...r, sku: ds.resolveSku(r.skuKey) }));
+  const fu = checkFollowup(decemberA.ds, master, decemberA.sales);
+  let tp = 0;
+  let fp = 0;
+  let fn = 0;
+  let agree = 0;
+  for (const x of fu.lines) {
+    const t = truthFollow.get(x.line.id);
+    if (t && t['label'] === (FOLLOW_TRUTH[x.status] ?? x.status)) agree++;
+    const isT = t?.['label'] === 'still_old_price';
+    const isE = x.status === 'still_old_price';
+    if (isT && isE) tp++;
+    else if (isE) fp++;
+    else if (isT) fn++;
+  }
+  return {
+    layout,
+    encoding,
+    rowsWritten: built.length,
+    rowsReadBack: master.length,
+    importIssues: back.data.result.issues.length,
+    stillOldPrice: prf(tp, fp, fn),
+    labelAgreement: { agree, of: fu.lines.length },
+    engineShortfallYen: fu.stillOld.shortfallYen,
+  };
+}
+const exportedRoundTrip = [roundTrip('A', 'utf-8'), roundTrip('B', 'utf-8'), roundTrip('A', 'shift_jis')];
+
+/* ---------- 6. the hand-written messy sample ---------- */
+
+const MESSY = join(ROOT, 'scripts', 'messy-sample');
+const MESSY_FILES = [
+  'customers.csv',
+  'products.csv',
+  'rate_tiers.csv',
+  'categories.csv',
+  'list_price_history.csv',
+  'cost_history.csv',
+  'agreements.csv',
+  'sales_sjis.csv',
+];
+function messyLabel(d: LineDiagnosis): string {
+  switch (d.status) {
+    case 'leak':
+      return `leak_${d.leak}`;
+    case 'price_mismatch':
+      return 'unexplained';
+    case 'ok_kept_price':
+      return 'ok_kept';
+    case 'excluded_return':
+      return 'ok_return';
+    default:
+      return d.status;
+  }
+}
+const messyWs = loadWorkspace(
+  MESSY_FILES.map((name) => ({ name, data: new Uint8Array(readFileSync(join(MESSY, name))) })),
+  { revisionDates: { 'agreements.csv': '2025-04-01' } },
+);
+const messySales = messyWs.sales.get('sales_sjis.csv') ?? [];
+const messyResult = diagnose(messyWs.dataset, messySales);
+const messyTruth = (() => {
+  const [header = [], ...body] = parseCsv(readFileSync(join(MESSY, 'truth.csv'), 'utf8'));
+  return body.map((r) => Object.fromEntries(header.map((h, i) => [h, r[i] ?? ''])));
+})();
+const messyGot = new Map(messyResult.lines.map((d) => [d.line.id, messyLabel(d)]));
+let mTp = 0;
+let mFp = 0;
+let mFn = 0;
+let mAgree = 0;
+const messyDiffs: string[] = [];
+for (const t of messyTruth) {
+  const id = t['line_id'] ?? '';
+  const got = messyGot.get(id) ?? '(missing)';
+  if (got === t['label']) mAgree++;
+  else messyDiffs.push(`${id}: truth ${t['label']}, engine ${got}`);
+  const isT = (t['label'] ?? '').startsWith('leak_') || t['label'] === 'unexplained';
+  const isE = got.startsWith('leak_') || got === 'unexplained';
+  if (isT && isE) mTp++;
+  else if (isE) mFp++;
+  else if (isT) mFn++;
+}
+const messy = {
+  lines: messyTruth.length,
+  linesRead: messySales.length,
+  importIssues: messyWs.importIssues.length,
+  encoding: messyWs.files.find((f) => f.name === 'sales_sjis.csv')?.decoded.encoding ?? '',
+  labelAgreement: { agree: mAgree, of: messyTruth.length },
+  leakOrUnexplained: prf(mTp, mFp, mFn),
+  overchargeLines: messyResult.overcharges.lines,
+  interpretedAgreementStatuses: messyWs.dataset.issues.filter(
+    (i) => i.kind === 'interpreted_agreement_status',
+  ).length,
+  differences: messyDiffs,
+};
+
 /* ---------- output ---------- */
 
 const out = {
@@ -371,6 +488,8 @@ const out = {
     counts: fuA.counts,
   },
   priceMasterRebuild,
+  followupOnExportedMaster: exportedRoundTrip,
+  messySample: messy,
 };
 
 const pct = (x: number | null) => (x === null ? '-' : `${(x * 100).toFixed(1)}%`);
@@ -378,7 +497,7 @@ const yen = (n: number) => n.toLocaleString('en-US');
 const typeJa: Record<string, string> = {
   old_price: '反映漏れ',
   expired_special: '特値の期限切れ',
-  rate_out_of_tier: '掛け率ランク外',
+  rate_out_of_tier: '掛率ランク外',
   below_margin_floor: '粗利下限割れ',
   any: '漏れ全体（種類を問わない）',
 };
@@ -417,5 +536,15 @@ console.log(
 console.log(`- 全ラベルの一致: ${followAgree}/${fuA.lines.length}、A/B差 ${followupLayoutDiffs}行`);
 console.log('\n# 新単価マスタの再現（協議結果と新定価表から）\n');
 console.log(JSON.stringify(priceMasterRebuild, null, 2));
+console.log('\n# 反映チェック：エンジンが書き出した新単価マスタを読み直して使った場合\n');
+for (const r of exportedRoundTrip)
+  console.log(
+    `- ${r.layout}形式・${r.encoding}: ${r.rowsWritten}行を書き出し ${r.rowsReadBack}行を読み直し（問題 ${r.importIssues}件）、旧単価のまま 適合率 ${pct(r.stillOldPrice.precision)} / 再現率 ${pct(r.stillOldPrice.recall)}（TP ${r.stillOldPrice.tp} / FP ${r.stillOldPrice.fp} / FN ${r.stillOldPrice.fn}）、全ラベルの一致 ${r.labelAgreement.agree}/${r.labelAgreement.of}`,
+  );
+console.log('\n# 手書きの「崩れた」サンプル（scripts/messy-sample/、別に採点）\n');
+console.log(
+  `- ${messy.lines}行（${messy.encoding}）を ${messy.linesRead}行読み込み（読み込みの問題 ${messy.importIssues}件）。判定の一致 ${messy.labelAgreement.agree}/${messy.labelAgreement.of}、漏れ・原因不明の 適合率 ${pct(messy.leakOrUnexplained.precision)} / 再現率 ${pct(messy.leakOrUnexplained.recall)}、基準より高い請求 ${messy.overchargeLines}行、読み替えた合意状況 ${messy.interpretedAgreementStatuses}件`,
+);
+for (const d of messy.differences) console.log(`  - 違い：${d}`);
 
 writeFileSync(join(ROOT, 'docs', 'evaluation-results.json'), `${JSON.stringify(out, null, 2)}\n`);
