@@ -38,10 +38,13 @@ export type InputsState =
   | null;
 
 export interface FollowupInputs {
-  /** null = use the price master built on the 書き出し screen */
+  /** which price master to check against: the one built on the 書き出し screen, or a file */
+  masterSource: 'built' | 'file';
   masterFile: SourceFile | null;
   salesFile: SourceFile | null;
 }
+
+const NO_FOLLOWUP: FollowupInputs = { masterSource: 'built', masterFile: null, salesFile: null };
 
 export interface AppContextValue {
   ready: boolean;
@@ -102,7 +105,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [loaded, setLoaded] = useState<Loaded | null>(null);
   const [settings, setSettings] = useState<AppSettings>(defaultSettings);
   const [logs, setLogs] = useState<Readonly<Record<string, NegotiationLog>>>({});
-  const [followup, setFollowupState] = useState<FollowupInputs>({ masterFile: null, salesFile: null });
+  const [followup, setFollowupState] = useState<FollowupInputs>(NO_FOLLOWUP);
   const [outcomesFile, setOutcomesFileState] = useState<SourceFile | null>(null);
 
   /** files currently loaded (sample files are kept in memory only) */
@@ -121,7 +124,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       sourcesRef.current = sources;
       setError(null);
       if (sources.length === 0) {
+        // 読み込み中に最後のファイルを外したとき: 古い読み込みは seq が古いので busy を消せない。ここで消す
         setLoaded(null);
+        setBusy(null);
         return;
       }
       setBusy('ファイルを読み込んでいます…');
@@ -166,7 +171,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setSettings(restored);
         settingsRef.current = restored;
         if (l) setLogs(l);
-        if (f) setFollowupState(f);
+        if (f) setFollowupState({ ...NO_FOLLOWUP, ...f, masterSource: f.masterSource ?? (f.masterFile ? 'file' : 'built') });
         if (o) setOutcomesFileState(o);
         savedInputs = i ?? null;
       } catch {
@@ -339,7 +344,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setInputs(null);
     setLoaded(null);
     setLogs({});
-    setFollowupState({ masterFile: null, salesFile: null });
+    setFollowupState(NO_FOLLOWUP);
     setOutcomesFileState(null);
     setError(null);
     setBusy(null);
