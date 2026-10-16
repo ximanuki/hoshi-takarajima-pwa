@@ -3,6 +3,7 @@ import {
   classifyPixel,
   evaluateLayerTile,
   HazardService,
+  neighbourOffsets,
   resolveLayerIds,
   toHex,
 } from '../src/api/hazard.js';
@@ -128,6 +129,37 @@ describe('evaluateLayerTile', () => {
   it('flags colours that are not in the legend', () => {
     const r = evaluateLayerTile(flood, image([0, 128, 0, 255]), at(10, 10), 35);
     expect(r).toMatchObject({ status: 'unknown_color', color: '#008000' });
+  });
+
+  it('reads across the tile edge for patterned layers (stroke in the adjacent tile)', () => {
+    const overflow = layer('house_collapse_overflow');
+    const stroke = [...(overflow.legend[0]?.rgb ?? [0, 0, 0]), 255] as [number, number, number, number];
+    const own = image(CLEAR);
+    const right = image(CLEAR, [[2, 16, stroke]]);
+    const pos = at(30, 16); // 2 px from the right edge of a 32 px tile; the stroke is 4 px away across it
+    expect(evaluateLayerTile(overflow, own, pos, 35)).toMatchObject({ status: 'not_in_zone' });
+    const r = evaluateLayerTile(overflow, own, pos, 35, new Map([['1,0', right]]));
+    expect(r.status).toBe('in_zone');
+    expect(r.noteJa).toContain('模様の隙間');
+  });
+
+  it('finds a patterned zone across the edge even when the own tile is empty (404)', () => {
+    const overflow = layer('house_collapse_overflow');
+    const stroke = [...(overflow.legend[0]?.rgb ?? [0, 0, 0]), 255] as [number, number, number, number];
+    const below = image(CLEAR, [[16, 3, stroke]]);
+    const pos = at(16, 250); // own tile is null; size falls back to 256 px, so 6 px from the bottom edge
+    expect(evaluateLayerTile(overflow, null, pos, 35)).toMatchObject({ status: 'not_in_zone' });
+    const r = evaluateLayerTile(overflow, null, pos, 35, new Map([['0,1', below]]));
+    expect(r.status).toBe('in_zone');
+  });
+
+  it('asks for adjacent tiles only near the edges', () => {
+    expect(neighbourOffsets(at(128, 128), 9)).toEqual([]);
+    expect(neighbourOffsets(at(3, 250), 9)).toEqual([
+      [0, 1],
+      [-1, 0],
+      [-1, 1],
+    ]);
   });
 
   it('looks through the gaps of circle-hatched layers (recorded tile, centre of a ring)', () => {

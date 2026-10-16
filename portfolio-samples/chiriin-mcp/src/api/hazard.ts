@@ -12,7 +12,7 @@ import {
 } from '../hazard-layers.js';
 import type { HttpClient } from '../http-client.js';
 import { type DecodedImage, decodePng, pixelAt } from '../png.js';
-import { latLonToTile, metersPerPixel, type TilePosition } from '../tiles.js';
+import { latLonToTile, metersPerPixel, TILE_SIZE, type TilePosition } from '../tiles.js';
 
 export type HazardStatus = 'in_zone' | 'not_in_zone' | 'unknown_color' | 'error';
 
@@ -86,21 +86,36 @@ function toClass(layer: HazardLayer, entry: LegendEntry): HazardClass {
   return c;
 }
 
-/** Most frequent legend entry among the pixels in a square of the given radius (excluding the centre). */
+/**
+ * Adjacent tiles keyed by `"dx,dy"` (each -1, 0 or 1). `null` is a tile the portal returned 404 for
+ * (no coloured pixel); a missing key is a tile that was not needed or could not be loaded.
+ */
+export type NeighbourTiles = ReadonlyMap<string, DecodedImage | null>;
+
+/** Most frequent legend entry among the pixels in a square of the given radius (excluding the centre).
+ * Pixels past the tile edge are read from the adjacent tile when it is available. */
 function neighbourhood(
-  image: DecodedImage,
+  image: DecodedImage | null,
   pos: TilePosition,
   radius: number,
   legend: readonly LegendEntry[],
+  neighbours?: NeighbourTiles,
 ): { entry: LegendEntry; distancePx: number } | undefined {
+  const size = image?.width ?? TILE_SIZE;
+  const tileAt = (ox: number, oy: number): DecodedImage | null | undefined =>
+    ox === 0 && oy === 0 ? image : neighbours?.get(`${ox},${oy}`);
   const counts = new Map<LegendEntry, { n: number; nearest: number }>();
   for (let dy = -radius; dy <= radius; dy++) {
     for (let dx = -radius; dx <= radius; dx++) {
       if (dx === 0 && dy === 0) continue;
-      const x = pos.px + dx;
-      const y = pos.py + dy;
-      if (x < 0 || y < 0 || x >= image.width || y >= image.height) continue;
-      const c = classifyPixel(pixelAt(image, x, y), legend);
+      const gx = pos.px + dx;
+      const gy = pos.py + dy;
+      const ox = Math.floor(gx / size);
+      const oy = Math.floor(gy / size);
+      if (Math.abs(ox) > 1 || Math.abs(oy) > 1) continue;
+      const tile = tileAt(ox, oy);
+      if (!tile) continue;
+      const c = classifyPixel(pixelAt(tile, gx - ox * size, gy - oy * size), legend);
       if (c.kind !== 'match') continue;
       const dist = Math.hypot(dx, dy);
       const prev = counts.get(c.entry);
@@ -125,11 +140,20 @@ export function evaluateLayerTile(
   image: DecodedImage | null,
   pos: TilePosition,
   lat: number,
+  neighbours?: NeighbourTiles,
 ): Omit<HazardLayerResult, 'tileUrl'> {
   const base = { id: layer.id, group: layer.group, nameJa: layer.nameJa, nameEn: layer.nameEn };
-  if (!image) return { ...base, status: 'not_in_zone' };
-
   const mpp = metersPerPixel(lat, pos.z);
+  const radius = neighbourhoodRadius(layer);
+
+  if (!image) {
+    // The point's own tile is empty, but near a tile edge the zone can start across the seam.
+    const near = neighbourhood(null, pos, radius, layer.legend, neighbours);
+    if (!near) return { ...base, status: 'not_in_zone' };
+    if (layer.pattern) return patternGapResult(base, layer, near.entry, radius, mpp);
+    return nearbyResult(base, near, mpp);
+  }
+
   const centre = pixelAt(image, pos.px, pos.py);
   const centreClass = classifyPixel(centre, layer.legend);
   const color = toHex(centre[0], centre[1], centre[2]);
@@ -138,30 +162,23 @@ export function evaluateLayerTile(
     return { ...base, status: 'in_zone', hazardClass: toClass(layer, centreClass.entry), color };
   }
 
-  // Circle-hatched layers draw ~16 px rings, so a point at a ring's centre is ~8 px from the nearest stroke.
-  const radius = layer.pattern ? 9 : 3;
-  const near = neighbourhood(image, pos, radius, layer.legend);
+  const near = neighbourhood(image, pos, radius, layer.legend, neighbours);
 
-  if (near && (layer.pattern || centreClass.kind === 'unknown')) {
-    // Patterned layers have gaps between the drawn shapes; unknown colours are usually boundary lines.
+  if (near && layer.pattern) {
+    // Patterned layers have gaps between the drawn shapes.
+    return patternGapResult(base, layer, near.entry, radius, mpp);
+  }
+  if (near && centreClass.kind === 'unknown') {
+    // Unknown colours are usually boundary lines.
     return {
       ...base,
       status: 'in_zone',
       hazardClass: toClass(layer, near.entry),
       color: toHex(...near.entry.rgb),
-      noteJa: layer.pattern
-        ? `模様の隙間に当たったため、周辺約${Math.ceil(radius * mpp)}m以内の表示から判定しました。`
-        : '区域の境界線上の地点です。隣接する区域の表示から判定しました。',
+      noteJa: '区域の境界線上の地点です。隣接する区域の表示から判定しました。',
     };
   }
-  if (near) {
-    return {
-      ...base,
-      status: 'not_in_zone',
-      nearbyWithinM: Math.max(1, Math.ceil(near.distancePx * mpp)),
-      noteJa: `地点は区域外ですが、約${Math.max(1, Math.ceil(near.distancePx * mpp))}m以内に「${near.entry.labelJa}」の区域があります。`,
-    };
-  }
+  if (near) return nearbyResult(base, near, mpp);
   if (centreClass.kind === 'unknown') {
     return {
       ...base,
@@ -171,6 +188,52 @@ export function evaluateLayerTile(
     };
   }
   return { ...base, status: 'not_in_zone' };
+}
+
+type LayerBase = Pick<HazardLayerResult, 'id' | 'group' | 'nameJa' | 'nameEn'>;
+
+/** Circle-hatched layers draw ~16 px rings, so a point at a ring's centre is ~8 px from the nearest stroke. */
+export function neighbourhoodRadius(layer: HazardLayer): number {
+  return layer.pattern ? 9 : 3;
+}
+
+function patternGapResult(
+  base: LayerBase,
+  layer: HazardLayer,
+  entry: LegendEntry,
+  radius: number,
+  mpp: number,
+): Omit<HazardLayerResult, 'tileUrl'> {
+  return {
+    ...base,
+    status: 'in_zone',
+    hazardClass: toClass(layer, entry),
+    color: toHex(...entry.rgb),
+    noteJa: `模様の隙間に当たったため、周辺約${Math.ceil(radius * mpp)}m以内の表示から判定しました。`,
+  };
+}
+
+function nearbyResult(
+  base: LayerBase,
+  near: { entry: LegendEntry; distancePx: number },
+  mpp: number,
+): Omit<HazardLayerResult, 'tileUrl'> {
+  const m = Math.max(1, Math.ceil(near.distancePx * mpp));
+  return {
+    ...base,
+    status: 'not_in_zone',
+    nearbyWithinM: m,
+    noteJa: `地点は区域外ですが、約${m}m以内に「${near.entry.labelJa}」の区域があります。`,
+  };
+}
+
+/** Offsets of the adjacent tiles a lookup at `pos` with this radius reaches into. */
+export function neighbourOffsets(pos: TilePosition, radius: number, size = TILE_SIZE): [number, number][] {
+  const xs = [0, ...(pos.px - radius < 0 ? [-1] : []), ...(pos.px + radius >= size ? [1] : [])];
+  const ys = [0, ...(pos.py - radius < 0 ? [-1] : []), ...(pos.py + radius >= size ? [1] : [])];
+  return xs
+    .flatMap((ox) => ys.map((oy): [number, number] => [ox, oy]))
+    .filter(([ox, oy]) => ox !== 0 || oy !== 0);
 }
 
 export function resolveLayerIds(ids: readonly string[] | undefined): HazardLayer[] {
@@ -201,6 +264,22 @@ export class HazardService {
     });
   }
 
+  /** Adjacent tiles needed when the point sits near a tile edge. A tile that fails to load is left out,
+   * so the lookup falls back to the point's own tile instead of failing. */
+  private async loadNeighbours(layer: HazardLayer, pos: TilePosition): Promise<NeighbourTiles> {
+    const map = new Map<string, DecodedImage | null>();
+    await Promise.all(
+      neighbourOffsets(pos, neighbourhoodRadius(layer)).map(async ([ox, oy]) => {
+        try {
+          map.set(`${ox},${oy}`, await this.loadTile(tileUrl(layer, pos.z, pos.x + ox, pos.y + oy)));
+        } catch {
+          // Leave it out.
+        }
+      }),
+    );
+    return map;
+  }
+
   async evaluate(lat: number, lon: number, layerIds?: readonly string[]): Promise<HazardLayerResult[]> {
     assertInJapan(lat, lon);
     const layers = resolveLayerIds(layerIds);
@@ -210,7 +289,12 @@ export class HazardService {
         const url = tileUrl(layer, pos.z, pos.x, pos.y);
         try {
           const image = await this.loadTile(url);
-          return { ...evaluateLayerTile(layer, image, pos, lat), tileUrl: url };
+          // Only patterned layers, and only when the point itself is not coloured, need the adjacent tiles:
+          // that is where a gap in the pattern can hide a zone that continues across the tile edge.
+          const coloured =
+            image && classifyPixel(pixelAt(image, pos.px, pos.py), layer.legend).kind === 'match';
+          const neighbours = layer.pattern && !coloured ? await this.loadNeighbours(layer, pos) : undefined;
+          return { ...evaluateLayerTile(layer, image, pos, lat, neighbours), tileUrl: url };
         } catch (error) {
           const e = toChiriinError(error);
           return {
