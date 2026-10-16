@@ -55,18 +55,30 @@ describe('HttpClient', () => {
     expect(clock.slept).toEqual([300, 600]);
   });
 
-  it('honours Retry-After on 429 (capped at 4 s)', async () => {
+  it('waits out the full Retry-After on 429 when it is 30 s or less', async () => {
     const clock = fakeClock();
     const http = new HttpClient({
       fetch: scriptedFetch([
         json({}, 429, { 'retry-after': '2' }),
-        json({}, 429, { 'retry-after': '120' }),
+        json({}, 429, { 'retry-after': '10' }),
         json(1),
       ]),
       clock,
     });
     await http.getJson('https://vldb.gsi.go.jp/a');
-    expect(clock.slept.filter((ms) => ms >= 1000)).toEqual([2000, 4000]);
+    expect(clock.slept.filter((ms) => ms >= 1000)).toEqual([2000, 10000]);
+  });
+
+  it('fails at once with the wait time when Retry-After is longer than 30 s', async () => {
+    const clock = fakeClock();
+    const steps: Step[] = [json({}, 429, { 'retry-after': '120' }), json({ never: true })];
+    const http = new HttpClient({ fetch: scriptedFetch(steps), clock });
+    const error = await caught(http.getJson('https://vldb.gsi.go.jp/a'));
+    expect(error.code).toBe('UPSTREAM_HTTP');
+    expect(error.retryable).toBe(true);
+    expect(error.messageJa).toContain('120秒後');
+    expect(error.hint).toContain('120秒');
+    expect(clock.slept.filter((ms) => ms >= 1000)).toEqual([]);
   });
 
   it('gives up after the configured retries with a bilingual timeout error', async () => {

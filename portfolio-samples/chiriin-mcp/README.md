@@ -187,7 +187,7 @@ Node.js の `fetch` は、標準では `HTTPS_PROXY` を参照しません。Nod
 | 変数 | 既定値 | 内容 |
 |---|---|---|
 | `CHIRIIN_TIMEOUT_MS` | `10000` | API 1 回あたりのタイムアウト（本文の受信を含む） |
-| `CHIRIIN_RETRIES` | `2` | タイムアウト・ネットワークエラー・429・5xx のときの再試行回数（指数バックオフ。`Retry-After` があればそれに従う） |
+| `CHIRIIN_RETRIES` | `2` | タイムアウト・ネットワークエラー・429・5xx のときの再試行回数（指数バックオフ。`Retry-After` が30秒以内ならその時間待ってから再試行し、30秒を超えるときは再試行せずに待ち時間を知らせる） |
 | `CHIRIIN_USER_AGENT` | `chiriin-mcp/<version> (+https://github.com/ximanuki/chiriin-mcp)` | User-Agent |
 | `CHIRIIN_MAX_RESPONSE_BYTES` | `2097152` | 応答 1 件あたりのサイズ上限 |
 | `MCP_TRANSPORT` | （未設定） | `http` にすると `--http` と同じ |

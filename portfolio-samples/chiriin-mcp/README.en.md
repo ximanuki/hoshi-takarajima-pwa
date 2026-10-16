@@ -19,7 +19,7 @@ There are already many MCP servers for the e-Gov law API and similar services, b
 
 - **11 hazard layers**, with depth classes (under 0.3 m to 20 m or more), duration classes (under 12 h to 4+ weeks), special-warning vs. warning zones, and designated vs. to-be-designated zones
 - **Transparent decisions**: legend colours were read pixel-exactly from the official legend images, and every result includes the tile URL and the sampled colour. The PNG decoder is dependency-free and tested pixel-for-pixel against Pillow
-- **Plays by the rules**: honours the survey API's limit of 10 requests per 10 s per IP, with timeouts, retries (exponential backoff and Retry-After), a response-size cap and caching
+- **Plays by the rules**: honours the survey API's limit of 10 requests per 10 s per IP, with timeouts, retries (exponential backoff; a Retry-After of up to 30 s is waited out in full, a longer one is reported back instead of retried), a response-size cap and caching
 - **Bilingual errors** (Japanese and English) with actionable hints
 - **stdio and Streamable HTTP** transports
 

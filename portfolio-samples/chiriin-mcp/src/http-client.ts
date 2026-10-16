@@ -50,6 +50,11 @@ export interface GetOptions {
 
 const RETRYABLE_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
 const MAX_BACKOFF_MS = 4_000;
+/**
+ * Longest Retry-After we wait out inside one tool call. A server asking for longer is not retried early
+ * (that would only burn the remaining attempts); the call fails at once and says when to try again.
+ */
+const MAX_RETRY_AFTER_MS = 30_000;
 
 /**
  * fetch wrapper with timeout, bounded retries (exponential backoff + jitter,
@@ -120,6 +125,16 @@ export class HttpClient {
         });
         if (retryable) {
           retryAfterMs = parseRetryAfter(response.headers.get('retry-after'));
+          if (retryAfterMs !== undefined && retryAfterMs > MAX_RETRY_AFTER_MS) {
+            const seconds = Math.ceil(retryAfterMs / 1000);
+            throw new ChiriinError({
+              code: 'UPSTREAM_HTTP',
+              ja: `${host} が HTTP ${response.status} を返し、${seconds}秒後の再試行を求めています`,
+              en: `${host} responded with HTTP ${response.status} and asked to retry after ${seconds} s`,
+              retryable: true,
+              hint: `${seconds}秒ほど待ってから再実行してください。`,
+            });
+          }
           continue;
         }
         throw lastError;
@@ -156,9 +171,10 @@ export class HttpClient {
     }
   }
 
-  /** Delay before retry number `attempt` (1-based). Retry-After wins when the server sent one. */
+  /** Delay before retry number `attempt` (1-based). A Retry-After the server sent is waited out in full
+   * (values above MAX_RETRY_AFTER_MS never get here). */
   private backoffMs(attempt: number, retryAfterMs: number | undefined): number {
-    if (retryAfterMs !== undefined) return Math.min(retryAfterMs, MAX_BACKOFF_MS);
+    if (retryAfterMs !== undefined) return retryAfterMs;
     const base = Math.min(300 * 2 ** (attempt - 1), MAX_BACKOFF_MS);
     return Math.round(base * (0.5 + this.random() * 0.5));
   }
