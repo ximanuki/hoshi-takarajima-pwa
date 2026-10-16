@@ -25,6 +25,9 @@ function setupTriggers() {
 
 /** フォームが送信されたら承認者にメールで知らせる */
 function onFormSubmit(e) {
+  // トリガーはスプレッドシート全体に付くので、同じファイルにつないだ別のフォームの送信でも呼ばれる。
+  // 設定した回答シート以外からの送信は、列の並びが違うので何もしない
+  if (e.range && e.range.getSheet().getName() !== CONFIG.responseSheet) return;
   const row = e.values; // 文字列の配列
   const amount = parseAmount(row[COL.amount]);
   const subject = `【経費申請】${row[COL.name]}さん ${formatYen(amount)}`;
@@ -131,5 +134,5 @@ function formatYen(n) {
 }
 
 if (typeof module !== 'undefined') {
-  module.exports = { summarizeMonth, toTable, formatReportMail, parseAmount, formatYen };
+  module.exports = { summarizeMonth, toTable, formatReportMail, parseAmount, formatYen, onFormSubmit };
 }

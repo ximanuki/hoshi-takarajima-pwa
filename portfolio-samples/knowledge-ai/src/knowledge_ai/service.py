@@ -35,8 +35,35 @@ from knowledge_ai.text import MatchIndex
 log = logging.getLogger(__name__)
 
 _MARKER = re.compile(r"[\[［]\s*(\d+)\s*[\]］]")
-# 文の区切り。句点の直後に付いた出典の印（「…です。[1]」）は、その文に含める
-_SENTENCE = re.compile(r"[^。！？!?\n]*(?:[。！？!?]+(?:\s*[\[［]\s*\d+\s*[\]］])*|\n|$)")
+_OPEN, _CLOSE = "「『（(", "」』）)"
+_TERMINATORS = "。！？!?\n"
+_TRAILING_MARKERS = re.compile(r"(?:\s*[\[［]\s*\d+\s*[\]］])*")
+
+
+def _split_sentences(text: str) -> list[str]:
+    """文に分ける。かぎかっこ・丸かっこの中の句点では区切らず、
+    句点の直後に付いた出典の印（「…です。[1]」）はその文に含める。"""
+    out: list[str] = []
+    start = depth = 0
+    i = 0
+    while i < len(text):
+        ch = text[i]
+        if ch in _OPEN:
+            depth += 1
+        elif ch in _CLOSE:
+            depth = max(0, depth - 1)
+        elif ch in _TERMINATORS and depth == 0:
+            j = i + 1
+            while j < len(text) and text[j] in _TERMINATORS:
+                j += 1
+            j = _TRAILING_MARKERS.match(text, j).end()
+            out.append(text[start:j])
+            start = i = j
+            continue
+        i += 1
+    if start < len(text):
+        out.append(text[start:])
+    return out
 
 
 @dataclass
@@ -248,12 +275,12 @@ class AnswerService:
         if not citations:
             return ABSTAIN_MESSAGE, [], "no_verified_citation", unverified
 
-        # 検証できない出典が付いた文は、出典の印だけでなく主張ごと落とす
-        kept = [
-            s
-            for s in _SENTENCE.findall(draft.text)
-            if all(int(n) in mapping for n in _MARKER.findall(s))
-        ]
+        # 出典の付いていない文と、検証できない出典が付いた文は、主張ごと落とす
+        kept = []
+        for s in _split_sentences(draft.text):
+            nums = _MARKER.findall(s)
+            if nums and all(int(n) in mapping for n in nums):
+                kept.append(s)
         referenced = sorted({mapping[int(n)] for s in kept for n in _MARKER.findall(s)})
         if not referenced:
             return ABSTAIN_MESSAGE, [], "no_verified_citation", unverified
@@ -267,6 +294,7 @@ class AnswerService:
             return f"[{final[mapping[int(m.group(1))]]}]"
 
         text = _MARKER.sub(renumber, "".join(kept)).strip()
+        text = text.lstrip(_TERMINATORS + " 　")
         return text, citations, None, unverified
 
 

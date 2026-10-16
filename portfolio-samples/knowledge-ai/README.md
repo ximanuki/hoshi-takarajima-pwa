@@ -180,7 +180,7 @@ curl -s localhost:8000/ask -H 'content-type: application/json' \
 
 ```jsonc
 {
-  "answer": "資料には次のように記載されています。「出張者は、帰着後5営業日以内に出張報告書を所属長に提出しなければならない。」[1]",
+  "answer": "資料には次のように記載されています：「出張者は、帰着後5営業日以内に出張報告書を所属長に提出しなければならない。」[1]",
   "abstained": false,
   "citations": [{
     "marker": 1, "doc_title": "経費精算・出張旅費規程（架空のサンプル）",

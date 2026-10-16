@@ -1,7 +1,7 @@
-// node --test で実行する。Google のサービスを使わない関数だけを検証する。
+// node --test で実行する。Google のサービスを使わない関数と、モックで差し替えた onFormSubmit を検証する。
 const test = require('node:test');
 const assert = require('node:assert');
-const { summarizeMonth, toTable, formatReportMail, parseAmount } = require('./Code.js');
+const { summarizeMonth, toTable, formatReportMail, parseAmount, onFormSubmit } = require('./Code.js');
 
 const rows = [
   [new Date(2026, 8, 3), '佐藤', '営業部', '交通費', 1200, '客先訪問'],
@@ -44,4 +44,25 @@ test('formatReportMail は件数と部署別合計を書く', () => {
   assert.match(body, /4件、合計 9,500円/);
   assert.match(body, /営業部: 4,200円/);
   assert.match(body, /開発部: 5,300円/);
+});
+
+test('onFormSubmit は設定した回答シート以外（別のフォーム）からの送信を無視する', (t) => {
+  const sent = [];
+  globalThis.MailApp = { sendEmail: (...args) => sent.push(args) };
+  globalThis.SpreadsheetApp = { getActive: () => ({ getUrl: () => 'https://example.com/sheet' }) };
+  t.after(() => {
+    delete globalThis.MailApp;
+    delete globalThis.SpreadsheetApp;
+  });
+  const event = (sheetName) => ({
+    range: { getSheet: () => ({ getName: () => sheetName }) },
+    values: ['2026/09/03 10:00:00', '佐藤', '営業部', '交通費', '1200', '客先訪問'],
+  });
+
+  onFormSubmit(event('フォームの回答 2'));
+  assert.strictEqual(sent.length, 0);
+
+  onFormSubmit(event('フォームの回答 1'));
+  assert.strictEqual(sent.length, 1);
+  assert.match(sent[0][1], /佐藤さん 1,200円/);
 });

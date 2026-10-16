@@ -155,3 +155,30 @@ def test_provider_failure_without_fallback_raises(make_service):
     svc = make_service(provider=SpyProvider(error=ProviderError("boom")))
     with pytest.raises(ProviderError):
         svc.ask("副業をする場合の手続きは？")
+
+
+def test_uncited_sentence_is_dropped_even_when_another_sentence_is_cited(make_service, retriever):
+    hits = retriever.search("在宅勤務手当はいくらですか", k=3).hits
+    real = next(h for h in hits if "在宅勤務手当" in h.chunk.text)
+    idx = hits.index(real)
+    draft = ProviderAnswer(
+        True,
+        "月額3,000円を支給します[1]。ただし通勤手当は全額廃止されます。",
+        [DraftCitation(idx, "在宅勤務手当として、月額3,000円を支給する。")],
+    )
+    result = make_service(provider=SpyProvider(draft)).ask("在宅勤務手当はいくらですか")
+    assert not result.abstained
+    assert result.answer == "月額3,000円を支給します[1]。"
+
+
+def test_period_inside_quotation_does_not_split_a_cited_sentence(make_service, retriever):
+    hits = retriever.search("在宅勤務手当はいくらですか", k=3).hits
+    real = next(h for h in hits if "在宅勤務手当" in h.chunk.text)
+    idx = hits.index(real)
+    draft = ProviderAnswer(
+        True,
+        "規程には「在宅勤務手当として、月額3,000円を支給する。」とあります[1]。",
+        [DraftCitation(idx, "在宅勤務手当として、月額3,000円を支給する。")],
+    )
+    result = make_service(provider=SpyProvider(draft)).ask("在宅勤務手当はいくらですか")
+    assert result.answer == "規程には「在宅勤務手当として、月額3,000円を支給する。」とあります[1]。"

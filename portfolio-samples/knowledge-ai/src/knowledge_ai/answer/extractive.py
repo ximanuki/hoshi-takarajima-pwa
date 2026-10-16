@@ -100,5 +100,6 @@ class ExtractiveProvider:
             quote = hits[hi].chunk.text[s:e]
             citations.append(DraftCitation(source_index=hi, quote=quote))
             parts.append(f"「{display_text(quote)}」[{n}]")
-        text = "資料には次のように記載されています。" + "".join(parts)
+        # 前置きと引用を1つの文にして、出典の付いた文として扱われるようにする
+        text = "資料には次のように記載されています：" + "".join(parts)
         return ProviderAnswer(True, text, citations, model=None)
