@@ -1,14 +1,17 @@
 // node --test で実行する。Google のサービスを使わない関数と、モックで差し替えた onFormSubmit を検証する。
 const test = require('node:test');
 const assert = require('node:assert');
-const { summarizeMonth, toTable, formatReportMail, parseAmount, onFormSubmit, setupTriggers, getResponseSheet } = require('./Code.js');
+const { summarizeMonth, toTable, formatReportMail, parseAmount, onFormSubmit, setupTriggers, getResponseSheet, yearMonthOf, reportMonth } = require('./Code.js');
+
+/** 日本時間のその日時を表す Date（回答シートのタイムスタンプは日本時間で記録される） */
+const jst = (y, mo, d, h = 0, mi = 0) => new Date(Date.UTC(y, mo, d, h - 9, mi));
 
 const rows = [
-  [new Date(2026, 8, 3), '佐藤', '営業部', '交通費', 1200, '客先訪問'],
-  [new Date(2026, 8, 10), '鈴木', '営業部', '会議費', '¥3,000', '打ち合わせ'],
-  [new Date(2026, 8, 15), '高橋', '開発部', '交通費', '800円', '出張'],
-  [new Date(2026, 8, 20), '田中', '開発部', '書籍', 4500, '技術書'],
-  [new Date(2026, 9, 1), '伊藤', '営業部', '交通費', 999, '翌月分なので対象外'],
+  [jst(2026, 8, 3, 10), '佐藤', '営業部', '交通費', 1200, '客先訪問'],
+  [jst(2026, 8, 10, 14), '鈴木', '営業部', '会議費', '¥3,000', '打ち合わせ'],
+  [jst(2026, 8, 15, 9), '高橋', '開発部', '交通費', '800円', '出張'],
+  [jst(2026, 8, 20, 18), '田中', '開発部', '書籍', 4500, '技術書'],
+  [jst(2026, 9, 1, 0, 30), '伊藤', '営業部', '交通費', 999, '翌月1日の0時半なので対象外'],
   ['', '', '', '', '', ''],
 ];
 
@@ -25,6 +28,20 @@ test('summarizeMonth は指定月だけを部署×区分で合計する', () => 
   assert.strictEqual(s.total, 9500);
   assert.deepStrictEqual(s.byDept['営業部'], { 交通費: 1200, 会議費: 3000 });
   assert.deepStrictEqual(s.categories, ['交通費', '会議費', '書籍'].sort());
+});
+
+test('月の判定は日本時間で行う（スクリプトのタイムゾーンが日本時間でなくても）', () => {
+  // 日本時間 2026-10-01 00:30 は UTC では 9月30日 15:30
+  assert.deepStrictEqual(yearMonthOf(jst(2026, 9, 1, 0, 30)), { year: 2026, month: 10 });
+  assert.deepStrictEqual(yearMonthOf(jst(2026, 8, 30, 23, 59)), { year: 2026, month: 9 });
+  // 文字のタイムスタンプは書かれた日付のまま
+  assert.deepStrictEqual(yearMonthOf('2026/10/01 0:30:00'), { year: 2026, month: 10 });
+  assert.strictEqual(yearMonthOf(''), null);
+  assert.strictEqual(yearMonthOf('なし'), null);
+  // 実行時刻も日本時間の「今日」で月を決める（UTC 9/30 20:00 = 日本時間 10/1 05:00）
+  assert.deepStrictEqual(reportMonth(new Date(Date.UTC(2026, 8, 30, 20)), 0), { year: 2026, month: 10 });
+  assert.deepStrictEqual(reportMonth(new Date(Date.UTC(2026, 8, 30, 20)), -1), { year: 2026, month: 9 });
+  assert.deepStrictEqual(reportMonth(jst(2026, 0, 1, 9), -1), { year: 2025, month: 12 });
 });
 
 test('toTable は合計行・合計列つきの表を作る', () => {
@@ -98,7 +115,16 @@ test('setupTriggers は同じプロジェクトにある別の処理のトリガ
   const existing = [trig('onFormSubmit'), trig('sendLastMonthReport'), trig('otherAutomation')];
   const deleted = [];
   const created = [];
-  const chain = { forSpreadsheet: () => chain, onFormSubmit: () => chain, timeBased: () => chain, onMonthDay: () => chain, atHour: () => chain, create: () => {} };
+  const zones = [];
+  const chain = {
+    forSpreadsheet: () => chain,
+    onFormSubmit: () => chain,
+    timeBased: () => chain,
+    onMonthDay: () => chain,
+    atHour: () => chain,
+    inTimezone: (tz) => (zones.push(tz), chain),
+    create: () => {},
+  };
   globalThis.ScriptApp = {
     getProjectTriggers: () => existing,
     deleteTrigger: (tr) => deleted.push(tr.getHandlerFunction()),
@@ -113,4 +139,6 @@ test('setupTriggers は同じプロジェクトにある別の処理のトリガ
   setupTriggers();
   assert.deepStrictEqual(deleted, ['onFormSubmit', 'sendLastMonthReport']);
   assert.deepStrictEqual(created, ['onFormSubmit', 'sendLastMonthReport']);
+  // 月次レポートの「毎月1日9時」は日本時間で決める
+  assert.deepStrictEqual(zones, ['Asia/Tokyo']);
 });

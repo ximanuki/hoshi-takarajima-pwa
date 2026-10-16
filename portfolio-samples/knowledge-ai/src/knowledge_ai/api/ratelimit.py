@@ -10,13 +10,18 @@ Three limits, all configurable (``KAI_RATE_LIMIT_PER_MINUTE``,
 Daily counters reset at local midnight (``KAI_TIMEZONE``, default Asia/Tokyo).
 State lives in memory, so limits are per process: run one worker for the demo,
 or move the counters to Redis when scaling out (same interface).
+
+Memory stays bounded: per-minute windows are kept for at most ``_MAX_TRACKED_IPS``
+addresses (least recently seen are forgotten first), and per-IP daily counts
+exist only for allowed requests, so the global daily cap bounds them. Keep
+``KAI_DAILY_CAP`` above zero on a public instance.
 """
 
 from __future__ import annotations
 
 import threading
 import time
-from collections import deque
+from collections import OrderedDict, deque
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
@@ -47,7 +52,8 @@ class RateLimiter:
         self.tz = ZoneInfo(timezone)
         self.clock = clock
         self._lock = threading.Lock()
-        self._windows: dict[str, deque[float]] = {}
+        # 最後に来た順に並べる（先頭が一番長く来ていない IP）
+        self._windows: OrderedDict[str, deque[float]] = OrderedDict()
         self._ip_day: dict[str, int] = {}
         self._day_total = 0
         self._day_key = ""
@@ -70,23 +76,33 @@ class RateLimiter:
                 return Decision(False, self._seconds_to_midnight(now), "daily")
             if self.per_ip_daily > 0 and self._ip_day.get(ip, 0) >= self.per_ip_daily:
                 return Decision(False, self._seconds_to_midnight(now), "ip_daily")
-            window = self._windows.setdefault(ip, deque())
-            while window and now - window[0] >= 60:
-                window.popleft()
-            if self.per_minute > 0 and len(window) >= self.per_minute:
-                return Decision(False, max(1, int(60 - (now - window[0])) + 1), "minute")
-            window.append(now)
+            if self.per_minute > 0:
+                window = self._track(ip, now)
+                if len(window) >= self.per_minute:
+                    return Decision(False, max(1, int(60 - (now - window[0])) + 1), "minute")
+                window.append(now)
             if self.per_ip_daily > 0:
                 # 上限が無効なら IP ごとの日次件数は使わないので、記録もしない（増え続けないように）
                 self._ip_day[ip] = self._ip_day.get(ip, 0) + 1
             self._day_total += 1
-            if len(self._windows) > _MAX_TRACKED_IPS:
-                # 1分より古い記録は全 IP について捨て、空になった IP は追跡をやめる
-                for w in self._windows.values():
-                    while w and now - w[0] >= 60:
-                        w.popleft()
-                self._windows = {k: v for k, v in self._windows.items() if v}
             return Decision(True)
+
+    def _track(self, ip: str, now: float) -> deque[float]:
+        """Return ``ip``'s window (pruned to the last minute), keeping at most ``_MAX_TRACKED_IPS`` IPs."""
+        # 取り出して末尾に入れ直す = 最後に来た IP にする（自分の記録が先頭で捨てられることはない）
+        window = self._windows.pop(ip, None) or deque()
+        # 先頭から、1分より古い記録しかない IP の追跡をやめる。1分以内に来た IP だけで上限に届くとき
+        # （大量の IP からの一斉アクセス）も、一番長く来ていない IP から捨てて上限を守る。
+        # どちらも先頭から取るだけなので、1回あたりの手間は平均して一定
+        while self._windows:
+            oldest = next(iter(self._windows.values()))
+            if len(self._windows) < _MAX_TRACKED_IPS and oldest and now - oldest[-1] < 60:
+                break
+            self._windows.popitem(last=False)
+        self._windows[ip] = window
+        while window and now - window[0] >= 60:
+            window.popleft()
+        return window
 
     @property
     def used_today(self) -> int:

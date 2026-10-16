@@ -208,7 +208,8 @@ function setupTriggers() {
     .forEach((t) => ScriptApp.deleteTrigger(t));
   const ss = SpreadsheetApp.getActive();
   ScriptApp.newTrigger('onFormSubmit').forSpreadsheet(ss).onFormSubmit().create();
-  ScriptApp.newTrigger('sendDailyReminder').timeBased().everyDays(1).atHour(CONFIG.reminderHour).nearMinute(0).create();
+  // 時刻は日本時間で決める（Code.js だけを貼り付けてスクリプトのタイムゾーンが違っていても、日本時間の9時台に動く）
+  ScriptApp.newTrigger('sendDailyReminder').timeBased().everyDays(1).atHour(CONFIG.reminderHour).nearMinute(0).inTimezone('Asia/Tokyo').create();
 }
 
 /** 「設定」「返信テンプレート」シートを作り、回答シートに管理用の列を足す（既存の値は消さない） */

@@ -46,6 +46,7 @@ def test_per_ip_and_global_daily_caps_reset_at_local_midnight():
 def test_zero_disables_a_limit():
     rl = RateLimiter(per_minute=0, per_ip_daily=0, daily_cap=0, clock=Clock(0.0))
     assert all(rl.check("a").allowed for _ in range(50))
+    assert not rl._windows  # 1分あたりの上限が無効なら、IP ごとの記録も持たない
 
 
 def test_tracking_cap_evicts_ips_whose_requests_have_expired(monkeypatch):
@@ -68,3 +69,34 @@ def test_per_ip_daily_counts_are_not_kept_when_that_cap_is_disabled():
         assert rl.check(f"10.0.0.{i}").allowed
     assert rl._ip_day == {}
     assert rl.used_today == 50
+
+
+def test_tracking_cap_holds_even_when_every_ip_is_active(monkeypatch):
+    from knowledge_ai.api import ratelimit
+
+    monkeypatch.setattr(ratelimit, "_MAX_TRACKED_IPS", 3)
+    clock = Clock(at(2026, 10, 6, 12))
+    rl = RateLimiter(per_minute=5, per_ip_daily=100, daily_cap=1000, clock=clock)
+    # 1分以内に上限を超える数の IP が来ても、追跡するのは最後に来た3つまで
+    for ip in "abcdefgh":
+        clock.t += 1
+        assert rl.check(ip).allowed
+        assert len(rl._windows) <= 3
+    assert list(rl._windows) == ["f", "g", "h"]
+    # 来るたびに「最後に来た IP」になるので、次に捨てられるのは一番長く来ていない g
+    assert rl.check("f").allowed
+    assert rl.check("x").allowed
+    assert list(rl._windows) == ["h", "f", "x"]
+
+
+def test_a_client_is_never_evicted_by_its_own_request(monkeypatch):
+    from knowledge_ai.api import ratelimit
+
+    monkeypatch.setattr(ratelimit, "_MAX_TRACKED_IPS", 2)
+    clock = Clock(at(2026, 10, 6, 12))
+    rl = RateLimiter(per_minute=2, per_ip_daily=100, daily_cap=1000, clock=clock)
+    assert rl.check("a").allowed
+    assert rl.check("b").allowed
+    # a は一番長く来ていないが、a 自身のリクエストで a の記録が消えて制限が外れることはない
+    assert rl.check("a").allowed
+    assert rl.check("a").reason == "minute"

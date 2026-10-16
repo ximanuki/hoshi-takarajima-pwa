@@ -2,6 +2,9 @@
 const test = require('node:test');
 const assert = require('node:assert');
 const { isInMonth, wasSentInGmail,
+  runInvoices,
+  keepConfirmedTargets,
+  orderTargets: orderTargetsForRun,
   MODE,
   planInvoices,
   collectLines,
@@ -569,4 +572,117 @@ test('日付セルは日本時間の日付として月を判定する（スク�
   assert.strictEqual(isInMonth(d, 2026, 9), false);
   // 実行時刻も日本時間の「今日」で月を決める（UTC 9/30 20:00 = 日本時間 10/1 05:00）
   assert.deepStrictEqual(targetMonth(new Date(Date.UTC(2026, 8, 30, 20, 0, 0)), 0), { year: 2026, month: 10 });
+});
+
+// ---- 確認ダイアログのあとの読み直し（ui.alert の間は LockService のロックが保たれないため） ----
+
+test('keepConfirmedTargets は確認したときと同じ内容の請求書だけを残す', () => {
+  const confirmedPlan = plan();
+  const confirmedTargets = orderTargetsForRun(confirmedPlan.invoices, []);
+  assert.deepStrictEqual(confirmedTargets.map((i) => i.number), ['INV-202609-001', 'INV-202609-002']);
+
+  // 確認している間に、別の人の実行が 001 を送信した
+  const historyRows = [[new Date(), 'INV-202609-001', '2026-09', '株式会社サンプル商事', 'billing@example.com', 0, '送信済', '', '']];
+  const sentByOther = plan({ historyRows });
+  let r = keepConfirmedTargets(confirmedPlan, confirmedTargets, sentByOther, orderTargetsForRun(sentByOther.invoices, historyRows));
+  assert.deepStrictEqual(r.targets.map((i) => i.number), ['INV-202609-002']);
+  assert.deepStrictEqual(r.gone.map((i) => i.client), ['株式会社サンプル商事']);
+  assert.deepStrictEqual(r.changed, []);
+
+  // 確認のあとで山田さんの金額が変わった（確認した金額のままでは作らない）
+  const edited = detailRows.map((row) => (row[2] === 'ロゴデザイン' ? [...row.slice(0, 4), 80000, row[5]] : row));
+  const amountChanged = plan({ detailRows: edited });
+  r = keepConfirmedTargets(confirmedPlan, confirmedTargets, amountChanged, orderTargetsForRun(amountChanged.invoices, []));
+  assert.deepStrictEqual(r.targets.map((i) => i.client), ['株式会社サンプル商事']);
+  assert.deepStrictEqual(r.changed.map((i) => i.client), ['山田 太郎']);
+
+  // 「下書き」で確認したのに、その後「送信」に変えられた → 何も作らない
+  const toSend = settingsRows.map((row) => (row[0] === '送信モード' ? ['送信モード', '送信', ''] : row));
+  const modeChanged = plan({ settingsRows: toSend });
+  r = keepConfirmedTargets(confirmedPlan, confirmedTargets, modeChanged, orderTargetsForRun(modeChanged.invoices, []));
+  assert.deepStrictEqual(r.targets, []);
+  assert.strictEqual(r.changed.length, 2);
+});
+
+/**
+ * runInvoices を動かすためのスプレッドシートのモック。
+ * 確認ダイアログ（ui.alert）が開いている間に onConfirm でシートを書き換え、別の人の実行を再現する
+ */
+function installSpreadsheet(t, { onConfirm, answer = 'YES', lockOk = true } = {}) {
+  const events = [];
+  const alerts = [];
+  const data = {
+    設定: settingsRows,
+    取引先: clientRows,
+    明細: detailRows,
+    送信履歴: [],
+    請求書テンプレ: [],
+  };
+  const sheet = (name) => ({
+    getName: () => name,
+    getLastRow: () => {
+      if (name === '送信履歴') events.push('read:history');
+      return data[name].length + 1;
+    },
+    getRange: (row, col, n, m) => ({ getValues: () => data[name].slice(row - 2, row - 2 + n).map((r) => r.slice(0, m)) }),
+    getDataRange: () => ({ getValues: () => data[name] }),
+  });
+  const ss = { getSheetByName: (name) => (name in data ? sheet(name) : null), toast: () => {} };
+  const ui = {
+    ButtonSet: { OK: 'OK', YES_NO: 'YES_NO' },
+    Button: { YES: 'YES', NO: 'NO' },
+    alert: (title, message) => {
+      if (title === '確認') {
+        events.push('confirm');
+        if (onConfirm) onConfirm(data);
+        return answer;
+      }
+      events.push('alert');
+      alerts.push({ title, message });
+      return 'OK';
+    },
+  };
+  globalThis.SpreadsheetApp = { getUi: () => ui, getActive: () => ss, flush: () => {} };
+  globalThis.LockService = {
+    getDocumentLock: () => ({ tryLock: () => (events.push('lock'), lockOk), releaseLock: () => events.push('unlock') }),
+  };
+  // 日本時間 2026-10-05 の実行として「先月分」= 2026年9月分を作る
+  t.mock.timers.enable({ apis: ['Date'], now: jst(2026, 9, 5, 10) });
+  t.after(() => {
+    delete globalThis.SpreadsheetApp;
+    delete globalThis.LockService;
+  });
+  return { events, alerts };
+}
+
+test('runInvoices は確認ダイアログのあとでロックを取り、シートを読み直してから作る', (t) => {
+  // 確認している間に、別の人の実行が2件とも送信してしまった
+  const { events, alerts } = installSpreadsheet(t, {
+    onConfirm: (data) => {
+      data.送信履歴 = [
+        [new Date(), 'INV-202609-001', '2026-09', '株式会社サンプル商事', 'billing@example.com', 0, '送信済', '', ''],
+        [new Date(), 'INV-202609-002', '2026-09', '山田 太郎', 'taro@example.com', 0, '送信済', '', ''],
+      ];
+    },
+  });
+  runInvoices({ offset: -1 });
+
+  // 確認 → ロック → 読み直し → ロック解除 → 結果、の順（ロックはダイアログをまたがない）
+  assert.deepStrictEqual(events, ['read:history', 'confirm', 'lock', 'read:history', 'unlock', 'alert']);
+  // 古い計画のまま作らない（作ろうとすると DriveApp がないので「エラー」になる）
+  assert.strictEqual(alerts[0].title, '作成する請求書はありません');
+  assert.match(alerts[0].message, /対象から外れたため作っていません.*株式会社サンプル商事、山田 太郎/);
+});
+
+test('runInvoices は確認で「いいえ」ならロックを取らない', (t) => {
+  const { events } = installSpreadsheet(t, { answer: 'NO' });
+  runInvoices({ offset: -1 });
+  assert.deepStrictEqual(events, ['read:history', 'confirm']);
+});
+
+test('runInvoices は確認のあとでロックが取れなければ何も作らない', (t) => {
+  const { events, alerts } = installSpreadsheet(t, { lockOk: false });
+  runInvoices({ offset: -1 });
+  assert.deepStrictEqual(events, ['read:history', 'confirm', 'lock', 'alert']);
+  assert.match(alerts[0].title, /別の作成処理が動いています/);
 });

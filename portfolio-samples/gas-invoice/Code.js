@@ -159,63 +159,90 @@ function createSelectedClients() {
 /** 請求書を作る本体。入力チェック → 確認ダイアログ → 1件ずつ PDF 作成・保存・メール */
 function runInvoices(opts) {
   const ui = SpreadsheetApp.getUi();
-  const lock = LockService.getDocumentLock(); // メニューの二度押しなどで同時に動いて二重送信しないように
+  const ss = SpreadsheetApp.getActive();
+  const { year, month } = targetMonth(new Date(), opts.offset || 0);
+  let confirmed;
+  try {
+    confirmed = readPlan(ss, year, month, opts);
+  } catch (e) {
+    ui.alert('エラー', e.message, ui.ButtonSet.OK);
+    return;
+  }
+  if (confirmed.plan.errors.length) {
+    ui.alert('入力内容を確認してください', formatErrors(confirmed.plan.errors), ui.ButtonSet.OK);
+    return;
+  }
+  if (!confirmed.targets.length) {
+    ui.alert('作成する請求書はありません', noTargetMessage(confirmed.plan), ui.ButtonSet.OK);
+    return;
+  }
+  if (ui.alert('確認', confirmMessage(confirmed.plan), ui.ButtonSet.YES_NO) !== ui.Button.YES) return;
+
+  // ダイアログを開いている間はスクリプトが止まり、LockService のロックは保たれない（Google のドキュメントに明記）。
+  // そのためロックは確認のあとで取り、確認している間にほかの人が作った分が見えるよう、シートを読み直してから作る
+  const lock = LockService.getDocumentLock(); // メニューの二度押しや2人の同時実行で二重送信しないように
   if (!lock.tryLock(3000)) {
     ui.alert('別の作成処理が動いています。終わってからもう一度実行してください。');
     return;
   }
+  let title;
+  let message;
   try {
-    const ss = SpreadsheetApp.getActive();
-    const { year, month } = targetMonth(new Date(), opts.offset || 0);
-    const historySheet = ensureHistorySheet(ss);
-    const historyRows = readRows(historySheet, HEADERS.history.length);
-    getSheet(ss, CONFIG.sheets.template); // テンプレがなければここで止める
-    const plan = planInvoices({
-      settingsRows: getSheet(ss, CONFIG.sheets.settings).getDataRange().getValues(),
-      clientRows: readRows(getSheet(ss, CONFIG.sheets.clients), HEADERS.clients.length),
-      detailRows: readRows(getSheet(ss, CONFIG.sheets.details), HEADERS.details.length),
-      historyRows,
-      year,
-      month,
-      onlyClients: opts.onlyClients,
-      forceDraft: opts.forceDraft,
-    });
-
-    if (plan.errors.length) {
-      ui.alert('入力内容を確認してください', formatErrors(plan.errors), ui.ButtonSet.OK);
-      return;
+    const fresh = readPlan(ss, year, month, opts);
+    const { targets, gone, changed } = keepConfirmedTargets(confirmed.plan, confirmed.targets, fresh.plan, fresh.targets);
+    if (fresh.plan.errors.length) {
+      title = '入力内容を確認してください';
+      message = formatErrors(fresh.plan.errors);
+    } else if (!targets.length) {
+      title = '作成する請求書はありません';
+      message = staleTargetLines(gone, changed).join('\n') || noTargetMessage(fresh.plan);
+    } else {
+      const folder = getMonthFolder(year, month);
+      const started = Date.now();
+      const result = { done: [], skipped: [], failed: [], rest: [], gone, changed };
+      targets.forEach((inv, i) => {
+        if (Date.now() - started > CONFIG.timeLimitMs) {
+          result.rest.push(inv);
+          return;
+        }
+        ss.toast(`${i + 1} / ${targets.length}件目: ${inv.client}`, '請求書を作成中', 30);
+        try {
+          const r = processInvoice(ss, inv, fresh.plan, { folder, historySheet: fresh.historySheet, historyRows: fresh.historyRows });
+          (r === 'skipped' ? result.skipped : result.done).push(inv);
+        } catch (e) {
+          appendHistory(fresh.historySheet, inv, `${STATUS.error}: ${e.message}`, '', '');
+          result.failed.push({ inv, message: e.message });
+        }
+        SpreadsheetApp.flush(); // 1件ごとに履歴を確定させる（途中で止まっても二重送信しない）
+      });
+      title = '完了';
+      message = resultMessage(fresh.plan.mode, result, folder.getUrl());
     }
-    const targets = orderTargets(plan.invoices, historyRows);
-    if (!targets.length) {
-      ui.alert('作成する請求書はありません', noTargetMessage(plan), ui.ButtonSet.OK);
-      return;
-    }
-    if (ui.alert('確認', confirmMessage(plan), ui.ButtonSet.YES_NO) !== ui.Button.YES) return;
-
-    const folder = getMonthFolder(year, month);
-    const started = Date.now();
-    const result = { done: [], skipped: [], failed: [], rest: [] };
-    targets.forEach((inv, i) => {
-      if (Date.now() - started > CONFIG.timeLimitMs) {
-        result.rest.push(inv);
-        return;
-      }
-      ss.toast(`${i + 1} / ${targets.length}件目: ${inv.client}`, '請求書を作成中', 30);
-      try {
-        const r = processInvoice(ss, inv, plan, { folder, historySheet, historyRows });
-        (r === 'skipped' ? result.skipped : result.done).push(inv);
-      } catch (e) {
-        appendHistory(historySheet, inv, `${STATUS.error}: ${e.message}`, '', '');
-        result.failed.push({ inv, message: e.message });
-      }
-      SpreadsheetApp.flush(); // 1件ごとに履歴を確定させる（途中で止まっても二重送信しない）
-    });
-    ui.alert('完了', resultMessage(plan.mode, result, folder.getUrl()), ui.ButtonSet.OK);
   } catch (e) {
-    ui.alert('エラー', e.message, ui.ButtonSet.OK);
+    title = 'エラー';
+    message = e.message;
   } finally {
     lock.releaseLock();
   }
+  ui.alert(title, message, ui.ButtonSet.OK);
+}
+
+/** シートを読んで請求書の計画を作る（確認ダイアログの前と、ロックを取ったあとの2回呼ぶ） */
+function readPlan(ss, year, month, opts) {
+  const historySheet = ensureHistorySheet(ss);
+  const historyRows = readRows(historySheet, HEADERS.history.length);
+  getSheet(ss, CONFIG.sheets.template); // テンプレがなければここで止める
+  const plan = planInvoices({
+    settingsRows: getSheet(ss, CONFIG.sheets.settings).getDataRange().getValues(),
+    clientRows: readRows(getSheet(ss, CONFIG.sheets.clients), HEADERS.clients.length),
+    detailRows: readRows(getSheet(ss, CONFIG.sheets.details), HEADERS.details.length),
+    historyRows,
+    year,
+    month,
+    onlyClients: opts.onlyClients,
+    forceDraft: opts.forceDraft,
+  });
+  return { plan, historySheet, historyRows, targets: orderTargets(plan.invoices, historyRows) };
 }
 
 /** 1件分: PDF を作って Drive に保存し、送信または下書き作成して履歴に残す */
@@ -752,6 +779,36 @@ function orderTargets(invoices, historyRows) {
   return invoices.filter((inv) => !inv.alreadySent).sort((a, b) => Number(seen.has(a.number)) - Number(seen.has(b.number)));
 }
 
+/**
+ * ロックを取ってから読み直した請求書のうち、確認ダイアログで見せた内容（送信モード・番号・宛先・敬称・金額）のままのものだけを作る。
+ * 確認している間に対象から外れたもの（ほかの実行で送信済みになった等）は gone、内容が変わったものや新しく増えたものは changed に入れ、どちらも作らない
+ */
+function keepConfirmedTargets(confirmedPlan, confirmedTargets, freshPlan, freshTargets) {
+  const key = (plan, inv) => JSON.stringify([plan.mode, inv.number, inv.client, inv.honorific, inv.email, inv.totals.total]);
+  const confirmedKeys = new Set(confirmedTargets.map((inv) => key(confirmedPlan, inv)));
+  const freshNumbers = new Set(freshTargets.map((inv) => inv.number));
+  return {
+    targets: freshTargets.filter((inv) => confirmedKeys.has(key(freshPlan, inv))),
+    gone: confirmedTargets.filter((inv) => !freshNumbers.has(inv.number)),
+    changed: freshTargets.filter((inv) => !confirmedKeys.has(key(freshPlan, inv))),
+  };
+}
+
+/** 確認のあとで外れた・変わったため作らなかった請求書の説明 */
+function staleTargetLines(gone, changed) {
+  const lines = [];
+  if (gone && gone.length) {
+    lines.push(`確認している間に対象から外れたため作っていません（ほかの実行で送信済みになった等）: ${gone.map((inv) => inv.client).join('、')}`);
+  }
+  if (changed && changed.length) {
+    lines.push(
+      `確認のあとで金額・宛先・送信モードが変わったか、新しく増えたため作っていません: ${changed.map((inv) => inv.client).join('、')}`,
+      '内容を確かめて、もう一度実行してください。',
+    );
+  }
+  return lines;
+}
+
 /** 送信履歴のうち「送信済」の請求書番号 */
 function sentInvoiceNumbers(historyRows) {
   const H = COL.history;
@@ -1032,6 +1089,8 @@ function resultMessage(mode, result, folderUrl) {
   const n = result.done.length;
   const lines = [mode === MODE.send ? `${n}件を送信しました。` : `${n}件を Gmail の下書きに保存しました。`];
   if (result.skipped.length) lines.push(`送信済みのためスキップ: ${result.skipped.map((inv) => inv.client).join('、')}`);
+  const stale = staleTargetLines(result.gone, result.changed);
+  if (stale.length) lines.push('', ...stale);
   if (result.failed.length) {
     lines.push('', `失敗 ${result.failed.length}件（「送信履歴」シートにも記録しました）:`);
     result.failed.forEach((f) => lines.push(`・${f.inv.client}: ${f.message}`));
@@ -1103,6 +1162,9 @@ if (typeof module !== 'undefined') {
   module.exports = {
     CONFIG,
     wasSentInGmail,
+    runInvoices,
+    keepConfirmedTargets,
+    staleTargetLines,
     MODE,
     STATUS,
     TPL,

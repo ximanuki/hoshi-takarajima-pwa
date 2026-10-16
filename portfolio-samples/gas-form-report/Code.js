@@ -25,7 +25,8 @@ function setupTriggers() {
     .forEach((t) => ScriptApp.deleteTrigger(t));
   const ss = SpreadsheetApp.getActive();
   ScriptApp.newTrigger('onFormSubmit').forSpreadsheet(ss).onFormSubmit().create();
-  ScriptApp.newTrigger('sendLastMonthReport').timeBased().onMonthDay(1).atHour(9).create();
+  // 時刻は CONFIG.timezone（日本時間）で決める。スクリプトのタイムゾーンが違っていても毎月1日の朝9時台に動く
+  ScriptApp.newTrigger('sendLastMonthReport').timeBased().onMonthDay(1).atHour(9).inTimezone(CONFIG.timezone).create();
 }
 
 /** フォームが送信されたら承認者にメールで知らせる */
@@ -52,15 +53,14 @@ function onFormSubmit(e) {
 
 /** 先月分を集計してシートを作り、レポートをメールする（毎月1日に自動実行） */
 function sendLastMonthReport() {
-  const now = new Date();
-  const target = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-  buildMonthlyReport(target.getFullYear(), target.getMonth() + 1, true);
+  const { year, month } = reportMonth(new Date(), -1);
+  buildMonthlyReport(year, month, true);
 }
 
 /** 手動実行用: 今月分の途中経過をシートに出す（メールは送らない） */
 function buildThisMonthReport() {
-  const now = new Date();
-  buildMonthlyReport(now.getFullYear(), now.getMonth() + 1, false);
+  const { year, month } = reportMonth(new Date(), 0);
+  buildMonthlyReport(year, month, false);
 }
 
 function buildMonthlyReport(year, month, sendMail) {
@@ -108,8 +108,8 @@ function summarizeMonth(rows, year, month) {
   let total = 0;
   let count = 0;
   rows.forEach((r) => {
-    const ts = r[COL.timestamp] instanceof Date ? r[COL.timestamp] : new Date(r[COL.timestamp]);
-    if (isNaN(ts) || ts.getFullYear() !== year || ts.getMonth() + 1 !== month) return;
+    const ym = yearMonthOf(r[COL.timestamp]);
+    if (!ym || ym.year !== year || ym.month !== month) return;
     const amount = parseAmount(r[COL.amount]);
     const dept = String(r[COL.dept] || '未入力').trim();
     const cat = String(r[COL.category] || 'その他').trim();
@@ -120,6 +120,36 @@ function summarizeMonth(rows, year, month) {
     count += 1;
   });
   return { year, month, byDept, categories: [...categories].sort(), total, count };
+}
+
+/**
+ * タイムスタンプが CONFIG.timezone（日本時間）で何年何月かを返す。読めなければ null。
+ * Code.js だけを貼り付けた場合など、スクリプトのタイムゾーンが日本時間でないと、
+ * 日本時間の10月1日0時30分が UTC では9月30日になり、前の月に数えられてしまうのを防ぐ
+ */
+function yearMonthOf(v) {
+  if (Object.prototype.toString.call(v) === '[object Date]') return isNaN(v.getTime()) ? null : civilYearMonth(v);
+  // 文字のタイムスタンプ（「2026/10/01 0:30:00」など）は、書かれている日付をそのまま使う
+  const m = String(v || '').trim().match(/^(\d{4})[/\-.年](\d{1,2})[/\-.月]\d{1,2}/);
+  if (m) return { year: Number(m[1]), month: Number(m[2]) };
+  const d = new Date(v);
+  return isNaN(d.getTime()) ? null : civilYearMonth(d);
+}
+
+/** ある瞬間が CONFIG.timezone で何年何月か */
+function civilYearMonth(d) {
+  const parts = {};
+  new Intl.DateTimeFormat('en-US', { timeZone: CONFIG.timezone, year: 'numeric', month: 'numeric' })
+    .formatToParts(d)
+    .forEach((p) => (parts[p.type] = Number(p.value)));
+  return { year: parts.year, month: parts.month };
+}
+
+/** 実行した瞬間から見た集計対象の月（日本時間で判定）。offset = 0 で今月、-1 で先月 */
+function reportMonth(now, offset) {
+  const { year, month } = civilYearMonth(now);
+  const d = new Date(year, month - 1 + (offset || 0), 1);
+  return { year: d.getFullYear(), month: d.getMonth() + 1 };
 }
 
 /** 集計結果をシートに書ける2次元配列にする（最終行・最終列に合計） */
@@ -156,5 +186,5 @@ function formatYen(n) {
 }
 
 if (typeof module !== 'undefined') {
-  module.exports = { summarizeMonth, toTable, formatReportMail, parseAmount, formatYen, onFormSubmit, setupTriggers, getResponseSheet };
+  module.exports = { summarizeMonth, toTable, formatReportMail, parseAmount, formatYen, onFormSubmit, setupTriggers, getResponseSheet, yearMonthOf, reportMonth };
 }

@@ -676,7 +676,7 @@ class FakeSpreadsheet {
 
 /** GAS のグローバル（SpreadsheetApp など）をモックに差し替える。呼ばれた内容は env に記録する */
 function installGas(ss, props) {
-  const env = { mails: [], fetches: [], triggers: [], alerts: [], props: Object.assign({}, props), status: () => 200 };
+  const env = { mails: [], fetches: [], triggers: [], triggerZones: [], alerts: [], props: Object.assign({}, props), status: () => 200 };
   const globals = {
     SpreadsheetApp: {
       getActive: () => ss,
@@ -689,7 +689,9 @@ function installGas(ss, props) {
       deleteTrigger: () => {},
       newTrigger: (fn) => {
         env.triggers.push(fn);
-        return chainable();
+        // 時刻のトリガーに付けたタイムゾーンを記録する
+        const builder = new Proxy({}, { get: (_, prop) => (prop === 'inTimezone' ? (tz) => (env.triggerZones.push([fn, tz]), builder) : () => builder) });
+        return builder;
       },
     },
     LockService: { getScriptLock: () => ({ waitLock: () => {}, releaseLock: () => {} }) },
@@ -765,6 +767,7 @@ test('[モック] setupAll は設定シート・テンプレート・管理列�
   assert.strictEqual(ss.getSheetByName('返信テンプレート').getLastRow(), 4);
   assert.deepStrictEqual(resp.rows[0].slice(7), ['対応状況', '担当', '処理ログ']);
   assert.deepStrictEqual(env.triggers, ['onFormSubmit', 'sendDailyReminder']);
+  assert.deepStrictEqual(env.triggerZones, [['sendDailyReminder', 'Asia/Tokyo']]); // 毎日9時は日本時間
   assert.ok(resp.validations.some((v) => v.col === 8 && v.row === 2)); // 対応状況のプルダウン
   assert.ok(resp.validations.some((v) => v.col === 9 && v.row === 2)); // 担当のプルダウン
   assert.strictEqual(resp.cfRules.length, 4); // 対応状況の色分け
