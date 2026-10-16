@@ -594,8 +594,12 @@ function buildSpecials(
         const ref = refAt(c, p, start < HIST_START ? HIST_START : start);
         let ok = false;
         let price = 0;
-        for (const d of [rng.int(3, 10), 3]) {
+        const oldPrice = p.list1 !== null ? priceAtRate(p.list0, c.ratePm) : -1;
+        const first = rng.int(3, 10);
+        for (const d of [first, first + 1, 3, 4]) {
           price = floorDiv(ref * (100 - d), 100);
+          // a 特値 equal to the pre-revision price would be ambiguous once it expires
+          if (price === oldPrice) continue;
           const to = end === null || end > '2026-12-31' ? '2026-12-31' : end;
           let maxCost = costAt(p, start < HIST_START ? HIST_START : start);
           for (const cp of p.costs) if (cp.start >= start && cp.start <= to) maxCost = Math.max(maxCost, cp.sen);
@@ -673,12 +677,15 @@ function chooseInjections(
   };
 
   // 1) 反映漏れ, whole customer: 得意先単価 never updated after the 2025-04 revision
-  const revWholeCands = stable.filter((c) => {
-    if (!['A', 'B'].includes(c.rank) || c.size === '小' || !rev1Std(c)) return false;
-    const n = c.basket.filter((p) => p.cat.rev1 && !hasSpecial(c.code, p.code) && countFrom(c.code, p.code, REV1) >= 1).length;
-    return n >= 12;
-  });
-  const revWhole = rng.shuffle(revWholeCands.slice()).slice(0, 2);
+  const affected = (c: Customer): number =>
+    c.basket.filter((p) => p.cat.rev1 && !hasSpecial(c.code, p.code)).reduce((s, p) => s + countFrom(c.code, p.code, REV1), 0);
+  const revWholeCands = stable
+    .filter((c) => ['A', 'B'].includes(c.rank) && c.size !== '小' && rev1Std(c))
+    .map((c) => ({ c, n: affected(c) }))
+    .sort((a, b) => b.n - a.n || (a.c.code < b.c.code ? -1 : 1))
+    .slice(0, 6)
+    .map((x) => x.c);
+  const revWhole = rng.shuffle(revWholeCands).slice(0, 2);
   revWhole.forEach((c, i) => {
     wholeCust.add(c.code);
     c.registered = true;
@@ -729,7 +736,7 @@ function chooseInjections(
   const perCust = new Map<string, number>();
   let revN = 0;
   for (const { c, p, eff } of rng.shuffle(revCands)) {
-    if (revN >= 70) break;
+    if (revN >= 80) break;
     const k = pairKey(c.code, p.code);
     if (used.has(k) || (perCust.get(c.code) ?? 0) >= 3) continue;
     let to: string | null = null;
