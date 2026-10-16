@@ -64,7 +64,10 @@ export function loadWorkspace(inputs: readonly InputFile[], options: WorkspaceOp
  * Build a Workspace from files that were already imported (importFile), e.g.
  * when the caller imports each file itself to report unreadable files one by one.
  */
-export function workspaceFromImports(files: readonly FileImport[], options: WorkspaceOptions = {}): Workspace {
+export function workspaceFromImports(
+  files: readonly FileImport[],
+  options: WorkspaceOptions = {},
+): Workspace {
   const customers: Customer[] = [];
   const products: Product[] = [];
   const tiers: RateTier[] = [];
