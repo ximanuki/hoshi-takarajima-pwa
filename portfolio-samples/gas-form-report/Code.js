@@ -15,9 +15,14 @@ const CONFIG = {
 // 列の位置（フォームの回答シートの並び順）
 const COL = { timestamp: 0, name: 1, dept: 2, category: 3, amount: 4, note: 5 };
 
-/** 最初に1回だけ実行する: フォーム送信時と毎月1日のトリガーを作る */
+const HANDLERS = ['onFormSubmit', 'sendLastMonthReport'];
+
+/** 最初に1回だけ実行する: フォーム送信時と毎月1日のトリガーを作る（何度実行しても1組だけになる） */
 function setupTriggers() {
-  ScriptApp.getProjectTriggers().forEach((t) => ScriptApp.deleteTrigger(t));
+  // このスクリプトのトリガーだけを作り直し、同じプロジェクトにある別の自動処理のトリガーには触れない
+  ScriptApp.getProjectTriggers()
+    .filter((t) => HANDLERS.includes(t.getHandlerFunction()))
+    .forEach((t) => ScriptApp.deleteTrigger(t));
   const ss = SpreadsheetApp.getActive();
   ScriptApp.newTrigger('onFormSubmit').forSpreadsheet(ss).onFormSubmit().create();
   ScriptApp.newTrigger('sendLastMonthReport').timeBased().onMonthDay(1).atHour(9).create();
@@ -26,8 +31,9 @@ function setupTriggers() {
 /** フォームが送信されたら承認者にメールで知らせる */
 function onFormSubmit(e) {
   // トリガーはスプレッドシート全体に付くので、同じファイルにつないだ別のフォームの送信でも呼ばれる。
-  // 設定した回答シート以外からの送信は、列の並びが違うので何もしない
-  if (e.range && e.range.getSheet().getName() !== CONFIG.responseSheet) return;
+  // 回答シート以外からの送信は、列の並びが違うので何もしない
+  const target = getResponseSheet(SpreadsheetApp.getActive());
+  if (e.range && target && e.range.getSheet().getSheetId() !== target.getSheetId()) return;
   const row = e.values; // 文字列の配列
   const amount = parseAmount(row[COL.amount]);
   const subject = `【経費申請】${row[COL.name]}さん ${formatYen(amount)}`;
@@ -59,7 +65,11 @@ function buildThisMonthReport() {
 
 function buildMonthlyReport(year, month, sendMail) {
   const ss = SpreadsheetApp.getActive();
-  const values = ss.getSheetByName(CONFIG.responseSheet).getDataRange().getValues().slice(1);
+  const source = getResponseSheet(ss);
+  if (!source) {
+    throw new Error(`回答シートが見つかりません。CONFIG.responseSheet（今は「${CONFIG.responseSheet}」）に回答シートの名前を書いてください。`);
+  }
+  const values = source.getDataRange().getValues().slice(1);
   const summary = summarizeMonth(values, year, month);
 
   const name = `集計_${year}-${String(month).padStart(2, '0')}`;
@@ -75,6 +85,18 @@ function buildMonthlyReport(year, month, sendMail) {
   if (sendMail) {
     MailApp.sendEmail(CONFIG.reportEmail, `【経費レポート】${year}年${month}月`, formatReportMail(summary, ss.getUrl()));
   }
+}
+
+/**
+ * 回答シートを探す。CONFIG.responseSheet の名前が無いとき（英語環境で「Form Responses 1」になっている等）は、
+ * フォームの回答シートらしい名前の最初のシートを使う
+ */
+function getResponseSheet(ss) {
+  return (
+    ss.getSheetByName(CONFIG.responseSheet) ||
+    ss.getSheets().find((sh) => /^(フォームの回答|Form Responses)/.test(sh.getName())) ||
+    null
+  );
 }
 
 // ---- ここから下は Google のサービスを使わない純粋な関数（Node でテストできる） ----
@@ -134,5 +156,5 @@ function formatYen(n) {
 }
 
 if (typeof module !== 'undefined') {
-  module.exports = { summarizeMonth, toTable, formatReportMail, parseAmount, formatYen, onFormSubmit };
+  module.exports = { summarizeMonth, toTable, formatReportMail, parseAmount, formatYen, onFormSubmit, setupTriggers, getResponseSheet };
 }
