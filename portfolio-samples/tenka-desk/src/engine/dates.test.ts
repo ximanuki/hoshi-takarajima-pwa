@@ -33,6 +33,17 @@ describe('parseDateLoose', () => {
     expect(parseDateLoose('令8.12.1')).toBe('2026-12-01');
   });
 
+  it('reads a 和暦 date outside its era the way systems around 改元 print it (same calendar day)', () => {
+    // 改元に追いついていないシステムは 2019-05 以降も「H31」「H32」と出し、
+    // 更新したシステムは 2019 年の日付をすべて「R01」で出し直すことがある。どちらも西暦は一意に決まる
+    expect(parseDateLoose('H31/05/01')).toBe('2019-05-01');
+    expect(parseDateLoose('H32/01/15')).toBe('2020-01-15');
+    expect(parseDateLoose('R01/01/01')).toBe('2019-01-01');
+    expect(parseDateLoose('R01/01/01')).toBe(parseDateLoose('H31/01/01'));
+    expect(parseDateLoose('S64/01/07')).toBe('1989-01-07');
+    expect(parseDateLoose('R00/05/01')).toBeNull();
+  });
+
   it('reads 西暦', () => {
     expect(parseDateLoose('20250401')).toBe('2025-04-01');
     expect(parseDateLoose('2025/4/1')).toBe('2025-04-01');

@@ -564,6 +564,16 @@ test('wasSentInGmail は請求書番号だけでなく宛先でも絞って、�
   assert.deepStrictEqual(queries, ['in:sent to:a@example.com "INV-202609-001"', 'in:sent to:b@example.com "INV-202609-001"']);
 });
 
+test('wasSentInGmail は検索に失敗したら「未送信」とみなさずエラーにする（二重送信を防ぐ）', (t) => {
+  globalThis.GmailApp = {
+    search: () => {
+      throw new Error('Service invoked too many times');
+    },
+  };
+  t.after(() => delete globalThis.GmailApp);
+  assert.throws(() => wasSentInGmail('INV-202609-001', 'a@example.com'), /送信済みを確認できませんでした.*Service invoked too many times.*作っていません/);
+});
+
 test('日付セルは日本時間の日付として月を判定する（スクリプトのタイムゾーンが日本時間でなくても）', () => {
   // 日本時間 2026-10-01 00:00 のセル。UTC では 9月30日 15:00
   const tokyoMidnightOct1 = new Date(Date.UTC(2026, 8, 30, 15, 0, 0));

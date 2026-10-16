@@ -68,6 +68,10 @@ export function parseDateLoose(raw: string): IsoDate | null {
     const era = ERA_BY_NAME.get((m[1] ?? '').toUpperCase());
     if (!era) return null;
     const ey = m[2] === '元' ? 1 : Number(m[2]);
+    if (ey < 1) return null;
+    // A date outside the named era (H31/05/01, H32/01/15, R01/01/01) is still read: the
+    // 西暦 is the same whichever era name is used, and sales systems around 改元 print
+    // exactly these (not yet updated → H31/H32; updated → R01 for all of 2019).
     return ymdOrNull(era.base + ey, Number(m[3]), Number(m[4]));
   }
   m = /^(\d{4})(\d{2})(\d{2})$/.exec(s);
