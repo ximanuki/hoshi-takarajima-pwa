@@ -53,7 +53,7 @@ function product(code: string, name: string, category: string, listPrice: number
   };
 }
 
-function agreement(
+export function agreement(
   cust: string,
   status: string,
   effective: string | null,

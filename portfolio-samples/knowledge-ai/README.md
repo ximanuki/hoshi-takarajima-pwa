@@ -166,7 +166,7 @@ docker compose up --build    # http://localhost:8000
 | `KAI_ABSTAIN_THRESHOLD` | `0.40` | 回答拒否の閾値（上げると慎重になる） |
 | `KAI_TOP_K` | `5` | 回答生成に渡すチャンク数 |
 | `KAI_RATE_LIMIT_PER_MINUTE` | `10` | IP ごとの1分あたりの上限 |
-| `KAI_PER_IP_DAILY_CAP` / `KAI_DAILY_CAP` | `100` / `1000` | IP ごと / 全体の1日あたりの上限（日本時間で0時にリセット） |
+| `KAI_PER_IP_DAILY_CAP` / `KAI_DAILY_CAP` | `100` / `1000` | IP ごと / 全体の1日あたりの上限（日本時間で0時にリセット）。IP ごとの上限を使うときは全体の上限も 1 以上にする（IP ごとの記録の数をおさえるため。0 だと起動時にエラー） |
 | `KAI_TRUST_PROXY_HEADERS` | `false` | リバースプロキシの背後で `X-Forwarded-For` を信頼する |
 
 その他は [`src/knowledge_ai/config.py`](src/knowledge_ai/config.py) を参照してください。

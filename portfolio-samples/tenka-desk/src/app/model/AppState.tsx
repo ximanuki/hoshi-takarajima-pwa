@@ -26,7 +26,7 @@ import {
   simulatePassThrough,
 } from '../../engine/index.ts';
 import { fetchSampleFiles, type SampleLayout, sampleFileNames } from '../sample.ts';
-import { clearAllStorage, idbGet, idbSet } from '../storage.ts';
+import { clearAllStorage, idbGet, idbSet, onClearedElsewhere } from '../storage.ts';
 import { buildLoaded, type ColumnChoice, type Loaded, type SourceFile } from './load.ts';
 import { acceptanceFromLogs, logOf } from './negotiation.ts';
 import { computeProposal, type ProposalResult } from './proposal.ts';
@@ -413,10 +413,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [persistScoped],
   );
 
-  const clearAll = useCallback(async () => {
+  /** forget everything shown (after the stored data was erased, here or in another tab) */
+  const resetInMemory = useCallback(() => {
     buildSeq.current++;
     justCleared.current = true;
-    await clearAllStorage();
     sourcesRef.current = [];
     scopeRef.current = 'upload';
     const d = defaultSettings();
@@ -431,6 +431,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setBusy(null);
     setStorageOk(true);
   }, []);
+
+  const clearAll = useCallback(async () => {
+    try {
+      await clearAllStorage();
+    } catch (e) {
+      // not erased (e.g. still open in another tab): keep showing the data and say why
+      setError(e instanceof Error ? e.message : String(e));
+      return;
+    }
+    resetInMemory();
+  }, [resetInMemory]);
+
+  // another tab erased the data: this one must not keep showing (or saving) it
+  useEffect(() => onClearedElsewhere(resetInMemory), [resetInMemory]);
 
   // the proposal follows the settings with a short delay, so sliders stay smooth
   const calcInput = useMemo(

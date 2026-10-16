@@ -100,3 +100,16 @@ def test_a_client_is_never_evicted_by_its_own_request(monkeypatch):
     # a は一番長く来ていないが、a 自身のリクエストで a の記録が消えて制限が外れることはない
     assert rl.check("a").allowed
     assert rl.check("a").reason == "minute"
+
+
+def test_per_ip_daily_cap_requires_a_global_cap():
+    import pytest
+
+    # 全体の上限がないと、IP ごとの日次件数の記録が0時まで増え続けるので、設定の時点で止める
+    with pytest.raises(ValueError, match="KAI_DAILY_CAP"):
+        RateLimiter(per_minute=5, per_ip_daily=100, daily_cap=0)
+    RateLimiter(per_minute=5, per_ip_daily=0, daily_cap=0)  # no per-IP daily records at all: fine
+    rl = RateLimiter(per_minute=0, per_ip_daily=2, daily_cap=3, clock=Clock(at(2026, 10, 6, 12)))
+    for i in range(10):
+        rl.check(f"10.0.0.{i}")
+    assert len(rl._ip_day) <= 3  # bounded by the global cap

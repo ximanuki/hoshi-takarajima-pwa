@@ -13,8 +13,8 @@ or move the counters to Redis when scaling out (same interface).
 
 Memory stays bounded: per-minute windows are kept for at most ``_MAX_TRACKED_IPS``
 addresses (least recently seen are forgotten first), and per-IP daily counts
-exist only for allowed requests, so the global daily cap bounds them. Keep
-``KAI_DAILY_CAP`` above zero on a public instance.
+exist only for allowed requests, so the global daily cap bounds them. For that
+reason a per-IP daily cap requires a positive global daily cap (checked at start).
 """
 
 from __future__ import annotations
@@ -46,6 +46,12 @@ class RateLimiter:
         timezone: str = "Asia/Tokyo",
         clock: Callable[[], float] = time.time,
     ) -> None:
+        if per_ip_daily > 0 and daily_cap <= 0:
+            # IP ごとの日次件数は許可したリクエストの分だけ記録するので、全体の上限がその数の上限になる。
+            # 全体の上限がないと、IP を変えながら来るアクセスで記録が0時まで増え続ける
+            raise ValueError(
+                "KAI_PER_IP_DAILY_CAP needs a positive KAI_DAILY_CAP (it bounds the per-IP daily records)"
+            )
         self.per_minute = per_minute
         self.per_ip_daily = per_ip_daily
         self.daily_cap = daily_cap

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Dataset, inferRevisionDates } from './dataset.ts';
-import { fixtureDataset, fixtureInput, REVISION } from './testing/fixtures.ts';
+import { agreement, fixtureDataset, fixtureInput, REVISION } from './testing/fixtures.ts';
 
 describe('applicableList', () => {
   const ds = fixtureDataset();
@@ -111,6 +111,58 @@ describe('expected price, 特値 and cost', () => {
     expect(gap.costAt('DB-1001', '2024-05-01')).toBe(31141);
     expect(gap.costAt('DB-1001', '2024-08-01')).toBe(29323);
     expect(gap.costAt('DB-1001', '2025-03-01')).toBe(31141);
+  });
+
+  it('merges agreement files that share a revision date (e.g. one per branch)', () => {
+    const label = '令和7年4月1日 定価改定';
+    const split = fixtureDataset({
+      revisions: [
+        {
+          date: REVISION,
+          label,
+          agreements: [agreement('000001', '合意', REVISION), agreement('000002', '見送り', null)],
+        },
+        {
+          date: REVISION,
+          label,
+          agreements: [
+            agreement('000003', '一部合意', REVISION, ['KG']),
+            agreement('000004', '合意(適用日変更)', '2025-06-01'),
+          ],
+        },
+      ],
+    });
+    expect(split.revisions).toHaveLength(1);
+    expect(split.revisions[0]?.agreements.map((a) => a.cust).sort()).toEqual([
+      '000001',
+      '000002',
+      '000003',
+      '000004',
+    ]);
+    // 000002 is only in the first file: still 見送り, not the new 定価
+    expect(split.applicableList('000002', 'DB-1001', '2025-05-10')).toMatchObject({
+      price: 710,
+      basis: 'kept_declined',
+    });
+    expect(split.applicableList('000004', 'DB-1001', '2025-05-31')).toMatchObject({
+      basis: 'kept_before_agreed_date',
+    });
+    expect(split.issues.filter((i) => i.kind === 'conflicting_agreement')).toEqual([]);
+
+    // the same customer answered differently in two files: reported, the later file wins
+    const clash = fixtureDataset({
+      revisions: [
+        { date: REVISION, label, agreements: [agreement('000002', '見送り', null)] },
+        { date: REVISION, label, agreements: [agreement('000002', '合意', REVISION)] },
+      ],
+    });
+    expect(clash.issues.filter((i) => i.kind === 'conflicting_agreement').map((i) => i.ref)).toEqual([
+      '000002',
+    ]);
+    expect(clash.applicableList('000002', 'DB-1001', '2025-05-10')).toMatchObject({
+      price: 770,
+      basis: 'current',
+    });
   });
 
   it('resolves codes written in any style', () => {

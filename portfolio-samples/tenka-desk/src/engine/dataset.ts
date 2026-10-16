@@ -53,6 +53,7 @@ export type DatasetIssueKind =
   | 'unknown_customer'
   | 'overlapping_period'
   | 'unknown_agreement_status'
+  | 'conflicting_agreement'
   | 'cost_share_missing';
 
 export interface DatasetIssue {
@@ -103,6 +104,15 @@ const BEGINNING: IsoDate = '0001-01-01';
 
 function sortByStart<T extends { start: IsoDate }>(rows: T[]): T[] {
   return [...rows].sort((a, b) => (a.start < b.start ? -1 : a.start > b.start ? 1 : 0));
+}
+
+/** Two answers for the same customer and revision mean the same thing (status wording aside). */
+function sameAnswer(a: RevisionAgreement, b: RevisionAgreement): boolean {
+  return (
+    a.kind === b.kind &&
+    a.effective === b.effective &&
+    [...a.excludedCategories].sort().join(',') === [...b.excludedCategories].sort().join(',')
+  );
 }
 
 function covers(row: { start: IsoDate; end: IsoDate | null }, date: IsoDate): boolean {
@@ -194,11 +204,25 @@ export class Dataset {
       this.specials.set(k, sorted);
     }
 
-    this.revisions = [...(input.revisions ?? [])].sort((a, b) => (a.date < b.date ? -1 : 1));
-    for (const rev of this.revisions) {
-      const byCust = new Map<string, RevisionAgreement>();
+    // 同じ改定日の合意状況が複数のファイル（支店別など）に分かれていても、1つの改定としてまとめる。
+    // 後のファイルが前のファイルを上書きすると、前のファイルにしかない得意先の「見送り」などが消えてしまう
+    const byDate = new Map<IsoDate, { revision: Revision; byCust: Map<string, RevisionAgreement> }>();
+    for (const rev of input.revisions ?? []) {
+      let entry = byDate.get(rev.date);
+      if (!entry) {
+        entry = { revision: rev, byCust: new Map() };
+        byDate.set(rev.date, entry);
+      }
       for (const ag of rev.agreements) {
-        byCust.set(ag.cust, ag);
+        const prev = entry.byCust.get(ag.cust);
+        if (prev && !sameAnswer(prev, ag)) {
+          this.issue(
+            'conflicting_agreement',
+            `同じ改定日（${rev.date}）の合意状況が食い違っています: 得意先 ${ag.cust}（「${prev.status}」と「${ag.status}」）。後から読み込んだ「${ag.status}」を使います`,
+            ag.cust,
+          );
+        }
+        entry.byCust.set(ag.cust, ag);
         if (ag.kind === 'unknown') {
           this.issue(
             'unknown_agreement_status',
@@ -207,7 +231,12 @@ export class Dataset {
           );
         }
       }
-      this.revisionByDate.set(rev.date, { revision: rev, byCust });
+    }
+    this.revisions = [...byDate.values()]
+      .map(({ revision, byCust }) => ({ ...revision, agreements: [...byCust.values()] }))
+      .sort((a, b) => (a.date < b.date ? -1 : 1));
+    for (const rev of this.revisions) {
+      this.revisionByDate.set(rev.date, { revision: rev, byCust: byDate.get(rev.date)?.byCust ?? new Map() });
     }
     this.supplierNotices = [...(input.supplierNotices ?? [])];
   }
