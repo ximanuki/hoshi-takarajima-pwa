@@ -31,7 +31,15 @@ import { clearAllStorage, idbGet, idbSet, onClearedElsewhere } from '../storage.
 import { buildLoaded, type ColumnChoice, type Loaded, type SourceFile } from './load.ts';
 import { acceptanceFromLogs, logOf } from './negotiation.ts';
 import { computeProposal, type ProposalResult } from './proposal.ts';
-import { type AppSettings, defaultSettings, restoreSettings, toBp } from './settings.ts';
+import {
+  type AppSettings,
+  dataSettingsOf,
+  defaultSettings,
+  restoreSettingsFor,
+  sharedSettingsOf,
+  toBp,
+  withDataSettings,
+} from './settings.ts';
 
 export type InputsState =
   | { source: 'sample'; layout: SampleLayout }
@@ -48,12 +56,13 @@ export interface FollowupInputs {
 const NO_FOLLOWUP: FollowupInputs = { masterSource: 'built', masterFile: null, salesFile: null };
 
 /**
- * 協議記録・交渉結果ファイル・反映チェックの入力は、サンプル（架空）と自社データで別々に保存する。
+ * 協議記録・交渉結果ファイル・反映チェックの入力、手入力の単価・改定日・差出人の会社情報
+ * （settings の DataSettings）は、サンプル（架空）と自社データで別々に保存する。
  * 共有すると、サンプルで記録した「合意」が同じ得意先コード（例: 001001）の実在の得意先に付いて
- * 書き出しに入ったり、自社の記録がサンプルを試しただけで消えたりする。
+ * 書き出しに入ったり、自社の記録や手入力の単価がサンプルを試しただけで消えたりする。
  */
 type Scope = 'sample' | 'upload';
-const SCOPED_KEYS = ['logs', 'followup', 'outcomes'] as const;
+const SCOPED_KEYS = ['logs', 'followup', 'outcomes', 'settings'] as const;
 type ScopedKey = (typeof SCOPED_KEYS)[number];
 const scopedKey = (key: ScopedKey, scope: Scope) => `${key}:${scope}`;
 
@@ -110,6 +119,10 @@ const EMPTY_COMPANY: Company = {
   branches: [],
 };
 
+/** shown while another tab keeps the database open during 「データを消す」 (not a failure: it goes on) */
+const WAITING_FOR_TABS =
+  'ほかのタブが閉じるのを待っています。このアプリを開いているほかのタブを閉じると、データが消えます。';
+
 function useDebounced<T>(value: T, ms: number): T {
   const [v, setV] = useState(value);
   useEffect(() => {
@@ -128,6 +141,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [inputs, setInputs] = useState<InputsState>(null);
   const [loaded, setLoaded] = useState<Loaded | null>(null);
   const [settings, setSettings] = useState<AppSettings>(defaultSettings);
+  /** whose 手入力の単価・改定日・会社情報 `settings` holds (saved under that data source's key) */
+  const [settingsScope, setSettingsScope] = useState<Scope>('upload');
   const [logs, setLogs] = useState<Readonly<Record<string, NegotiationLog>>>({});
   const [followup, setFollowupState] = useState<FollowupInputs>(NO_FOLLOWUP);
   const [outcomesFile, setOutcomesFileState] = useState<SourceFile | null>(null);
@@ -149,11 +164,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const buildSeq = useRef(0);
   const settingsRef = useRef(settings);
   settingsRef.current = settings;
+  const settingsScopeRef = useRef(settingsScope);
+  settingsScopeRef.current = settingsScope;
   /** set by clearAll: the reset settings must not be written back right after the database was deleted */
   const justCleared = useRef(false);
+  /** set while the database is being erased: a write now would create it again afterwards */
+  const clearing = useRef(false);
 
   const persist = useCallback((key: string, value: unknown) => {
+    if (clearing.current) return;
     idbSet(key, value).catch(() => setStorageOk(false));
+  }, []);
+
+  /** show these settings, whose data settings are `scope`'s (saved by the effect below) */
+  const showSettings = useCallback((next: AppSettings, scope: Scope) => {
+    settingsRef.current = next;
+    settingsScopeRef.current = scope;
+    setSettings(next);
+    setSettingsScope(scope);
   }, []);
 
   const persistScoped = useCallback(
@@ -162,26 +190,34 @@ export function AppProvider({ children }: { children: ReactNode }) {
   );
 
   /** show the 協議記録 etc. saved for the other data source (the current ones stay saved under their own) */
-  const switchScope = useCallback(async (next: Scope) => {
-    if (scopeRef.current === next) return;
-    scopeRef.current = next;
-    let l: Record<string, NegotiationLog> | undefined;
-    let f: FollowupInputs | undefined;
-    let o: SourceFile | null | undefined;
-    try {
-      [l, f, o] = await Promise.all([
-        idbGet<Record<string, NegotiationLog>>(scopedKey('logs', next)),
-        idbGet<FollowupInputs>(scopedKey('followup', next)),
-        idbGet<SourceFile | null>(scopedKey('outcomes', next)),
-      ]);
-    } catch {
-      setStorageOk(false);
-    }
-    if (scopeRef.current !== next) return;
-    setLogs(l ?? {});
-    setFollowupState(normaliseFollowup(f));
-    setOutcomesFileState(o ?? null);
-  }, []);
+  const switchScope = useCallback(
+    async (next: Scope) => {
+      if (scopeRef.current === next) return;
+      scopeRef.current = next;
+      // the settings are saved shortly after a change; save the data settings being left now
+      persist(scopedKey('settings', settingsScopeRef.current), dataSettingsOf(settingsRef.current));
+      let l: Record<string, NegotiationLog> | undefined;
+      let f: FollowupInputs | undefined;
+      let o: SourceFile | null | undefined;
+      let d: unknown;
+      try {
+        [l, f, o, d] = await Promise.all([
+          idbGet<Record<string, NegotiationLog>>(scopedKey('logs', next)),
+          idbGet<FollowupInputs>(scopedKey('followup', next)),
+          idbGet<SourceFile | null>(scopedKey('outcomes', next)),
+          idbGet<unknown>(scopedKey('settings', next)),
+        ]);
+      } catch {
+        setStorageOk(false);
+      }
+      if (scopeRef.current !== next) return;
+      setLogs(l ?? {});
+      setFollowupState(normaliseFollowup(f));
+      setOutcomesFileState(o ?? null);
+      showSettings(withDataSettings(settingsRef.current, d), next);
+    },
+    [persist, showSettings],
+  );
 
   /** Read the files and diagnose; resolves to true when this build finished with a diagnosis. */
   const rebuild = useCallback(
@@ -233,18 +269,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
       try {
         const [s, i] = await Promise.all([idbGet<unknown>('settings'), idbGet<InputsState>('inputs')]);
         if (cancelled) return;
-        restored = restoreSettings(s);
-        setSettings(restored);
-        settingsRef.current = restored;
         savedInputs = i ?? null;
         const scope: Scope = savedInputs?.source ?? 'upload';
         scopeRef.current = scope;
-        const [l, f, o] = await Promise.all([
+        // the shared settings are kept even if the rest cannot be read
+        restored = restoreSettingsFor(s, undefined);
+        const [l, f, o, d] = await Promise.all([
           idbGet<Record<string, NegotiationLog>>(scopedKey('logs', scope)),
           idbGet<FollowupInputs>(scopedKey('followup', scope)),
           idbGet<SourceFile | null>(scopedKey('outcomes', scope)),
+          idbGet<unknown>(scopedKey('settings', scope)),
         ]);
         if (cancelled) return;
+        restored = restoreSettingsFor(s, d);
         if (l) setLogs(l);
         if (f) setFollowupState(normaliseFollowup(f));
         if (o) setOutcomesFileState(o);
@@ -252,6 +289,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setStorageOk(false);
       }
       if (cancelled) return;
+      showSettings(restored, scopeRef.current);
       setInputs(savedInputs);
       setReady(true);
       restoredRef.current?.resolve();
@@ -271,18 +309,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [rebuild]);
+  }, [rebuild, showSettings]);
 
-  // save settings (debounced: sliders change them often)
+  // save settings (debounced: sliders change them often): the shared ones, and the data settings
+  // under the data source they belong to
   useEffect(() => {
     if (!ready) return;
     if (justCleared.current) {
       justCleared.current = false;
       return;
     }
-    const t = setTimeout(() => persist('settings', settings), 400);
+    const t = setTimeout(() => {
+      persist('settings', sharedSettingsOf(settings));
+      persist(scopedKey('settings', settingsScope), dataSettingsOf(settings));
+    }, 400);
     return () => clearTimeout(t);
-  }, [settings, ready, persist]);
+  }, [settings, settingsScope, ready, persist]);
 
   const updateSettings = useCallback((fn: (s: AppSettings) => AppSettings) => {
     setSettings((s) => fn(s));
@@ -303,13 +345,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setBusy('サンプルデータ（架空）を読み込んでいます…');
       try {
         const files = await fetchSampleFiles(sampleFileNames(layout));
+        // the sample's own 協議記録, 手入力の単価 etc. (empty at first); the user's stay saved
         await switchScope('sample');
         setInputsAndSave({ source: 'sample', layout });
-        const next = { ...settingsRef.current, company: null, overrides: {}, revisionDates: {} };
-        setSettings(next);
-        settingsRef.current = next;
         // the story goes on with the diagnosis (the screen moves its focus to the new heading)
-        if (await rebuild(files, true, next)) window.location.hash = href('diagnosis');
+        if (await rebuild(files, true)) window.location.hash = href('diagnosis');
       } catch (e) {
         setBusy(null);
         setError(e instanceof Error ? e.message : String(e));
@@ -326,11 +366,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const merged = [...current.filter((f) => !names.has(f.name)), ...files];
       await switchScope('upload');
       setInputsAndSave({ source: 'upload', files: merged });
-      if (inputs?.source === 'sample') {
-        const next = { ...settingsRef.current, company: null, overrides: {} };
-        setSettings(next);
-        settingsRef.current = next;
-      }
       await rebuild(merged, false);
     },
     [inputs, rebuild, setInputsAndSave, switchScope, whenRestored],
@@ -428,9 +463,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     justCleared.current = true;
     sourcesRef.current = [];
     scopeRef.current = 'upload';
-    const d = defaultSettings();
-    settingsRef.current = d;
-    setSettings(d);
+    showSettings(defaultSettings(), 'upload');
     setInputs(null);
     setLoaded(null);
     setLogs({});
@@ -439,15 +472,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setError(null);
     setBusy(null);
     setStorageOk(true);
-  }, []);
+  }, [showSettings]);
 
   const clearAll = useCallback(async () => {
+    clearing.current = true;
+    setBusy('データを消しています…');
     try {
-      await clearAllStorage();
+      // a tab that keeps the database open holds the erase until it is closed: wait, it is not a failure
+      await clearAllStorage({ onBlocked: () => setBusy(WAITING_FOR_TABS) });
     } catch (e) {
-      // not erased (e.g. still open in another tab): keep showing the data and say why
+      // not erased: keep showing the data and say why
+      setBusy(null);
       setError(e instanceof Error ? e.message : String(e));
       return;
+    } finally {
+      clearing.current = false;
     }
     resetInMemory();
   }, [resetInMemory]);

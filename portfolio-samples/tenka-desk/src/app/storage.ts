@@ -13,7 +13,6 @@ let dbPromise: Promise<IDBDatabase> | null = null;
 
 /** tells this app's other tabs that the data was erased here, so they drop what they still show */
 const CHANNEL = 'tenka-desk';
-const BLOCKED_WAIT_MS = 5000;
 
 function openDb(): Promise<IDBDatabase> {
   if (dbPromise) return dbPromise;
@@ -70,12 +69,21 @@ export async function idbDelete(key: string): Promise<void> {
   await run('readwrite', (s) => s.delete(key));
 }
 
+export interface ClearOptions {
+  /**
+   * Called when another tab (for example one still running an older version of the app) keeps the
+   * database open. The erase is not given up: it goes on as soon as that tab is closed.
+   */
+  onBlocked?: () => void;
+}
+
 /**
  * Remove the whole database and every preference of this app, and tell the app's other
- * tabs. Resolves only once the database is really gone; rejects when it could not be
- * erased (for example a tab of an older version that keeps it open).
+ * tabs. Resolves only once the database is really gone, however long another tab keeps it
+ * open: the browser cannot cancel a started erase, so reporting a failure in the meantime
+ * would be wrong. Rejects when the browser could not erase it.
  */
-export async function clearAllStorage(): Promise<void> {
+export async function clearAllStorage(opts: ClearOptions = {}): Promise<void> {
   try {
     const db = await dbPromise;
     db?.close();
@@ -85,29 +93,14 @@ export async function clearAllStorage(): Promise<void> {
   dbPromise = null;
   if (typeof indexedDB !== 'undefined') {
     await new Promise<void>((resolve, reject) => {
-      let timer: ReturnType<typeof setTimeout> | undefined;
       const req = indexedDB.deleteDatabase(DB_NAME);
-      req.onsuccess = () => {
-        clearTimeout(timer);
-        resolve();
-      };
-      req.onerror = () => {
-        clearTimeout(timer);
-        reject(req.error ?? new Error('データを消せませんでした'));
-      };
-      // Other tabs of this app close their connection on versionchange; give them a moment.
-      req.onblocked = () => {
-        clearTimeout(timer);
-        timer = setTimeout(
-          () =>
-            reject(
-              new Error(
-                'ほかのタブでこのアプリが開いているため、まだ消し切れていません。ほかのタブを閉じると消えます。閉じてから、もう一度「データを消す」を押してください。',
-              ),
-            ),
-          BLOCKED_WAIT_MS,
+      req.onsuccess = () => resolve();
+      req.onerror = () =>
+        reject(
+          new Error(`データを消せませんでした${req.error?.message ? `（${req.error.message}）` : ''}。`),
         );
-      };
+      // Other tabs of this app close their connection on versionchange; one that does not holds the erase.
+      req.onblocked = () => opts.onBlocked?.();
     });
   }
   try {

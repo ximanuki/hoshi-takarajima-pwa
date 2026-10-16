@@ -59,6 +59,39 @@ describe('runScenario', () => {
     expect(already.items.get('KG-1001')?.source).toBe('model');
   });
 
+  it('uses only the notices in force by the proposal date, combined in date order', () => {
+    const notice = (effective: string, currentCostSen: number, newCostSen: number) => ({
+      noticeDate: '2026-08-01',
+      supplier: 'S12',
+      supplierName: '架空鋼材株式会社',
+      sku: 'KG-1001',
+      currentCostSen,
+      newCostSen,
+      effective,
+      reason: '鋼材価格の上昇',
+      status: '予定',
+    });
+    // chained: 600円 → 660円 (11/1), then 660円 → 693円 (2027/2/1)
+    const chained = fixtureDataset({
+      supplierNotices: [notice('2027-02-01', 66000, 69300), notice('2026-11-01', 60000, 66000)],
+    });
+    const run = (ds: typeof chained, horizon: string) =>
+      runScenario(ds, { shock, asOf: '2026-09-30', supplierNotices: 'use', horizon }).items.get('KG-1001');
+    // between the two notices: only the first has started (+10%), not the later +5%
+    expect(run(chained, '2026-12-01')).toMatchObject({ source: 'notice', deltaSen: 6000, changeBp: 1000 });
+    expect(run(chained, '2026-12-01')?.notices).toHaveLength(1);
+    // after both: both increases (600円 → 693円, +15.5%), not just the later +5%
+    expect(run(chained, '2027-04-01')).toMatchObject({ source: 'notice', deltaSen: 9300, changeBp: 1550 });
+    expect(run(chained, '2027-04-01')?.notices.map((n) => n.effective)).toEqual(['2026-11-01', '2027-02-01']);
+    // before either: the cost model
+    expect(run(chained, '2026-10-15')?.source).toBe('model');
+    // each notice stated from today's cost (600円 → 660円, 600円 → 693円): the same 693円 by April
+    const fromToday = fixtureDataset({
+      supplierNotices: [notice('2026-11-01', 60000, 66000), notice('2027-02-01', 60000, 69300)],
+    });
+    expect(run(fromToday, '2027-04-01')).toMatchObject({ deltaSen: 9300 });
+  });
+
   it('is zero when nothing rises', () => {
     const r = runScenario(ds, { shock: { material: 0, labor: 0, energy: 0, other: 0 }, asOf: '2026-09-30' });
     for (const item of r.items.values()) expect(item.deltaSen).toBe(0);

@@ -135,12 +135,42 @@ export const FILE_CHECKS: readonly FileCheck[] = [
   { kind: 'suppliers', label: '仕入先', need: 'optional', why: '仕入先名の表示に使います。' },
 ];
 
+/** One of two sales lines that share a 伝票番号-行. */
+export interface SlipLineRef {
+  file: string;
+  /** line number in the file (header = 1) */
+  row: number;
+  /** the line's id in the app */
+  id: string;
+  date: IsoDate;
+  cust: string;
+  rawSku: string;
+  qty: number;
+  unitPrice: number;
+}
+
+/** A different sale that reuses the 伝票番号-行 of a line read before it. */
+export interface SlipCollision {
+  slipLine: string;
+  first: SlipLineRef;
+  other: SlipLineRef;
+}
+
+/** how many slip-line collisions are kept as examples for the import screen */
+export const SLIP_COLLISION_EXAMPLES = 5;
+
 export interface Loaded {
   ws: Workspace;
   files: FileInfo[];
   kinds: Set<FileKind>;
   lines: SalesLine[];
+  /** lines left out because the same sale (伝票番号-行 and its contents) was already read */
   duplicateLines: number;
+  /**
+   * Lines kept although their 伝票番号-行 was already used by a different sale
+   * (separate month, branch or system exports). Each one gets its own id.
+   */
+  slipCollisions: { count: number; examples: SlipCollision[] };
   diagnosis: DiagnosisResult | null;
   lineById: Map<string, LineDiagnosis>;
   volumes: Map<string, PairVolume>;
@@ -209,6 +239,36 @@ function emptyInfo(name: string, status: FileStatus, label: string, error: strin
     header: [],
     error,
     mapped: false,
+  };
+}
+
+/**
+ * The same sale read twice (the same export loaded again, or the A and B
+ * layouts of one export): everything that makes up the sale matches. 金額 is
+ * compared only when both files have it.
+ */
+function sameSale(a: SalesLine, b: SalesLine): boolean {
+  return (
+    a.date === b.date &&
+    a.cust === b.cust &&
+    a.skuKey === b.skuKey &&
+    a.qty === b.qty &&
+    a.unitPrice === b.unitPrice &&
+    a.isReturn === b.isReturn &&
+    (a.amount === null || b.amount === null || a.amount === b.amount)
+  );
+}
+
+function slipLineRef(file: string, l: SalesLine): SlipLineRef {
+  return {
+    file,
+    row: l.sourceRow,
+    id: l.id,
+    date: l.date,
+    cust: l.cust,
+    rawSku: l.rawSku,
+    qty: l.qty,
+    unitPrice: l.unitPrice,
   };
 }
 
@@ -286,15 +346,35 @@ export async function buildLoaded(sources: readonly SourceFile[], opts: LoadOpti
   const slim: Workspace = { ...ws, files: [] };
   const kinds = new Set<FileKind>(imports.map((f) => f.spec.kind));
 
-  const byId = new Map<string, SalesLine>();
+  // 伝票番号-行 is only unique within one export: a line is left out only when the
+  // whole sale matches one already read, not just its number
+  const byId = new Map<string, { file: string; line: SalesLine }[]>();
+  const lines: SalesLine[] = [];
   let duplicateLines = 0;
-  for (const lines of ws.sales.values()) {
-    for (const l of lines) {
-      if (byId.has(l.id)) duplicateLines++;
-      else byId.set(l.id, l);
+  const slipCollisions: Loaded['slipCollisions'] = { count: 0, examples: [] };
+  for (const [file, fileLines] of ws.sales) {
+    for (const l of fileLines) {
+      const same = byId.get(l.id);
+      if (!same) {
+        byId.set(l.id, [{ file, line: l }]);
+        lines.push(l);
+      } else if (same.some((s) => sameSale(s.line, l))) {
+        duplicateLines++;
+      } else {
+        const kept: SalesLine = { ...l, id: `${l.id}（${file} ${l.sourceRow}行目）` };
+        same.push({ file, line: kept });
+        lines.push(kept);
+        slipCollisions.count++;
+        const first = same[0];
+        if (first && slipCollisions.examples.length < SLIP_COLLISION_EXAMPLES)
+          slipCollisions.examples.push({
+            slipLine: l.id,
+            first: slipLineRef(first.file, first.line),
+            other: slipLineRef(file, kept),
+          });
+      }
     }
   }
-  const lines = [...byId.values()];
   let period: Loaded['period'] = null;
   for (const l of lines) {
     if (!period) period = { first: l.date, last: l.date };
@@ -323,6 +403,7 @@ export async function buildLoaded(sources: readonly SourceFile[], opts: LoadOpti
     kinds,
     lines,
     duplicateLines,
+    slipCollisions,
     diagnosis,
     lineById,
     volumes,

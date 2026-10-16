@@ -6,7 +6,8 @@
  *    - keep_margin_rate:    raise 定価 by the cost increase rate (keeps the 粗利率)
  *    - pass_through_amount: raise 定価 so that the cost increase in 円 is passed on
  *                           at the buyers' quantity-weighted average 掛率 (keeps the 粗利額)
- *    - fixed_list:          use a given new 定価 table
+ *    - fixed_list:          use a given new 定価 table (per product, the latest row
+ *                           whose 適用日 is on or before the proposal's 適用日)
  *    then round to the Japanese price grid (10/50/100円, optional ending).
  * 2. Unit price per customer × product (proposePairs): new 定価 × the customer's
  *    掛率, so every customer stays inside their 掛率ランク. Guardrails:
@@ -22,7 +23,7 @@
  */
 
 import { type Dataset, pairKey } from './dataset.ts';
-import type { IsoDate } from './dates.ts';
+import { type IsoDate, toWareki } from './dates.ts';
 import type { DiagnosisResult, LeakType } from './diagnosis.ts';
 import {
   changeBp,
@@ -122,7 +123,10 @@ export interface ProposalInput {
   method: ProposalMethod;
   /** required for keep_margin_rate / pass_through_amount; gives new costs for the margin checks in every method */
   scenario?: ScenarioResult;
-  /** required for fixed_list */
+  /**
+   * required for fixed_list; may hold the tables of several revisions (rows
+   * with a 適用日 after effectiveDate are not used)
+   */
   newListPrices?: readonly NewListPrice[];
   /** share of the cost increase to pass on (default 10000 = 100%) */
   passThroughBp?: number;
@@ -174,6 +178,29 @@ function scenarioCosts(ds: Dataset, input: ProposalInput, sku: string): { curren
   return { current: c, next: c };
 }
 
+/**
+ * New 定価 per product from the new 定価 tables, for one 適用日: the latest row on
+ * or before it, whatever the load order (a later revision's rows are left for
+ * that revision). Different prices for one product on that same 適用日 are all
+ * kept, so the caller can report them instead of picking one.
+ */
+function fixedListPrices(
+  ds: Dataset,
+  rows: readonly NewListPrice[],
+  effectiveDate: IsoDate,
+): Map<string, { effective: IsoDate; prices: number[] }> {
+  const out = new Map<string, { effective: IsoDate; prices: number[] }>();
+  for (const n of rows) {
+    if (n.effective > effectiveDate) continue;
+    const sku = ds.resolveSku(n.sku);
+    if (sku === null) continue;
+    const cur = out.get(sku);
+    if (!cur || n.effective > cur.effective) out.set(sku, { effective: n.effective, prices: [n.newPrice] });
+    else if (n.effective === cur.effective && !cur.prices.includes(n.newPrice)) cur.prices.push(n.newPrice);
+  }
+  return out;
+}
+
 /** New 定価 per product (products bought in the window, or all with a new 定価 in fixed_list). */
 export function proposeListPrices(
   ds: Dataset,
@@ -185,11 +212,8 @@ export function proposeListPrices(
     throw new RangeError('この方法には原価シナリオが必要です');
   if (input.method === 'fixed_list' && !input.newListPrices) throw new RangeError('新定価表が必要です');
   const pt = input.passThroughBp ?? 10000;
-  const fixed = new Map<string, number>();
-  for (const n of input.newListPrices ?? []) {
-    const sku = ds.resolveSku(n.sku);
-    if (sku !== null) fixed.set(sku, n.newPrice);
-  }
+  const fixed = fixedListPrices(ds, input.newListPrices ?? [], input.effectiveDate);
+  const conflicts: string[] = [];
   const rateBySku = new Map<string, { qty: number; weighted: number }>();
   for (const v of volumes.values()) {
     const c = ds.customers.get(v.cust);
@@ -213,7 +237,12 @@ export function proposeListPrices(
     let rawSen = currentList * 100;
     let weightedRatePm: number | null = null;
     if (input.method === 'fixed_list') {
-      rawSen = (fixed.get(sku) ?? currentList) * 100;
+      const f = fixed.get(sku);
+      if (f && f.prices.length > 1) {
+        const prices = [...f.prices].sort((a, b) => a - b).map((p) => `${p}円`);
+        conflicts.push(`${sku}（${toWareki(f.effective)}: ${prices.join('・')}）`);
+      }
+      rawSen = (f?.prices[0] ?? currentList) * 100;
     } else if (deltaCost > 0 && cost.current > 0) {
       if (input.method === 'keep_margin_rate') {
         const target = divCeil(currentList * 100 * cost.next, cost.current);
@@ -251,6 +280,13 @@ export function proposeListPrices(
       capped,
       method: input.method,
     });
+  }
+  if (conflicts.length > 0) {
+    const shown =
+      conflicts.slice(0, 5).join('、') + (conflicts.length > 5 ? ` ほか${conflicts.length - 5}件` : '');
+    throw new RangeError(
+      `新定価表に、同じ商品で適用日も同じなのに新定価が違う行があります: ${shown}。どの新定価を使うか決められないため、新定価表を直してから読み込み直してください`,
+    );
   }
   return out;
 }

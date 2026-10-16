@@ -13,6 +13,7 @@ import {
 } from './proposal.ts';
 import { runScenario } from './scenario.ts';
 import { fixtureDataset, line } from './testing/fixtures.ts';
+import type { NewListPrice } from './types.ts';
 
 const ds = fixtureDataset();
 const W = { start: '2025-10-01', end: '2026-09-30' };
@@ -91,6 +92,41 @@ describe('proposeListPrices', () => {
     );
     expect(lists.get('DB-1001')?.newList).toBe(840);
     expect(lists.get('KG-1001')?.newList).toBe(1100);
+  });
+
+  describe('fixed_list with several new 定価 tables', () => {
+    const fixedList = (newListPrices: readonly NewListPrice[], effectiveDate = '2026-12-01') =>
+      proposeListPrices(ds, volumes, { ...base, method: 'fixed_list', newListPrices, effectiveDate }, guard);
+    const dec = { sku: 'DB-1001', currentPrice: 770, newPrice: 840, effective: '2026-12-01' };
+    const apr = { sku: 'DB-1001', currentPrice: 840, newPrice: 900, effective: '2027-04-01' };
+
+    it('uses the latest row on or before the 適用日, whatever the load order', () => {
+      expect(fixedList([dec, apr]).get('DB-1001')?.newList).toBe(840);
+      expect(fixedList([apr, dec]).get('DB-1001')?.newList).toBe(840);
+      expect(fixedList([dec, apr], '2027-04-01').get('DB-1001')?.newList).toBe(900);
+      expect(fixedList([apr, dec], '2027-06-30').get('DB-1001')?.newList).toBe(900);
+    });
+
+    it('ignores rows that take effect after the 適用日 (no new 定価 for that product)', () => {
+      const lists = fixedList([apr]);
+      expect(lists.get('DB-1001')).toMatchObject({ currentList: 770, newList: 770, changeBp: 0 });
+      const input: ProposalInput = { ...base, method: 'fixed_list', newListPrices: [apr] };
+      const pair = proposePairs(ds, volumes, lists, input, guard).find(
+        (p) => p.cust === '000001' && p.sku === 'DB-1001',
+      );
+      expect(pair).toMatchObject({ status: 'excluded', excludedReason: 'no_list_change', newPrice: 554 });
+    });
+
+    it('reports two different prices for one product on the same 適用日 instead of picking one', () => {
+      const other = { ...dec, sku: 'ＤＢ－１００１', newPrice: 850 };
+      expect(() => fixedList([dec, other])).toThrow(RangeError);
+      expect(() => fixedList([dec, other])).toThrow(/DB-1001.*令和8年12月1日.*840円.*850円/);
+      // the same row loaded twice is not a conflict
+      expect(fixedList([dec, { ...dec }]).get('DB-1001')?.newList).toBe(840);
+      // a conflict this proposal does not use (a later 適用日, or replaced by a later row) does not stop it
+      expect(fixedList([dec, apr, { ...apr, newPrice: 910 }]).get('DB-1001')?.newList).toBe(840);
+      expect(fixedList([dec, other, apr], '2027-04-01').get('DB-1001')?.newList).toBe(900);
+    });
   });
 
   it('caps the 定価 increase and requires its inputs', () => {

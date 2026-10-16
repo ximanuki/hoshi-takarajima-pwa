@@ -158,4 +158,42 @@ export function restoreSettings(saved: unknown): AppSettings {
   };
 }
 
+/**
+ * 手入力の単価・改定日・差出人の会社情報: settings made for one set of data. They are saved separately
+ * for the sample (架空) and for the user's own data, like the 協議記録, so that trying the sample
+ * neither shows the user's values on the sample nor erases them. Everything else is shared.
+ */
+export type DataSettings = Pick<AppSettings, 'company' | 'overrides' | 'revisionDates'>;
+export type SharedSettings = Omit<AppSettings, keyof DataSettings>;
+
+export function dataSettingsOf(s: AppSettings): DataSettings {
+  return { company: s.company, overrides: s.overrides, revisionDates: s.revisionDates };
+}
+
+export function sharedSettingsOf(s: AppSettings): SharedSettings {
+  const { company: _company, overrides: _overrides, revisionDates: _revisionDates, ...shared } = s;
+  return shared;
+}
+
+/** `s` with the data settings saved for another data source (nothing saved yet: empty values). */
+export function withDataSettings(s: AppSettings, saved: unknown): AppSettings {
+  const d = typeof saved === 'object' && saved !== null ? (saved as Partial<DataSettings>) : {};
+  return {
+    ...s,
+    company: d.company ?? null,
+    overrides: { ...d.overrides },
+    revisionDates: { ...d.revisionDates },
+  };
+}
+
+/**
+ * Settings restored on the next visit: the shared ones and those of the data that was open.
+ * Older versions saved the data settings with the shared ones; they belong to the data open
+ * then, so they are kept until that data has values of its own.
+ */
+export function restoreSettingsFor(shared: unknown, own: unknown): AppSettings {
+  const s = restoreSettings(shared);
+  return own === undefined ? s : withDataSettings(s, own);
+}
+
 export const toBp = (pct: number): number => pctToBp(pct);

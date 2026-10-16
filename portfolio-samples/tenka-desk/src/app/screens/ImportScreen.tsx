@@ -2,9 +2,9 @@ import { useId, useMemo, useState } from 'react';
 import { type FileKind, LAYOUTS, mapColumns, pctToBp, toWareki } from '../../engine/index.ts';
 import { DropZone } from '../components/DropZone.tsx';
 import { Badge, Card, Icon, Kpi, Notice, PageHeader } from '../components/ui.tsx';
-import { num, warekiRange } from '../format.ts';
+import { num, wareki, warekiRange, yen } from '../format.ts';
 import { useApp } from '../model/AppState.tsx';
-import { type ColumnChoice, FILE_CHECKS, type FileInfo } from '../model/load.ts';
+import { type ColumnChoice, FILE_CHECKS, type FileInfo, type SlipLineRef } from '../model/load.ts';
 
 export function ImportScreen() {
   const app = useApp();
@@ -274,6 +274,10 @@ function FileChecklist({ kinds }: { kinds: ReadonlySet<FileKind> }) {
   );
 }
 
+function slipLineText(r: SlipLineRef): string {
+  return `${r.file} ${num(r.row)}行目（${wareki(r.date)}・得意先${r.cust}・${r.rawSku}・${num(r.qty)}×${yen(r.unitPrice)}）`;
+}
+
 function DataNotes() {
   const app = useApp();
   const loaded = app.loaded;
@@ -296,9 +300,29 @@ function DataNotes() {
       {loaded.duplicateLines > 0 && (
         <Notice tone="warning">
           <p>
-            同じ「伝票番号-行」の売上明細が複数のファイルに {num(loaded.duplicateLines)}
-            行ありました。重複分は最初のファイルの行だけを使っています。
+            「伝票番号-行」と取引の内容（日付・得意先・商品・数量・単価・金額）がすべて同じ売上明細が{' '}
+            {num(loaded.duplicateLines)}
+            行重なっていました。同じ書き出しを2回読み込んだときなどに起こります。重複分は最初に読み込んだ行だけを使っています。
           </p>
+        </Notice>
+      )}
+      {loaded.slipCollisions.count > 0 && (
+        <Notice tone="warning">
+          <p>
+            同じ「伝票番号-行」で取引の内容（日付・得意先・商品・数量・単価・金額）が違う売上明細が{' '}
+            {num(loaded.slipCollisions.count)}
+            行ありました。月・部門・システムごとの書き出しで番号が重なったものとみなし、別の取引として診断に含めています。あとから読み込んだ行は、伝票番号-行の後ろにファイル名と行番号を付けて区別しています。同じ取引のはずでしたら、書き出し元のファイルをお確かめください。
+          </p>
+          <details className="issues">
+            <summary>例を見る（{num(loaded.slipCollisions.examples.length)}件）</summary>
+            <ul>
+              {loaded.slipCollisions.examples.map((c) => (
+                <li key={c.other.id}>
+                  {c.slipLine}：{slipLineText(c.first)} と {slipLineText(c.other)}
+                </li>
+              ))}
+            </ul>
+          </details>
         </Notice>
       )}
       {ds.issues.length > 0 && (

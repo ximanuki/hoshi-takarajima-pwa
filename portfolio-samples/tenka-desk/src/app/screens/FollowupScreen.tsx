@@ -12,7 +12,13 @@ import { DropZone } from '../components/DropZone.tsx';
 import { Card, downloadFile, Icon, Kpi, NeedsData, Notice, PageHeader } from '../components/ui.tsx';
 import { num, todayJst, wareki, warekiRange, yen } from '../format.ts';
 import { useApp } from '../model/AppState.tsx';
-import { readPriceMasterFile, readSalesFile, usePriceMaster } from '../model/outputs.ts';
+import {
+  FileRowsError,
+  readPriceMasterFile,
+  readSalesFile,
+  type SalesRead,
+  usePriceMaster,
+} from '../model/outputs.ts';
 import { href } from '../router.ts';
 import { fetchSample, sampleFollowupNames } from '../sample.ts';
 
@@ -34,23 +40,38 @@ export function FollowupScreen() {
   /** set when the user starts a check, so the result is brought into view once it is there */
   const [scrollPending, setScrollPending] = useState(false);
   const computed = useMemo(():
-    | { ok: true; result: FollowupResult; master: PriceMasterRow[]; salesIssues: number }
-    | { ok: false; error: string }
+    | { ok: true; result: FollowupResult; master: PriceMasterRow[]; sales: SalesRead }
+    | { ok: false; error: string; problems: string[] }
     | null => {
     if (!ds || !followup.salesFile) return null;
+    const fromFile = followup.masterSource === 'file' && followup.masterFile;
+    if (!fromFile && built.error)
+      return {
+        ok: false,
+        error: `書き出しで使う協議結果のファイルを読めません。${built.error}`,
+        problems: built.problems,
+      };
     try {
-      const master =
-        followup.masterSource === 'file' && followup.masterFile
-          ? readPriceMasterFile(followup.masterFile)
-          : built.rows;
-      if (master.length === 0) return { ok: false, error: '新単価マスタが空です。' };
+      const master = fromFile ? readPriceMasterFile(fromFile) : built.rows;
+      if (master.length === 0) return { ok: false, error: '新単価マスタが空です。', problems: [] };
       const sales = readSalesFile(followup.salesFile);
+      if (sales.lines.length === 0)
+        return { ok: false, error: '売上明細に読める行がありません。', problems: sales.problems };
       const result = checkFollowup(ds, master, ds.resolveLines(sales.lines));
-      return { ok: true, result, master, salesIssues: sales.issues };
+      return { ok: true, result, master, sales };
     } catch (e) {
-      return { ok: false, error: e instanceof Error ? e.message : String(e) };
+      return {
+        ok: false,
+        error:
+          e instanceof FileRowsError
+            ? `${e.message}読めない行の得意先・商品は、旧単価のまま請求していても見つけられないため、チェックしていません。ファイルを直して読み込み直してください。`
+            : e instanceof Error
+              ? e.message
+              : String(e),
+        problems: e instanceof FileRowsError ? e.problems : [],
+      };
     }
-  }, [ds, followup, built.rows]);
+  }, [ds, followup, built.rows, built.error, built.problems]);
 
   const ready = computed?.ok === true;
   useEffect(() => {
@@ -243,6 +264,7 @@ export function FollowupScreen() {
       {computed && !computed.ok && (
         <Notice tone="critical" title="チェックできません">
           <p>{computed.error}</p>
+          {computed.problems.length > 0 && <ProblemList problems={computed.problems} />}
         </Notice>
       )}
 
@@ -256,8 +278,18 @@ export function FollowupScreen() {
                 ? `ファイル：${baseName(followup.masterFile.name)}`
                 : '書き出しで作ったもの'}
               ）で確認しました。
-              {computed.salesIssues > 0 && ` 読めなかった行が${num(computed.salesIssues)}行あります。`}
             </p>
+            {computed.sales.skippedRows > 0 && (
+              <Notice
+                tone="warning"
+                title={`売上明細のうち ${num(computed.sales.skippedRows)}行は読めなかったため、チェックに含めていません`}
+              >
+                <p className="small">
+                  この行に旧単価のままの請求があっても、ここには出てきません。ファイルを直して読み込み直すと、チェックに入ります。
+                </p>
+                <ProblemList problems={computed.sales.problems} />
+              </Notice>
+            )}
             <div className="kpi-row">
               <Kpi
                 label="旧単価のまま"
@@ -386,5 +418,17 @@ export function FollowupScreen() {
         </div>
       )}
     </>
+  );
+}
+
+/** Rows of a file that could not be read, with the reasons (the first 20). */
+function ProblemList({ problems }: { problems: string[] }) {
+  return (
+    <ul className="small">
+      {problems.slice(0, 20).map((x) => (
+        <li key={x}>{x}</li>
+      ))}
+      {problems.length > 20 && <li>ほか {num(problems.length - 20)}件</li>}
+    </ul>
   );
 }

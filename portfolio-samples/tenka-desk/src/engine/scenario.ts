@@ -39,6 +39,11 @@ export interface ScenarioInput {
   noticeStatuses?: string[];
   /** the day of the current cost (現在の原単価) */
   asOf: IsoDate;
+  /**
+   * the proposal's 適用日: only notices in force by then count (default: every notice
+   * after asOf). Without it a proposal could use an increase that has not started yet.
+   */
+  horizon?: IsoDate;
   /** limit to these products (default: all) */
   skus?: readonly string[];
 }
@@ -53,7 +58,10 @@ export interface SkuCostImpact {
   /** increase per component in 銭 (all zero when a notice was used) */
   byComponent: Record<CostComponent, number>;
   source: 'model' | 'notice';
+  /** the latest notice in force by the horizon (null when the cost model was used) */
   notice: SupplierNotice | null;
+  /** every notice in force by the horizon, oldest first */
+  notices: SupplierNotice[];
   share: CostShare | null;
   /** component increases that applied (percent, as basis points) */
   appliedBp: Record<CostComponent, number>;
@@ -69,15 +77,20 @@ const ZERO: Record<CostComponent, number> = { material: 0, labor: 0, energy: 0, 
 export function runScenario(ds: Dataset, input: ScenarioInput): ScenarioResult {
   const items = new Map<string, SkuCostImpact>();
   const statuses = input.noticeStatuses ?? ['予定'];
-  const notices = new Map<string, SupplierNotice>();
+  // 適用日までに始まる通知だけを、日付の順に並べて使う（それより後の値上げはまだ起きていない）
+  const notices = new Map<string, SupplierNotice[]>();
   if (input.supplierNotices === 'use') {
     for (const n of ds.supplierNotices) {
       if (!statuses.includes(n.status) || n.effective <= input.asOf) continue;
+      if (input.horizon !== undefined && n.effective > input.horizon) continue;
       const sku = ds.resolveSku(n.sku);
       if (sku === null) continue;
-      const prev = notices.get(sku);
-      if (!prev || n.effective > prev.effective) notices.set(sku, n);
+      const list = notices.get(sku) ?? [];
+      list.push(n);
+      notices.set(sku, list);
     }
+    for (const list of notices.values())
+      list.sort((a, b) => (a.effective < b.effective ? -1 : a.effective > b.effective ? 1 : 0));
   }
   const skus = input.skus ?? [...ds.products.keys()];
   for (const sku of skus) {
@@ -87,10 +100,16 @@ export function runScenario(ds: Dataset, input: ScenarioInput): ScenarioResult {
     const override = input.categoryShocks?.[p.category] ?? {};
     const appliedBp = { ...ZERO };
     for (const c of COST_COMPONENTS) appliedBp[c] = pctToBp(override[c] ?? input.shock[c]);
-    const notice = notices.get(sku) ?? null;
+    const applied = notices.get(sku) ?? [];
+    const first = applied[0];
+    const notice = applied.at(-1) ?? null;
     const share = ds.costShareOf(sku);
-    if (notice && notice.currentCostSen > 0) {
-      const delta = divRound(current * (notice.newCostSen - notice.currentCostSen), notice.currentCostSen);
+    if (first && notice && first.currentCostSen > 0) {
+      // Several notices: the cost by the horizon is the last notice's new cost, measured from
+      // the first notice's starting cost. This is right whether the notices are chained
+      // (A→B, then B→C) or each states today's cost (A→B, then A→C), and with one notice it
+      // is that notice's own rate. The rate is applied to this company's current cost.
+      const delta = divRound(current * (notice.newCostSen - first.currentCostSen), first.currentCostSen);
       items.set(sku, {
         sku,
         category: p.category,
@@ -101,6 +120,7 @@ export function runScenario(ds: Dataset, input: ScenarioInput): ScenarioResult {
         byComponent: { ...ZERO },
         source: 'notice',
         notice,
+        notices: applied,
         share,
         appliedBp,
       });
@@ -122,6 +142,7 @@ export function runScenario(ds: Dataset, input: ScenarioInput): ScenarioResult {
       byComponent,
       source: 'model',
       notice: null,
+      notices: [],
       share,
       appliedBp,
     });

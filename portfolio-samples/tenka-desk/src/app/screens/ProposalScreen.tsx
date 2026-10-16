@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   ATTENTION_RULES,
   changeBp,
@@ -309,6 +309,13 @@ function PriceEditor({ p }: { p: AppPair }) {
   const shownPrice = p.status === 'proposed' ? p.newPrice : p.currentPrice;
   const [draft, setDraft] = useState<string | null>(null);
   const [focused, setFocused] = useState(false);
+  const input = useRef<HTMLInputElement>(null);
+  // Focusing swaps "¥4,237" for "4237", and the browser then drops the selection that Tab focus
+  // made and puts the caret at the end, so typing a price would be added to the old one
+  // ("42374000"). Select the number again so that what is typed replaces it.
+  useLayoutEffect(() => {
+    if (focused && input.current === document.activeElement) input.current?.select();
+  }, [focused]);
   const [message, setMessage] = useState<{ tone: 'error' | 'warning'; text: string } | null>(null);
   const key = pairKey(p.cust, p.sku);
   const msgId = `msg-${key.replace(/[^A-Za-z0-9]/g, '-')}`;
@@ -352,6 +359,7 @@ function PriceEditor({ p }: { p: AppPair }) {
       }}
     >
       <input
+        ref={input}
         type="text"
         inputMode="numeric"
         className={`input-price${p.override !== null ? ' is-override' : ''}`}

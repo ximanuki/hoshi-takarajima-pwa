@@ -340,6 +340,7 @@ export function computeProposal(
       categoryShocks: scenario.categoryShocks,
       supplierNotices: scenario.useNotices ? 'use' : 'ignore',
       asOf,
+      horizon: effectiveDate,
     });
     const input: ProposalInput = {
       method: scenario.method,

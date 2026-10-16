@@ -134,6 +134,11 @@ export function ExportScreen() {
             {CURRENT_PRICE_LABEL[opts.currentPrice]}（下の「書き出しの設定」で変えられます）
           </span>
         </div>
+        {master.error && (
+          <Notice tone="critical" title="協議結果のファイルを直すまで、保存できません">
+            <p>理由は、下の「どの合意を使うか」に出しています。</p>
+          </Notice>
+        )}
         {saveProblem && (
           <Notice tone="warning" title="Shift_JIS で表せない文字があるため、保存していません">
             <p>
@@ -284,6 +289,19 @@ export function ExportScreen() {
         {master.error && (
           <Notice tone="critical" title="協議結果を読めません">
             <p>{master.error}</p>
+            {master.problems.length > 0 && (
+              <>
+                <p className="small">
+                  このまま書き出すと、読めない行の得意先が新単価マスタから抜けてしまうため、書き出していません。ファイルを直して読み込み直すか、上の「交渉の記録」を選んでください。
+                </p>
+                <ul className="small">
+                  {master.problems.slice(0, 20).map((x) => (
+                    <li key={x}>{x}</li>
+                  ))}
+                  {master.problems.length > 20 && <li>ほか {num(master.problems.length - 20)}件</li>}
+                </ul>
+              </>
+            )}
           </Notice>
         )}
         {opts.outcomeSource === 'logs' && agreedOutcomes.length === 0 && (
