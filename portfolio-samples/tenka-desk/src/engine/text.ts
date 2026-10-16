@@ -6,6 +6,8 @@
  * either style ends up in one canonical form.
  */
 
+import { divRound } from './money.ts';
+
 /** NFKC and trim. "ＤＢ－１００１ " -> "DB-1001", "ｻﾝﾌﾟﾙ" -> "サンプル". */
 export function normalizeText(raw: string): string {
   return raw.normalize('NFKC').trim();
@@ -123,6 +125,22 @@ export function formatBp(bp: number, decimals: 0 | 1 | 2 = 1): string {
   const whole = Math.floor(q / 10 ** decimals);
   const frac = decimals === 0 ? '' : `.${String(q % 10 ** decimals).padStart(decimals, '0')}`;
   return `${neg && q !== 0 ? '-' : ''}${whole}${frac}%`;
+}
+
+/**
+ * num / den as a percentage with a fixed number of decimals, rounded once
+ * (half away from zero). Use it instead of formatBp on a value that was
+ * already rounded to basis points, to avoid rounding twice.
+ * formatRatioPct(-20, 580) -> "-3.4%".
+ */
+export function formatRatioPct(num: number, den: number, decimals: 0 | 1 | 2 = 1): string {
+  if (den === 0) return '-';
+  const scaled = divRound(num * 100 * 10 ** decimals, den);
+  const neg = scaled < 0;
+  const a = Math.abs(scaled);
+  const whole = Math.floor(a / 10 ** decimals);
+  const frac = decimals === 0 ? '' : `.${String(a % 10 ** decimals).padStart(decimals, '0')}`;
+  return `${neg ? '-' : ''}${whole}${frac}%`;
 }
 
 /** 725 ‰ -> "72.5%". */

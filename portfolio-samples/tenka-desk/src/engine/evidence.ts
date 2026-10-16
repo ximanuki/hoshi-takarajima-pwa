@@ -10,7 +10,7 @@
 
 import { type IsoDate, toWareki, toWarekiFiscalYear, toWarekiMonth } from './dates.ts';
 import { changeBp } from './money.ts';
-import { formatBp, withCommas } from './text.ts';
+import { formatRatioPct, withCommas } from './text.ts';
 import type { Category } from './types.ts';
 
 /* ---------- dataset types and parsers ---------- */
@@ -294,7 +294,7 @@ function indexChange(
   const stat = statName(ds);
   const subject = indexTitle === stat ? series.name : `${indexTitle}の${series.name}`;
   const title = `${indexTitle}（${series.name}）`;
-  const statement = `${publisherShort(ds.publisher)}「${stat}」によりますと、${subject}（${series.unit}）は${toWarekiMonth(latestPeriod)}に${fmtIndex(latest)}となり、${toWarekiMonth(basePer)}の${fmtIndex(base)}から${formatBp(Math.abs(bp))}${direction(bp)}しております（変化率は本ツールで計算）。`;
+  const statement = `${publisherShort(ds.publisher)}「${stat}」によりますと、${subject}（${series.unit}）は${toWarekiMonth(latestPeriod)}に${fmtIndex(latest)}となり、${toWarekiMonth(basePer)}の${fmtIndex(base)}から${formatRatioPct(Math.abs(tenths(latest) - tenths(base)), tenths(base))}${direction(bp)}しております（変化率は本ツールで計算）。`;
   return {
     id: `${ds.id}:${code}`,
     topic,
@@ -303,7 +303,10 @@ function indexChange(
     figures: [
       { label: toWarekiMonth(basePer), value: fmtIndex(base) },
       { label: toWarekiMonth(latestPeriod), value: fmtIndex(latest) },
-      { label: '変化率（本ツールで計算）', value: `${bp >= 0 ? '+' : ''}${formatBp(bp)}` },
+      {
+        label: '変化率（本ツールで計算）',
+        value: `${bp >= 0 ? '+' : ''}${formatRatioPct(tenths(latest) - tenths(base), tenths(base))}`,
+      },
     ],
     computedByTool: true,
     source: {

@@ -23,7 +23,15 @@ import type { ApplicableList, Dataset, ExpectedPrice } from './dataset.ts';
 import { pairKey } from './dataset.ts';
 import { type IsoDate, toWareki, trailingMonths } from './dates.ts';
 import { divide, isBelowMarginFloor, marginBp, marginFloorPrice, priceAtRate } from './money.ts';
-import { formatBp, formatPm, formatSen, formatYen, isSampleRemark, parseRemarkDiscount } from './text.ts';
+import {
+  formatBp,
+  formatPm,
+  formatRatioPct,
+  formatSen,
+  formatYen,
+  isSampleRemark,
+  parseRemarkDiscount,
+} from './text.ts';
 import type { SalesLine, SpecialPrice } from './types.ts';
 
 export type LeakType = 'old_price' | 'expired_special' | 'rate_out_of_tier' | 'below_margin_floor';
@@ -95,6 +103,8 @@ export interface LineDiagnosis {
   costSen: number | null;
   marginBp: number | null;
   floorPrice: number | null;
+  /** 粗利率の下限 used for the check (bp) */
+  floorBp: number;
   /** volume discount stated in the remark (bp) */
   discountBp: number | null;
   /** the bill differs from the expected price for no known reason (要確認) */
@@ -133,6 +143,11 @@ export interface Finding {
   latest: LineDiagnosis;
 }
 
+/**
+ * One customer and one leak type. The share compares the affected items with
+ * the items the customer bought while the problem lasted (first to last
+ * affected line) and that could show it.
+ */
 export interface CustomerRollup {
   cust: string;
   custName: string;
@@ -140,9 +155,10 @@ export interface CustomerRollup {
   affectedPairs: number;
   eligiblePairs: number;
   shareBp: number;
-  /** most of the customer's items show the same problem: likely a master-level cause */
+  /** most of the customer's items show the same problem: likely a customer-level cause (e.g. the customer master) */
   wholeCustomer: boolean;
   firstDate: IsoDate;
+  lastDate: IsoDate;
   annualImpactYen: number;
 }
 
@@ -185,6 +201,7 @@ function emptyDiagnosis(line: SalesLine, status: LineStatus): LineDiagnosis {
     costSen: null,
     marginBp: null,
     floorPrice: null,
+    floorBp: 0,
     discountBp: null,
     mismatch: false,
     eligible: [],
@@ -242,6 +259,7 @@ export function diagnoseLine(ds: Dataset, line: SalesLine): LineDiagnosis {
     costSen,
     marginBp: costSen !== null ? marginBp(billed, costSen) : null,
     floorPrice,
+    floorBp,
     discountBp,
     mismatch: false,
     eligible,
@@ -331,7 +349,7 @@ export function explainLine(d: LineDiagnosis): string[] {
       );
     } else if (f === 'below_margin_floor' && d.costSen !== null && d.floorPrice !== null) {
       out.push(
-        `粗利率が ${d.marginBp === null ? '-' : formatBp(d.marginBp)} で、下限を下回っています（原単価 ${formatSen(d.costSen)}円、下限を満たす単価は ${formatYen(d.floorPrice)} 以上）。`,
+        `粗利率が ${formatRatioPct(billed * 100 - d.costSen, billed * 100)} で、下限 ${formatBp(d.floorBp)} を下回っています（原単価 ${formatSen(d.costSen)}円、下限を満たす単価は ${formatYen(d.floorPrice)} 以上）。`,
       );
     }
   }
@@ -372,8 +390,8 @@ export function diagnose(
     asOf = '0001-01-01';
     for (const l of resolved) if (l.date > asOf) asOf = l.date;
   }
-  const window = trailingMonths(asOf, options.windowMonths ?? ds.settings.windowMonths);
-  const inWindow = (d: IsoDate) => d >= window.start && d <= window.end;
+  const period = trailingMonths(asOf, options.windowMonths ?? ds.settings.windowMonths);
+  const inWindow = (d: IsoDate) => d >= period.start && d <= period.end;
 
   const sorted = [...resolved].sort((a, b) =>
     a.date !== b.date
@@ -394,8 +412,8 @@ export function diagnose(
   const groups = new Map<string, Acc>();
   /** latest checked line per pair */
   const lastByPair = new Map<string, LineDiagnosis>();
-  /** pairs per customer and type: eligible in window / affected in window */
-  const eligibleByCust = new Map<string, Set<string>>();
+  /** dates on which a customer's product could show a leak type: `${cust}|${type}` -> sku -> dates */
+  const eligibleDates = new Map<string, Map<string, IsoDate[]>>();
 
   for (const d of results) {
     statusCounts[d.status]++;
@@ -404,13 +422,16 @@ export function diagnose(
     if (l.sku === null || d.expected === null) continue;
     const pk = pairKey(l.cust, l.sku);
     lastByPair.set(pk, d);
-    if (inWindow(l.date)) {
-      for (const t of d.eligible) {
-        const k = `${l.cust}|${t}`;
-        const set = eligibleByCust.get(k) ?? new Set<string>();
-        set.add(l.sku);
-        eligibleByCust.set(k, set);
+    for (const t of d.eligible) {
+      const k = `${l.cust}|${t}`;
+      let bySku = eligibleDates.get(k);
+      if (!bySku) {
+        bySku = new Map();
+        eligibleDates.set(k, bySku);
       }
+      const dates = bySku.get(l.sku);
+      if (dates) dates.push(l.date);
+      else bySku.set(l.sku, [l.date]);
     }
     if (d.leak === null) continue;
     const gk = `${d.leak}|${pk}`;
@@ -492,8 +513,8 @@ export function diagnose(
     };
   });
 
-  const customers = rollupCustomers(ds, findings, eligibleByCust, inWindow);
-  return { window, lines: results, findings, summary, customers, statusCounts, salesInWindowYen };
+  const customers = rollupCustomers(ds, findings, eligibleDates);
+  return { window: period, lines: results, findings, summary, customers, statusCounts, salesInWindowYen };
 }
 
 /** Minimum items and share for "most of this customer's items": likely a customer-level cause. */
@@ -503,8 +524,7 @@ const WHOLE_CUSTOMER_MIN_SHARE_BP = 8000;
 function rollupCustomers(
   ds: Dataset,
   findings: readonly Finding[],
-  eligibleByCust: Map<string, Set<string>>,
-  inWindow: (d: IsoDate) => boolean,
+  eligibleDates: Map<string, Map<string, IsoDate[]>>,
 ): CustomerRollup[] {
   const by = new Map<string, Finding[]>();
   for (const f of findings) {
@@ -516,18 +536,24 @@ function rollupCustomers(
   const out: CustomerRollup[] = [];
   for (const [k, fs] of by) {
     const first = fs[0] as Finding;
-    const affected = new Set(fs.filter((f) => f.linesInWindow > 0 || inWindow(f.lastDate)).map((f) => f.sku));
-    const eligible = eligibleByCust.get(k)?.size ?? 0;
-    const shareBp = eligible > 0 ? Math.round((affected.size * 10000) / eligible) : 0;
+    const firstDate = fs.reduce((m, f) => (f.firstDate < m ? f.firstDate : m), first.firstDate);
+    const lastDate = fs.reduce((m, f) => (f.lastDate > m ? f.lastDate : m), first.lastDate);
+    const affected = new Set(fs.map((f) => f.sku));
+    const eligible = new Set(affected);
+    for (const [sku, dates] of eligibleDates.get(k) ?? []) {
+      if (dates.some((d) => d >= firstDate && d <= lastDate)) eligible.add(sku);
+    }
+    const shareBp = Math.round((affected.size * 10000) / eligible.size);
     out.push({
       cust: first.cust,
       custName: ds.customers.get(first.cust)?.name ?? first.custName,
       type: first.type,
       affectedPairs: affected.size,
-      eligiblePairs: eligible,
+      eligiblePairs: eligible.size,
       shareBp,
       wholeCustomer: affected.size >= WHOLE_CUSTOMER_MIN_PAIRS && shareBp >= WHOLE_CUSTOMER_MIN_SHARE_BP,
-      firstDate: fs.reduce((m, f) => (f.firstDate < m ? f.firstDate : m), first.firstDate),
+      firstDate,
+      lastDate,
       annualImpactYen: fs.reduce((s, f) => s + Math.max(0, f.annualImpactYen), 0),
     });
   }

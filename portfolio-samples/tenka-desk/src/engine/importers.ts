@@ -282,6 +282,7 @@ const NO_SHARE: CostShare = { material: 0, labor: 0, energy: 0, other: 0 };
 
 function readShare(r: RowReader): CostShare | null {
   if (!r.has('material')) return null;
+  if (['material', 'labor', 'energy', 'other'].every((f) => r.raw(f).trim() === '')) return null;
   const s = {
     material: r.int('material'),
     labor: r.int('labor'),

@@ -163,9 +163,13 @@ export function toWarekiMonth(ym: string): string {
   return full.replace(/1日$/, '');
 }
 
-/** Fiscal year label: 2026 -> "令和8年度" (fiscal year starting in April). */
+/**
+ * Fiscal year label (April start): 2026 -> "令和8年度". The era is the one in
+ * force at the end of the calendar year, so FY2019 is "令和元年度" as in
+ * government statistics.
+ */
 export function toWarekiFiscalYear(fy: number): string {
-  return `${toWareki(isoDate(fy, 4, 1)).replace(/年.*$/, '')}年度`;
+  return `${toWareki(isoDate(fy, 12, 31)).replace(/年.*$/, '')}年度`;
 }
 
 /** "2026-12-01" -> "20261201". */

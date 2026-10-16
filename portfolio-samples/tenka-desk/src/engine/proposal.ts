@@ -20,7 +20,16 @@
 
 import { type Dataset, pairKey } from './dataset.ts';
 import type { IsoDate } from './dates.ts';
-import { changeBp, divCeil, divFloor, marginBp, marginFloorPrice, priceAtRate } from './money.ts';
+import type { DiagnosisResult, LeakType } from './diagnosis.ts';
+import {
+  changeBp,
+  divCeil,
+  divFloor,
+  isBelowMarginFloor,
+  marginBp,
+  marginFloorPrice,
+  priceAtRate,
+} from './money.ts';
 import { roundPrice } from './rounding.ts';
 import type { ScenarioResult } from './scenario.ts';
 import { isSampleRemark } from './text.ts';
@@ -73,13 +82,13 @@ export interface PairVolume {
  */
 export function collectPairVolumes(
   lines: readonly SalesLine[],
-  window: { start: IsoDate; end: IsoDate },
+  period: { start: IsoDate; end: IsoDate },
 ): Map<string, PairVolume> {
   const out = new Map<string, PairVolume>();
   for (const l of lines) {
     if (l.sku === null || l.isReturn || l.qty <= 0) continue;
     if (l.unitPrice === 0 && isSampleRemark(l.remark)) continue;
-    if (l.date < window.start || l.date > window.end) continue;
+    if (l.date < period.start || l.date > period.end) continue;
     const k = pairKey(l.cust, l.sku);
     const v = out.get(k);
     const amount = l.amount ?? l.unitPrice * l.qty;
@@ -120,6 +129,24 @@ export interface ProposalInput {
   asOf: IsoDate;
   /** limit to these customers */
   customers?: readonly string[];
+  /**
+   * Pairs whose latest bill is still a billing leak (see ongoingBillingLeaks):
+   * for those the sales system holds the wrong price, which becomes the
+   * pair's systemPrice.
+   */
+  ongoingLeaks?: ReadonlyMap<string, LeakType>;
+}
+
+/**
+ * Customer × product pairs whose latest checked line is still a billing leak
+ * (反映漏れ, 特値の期限切れ, 掛け率ランク外). 粗利下限割れ is not a billing error.
+ */
+export function ongoingBillingLeaks(result: DiagnosisResult): Map<string, LeakType> {
+  const out = new Map<string, LeakType>();
+  for (const f of result.findings) {
+    if (f.ongoing && f.type !== 'below_margin_floor') out.set(pairKey(f.cust, f.sku), f.type);
+  }
+  return out;
 }
 
 export interface ListProposal {
@@ -260,8 +287,15 @@ export interface PairProposal {
   basis: 'list_rate' | 'special_scaled';
   /** correct unit price on asOf (特値 or 定価 × 掛率) */
   currentPrice: number;
-  /** latest billed price in the window (what the sales system currently uses) */
+  /** latest billed price in the window */
   lastBilledPrice: number;
+  /** a billing leak still going on for this pair (from the diagnosis) */
+  ongoingLeak: LeakType | null;
+  /**
+   * The price the sales system is expected to charge before the change: the
+   * last billed price while a billing leak goes on, else currentPrice.
+   */
+  systemPrice: number;
   newPrice: number;
   changeYen: number;
   changeBp: number;
@@ -279,7 +313,7 @@ export interface PairProposal {
   guardrails: GuardrailHit[];
 }
 
-/** New unit price per customer × product bought in the window. Excluded pairs are kept (with newPrice = currentPrice). */
+/** New unit price per customer × product bought in the period (直近12か月). Excluded pairs are kept, with newPrice = currentPrice. */
 export function proposePairs(
   ds: Dataset,
   volumes: ReadonlyMap<string, PairVolume>,
@@ -304,6 +338,7 @@ export function proposePairs(
     const newList = lp?.newList ?? expected.list.row.price;
     const currentPrice = expected.price;
     const special = expected.special ?? ds.validSpecial(v.cust, v.sku, input.effectiveDate);
+    const ongoingLeak = input.ongoingLeaks?.get(pairKey(v.cust, v.sku)) ?? null;
     const base: PairProposal = {
       cust: v.cust,
       sku: v.sku,
@@ -313,6 +348,8 @@ export function proposePairs(
       basis: special ? 'special_scaled' : 'list_rate',
       currentPrice,
       lastBilledPrice: v.lastBilledPrice,
+      ongoingLeak,
+      systemPrice: ongoingLeak ? v.lastBilledPrice : currentPrice,
       newPrice: currentPrice,
       changeYen: 0,
       changeBp: 0,
@@ -349,11 +386,7 @@ export function proposePairs(
       newPrice = Math.max(currentPrice, capPrice);
       hits.push({ rule: 'max_increase_capped', message: `値上げ率の上限で ${capPrice}円 に抑えました` });
     }
-    if (
-      cost.next > 0 &&
-      marginBp(newPrice, cost.next) !== null &&
-      (marginBp(newPrice, cost.next) ?? 0) < guard.marginFloorBp
-    ) {
+    if (cost.next > 0 && isBelowMarginFloor(newPrice, cost.next, guard.marginFloorBp)) {
       const target = marginFloorPrice(cost.next, guard.marginFloorBp);
       const withinCap = capPrice === null || target <= capPrice;
       const withinTier = special !== null || tierMax === null || target <= tierMax;

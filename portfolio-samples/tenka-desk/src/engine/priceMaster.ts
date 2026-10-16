@@ -57,10 +57,12 @@ export function outcomeFromLog(log: NegotiationLog): NegotiationOutcome | null {
 
 export interface PriceMasterOptions {
   /**
-   * 現単価 column: the latest billed price (what the sales system holds now;
-   * default) or the correct current price.
+   * 現単価 column: 'system' (default) — the price the sales system charges now:
+   * the last billed price while a billing leak goes on, else the correct price;
+   * 'last_billed' — the latest billed price in the sales data;
+   * 'expected' — the correct current price.
    */
-  currentPrice?: 'last_billed' | 'expected';
+  currentPrice?: 'system' | 'last_billed' | 'expected';
 }
 
 /** Rows for every proposed pair of an agreed customer (except kept categories), sorted by customer and product. */
@@ -76,7 +78,9 @@ export function buildPriceMaster(
     if (!o?.agreed || o.effective === null) continue;
     if (o.excludedCategories.includes(p.category)) continue;
     const newPrice = o.itemPrices.get(p.sku) ?? p.newPrice;
-    const currentPrice = options.currentPrice === 'expected' ? p.currentPrice : p.lastBilledPrice;
+    const mode = options.currentPrice ?? 'system';
+    const currentPrice =
+      mode === 'expected' ? p.currentPrice : mode === 'last_billed' ? p.lastBilledPrice : p.systemPrice;
     if (newPrice === currentPrice) continue;
     rows.push({
       cust: p.cust,

@@ -13,7 +13,7 @@ import { type IsoDate, toWareki } from './dates.ts';
 import { EVIDENCE_TOPIC_JA, type EvidenceItem, type EvidenceTopic } from './evidence.ts';
 import { changeBp } from './money.ts';
 import type { PairProposal } from './proposal.ts';
-import { formatBp, withCommas } from './text.ts';
+import { formatRatioPct, withCommas } from './text.ts';
 import type { Company } from './types.ts';
 
 export type EffectiveBasis = '出荷分' | '受注分' | '納品分';
@@ -118,7 +118,7 @@ export function buildLetter(
       currentPriceText: withCommas(p.currentPrice),
       newPriceText: withCommas(p.newPrice),
       changeText: `+${withCommas(p.changeYen)}`,
-      rateText: `+${formatBp(p.changeBp)}`,
+      rateText: `+${formatRatioPct(p.changeYen, p.currentPrice)}`,
     };
   });
   let before = 0;
@@ -128,8 +128,12 @@ export function buildLetter(
     after += p.newPrice * p.qty;
   }
   const averageChangeBp = before > 0 ? changeBp(after, before) : 0;
-  const minBp = Math.min(...mine.map((p) => p.changeBp));
-  const maxBp = Math.max(...mine.map((p) => p.changeBp));
+  // compare the exact ratios changeYen / currentPrice (no rounding)
+  const less = (a: PairProposal, b: PairProposal) =>
+    a.changeYen * b.currentPrice < b.changeYen * a.currentPrice;
+  const lowest = mine.reduce((m, p) => (less(p, m) ? p : m));
+  const highest = mine.reduce((m, p) => (less(m, p) ? p : m));
+  const pctOf = (p: PairProposal) => formatRatioPct(p.changeYen, p.currentPrice);
 
   const effectiveText = toWareki(options.effectiveDate);
   const topics = new Set(evidence.map((e) => e.topic));
@@ -153,9 +157,9 @@ export function buildLetter(
     {
       label: '改定率',
       value:
-        minBp === maxBp
-          ? formatBp(minBp)
-          : `平均 ${formatBp(averageChangeBp)}（品目により ${formatBp(minBp)}〜${formatBp(maxBp)}）`,
+        pctOf(lowest) === pctOf(highest)
+          ? pctOf(lowest)
+          : `平均 ${formatRatioPct(after - before, before)}（品目により ${pctOf(lowest)}〜${pctOf(highest)}）`,
     },
   ];
   if (options.contact) {
