@@ -84,6 +84,7 @@ code {
 }
 
 .visually-hidden {
+  /* biome-ignore lint/complexity/noImportantStyles: must win over any component's position */
   position: absolute !important;
   width: 1px;
   height: 1px;
@@ -912,6 +913,14 @@ legend {
   pointer-events: none;
   white-space: nowrap;
 }
+.chart-table {
+  margin-top: 4px;
+  font-size: 12px;
+}
+.chart-table summary {
+  cursor: pointer;
+  color: var(--accent);
+}
 .chart-tip strong {
   font-size: 14px;
   text-align: left;
@@ -1231,11 +1240,22 @@ legend {
 .letter p {
   margin: 0;
 }
+.letter p.letter-to {
+  margin-top: 1.5em;
+}
+.letter p.letter-close {
+  margin-top: 0.5em;
+}
+.letter p.letter-ki {
+  margin-top: 1.5em;
+}
+.letter p.letter-ijo {
+  margin-top: 1em;
+}
 .letter-meta {
   text-align: right;
 }
 .letter-to {
-  margin-top: 1.5em !important;
   font-size: 12pt;
 }
 .letter-from {
@@ -1256,10 +1276,8 @@ legend {
 }
 .letter-close {
   text-align: right;
-  margin-top: 0.5em !important;
 }
 .letter-ki {
-  margin-top: 1.5em !important;
   text-align: center;
 }
 .letter-record {
@@ -1277,7 +1295,6 @@ legend {
   margin: 0;
 }
 .letter-ijo {
-  margin-top: 1em !important;
   text-align: right;
 }
 .sheet-tag {
@@ -1541,6 +1558,7 @@ legend {
   .busy,
   .skip-link,
   .dialog {
+    /* biome-ignore lint/complexity/noImportantStyles: nothing of the app chrome may print */
     display: none !important;
   }
   .print-only {

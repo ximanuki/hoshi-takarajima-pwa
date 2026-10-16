@@ -4,7 +4,7 @@
  *  - LineChart: one series over time, with a crosshair tooltip (pointer and keyboard)
  */
 
-import { type KeyboardEvent, type PointerEvent, useId, useMemo, useRef, useState } from 'react';
+import { type PointerEvent, useMemo, useRef, useState } from 'react';
 
 export interface BarRow {
   key: string;
@@ -79,7 +79,6 @@ export function LineChart({
 }) {
   const [active, setActive] = useState<number | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
-  const tipId = useId();
   const geo = useMemo(() => {
     const values = points.map((p) => p.value);
     let lo = Math.min(...values);
@@ -134,13 +133,6 @@ export function LineChart({
     }
     setActive(best);
   };
-  const onKey = (e: KeyboardEvent<SVGSVGElement>) => {
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-      e.preventDefault();
-      const cur = active ?? last;
-      setActive(Math.max(0, Math.min(last, cur + (e.key === 'ArrowLeft' ? -1 : 1))));
-    } else if (e.key === 'Escape') setActive(null);
-  };
   const ap = active !== null ? points[active] : undefined;
   const xTickLabel = (i: number) => {
     const p = points[i] as LinePoint;
@@ -153,14 +145,9 @@ export function LineChart({
         ref={svgRef}
         viewBox={`0 0 ${W} ${H}`}
         role="img"
-        aria-label={`${title}（${unit}）。${periodLabel(first.period)} ${format(first.value)} から ${periodLabel(lastPoint.period)} ${format(lastPoint.value)}。左右の矢印キーで各時点の値を読めます。`}
-        aria-describedby={ap ? tipId : undefined}
-        tabIndex={0}
+        aria-label={`${title}（${unit}）。${periodLabel(first.period)} ${format(first.value)} から ${periodLabel(lastPoint.period)} ${format(lastPoint.value)}。各時点の値は下の表で読めます。`}
         onPointerMove={pick}
         onPointerLeave={() => setActive(null)}
-        onFocus={() => setActive(last)}
-        onBlur={() => setActive(null)}
-        onKeyDown={onKey}
       >
         {geo.ticks.map((t) => (
           <g key={t}>
@@ -200,9 +187,8 @@ export function LineChart({
       </svg>
       {ap && active !== null && (
         <div
-          id={tipId}
           className="chart-tip"
-          role="status"
+          aria-hidden="true"
           style={{
             left: `${(geo.x(active) / W) * 100}%`,
             transform: geo.x(active) > W * 0.6 ? 'translateX(calc(-100% - 10px))' : 'translateX(10px)',
@@ -212,6 +198,32 @@ export function LineChart({
           <span>{periodLabel(ap.period)}</span>
         </div>
       )}
+      <details className="chart-table no-print">
+        <summary>数値を表で見る</summary>
+        <div className="table-wrap scroll-y">
+          <table className="table compact">
+            <caption className="visually-hidden">
+              {title}（{unit}）
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">時点</th>
+                <th scope="col" className="num">
+                  値（{unit}）
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {points.map((p) => (
+                <tr key={p.period}>
+                  <th scope="row">{periodLabel(p.period)}</th>
+                  <td className="num">{format(p.value)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </details>
     </div>
   );
 }

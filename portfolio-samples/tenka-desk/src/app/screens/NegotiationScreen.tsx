@@ -203,7 +203,7 @@ export function NegotiationScreen() {
             />
           </label>
         </div>
-        <div className="kanban" aria-label="状況ごとの得意先">
+        <section className="kanban" aria-label="状況ごとの得意先">
           {NEGOTIATION_STATUSES.map((s) => {
             const list = columns.get(s) ?? [];
             return (
@@ -234,7 +234,7 @@ export function NegotiationScreen() {
               </section>
             );
           })}
-        </div>
+        </section>
       </div>
       {selected ? (
         <CustomerLog key={selected} cust={selected} />
