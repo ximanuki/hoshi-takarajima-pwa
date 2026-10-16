@@ -156,3 +156,56 @@ export function loadWorkspace(inputs: readonly InputFile[], options: WorkspaceOp
   }
   return { dataset, files, sales, priceMasters, newListPrices, importIssues, notes };
 }
+
+function num(o: Record<string, unknown>, k: string): number | undefined {
+  const v = o[k];
+  return typeof v === 'number' && Number.isFinite(v) ? v : undefined;
+}
+
+function str(o: Record<string, unknown>, k: string): string {
+  const v = o[k];
+  return typeof v === 'string' ? v : '';
+}
+
+/** Settings from a JSON object like public/sample/demo_settings.json (unknown keys are ignored). */
+export function settingsFromJson(json: unknown): Partial<Settings> {
+  if (typeof json !== 'object' || json === null) return {};
+  const o = json as Record<string, unknown>;
+  const out: Partial<Settings> = {};
+  const floor = num(o, 'marginFloorPct');
+  if (floor !== undefined) out.marginFloorBp = Math.round(floor * 100);
+  const r = o['unitPriceRounding'];
+  if (r === 'floor' || r === 'ceil' || r === 'round') out.unitRounding = r;
+  const lr = o['listPriceRounding'];
+  if (typeof lr === 'object' && lr !== null) {
+    const l = lr as Record<string, unknown>;
+    const b1 = num(l, 'below1000');
+    const b2 = num(l, 'below10000');
+    const b3 = num(l, 'otherwise');
+    if (b1 !== undefined && b2 !== undefined && b3 !== undefined) {
+      out.listRounding = {
+        bands: [
+          { below: 1000, unit: b1 },
+          { below: 10000, unit: b2 },
+          { below: null, unit: b3 },
+        ],
+        mode: 'ceil',
+      };
+    }
+  }
+  return out;
+}
+
+/** Company profile from a JSON object like public/sample/company.json. */
+export function companyFromJson(json: unknown): Company {
+  const o = (typeof json === 'object' && json !== null ? json : {}) as Record<string, unknown>;
+  const branches = Array.isArray(o['branches']) ? o['branches'].filter((b): b is string => typeof b === 'string') : [];
+  return {
+    name: str(o, 'name'),
+    business: str(o, 'business'),
+    address: str(o, 'address'),
+    tel: str(o, 'tel'),
+    representative: str(o, 'representative'),
+    branches,
+  };
+}

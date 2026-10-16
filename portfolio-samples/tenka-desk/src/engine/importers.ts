@@ -46,7 +46,10 @@ class RowReader {
   row = 0;
   private cells: readonly string[] = [];
   private failed = false;
-  constructor(private readonly mapping: ColumnMapping) {}
+  private readonly mapping: ColumnMapping;
+  constructor(mapping: ColumnMapping) {
+    this.mapping = mapping;
+  }
 
   start(cells: readonly string[], row: number): void {
     this.cells = cells;
@@ -428,12 +431,13 @@ export interface FileImport {
 }
 
 export class LayoutNotRecognisedError extends Error {
-  constructor(
-    readonly fileName: string,
-    readonly header: string[],
-  ) {
+  readonly fileName: string;
+  readonly header: string[];
+  constructor(fileName: string, header: string[]) {
     super(`${fileName}: 列の見出しからファイルの種類を判別できませんでした（${header.slice(0, 6).join(', ')} …）`);
     this.name = 'LayoutNotRecognisedError';
+    this.fileName = fileName;
+    this.header = header;
   }
 }
 
