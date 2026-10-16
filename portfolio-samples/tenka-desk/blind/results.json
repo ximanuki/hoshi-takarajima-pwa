@@ -1,0 +1,2689 @@
+{
+  "note": "Blind evaluation of the tenka-desk engine on two independently generated fictional datasets. Engine labels were written by scripts/blind-score.ts before the truth was read; the truth hashes were checked against blind/<gen>/SEALED.sha256 first. Lines the truth marks ambiguous are excluded from precision/recall and reported per pattern.",
+  "runs": {
+    "default": "engine-labels.csv: the app as shipped, default settings (no 改定日 typed for the agreements file).",
+    "revdate": "engine-labels.revdate.csv: the same, after the one action the import screen asks for: typing the 改定日 of the agreements file (from demo_settings.json previousRevisionDate / the README)."
+  },
+  "labelMapping": {
+    "truth": {
+      "unexplained_price_diff": "unexplained"
+    },
+    "engine": {
+      "ok_kept_excluded_category": "ok_declined",
+      "ok_negotiating": "ok_declined",
+      "excluded_unknown_customer": "excluded",
+      "excluded_no_list_price": "excluded",
+      "price_mismatch (status)": "unexplained",
+      "overcharge (status)": "overcharge (kept: the engine never counts billing above the expected price as a leak)"
+    }
+  },
+  "datasets": {
+    "gen-1": {
+      "sealedTruth": [
+        {
+          "file": "truth/lines.csv",
+          "sha256": "6120c7f2644bf62138c8f4b6674d7969002407da135adc2fa2237bcec8fb9ad1",
+          "ok": true
+        },
+        {
+          "file": "truth/summary.json",
+          "sha256": "9d50f70120129282caeae5c5b95f81f2666b7e4bd37051ee2dc7397675eaef99",
+          "ok": true
+        }
+      ],
+      "runs": {
+        "default": {
+          "lines": {
+            "truth": 22200,
+            "engine": 22200,
+            "joined": 22200
+          },
+          "joinCheck": {
+            "notImported": 0,
+            "lineIdDifferent": 0
+          },
+          "linesScored": 22111,
+          "linesAmbiguous": 89,
+          "mismatchesScored": 769,
+          "labelAgreementScored": {
+            "agree": 21342,
+            "of": 22111
+          },
+          "importAndExclusion": {
+            "revisionsAssigned": [],
+            "workspaceNotes": [
+              "revision_2025-10_agreements.csv: どの定価改定の合意状況か決められないため、使っていません。改定日を指定してください。"
+            ],
+            "sales": {
+              "rowsInFiles": 22200,
+              "linesImported": 22200,
+              "rowsNotImported": 0,
+              "duplicateLinesDropped": 0,
+              "duplicateExamples": [],
+              "slipCollisionsKept": 0,
+              "linesDiagnosed": 22200
+            },
+            "filesNotUsed": [
+              {
+                "file": "README.md",
+                "status": "unrecognised",
+                "error": "README.md: 列の見出しからファイルの種類を判別できませんでした（# 検証用データ gen-1（架空） …）"
+              }
+            ],
+            "rowsSkippedInUsedFiles": 0,
+            "engineExcluded": {
+              "unknownCustomer": 8,
+              "noListPrice": 0,
+              "overchargeNotCountedAsLeak": 6
+            }
+          },
+          "labelCounts": {
+            "truth": {
+              "ok": 17025,
+              "ok_non_product": 1297,
+              "ok_special": 1198,
+              "ok_declined": 537,
+              "leak_old_price": 501,
+              "ok_volume_discount": 430,
+              "leak_rate_out_of_tier": 278,
+              "leak_below_margin_floor": 238,
+              "ok_return": 203,
+              "ok_deferred": 197,
+              "leak_expired_special": 163,
+              "ambiguous": 89,
+              "ok_sample": 39,
+              "unexplained": 5
+            },
+            "engine": {
+              "ok": 17057,
+              "ok_non_product": 1297,
+              "leak_old_price": 1283,
+              "ok_special": 1200,
+              "ok_volume_discount": 413,
+              "leak_rate_out_of_tier": 295,
+              "leak_below_margin_floor": 228,
+              "ok_return": 203,
+              "leak_expired_special": 163,
+              "ok_sample": 42,
+              "excluded": 8,
+              "overcharge": 6,
+              "unexplained": 5
+            }
+          },
+          "lineLevel": {
+            "leak_old_price": {
+              "tp": 501,
+              "fp": 746,
+              "fn": 0,
+              "precision": 0.4018,
+              "recall": 1
+            },
+            "leak_expired_special": {
+              "tp": 163,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1,
+              "recall": 1
+            },
+            "leak_rate_out_of_tier": {
+              "tp": 272,
+              "fp": 17,
+              "fn": 6,
+              "precision": 0.9412,
+              "recall": 0.9784
+            },
+            "leak_below_margin_floor": {
+              "tp": 226,
+              "fp": 0,
+              "fn": 12,
+              "precision": 1,
+              "recall": 0.9496
+            },
+            "unexplained": {
+              "tp": 5,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1,
+              "recall": 1
+            },
+            "any_leak_type_ignored": {
+              "tp": 1174,
+              "fp": 751,
+              "fn": 6,
+              "precision": 0.6099,
+              "recall": 0.9949
+            },
+            "any_flag_incl_unexplained": {
+              "tp": 1179,
+              "fp": 751,
+              "fn": 6,
+              "precision": 0.6109,
+              "recall": 0.9949
+            }
+          },
+          "pairLevel": {
+            "leak_old_price": {
+              "tp": 87,
+              "fp": 208,
+              "fn": 0,
+              "precision": 0.2949,
+              "recall": 1
+            },
+            "leak_expired_special": {
+              "tp": 18,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1,
+              "recall": 1
+            },
+            "leak_rate_out_of_tier": {
+              "tp": 47,
+              "fp": 13,
+              "fn": 4,
+              "precision": 0.7833,
+              "recall": 0.9216
+            },
+            "leak_below_margin_floor": {
+              "tp": 24,
+              "fp": 0,
+              "fn": 5,
+              "precision": 1,
+              "recall": 0.8276
+            },
+            "unexplained": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1,
+              "recall": 1
+            },
+            "any_leak_type_ignored": {
+              "tp": 180,
+              "fp": 202,
+              "fn": 4,
+              "precision": 0.4712,
+              "recall": 0.9783
+            }
+          },
+          "yen": {
+            "leak_old_price": {
+              "truthLast12m": 547099,
+              "truthLast12mPositiveOnly": 547099,
+              "truthAllPeriod": 569610,
+              "engineAppFigureLast12m": 1670878,
+              "engineLast12m": 1670878,
+              "engineLast12mOnTruthAmbiguousLines": 23897,
+              "engineAllPeriod": 1693389,
+              "truePositiveLinesLast12m": {
+                "lines": 475,
+                "truthYen": 547099,
+                "engineYen": 547099,
+                "linesWithSameShortfall": 475
+              }
+            },
+            "leak_expired_special": {
+              "truthLast12m": 331012,
+              "truthLast12mPositiveOnly": 331012,
+              "truthAllPeriod": 341175,
+              "engineAppFigureLast12m": 333037,
+              "engineLast12m": 333037,
+              "engineLast12mOnTruthAmbiguousLines": 0,
+              "engineAllPeriod": 343200,
+              "truePositiveLinesLast12m": {
+                "lines": 145,
+                "truthYen": 331012,
+                "engineYen": 333037,
+                "linesWithSameShortfall": 142
+              }
+            },
+            "leak_rate_out_of_tier": {
+              "truthLast12m": 168877,
+              "truthLast12mPositiveOnly": 175057,
+              "truthAllPeriod": 242090,
+              "engineAppFigureLast12m": 183462,
+              "engineLast12m": 183462,
+              "engineLast12mOnTruthAmbiguousLines": 7638,
+              "engineAllPeriod": 256675,
+              "truePositiveLinesLast12m": {
+                "lines": 169,
+                "truthYen": 141761,
+                "engineYen": 146626,
+                "linesWithSameShortfall": 166
+              }
+            },
+            "leak_below_margin_floor": {
+              "truthLast12m": 261026,
+              "truthLast12mPositiveOnly": 261026,
+              "truthAllPeriod": 265498,
+              "engineAppFigureLast12m": 249623,
+              "engineLast12m": 249623,
+              "engineLast12mOnTruthAmbiguousLines": 28960,
+              "engineAllPeriod": 254095,
+              "truePositiveLinesLast12m": {
+                "lines": 205,
+                "truthYen": 220663,
+                "engineYen": 220663,
+                "linesWithSameShortfall": 205
+              }
+            },
+            "unexplained": {
+              "truthLast12m": 4527,
+              "truthLast12mPositiveOnly": 4527,
+              "truthAllPeriod": 4527,
+              "engineAppFigureLast12m": null,
+              "engineLast12m": 4527,
+              "engineLast12mOnTruthAmbiguousLines": 0,
+              "engineAllPeriod": 4527,
+              "truePositiveLinesLast12m": {
+                "lines": 5,
+                "truthYen": 4527,
+                "engineYen": 4527,
+                "linesWithSameShortfall": 5
+              }
+            }
+          },
+          "referencePriceAgreement": {
+            "compared": 20569,
+            "agree": 19800
+          },
+          "leakConfusion": {
+            "ok_declined -> leak_old_price": 537,
+            "ok_deferred -> leak_old_price": 197,
+            "ok_volume_discount -> leak_rate_out_of_tier": 17,
+            "leak_below_margin_floor -> leak_old_price": 12,
+            "leak_rate_out_of_tier -> ok_sample": 3,
+            "leak_rate_out_of_tier -> overcharge": 3
+          },
+          "decoys": {
+            "ok": {
+              "lines": 17025,
+              "sameLabel": 17025,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok": 17025
+              }
+            },
+            "ok_non_product": {
+              "lines": 1297,
+              "sameLabel": 1297,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok_non_product": 1297
+              }
+            },
+            "ok_volume_discount": {
+              "lines": 430,
+              "sameLabel": 413,
+              "flaggedAsLeak": 17,
+              "engine": {
+                "ok_volume_discount": 413,
+                "leak_rate_out_of_tier": 17
+              }
+            },
+            "ok_special": {
+              "lines": 1198,
+              "sameLabel": 1198,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok_special": 1198
+              }
+            },
+            "ok_return": {
+              "lines": 203,
+              "sameLabel": 203,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok_return": 203
+              }
+            },
+            "ok_sample": {
+              "lines": 39,
+              "sameLabel": 39,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok_sample": 39
+              }
+            },
+            "ok_deferred": {
+              "lines": 197,
+              "sameLabel": 0,
+              "flaggedAsLeak": 197,
+              "engine": {
+                "leak_old_price": 197
+              }
+            },
+            "ok_declined": {
+              "lines": 537,
+              "sameLabel": 0,
+              "flaggedAsLeak": 537,
+              "engine": {
+                "leak_old_price": 537
+              }
+            }
+          },
+          "embeddedCauses": {},
+          "ambiguous": {
+            "list_cut_old_price": {
+              "lines": 3,
+              "engine": {
+                "overcharge": 3
+              },
+              "readingA": "leak_old_price",
+              "readingB": "leak_rate_out_of_tier",
+              "engineMatchesA": 0,
+              "engineMatchesB": 0,
+              "engineMatchesNeither": 3,
+              "engineYenLast12m": -1110
+            },
+            "negotiating_status": {
+              "lines": 36,
+              "engine": {
+                "leak_old_price": 36
+              },
+              "readingA": "ok_declined",
+              "readingB": "leak_old_price",
+              "engineMatchesA": 0,
+              "engineMatchesB": 36,
+              "engineMatchesNeither": 0,
+              "engineYenLast12m": 23897
+            },
+            "no_agreement_row": {
+              "lines": 32,
+              "engine": {
+                "ok": 32
+              },
+              "readingA": "ok",
+              "readingB": "leak_rate_out_of_tier",
+              "engineMatchesA": 32,
+              "engineMatchesB": 0,
+              "engineMatchesNeither": 0,
+              "engineYenLast12m": 0
+            },
+            "overlapping_specials": {
+              "lines": 2,
+              "engine": {
+                "ok_special": 2
+              },
+              "readingA": "ok_special",
+              "readingB": "leak_rate_out_of_tier",
+              "engineMatchesA": 2,
+              "engineMatchesB": 0,
+              "engineMatchesNeither": 0,
+              "engineYenLast12m": 0
+            },
+            "two_revisions_behind": {
+              "lines": 6,
+              "engine": {
+                "leak_rate_out_of_tier": 6
+              },
+              "readingA": "leak_old_price",
+              "readingB": "leak_rate_out_of_tier",
+              "engineMatchesA": 0,
+              "engineMatchesB": 6,
+              "engineMatchesNeither": 0,
+              "engineYenLast12m": 7638
+            },
+            "unknown_customer": {
+              "lines": 8,
+              "engine": {
+                "excluded": 8
+              },
+              "readingA": "excluded",
+              "readingB": "excluded",
+              "engineMatchesA": 8,
+              "engineMatchesB": 8,
+              "engineMatchesNeither": 0,
+              "engineYenLast12m": 0
+            },
+            "volume_discount_below_floor": {
+              "lines": 2,
+              "engine": {
+                "leak_below_margin_floor": 2
+              },
+              "readingA": "ok_volume_discount",
+              "readingB": "leak_below_margin_floor",
+              "engineMatchesA": 0,
+              "engineMatchesB": 2,
+              "engineMatchesNeither": 0,
+              "engineYenLast12m": 28960
+            }
+          },
+          "confusion": {
+            "ambiguous:list_cut_old_price": {
+              "overcharge": 3
+            },
+            "ambiguous:negotiating_status": {
+              "leak_old_price": 36
+            },
+            "ambiguous:no_agreement_row": {
+              "ok": 32
+            },
+            "ambiguous:overlapping_specials": {
+              "ok_special": 2
+            },
+            "ambiguous:two_revisions_behind": {
+              "leak_rate_out_of_tier": 6
+            },
+            "ambiguous:unknown_customer": {
+              "excluded": 8
+            },
+            "ambiguous:volume_discount_below_floor": {
+              "leak_below_margin_floor": 2
+            },
+            "leak_below_margin_floor": {
+              "leak_below_margin_floor": 226,
+              "leak_old_price": 12
+            },
+            "leak_expired_special": {
+              "leak_expired_special": 163
+            },
+            "leak_old_price": {
+              "leak_old_price": 501
+            },
+            "leak_rate_out_of_tier": {
+              "leak_rate_out_of_tier": 272,
+              "ok_sample": 3,
+              "overcharge": 3
+            },
+            "ok": {
+              "ok": 17025
+            },
+            "ok_declined": {
+              "leak_old_price": 537
+            },
+            "ok_deferred": {
+              "leak_old_price": 197
+            },
+            "ok_non_product": {
+              "ok_non_product": 1297
+            },
+            "ok_return": {
+              "ok_return": 203
+            },
+            "ok_sample": {
+              "ok_sample": 39
+            },
+            "ok_special": {
+              "ok_special": 1198
+            },
+            "ok_volume_discount": {
+              "ok_volume_discount": 413,
+              "leak_rate_out_of_tier": 17
+            },
+            "unexplained": {
+              "unexplained": 5
+            }
+          }
+        },
+        "revdate": {
+          "lines": {
+            "truth": 22200,
+            "engine": 22200,
+            "joined": 22200
+          },
+          "joinCheck": {
+            "notImported": 0,
+            "lineIdDifferent": 0
+          },
+          "linesScored": 22111,
+          "linesAmbiguous": 89,
+          "mismatchesScored": 6,
+          "labelAgreementScored": {
+            "agree": 22105,
+            "of": 22111
+          },
+          "importAndExclusion": {
+            "revisionsAssigned": [
+              {
+                "date": "2025-10-01",
+                "customers": 76
+              }
+            ],
+            "workspaceNotes": [],
+            "sales": {
+              "rowsInFiles": 22200,
+              "linesImported": 22200,
+              "rowsNotImported": 0,
+              "duplicateLinesDropped": 0,
+              "duplicateExamples": [],
+              "slipCollisionsKept": 0,
+              "linesDiagnosed": 22200
+            },
+            "filesNotUsed": [
+              {
+                "file": "README.md",
+                "status": "unrecognised",
+                "error": "README.md: 列の見出しからファイルの種類を判別できませんでした（# 検証用データ gen-1（架空） …）"
+              }
+            ],
+            "rowsSkippedInUsedFiles": 0,
+            "engineExcluded": {
+              "unknownCustomer": 8,
+              "noListPrice": 0,
+              "overchargeNotCountedAsLeak": 6
+            }
+          },
+          "labelCounts": {
+            "truth": {
+              "ok": 17025,
+              "ok_non_product": 1297,
+              "ok_special": 1198,
+              "ok_declined": 537,
+              "leak_old_price": 501,
+              "ok_volume_discount": 430,
+              "leak_rate_out_of_tier": 278,
+              "leak_below_margin_floor": 238,
+              "ok_return": 203,
+              "ok_deferred": 197,
+              "leak_expired_special": 163,
+              "ambiguous": 89,
+              "ok_sample": 39,
+              "unexplained": 5
+            },
+            "engine": {
+              "ok": 17057,
+              "ok_non_product": 1297,
+              "ok_special": 1200,
+              "ok_declined": 573,
+              "leak_old_price": 501,
+              "ok_volume_discount": 430,
+              "leak_rate_out_of_tier": 278,
+              "leak_below_margin_floor": 240,
+              "ok_return": 203,
+              "ok_deferred": 197,
+              "leak_expired_special": 163,
+              "ok_sample": 42,
+              "excluded": 8,
+              "overcharge": 6,
+              "unexplained": 5
+            }
+          },
+          "lineLevel": {
+            "leak_old_price": {
+              "tp": 501,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1,
+              "recall": 1
+            },
+            "leak_expired_special": {
+              "tp": 163,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1,
+              "recall": 1
+            },
+            "leak_rate_out_of_tier": {
+              "tp": 272,
+              "fp": 0,
+              "fn": 6,
+              "precision": 1,
+              "recall": 0.9784
+            },
+            "leak_below_margin_floor": {
+              "tp": 238,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1,
+              "recall": 1
+            },
+            "unexplained": {
+              "tp": 5,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1,
+              "recall": 1
+            },
+            "any_leak_type_ignored": {
+              "tp": 1174,
+              "fp": 0,
+              "fn": 6,
+              "precision": 1,
+              "recall": 0.9949
+            },
+            "any_flag_incl_unexplained": {
+              "tp": 1179,
+              "fp": 0,
+              "fn": 6,
+              "precision": 1,
+              "recall": 0.9949
+            }
+          },
+          "pairLevel": {
+            "leak_old_price": {
+              "tp": 87,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1,
+              "recall": 1
+            },
+            "leak_expired_special": {
+              "tp": 18,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1,
+              "recall": 1
+            },
+            "leak_rate_out_of_tier": {
+              "tp": 47,
+              "fp": 0,
+              "fn": 4,
+              "precision": 1,
+              "recall": 0.9216
+            },
+            "leak_below_margin_floor": {
+              "tp": 29,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1,
+              "recall": 1
+            },
+            "unexplained": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1,
+              "recall": 1
+            },
+            "any_leak_type_ignored": {
+              "tp": 180,
+              "fp": 0,
+              "fn": 4,
+              "precision": 1,
+              "recall": 0.9783
+            }
+          },
+          "yen": {
+            "leak_old_price": {
+              "truthLast12m": 547099,
+              "truthLast12mPositiveOnly": 547099,
+              "truthAllPeriod": 569610,
+              "engineAppFigureLast12m": 547099,
+              "engineLast12m": 547099,
+              "engineLast12mOnTruthAmbiguousLines": 0,
+              "engineAllPeriod": 569610,
+              "truePositiveLinesLast12m": {
+                "lines": 475,
+                "truthYen": 547099,
+                "engineYen": 547099,
+                "linesWithSameShortfall": 475
+              }
+            },
+            "leak_expired_special": {
+              "truthLast12m": 331012,
+              "truthLast12mPositiveOnly": 331012,
+              "truthAllPeriod": 341175,
+              "engineAppFigureLast12m": 331012,
+              "engineLast12m": 331012,
+              "engineLast12mOnTruthAmbiguousLines": 0,
+              "engineAllPeriod": 341175,
+              "truePositiveLinesLast12m": {
+                "lines": 145,
+                "truthYen": 331012,
+                "engineYen": 331012,
+                "linesWithSameShortfall": 145
+              }
+            },
+            "leak_rate_out_of_tier": {
+              "truthLast12m": 168877,
+              "truthLast12mPositiveOnly": 175057,
+              "truthAllPeriod": 242090,
+              "engineAppFigureLast12m": 149399,
+              "engineLast12m": 149399,
+              "engineLast12mOnTruthAmbiguousLines": 7638,
+              "engineAllPeriod": 222612,
+              "truePositiveLinesLast12m": {
+                "lines": 169,
+                "truthYen": 141761,
+                "engineYen": 141761,
+                "linesWithSameShortfall": 169
+              }
+            },
+            "leak_below_margin_floor": {
+              "truthLast12m": 261026,
+              "truthLast12mPositiveOnly": 261026,
+              "truthAllPeriod": 265498,
+              "engineAppFigureLast12m": 289986,
+              "engineLast12m": 289986,
+              "engineLast12mOnTruthAmbiguousLines": 28960,
+              "engineAllPeriod": 294458,
+              "truePositiveLinesLast12m": {
+                "lines": 217,
+                "truthYen": 261026,
+                "engineYen": 261026,
+                "linesWithSameShortfall": 217
+              }
+            },
+            "unexplained": {
+              "truthLast12m": 4527,
+              "truthLast12mPositiveOnly": 4527,
+              "truthAllPeriod": 4527,
+              "engineAppFigureLast12m": null,
+              "engineLast12m": 4527,
+              "engineLast12mOnTruthAmbiguousLines": 0,
+              "engineAllPeriod": 4527,
+              "truePositiveLinesLast12m": {
+                "lines": 5,
+                "truthYen": 4527,
+                "engineYen": 4527,
+                "linesWithSameShortfall": 5
+              }
+            }
+          },
+          "referencePriceAgreement": {
+            "compared": 20569,
+            "agree": 20569
+          },
+          "leakConfusion": {
+            "leak_rate_out_of_tier -> ok_sample": 3,
+            "leak_rate_out_of_tier -> overcharge": 3
+          },
+          "decoys": {
+            "ok": {
+              "lines": 17025,
+              "sameLabel": 17025,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok": 17025
+              }
+            },
+            "ok_non_product": {
+              "lines": 1297,
+              "sameLabel": 1297,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok_non_product": 1297
+              }
+            },
+            "ok_volume_discount": {
+              "lines": 430,
+              "sameLabel": 430,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok_volume_discount": 430
+              }
+            },
+            "ok_special": {
+              "lines": 1198,
+              "sameLabel": 1198,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok_special": 1198
+              }
+            },
+            "ok_return": {
+              "lines": 203,
+              "sameLabel": 203,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok_return": 203
+              }
+            },
+            "ok_sample": {
+              "lines": 39,
+              "sameLabel": 39,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok_sample": 39
+              }
+            },
+            "ok_deferred": {
+              "lines": 197,
+              "sameLabel": 197,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok_deferred": 197
+              }
+            },
+            "ok_declined": {
+              "lines": 537,
+              "sameLabel": 537,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok_declined": 537
+              }
+            }
+          },
+          "embeddedCauses": {},
+          "ambiguous": {
+            "list_cut_old_price": {
+              "lines": 3,
+              "engine": {
+                "overcharge": 3
+              },
+              "readingA": "leak_old_price",
+              "readingB": "leak_rate_out_of_tier",
+              "engineMatchesA": 0,
+              "engineMatchesB": 0,
+              "engineMatchesNeither": 3,
+              "engineYenLast12m": -1110
+            },
+            "negotiating_status": {
+              "lines": 36,
+              "engine": {
+                "ok_declined": 36
+              },
+              "readingA": "ok_declined",
+              "readingB": "leak_old_price",
+              "engineMatchesA": 36,
+              "engineMatchesB": 0,
+              "engineMatchesNeither": 0,
+              "engineYenLast12m": 0
+            },
+            "no_agreement_row": {
+              "lines": 32,
+              "engine": {
+                "ok": 32
+              },
+              "readingA": "ok",
+              "readingB": "leak_rate_out_of_tier",
+              "engineMatchesA": 32,
+              "engineMatchesB": 0,
+              "engineMatchesNeither": 0,
+              "engineYenLast12m": 0
+            },
+            "overlapping_specials": {
+              "lines": 2,
+              "engine": {
+                "ok_special": 2
+              },
+              "readingA": "ok_special",
+              "readingB": "leak_rate_out_of_tier",
+              "engineMatchesA": 2,
+              "engineMatchesB": 0,
+              "engineMatchesNeither": 0,
+              "engineYenLast12m": 0
+            },
+            "two_revisions_behind": {
+              "lines": 6,
+              "engine": {
+                "leak_rate_out_of_tier": 6
+              },
+              "readingA": "leak_old_price",
+              "readingB": "leak_rate_out_of_tier",
+              "engineMatchesA": 0,
+              "engineMatchesB": 6,
+              "engineMatchesNeither": 0,
+              "engineYenLast12m": 7638
+            },
+            "unknown_customer": {
+              "lines": 8,
+              "engine": {
+                "excluded": 8
+              },
+              "readingA": "excluded",
+              "readingB": "excluded",
+              "engineMatchesA": 8,
+              "engineMatchesB": 8,
+              "engineMatchesNeither": 0,
+              "engineYenLast12m": 0
+            },
+            "volume_discount_below_floor": {
+              "lines": 2,
+              "engine": {
+                "leak_below_margin_floor": 2
+              },
+              "readingA": "ok_volume_discount",
+              "readingB": "leak_below_margin_floor",
+              "engineMatchesA": 0,
+              "engineMatchesB": 2,
+              "engineMatchesNeither": 0,
+              "engineYenLast12m": 28960
+            }
+          },
+          "confusion": {
+            "ambiguous:list_cut_old_price": {
+              "overcharge": 3
+            },
+            "ambiguous:negotiating_status": {
+              "ok_declined": 36
+            },
+            "ambiguous:no_agreement_row": {
+              "ok": 32
+            },
+            "ambiguous:overlapping_specials": {
+              "ok_special": 2
+            },
+            "ambiguous:two_revisions_behind": {
+              "leak_rate_out_of_tier": 6
+            },
+            "ambiguous:unknown_customer": {
+              "excluded": 8
+            },
+            "ambiguous:volume_discount_below_floor": {
+              "leak_below_margin_floor": 2
+            },
+            "leak_below_margin_floor": {
+              "leak_below_margin_floor": 238
+            },
+            "leak_expired_special": {
+              "leak_expired_special": 163
+            },
+            "leak_old_price": {
+              "leak_old_price": 501
+            },
+            "leak_rate_out_of_tier": {
+              "leak_rate_out_of_tier": 272,
+              "ok_sample": 3,
+              "overcharge": 3
+            },
+            "ok": {
+              "ok": 17025
+            },
+            "ok_declined": {
+              "ok_declined": 537
+            },
+            "ok_deferred": {
+              "ok_deferred": 197
+            },
+            "ok_non_product": {
+              "ok_non_product": 1297
+            },
+            "ok_return": {
+              "ok_return": 203
+            },
+            "ok_sample": {
+              "ok_sample": 39
+            },
+            "ok_special": {
+              "ok_special": 1198
+            },
+            "ok_volume_discount": {
+              "ok_volume_discount": 430
+            },
+            "unexplained": {
+              "unexplained": 5
+            }
+          }
+        }
+      }
+    },
+    "gen-2": {
+      "sealedTruth": [
+        {
+          "file": "truth/followup_lines.csv",
+          "sha256": "3f9ce74f390abab21e72563a41606d18e6615b4e6eec8c62b453091b0ca07282",
+          "ok": true
+        },
+        {
+          "file": "truth/lines.csv",
+          "sha256": "fce7a291f9f184fec19a5fc538e9d3dab4b7e005f7a8aeabdaf39c6cc1c29fea",
+          "ok": true
+        },
+        {
+          "file": "truth/summary.json",
+          "sha256": "398d02a1a6143a1df8d5a14081e5471dab060a98fccf1d2555feb5a1eb939661",
+          "ok": true
+        }
+      ],
+      "runs": {
+        "default": {
+          "lines": {
+            "truth": 21953,
+            "engine": 21953,
+            "joined": 21953
+          },
+          "joinCheck": {
+            "notImported": 0,
+            "lineIdDifferent": 0
+          },
+          "linesScored": 21864,
+          "linesAmbiguous": 89,
+          "mismatchesScored": 971,
+          "labelAgreementScored": {
+            "agree": 20893,
+            "of": 21864
+          },
+          "importAndExclusion": {
+            "revisionsAssigned": [],
+            "workspaceNotes": [
+              "revision_2025-06_agreements.csv: どの定価改定の合意状況か決められないため、使っていません。改定日を指定してください。"
+            ],
+            "sales": {
+              "rowsInFiles": 21953,
+              "linesImported": 21953,
+              "rowsNotImported": 0,
+              "duplicateLinesDropped": 0,
+              "duplicateExamples": [],
+              "slipCollisionsKept": 0,
+              "linesDiagnosed": 21953
+            },
+            "filesNotUsed": [
+              {
+                "file": "README.md",
+                "status": "unrecognised",
+                "error": "README.md: 列の見出しからファイルの種類を判別できませんでした（# 検証用データ gen-2（架空） …）"
+              },
+              {
+                "file": "next/list_prices_20260901.csv",
+                "status": "ok",
+                "error": null
+              },
+              {
+                "file": "next/price_master_A_20260901.csv",
+                "status": "ok",
+                "error": null
+              },
+              {
+                "file": "next/price_master_B_20260901.csv",
+                "status": "ok",
+                "error": null
+              },
+              {
+                "file": "next/revision_2026-09_outcomes.csv",
+                "status": "ok",
+                "error": null
+              },
+              {
+                "file": "next/sales_B_202609.csv",
+                "status": "ok",
+                "error": null
+              }
+            ],
+            "rowsSkippedInUsedFiles": 0,
+            "engineExcluded": {
+              "unknownCustomer": 12,
+              "noListPrice": 0,
+              "overchargeNotCountedAsLeak": 2
+            }
+          },
+          "labelCounts": {
+            "truth": {
+              "ok": 17453,
+              "ok_non_product": 1000,
+              "ok_declined": 863,
+              "ok_volume_discount": 620,
+              "ok_special": 564,
+              "leak_rate_out_of_tier": 439,
+              "leak_old_price": 390,
+              "leak_below_margin_floor": 188,
+              "ok_return": 143,
+              "ambiguous": 89,
+              "ok_deferred": 82,
+              "leak_expired_special": 62,
+              "ok_sample": 60
+            },
+            "engine": {
+              "ok": 17508,
+              "leak_old_price": 1337,
+              "ok_non_product": 1000,
+              "ok_volume_discount": 599,
+              "ok_special": 564,
+              "leak_rate_out_of_tier": 463,
+              "leak_below_margin_floor": 192,
+              "ok_return": 143,
+              "leak_expired_special": 62,
+              "ok_sample": 61,
+              "excluded": 12,
+              "unexplained": 10,
+              "overcharge": 2
+            }
+          },
+          "lineLevel": {
+            "leak_old_price": {
+              "tp": 390,
+              "fp": 945,
+              "fn": 0,
+              "precision": 0.2921,
+              "recall": 1
+            },
+            "leak_expired_special": {
+              "tp": 62,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1,
+              "recall": 1
+            },
+            "leak_rate_out_of_tier": {
+              "tp": 437,
+              "fp": 24,
+              "fn": 2,
+              "precision": 0.9479,
+              "recall": 0.9954
+            },
+            "leak_below_margin_floor": {
+              "tp": 188,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1,
+              "recall": 1
+            },
+            "unexplained": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 0,
+              "precision": null,
+              "recall": null
+            },
+            "any_leak_type_ignored": {
+              "tp": 1077,
+              "fp": 969,
+              "fn": 2,
+              "precision": 0.5264,
+              "recall": 0.9981
+            },
+            "any_flag_incl_unexplained": {
+              "tp": 1077,
+              "fp": 969,
+              "fn": 2,
+              "precision": 0.5264,
+              "recall": 0.9981
+            }
+          },
+          "pairLevel": {
+            "leak_old_price": {
+              "tp": 117,
+              "fp": 229,
+              "fn": 0,
+              "precision": 0.3382,
+              "recall": 1
+            },
+            "leak_expired_special": {
+              "tp": 14,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1,
+              "recall": 1
+            },
+            "leak_rate_out_of_tier": {
+              "tp": 82,
+              "fp": 23,
+              "fn": 1,
+              "precision": 0.781,
+              "recall": 0.988
+            },
+            "leak_below_margin_floor": {
+              "tp": 44,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1,
+              "recall": 1
+            },
+            "unexplained": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 0,
+              "precision": null,
+              "recall": null
+            },
+            "any_leak_type_ignored": {
+              "tp": 256,
+              "fp": 227,
+              "fn": 1,
+              "precision": 0.53,
+              "recall": 0.9961
+            }
+          },
+          "yen": {
+            "leak_old_price": {
+              "truthLast12m": 3727227,
+              "truthLast12mPositiveOnly": 3727227,
+              "truthAllPeriod": 3919608,
+              "engineAppFigureLast12m": 12026956,
+              "engineLast12m": 12026956,
+              "engineLast12mOnTruthAmbiguousLines": 7600,
+              "engineAllPeriod": 13155750,
+              "truePositiveLinesLast12m": {
+                "lines": 353,
+                "truthYen": 3727227,
+                "engineYen": 3727227,
+                "linesWithSameShortfall": 353
+              }
+            },
+            "leak_expired_special": {
+              "truthLast12m": 869149,
+              "truthLast12mPositiveOnly": 869149,
+              "truthAllPeriod": 906410,
+              "engineAppFigureLast12m": 869149,
+              "engineLast12m": 869149,
+              "engineLast12mOnTruthAmbiguousLines": 0,
+              "engineAllPeriod": 906410,
+              "truePositiveLinesLast12m": {
+                "lines": 49,
+                "truthYen": 869149,
+                "engineYen": 869149,
+                "linesWithSameShortfall": 49
+              }
+            },
+            "leak_rate_out_of_tier": {
+              "truthLast12m": 2329026,
+              "truthLast12mPositiveOnly": 2339300,
+              "truthAllPeriod": 2765342,
+              "engineAppFigureLast12m": 2745260,
+              "engineLast12m": 2745260,
+              "engineLast12mOnTruthAmbiguousLines": 10901,
+              "engineAllPeriod": 3298084,
+              "truePositiveLinesLast12m": {
+                "lines": 347,
+                "truthYen": 2339300,
+                "engineYen": 2356064,
+                "linesWithSameShortfall": 343
+              }
+            },
+            "leak_below_margin_floor": {
+              "truthLast12m": 1081058,
+              "truthLast12mPositiveOnly": 1081058,
+              "truthAllPeriod": 1153806,
+              "engineAppFigureLast12m": 1104714,
+              "engineLast12m": 1104714,
+              "engineLast12mOnTruthAmbiguousLines": 23656,
+              "engineAllPeriod": 1182034,
+              "truePositiveLinesLast12m": {
+                "lines": 158,
+                "truthYen": 1081058,
+                "engineYen": 1081058,
+                "linesWithSameShortfall": 158
+              }
+            },
+            "unexplained": {
+              "truthLast12m": 0,
+              "truthLast12mPositiveOnly": 0,
+              "truthAllPeriod": 0,
+              "engineAppFigureLast12m": null,
+              "engineLast12m": 26831,
+              "engineLast12mOnTruthAmbiguousLines": 26831,
+              "engineAllPeriod": 32967,
+              "truePositiveLinesLast12m": {
+                "lines": 0,
+                "truthYen": 0,
+                "engineYen": 0,
+                "linesWithSameShortfall": 0
+              }
+            }
+          },
+          "referencePriceAgreement": {
+            "compared": 20661,
+            "agree": 19688
+          },
+          "leakConfusion": {
+            "ok_declined -> leak_old_price": 863,
+            "ok_deferred -> leak_old_price": 82,
+            "ok_volume_discount -> leak_rate_out_of_tier": 24,
+            "leak_rate_out_of_tier -> overcharge": 2
+          },
+          "decoys": {
+            "ok_special": {
+              "lines": 564,
+              "sameLabel": 564,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok_special": 564
+              }
+            },
+            "ok": {
+              "lines": 17453,
+              "sameLabel": 17453,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok": 17453
+              }
+            },
+            "ok_volume_discount": {
+              "lines": 620,
+              "sameLabel": 596,
+              "flaggedAsLeak": 24,
+              "engine": {
+                "ok_volume_discount": 596,
+                "leak_rate_out_of_tier": 24
+              }
+            },
+            "ok_sample": {
+              "lines": 60,
+              "sameLabel": 60,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok_sample": 60
+              }
+            },
+            "ok_non_product": {
+              "lines": 1000,
+              "sameLabel": 1000,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok_non_product": 1000
+              }
+            },
+            "ok_return": {
+              "lines": 143,
+              "sameLabel": 143,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok_return": 143
+              }
+            },
+            "ok_declined": {
+              "lines": 863,
+              "sameLabel": 0,
+              "flaggedAsLeak": 863,
+              "engine": {
+                "leak_old_price": 863
+              }
+            },
+            "ok_deferred": {
+              "lines": 82,
+              "sameLabel": 0,
+              "flaggedAsLeak": 82,
+              "engine": {
+                "leak_old_price": 82
+              }
+            }
+          },
+          "embeddedCauses": {
+            "cost_increase_list_unchanged": {
+              "truthLabel": {
+                "leak_below_margin_floor": 80
+              },
+              "engine": {
+                "leak_below_margin_floor": 80
+              }
+            },
+            "customer_master_rate_wrong": {
+              "truthLabel": {
+                "leak_rate_out_of_tier": 347
+              },
+              "engine": {
+                "leak_rate_out_of_tier": 347
+              }
+            },
+            "customer_price_not_updated": {
+              "truthLabel": {
+                "leak_old_price": 191
+              },
+              "engine": {
+                "leak_old_price": 191
+              }
+            },
+            "customer_wide_old_price": {
+              "truthLabel": {
+                "leak_old_price": 153
+              },
+              "engine": {
+                "leak_old_price": 153
+              }
+            },
+            "earlier_revision_old_price": {
+              "truthLabel": {
+                "leak_old_price": 10
+              },
+              "engine": {
+                "leak_old_price": 10
+              }
+            },
+            "later_revision_old_price": {
+              "truthLabel": {
+                "leak_old_price": 21
+              },
+              "engine": {
+                "leak_old_price": 21
+              }
+            },
+            "manual_price_high": {
+              "truthLabel": {
+                "leak_rate_out_of_tier": 2
+              },
+              "engine": {
+                "overcharge": 2
+              }
+            },
+            "manual_price_low": {
+              "truthLabel": {
+                "leak_rate_out_of_tier": 86
+              },
+              "engine": {
+                "leak_rate_out_of_tier": 86
+              }
+            },
+            "previous_period_special": {
+              "truthLabel": {
+                "leak_expired_special": 15
+              },
+              "engine": {
+                "leak_expired_special": 15
+              }
+            },
+            "product_master_list_not_updated": {
+              "truthLabel": {
+                "leak_old_price": 15
+              },
+              "engine": {
+                "leak_old_price": 15
+              }
+            },
+            "special_after_end": {
+              "truthLabel": {
+                "leak_expired_special": 47
+              },
+              "engine": {
+                "leak_expired_special": 47
+              }
+            },
+            "special_below_floor": {
+              "truthLabel": {
+                "leak_below_margin_floor": 90
+              },
+              "engine": {
+                "leak_below_margin_floor": 90
+              }
+            },
+            "special_below_floor_after_cost_increase": {
+              "truthLabel": {
+                "leak_below_margin_floor": 18
+              },
+              "engine": {
+                "leak_below_margin_floor": 18
+              }
+            },
+            "special_billed_before_start": {
+              "truthLabel": {
+                "leak_rate_out_of_tier": 4
+              },
+              "engine": {
+                "leak_rate_out_of_tier": 4
+              }
+            }
+          },
+          "ambiguous": {
+            "AMB_CUSTOMER_NOT_IN_MASTER": {
+              "lines": 12,
+              "engine": {
+                "excluded": 12
+              },
+              "engineYenLast12m": 0
+            },
+            "AMB_DECIMAL_DISCOUNT_RATE": {
+              "lines": 3,
+              "engine": {
+                "ok_volume_discount": 3
+              },
+              "engineYenLast12m": 0
+            },
+            "AMB_HELD_PRICE_AND_LATER_LIST_CHANGE": {
+              "lines": 8,
+              "engine": {
+                "ok": 6,
+                "leak_old_price": 2
+              },
+              "engineYenLast12m": 7600
+            },
+            "AMB_HELD_PRICE_BUT_NO_LIST_BEFORE_REVISION": {
+              "lines": 6,
+              "engine": {
+                "ok": 6
+              },
+              "engineYenLast12m": 0
+            },
+            "AMB_NO_AGREEMENT_ROW": {
+              "lines": 43,
+              "engine": {
+                "ok": 43
+              },
+              "engineYenLast12m": 0
+            },
+            "AMB_UNEXPLAINED_PRICE_INSIDE_TIER": {
+              "lines": 10,
+              "engine": {
+                "unexplained": 10
+              },
+              "engineYenLast12m": 26831
+            },
+            "AMB_VOLUME_DISCOUNT_BELOW_FLOOR": {
+              "lines": 4,
+              "engine": {
+                "leak_below_margin_floor": 4
+              },
+              "engineYenLast12m": 23656
+            },
+            "AMB_ZERO_PRICE_WITHOUT_SAMPLE_NOTE": {
+              "lines": 3,
+              "engine": {
+                "leak_rate_out_of_tier": 2,
+                "ok_sample": 1
+              },
+              "engineYenLast12m": 10901
+            }
+          },
+          "confusion": {
+            "ambiguous:AMB_CUSTOMER_NOT_IN_MASTER": {
+              "excluded": 12
+            },
+            "ambiguous:AMB_DECIMAL_DISCOUNT_RATE": {
+              "ok_volume_discount": 3
+            },
+            "ambiguous:AMB_HELD_PRICE_AND_LATER_LIST_CHANGE": {
+              "ok": 6,
+              "leak_old_price": 2
+            },
+            "ambiguous:AMB_HELD_PRICE_BUT_NO_LIST_BEFORE_REVISION": {
+              "ok": 6
+            },
+            "ambiguous:AMB_NO_AGREEMENT_ROW": {
+              "ok": 43
+            },
+            "ambiguous:AMB_UNEXPLAINED_PRICE_INSIDE_TIER": {
+              "unexplained": 10
+            },
+            "ambiguous:AMB_VOLUME_DISCOUNT_BELOW_FLOOR": {
+              "leak_below_margin_floor": 4
+            },
+            "ambiguous:AMB_ZERO_PRICE_WITHOUT_SAMPLE_NOTE": {
+              "leak_rate_out_of_tier": 2,
+              "ok_sample": 1
+            },
+            "leak_below_margin_floor": {
+              "leak_below_margin_floor": 188
+            },
+            "leak_expired_special": {
+              "leak_expired_special": 62
+            },
+            "leak_old_price": {
+              "leak_old_price": 390
+            },
+            "leak_rate_out_of_tier": {
+              "leak_rate_out_of_tier": 437,
+              "overcharge": 2
+            },
+            "ok": {
+              "ok": 17453
+            },
+            "ok_declined": {
+              "leak_old_price": 863
+            },
+            "ok_deferred": {
+              "leak_old_price": 82
+            },
+            "ok_non_product": {
+              "ok_non_product": 1000
+            },
+            "ok_return": {
+              "ok_return": 143
+            },
+            "ok_sample": {
+              "ok_sample": 60
+            },
+            "ok_special": {
+              "ok_special": 564
+            },
+            "ok_volume_discount": {
+              "ok_volume_discount": 596,
+              "leak_rate_out_of_tier": 24
+            }
+          }
+        },
+        "revdate": {
+          "lines": {
+            "truth": 21953,
+            "engine": 21953,
+            "joined": 21953
+          },
+          "joinCheck": {
+            "notImported": 0,
+            "lineIdDifferent": 0
+          },
+          "linesScored": 21864,
+          "linesAmbiguous": 89,
+          "mismatchesScored": 2,
+          "labelAgreementScored": {
+            "agree": 21862,
+            "of": 21864
+          },
+          "importAndExclusion": {
+            "revisionsAssigned": [
+              {
+                "date": "2025-06-16",
+                "customers": 114
+              }
+            ],
+            "workspaceNotes": [],
+            "sales": {
+              "rowsInFiles": 21953,
+              "linesImported": 21953,
+              "rowsNotImported": 0,
+              "duplicateLinesDropped": 0,
+              "duplicateExamples": [],
+              "slipCollisionsKept": 0,
+              "linesDiagnosed": 21953
+            },
+            "filesNotUsed": [
+              {
+                "file": "README.md",
+                "status": "unrecognised",
+                "error": "README.md: 列の見出しからファイルの種類を判別できませんでした（# 検証用データ gen-2（架空） …）"
+              },
+              {
+                "file": "next/list_prices_20260901.csv",
+                "status": "ok",
+                "error": null
+              },
+              {
+                "file": "next/price_master_A_20260901.csv",
+                "status": "ok",
+                "error": null
+              },
+              {
+                "file": "next/price_master_B_20260901.csv",
+                "status": "ok",
+                "error": null
+              },
+              {
+                "file": "next/revision_2026-09_outcomes.csv",
+                "status": "ok",
+                "error": null
+              },
+              {
+                "file": "next/sales_B_202609.csv",
+                "status": "ok",
+                "error": null
+              }
+            ],
+            "rowsSkippedInUsedFiles": 0,
+            "engineExcluded": {
+              "unknownCustomer": 12,
+              "noListPrice": 0,
+              "overchargeNotCountedAsLeak": 2
+            }
+          },
+          "labelCounts": {
+            "truth": {
+              "ok": 17453,
+              "ok_non_product": 1000,
+              "ok_declined": 863,
+              "ok_volume_discount": 620,
+              "ok_special": 564,
+              "leak_rate_out_of_tier": 439,
+              "leak_old_price": 390,
+              "leak_below_margin_floor": 188,
+              "ok_return": 143,
+              "ambiguous": 89,
+              "ok_deferred": 82,
+              "leak_expired_special": 62,
+              "ok_sample": 60
+            },
+            "engine": {
+              "ok": 17508,
+              "ok_non_product": 1000,
+              "ok_declined": 863,
+              "ok_volume_discount": 623,
+              "ok_special": 564,
+              "leak_rate_out_of_tier": 439,
+              "leak_old_price": 392,
+              "leak_below_margin_floor": 192,
+              "ok_return": 143,
+              "ok_deferred": 82,
+              "leak_expired_special": 62,
+              "ok_sample": 61,
+              "excluded": 12,
+              "unexplained": 10,
+              "overcharge": 2
+            }
+          },
+          "lineLevel": {
+            "leak_old_price": {
+              "tp": 390,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1,
+              "recall": 1
+            },
+            "leak_expired_special": {
+              "tp": 62,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1,
+              "recall": 1
+            },
+            "leak_rate_out_of_tier": {
+              "tp": 437,
+              "fp": 0,
+              "fn": 2,
+              "precision": 1,
+              "recall": 0.9954
+            },
+            "leak_below_margin_floor": {
+              "tp": 188,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1,
+              "recall": 1
+            },
+            "unexplained": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 0,
+              "precision": null,
+              "recall": null
+            },
+            "any_leak_type_ignored": {
+              "tp": 1077,
+              "fp": 0,
+              "fn": 2,
+              "precision": 1,
+              "recall": 0.9981
+            },
+            "any_flag_incl_unexplained": {
+              "tp": 1077,
+              "fp": 0,
+              "fn": 2,
+              "precision": 1,
+              "recall": 0.9981
+            }
+          },
+          "pairLevel": {
+            "leak_old_price": {
+              "tp": 117,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1,
+              "recall": 1
+            },
+            "leak_expired_special": {
+              "tp": 14,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1,
+              "recall": 1
+            },
+            "leak_rate_out_of_tier": {
+              "tp": 82,
+              "fp": 0,
+              "fn": 1,
+              "precision": 1,
+              "recall": 0.988
+            },
+            "leak_below_margin_floor": {
+              "tp": 44,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1,
+              "recall": 1
+            },
+            "unexplained": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 0,
+              "precision": null,
+              "recall": null
+            },
+            "any_leak_type_ignored": {
+              "tp": 256,
+              "fp": 0,
+              "fn": 1,
+              "precision": 1,
+              "recall": 0.9961
+            }
+          },
+          "yen": {
+            "leak_old_price": {
+              "truthLast12m": 3727227,
+              "truthLast12mPositiveOnly": 3727227,
+              "truthAllPeriod": 3919608,
+              "engineAppFigureLast12m": 3734827,
+              "engineLast12m": 3734827,
+              "engineLast12mOnTruthAmbiguousLines": 7600,
+              "engineAllPeriod": 3927208,
+              "truePositiveLinesLast12m": {
+                "lines": 353,
+                "truthYen": 3727227,
+                "engineYen": 3727227,
+                "linesWithSameShortfall": 353
+              }
+            },
+            "leak_expired_special": {
+              "truthLast12m": 869149,
+              "truthLast12mPositiveOnly": 869149,
+              "truthAllPeriod": 906410,
+              "engineAppFigureLast12m": 869149,
+              "engineLast12m": 869149,
+              "engineLast12mOnTruthAmbiguousLines": 0,
+              "engineAllPeriod": 906410,
+              "truePositiveLinesLast12m": {
+                "lines": 49,
+                "truthYen": 869149,
+                "engineYen": 869149,
+                "linesWithSameShortfall": 49
+              }
+            },
+            "leak_rate_out_of_tier": {
+              "truthLast12m": 2329026,
+              "truthLast12mPositiveOnly": 2339300,
+              "truthAllPeriod": 2765342,
+              "engineAppFigureLast12m": 2350201,
+              "engineLast12m": 2350201,
+              "engineLast12mOnTruthAmbiguousLines": 10901,
+              "engineAllPeriod": 2786517,
+              "truePositiveLinesLast12m": {
+                "lines": 347,
+                "truthYen": 2339300,
+                "engineYen": 2339300,
+                "linesWithSameShortfall": 347
+              }
+            },
+            "leak_below_margin_floor": {
+              "truthLast12m": 1081058,
+              "truthLast12mPositiveOnly": 1081058,
+              "truthAllPeriod": 1153806,
+              "engineAppFigureLast12m": 1104714,
+              "engineLast12m": 1104714,
+              "engineLast12mOnTruthAmbiguousLines": 23656,
+              "engineAllPeriod": 1182034,
+              "truePositiveLinesLast12m": {
+                "lines": 158,
+                "truthYen": 1081058,
+                "engineYen": 1081058,
+                "linesWithSameShortfall": 158
+              }
+            },
+            "unexplained": {
+              "truthLast12m": 0,
+              "truthLast12mPositiveOnly": 0,
+              "truthAllPeriod": 0,
+              "engineAppFigureLast12m": null,
+              "engineLast12m": 26831,
+              "engineLast12mOnTruthAmbiguousLines": 26831,
+              "engineAllPeriod": 32967,
+              "truePositiveLinesLast12m": {
+                "lines": 0,
+                "truthYen": 0,
+                "engineYen": 0,
+                "linesWithSameShortfall": 0
+              }
+            }
+          },
+          "referencePriceAgreement": {
+            "compared": 20661,
+            "agree": 20661
+          },
+          "leakConfusion": {
+            "leak_rate_out_of_tier -> overcharge": 2
+          },
+          "decoys": {
+            "ok_special": {
+              "lines": 564,
+              "sameLabel": 564,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok_special": 564
+              }
+            },
+            "ok": {
+              "lines": 17453,
+              "sameLabel": 17453,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok": 17453
+              }
+            },
+            "ok_volume_discount": {
+              "lines": 620,
+              "sameLabel": 620,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok_volume_discount": 620
+              }
+            },
+            "ok_sample": {
+              "lines": 60,
+              "sameLabel": 60,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok_sample": 60
+              }
+            },
+            "ok_non_product": {
+              "lines": 1000,
+              "sameLabel": 1000,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok_non_product": 1000
+              }
+            },
+            "ok_return": {
+              "lines": 143,
+              "sameLabel": 143,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok_return": 143
+              }
+            },
+            "ok_declined": {
+              "lines": 863,
+              "sameLabel": 863,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok_declined": 863
+              }
+            },
+            "ok_deferred": {
+              "lines": 82,
+              "sameLabel": 82,
+              "flaggedAsLeak": 0,
+              "engine": {
+                "ok_deferred": 82
+              }
+            }
+          },
+          "embeddedCauses": {
+            "cost_increase_list_unchanged": {
+              "truthLabel": {
+                "leak_below_margin_floor": 80
+              },
+              "engine": {
+                "leak_below_margin_floor": 80
+              }
+            },
+            "customer_master_rate_wrong": {
+              "truthLabel": {
+                "leak_rate_out_of_tier": 347
+              },
+              "engine": {
+                "leak_rate_out_of_tier": 347
+              }
+            },
+            "customer_price_not_updated": {
+              "truthLabel": {
+                "leak_old_price": 191
+              },
+              "engine": {
+                "leak_old_price": 191
+              }
+            },
+            "customer_wide_old_price": {
+              "truthLabel": {
+                "leak_old_price": 153
+              },
+              "engine": {
+                "leak_old_price": 153
+              }
+            },
+            "earlier_revision_old_price": {
+              "truthLabel": {
+                "leak_old_price": 10
+              },
+              "engine": {
+                "leak_old_price": 10
+              }
+            },
+            "later_revision_old_price": {
+              "truthLabel": {
+                "leak_old_price": 21
+              },
+              "engine": {
+                "leak_old_price": 21
+              }
+            },
+            "manual_price_high": {
+              "truthLabel": {
+                "leak_rate_out_of_tier": 2
+              },
+              "engine": {
+                "overcharge": 2
+              }
+            },
+            "manual_price_low": {
+              "truthLabel": {
+                "leak_rate_out_of_tier": 86
+              },
+              "engine": {
+                "leak_rate_out_of_tier": 86
+              }
+            },
+            "previous_period_special": {
+              "truthLabel": {
+                "leak_expired_special": 15
+              },
+              "engine": {
+                "leak_expired_special": 15
+              }
+            },
+            "product_master_list_not_updated": {
+              "truthLabel": {
+                "leak_old_price": 15
+              },
+              "engine": {
+                "leak_old_price": 15
+              }
+            },
+            "special_after_end": {
+              "truthLabel": {
+                "leak_expired_special": 47
+              },
+              "engine": {
+                "leak_expired_special": 47
+              }
+            },
+            "special_below_floor": {
+              "truthLabel": {
+                "leak_below_margin_floor": 90
+              },
+              "engine": {
+                "leak_below_margin_floor": 90
+              }
+            },
+            "special_below_floor_after_cost_increase": {
+              "truthLabel": {
+                "leak_below_margin_floor": 18
+              },
+              "engine": {
+                "leak_below_margin_floor": 18
+              }
+            },
+            "special_billed_before_start": {
+              "truthLabel": {
+                "leak_rate_out_of_tier": 4
+              },
+              "engine": {
+                "leak_rate_out_of_tier": 4
+              }
+            }
+          },
+          "ambiguous": {
+            "AMB_CUSTOMER_NOT_IN_MASTER": {
+              "lines": 12,
+              "engine": {
+                "excluded": 12
+              },
+              "engineYenLast12m": 0
+            },
+            "AMB_DECIMAL_DISCOUNT_RATE": {
+              "lines": 3,
+              "engine": {
+                "ok_volume_discount": 3
+              },
+              "engineYenLast12m": 0
+            },
+            "AMB_HELD_PRICE_AND_LATER_LIST_CHANGE": {
+              "lines": 8,
+              "engine": {
+                "ok": 6,
+                "leak_old_price": 2
+              },
+              "engineYenLast12m": 7600
+            },
+            "AMB_HELD_PRICE_BUT_NO_LIST_BEFORE_REVISION": {
+              "lines": 6,
+              "engine": {
+                "ok": 6
+              },
+              "engineYenLast12m": 0
+            },
+            "AMB_NO_AGREEMENT_ROW": {
+              "lines": 43,
+              "engine": {
+                "ok": 43
+              },
+              "engineYenLast12m": 0
+            },
+            "AMB_UNEXPLAINED_PRICE_INSIDE_TIER": {
+              "lines": 10,
+              "engine": {
+                "unexplained": 10
+              },
+              "engineYenLast12m": 26831
+            },
+            "AMB_VOLUME_DISCOUNT_BELOW_FLOOR": {
+              "lines": 4,
+              "engine": {
+                "leak_below_margin_floor": 4
+              },
+              "engineYenLast12m": 23656
+            },
+            "AMB_ZERO_PRICE_WITHOUT_SAMPLE_NOTE": {
+              "lines": 3,
+              "engine": {
+                "leak_rate_out_of_tier": 2,
+                "ok_sample": 1
+              },
+              "engineYenLast12m": 10901
+            }
+          },
+          "confusion": {
+            "ambiguous:AMB_CUSTOMER_NOT_IN_MASTER": {
+              "excluded": 12
+            },
+            "ambiguous:AMB_DECIMAL_DISCOUNT_RATE": {
+              "ok_volume_discount": 3
+            },
+            "ambiguous:AMB_HELD_PRICE_AND_LATER_LIST_CHANGE": {
+              "ok": 6,
+              "leak_old_price": 2
+            },
+            "ambiguous:AMB_HELD_PRICE_BUT_NO_LIST_BEFORE_REVISION": {
+              "ok": 6
+            },
+            "ambiguous:AMB_NO_AGREEMENT_ROW": {
+              "ok": 43
+            },
+            "ambiguous:AMB_UNEXPLAINED_PRICE_INSIDE_TIER": {
+              "unexplained": 10
+            },
+            "ambiguous:AMB_VOLUME_DISCOUNT_BELOW_FLOOR": {
+              "leak_below_margin_floor": 4
+            },
+            "ambiguous:AMB_ZERO_PRICE_WITHOUT_SAMPLE_NOTE": {
+              "leak_rate_out_of_tier": 2,
+              "ok_sample": 1
+            },
+            "leak_below_margin_floor": {
+              "leak_below_margin_floor": 188
+            },
+            "leak_expired_special": {
+              "leak_expired_special": 62
+            },
+            "leak_old_price": {
+              "leak_old_price": 390
+            },
+            "leak_rate_out_of_tier": {
+              "leak_rate_out_of_tier": 437,
+              "overcharge": 2
+            },
+            "ok": {
+              "ok": 17453
+            },
+            "ok_declined": {
+              "ok_declined": 863
+            },
+            "ok_deferred": {
+              "ok_deferred": 82
+            },
+            "ok_non_product": {
+              "ok_non_product": 1000
+            },
+            "ok_return": {
+              "ok_return": 143
+            },
+            "ok_sample": {
+              "ok_sample": 60
+            },
+            "ok_special": {
+              "ok_special": 564
+            },
+            "ok_volume_discount": {
+              "ok_volume_discount": 620
+            }
+          }
+        }
+      }
+    }
+  },
+  "mismatchClusters": {
+    "gen-1/default": [
+      {
+        "cluster": "ok_declined -> leak_old_price [reference_differs]",
+        "lines": 537,
+        "scored": true,
+        "examples": [
+          "sales_B_202501-202606.csv:10817 (52002464-5)",
+          "sales_B_202501-202606.csv:10854 (52002476-1)",
+          "sales_B_202501-202606.csv:10855 (52002476-2)"
+        ]
+      },
+      {
+        "cluster": "ok_deferred -> leak_old_price [reference_differs]",
+        "lines": 197,
+        "scored": true,
+        "examples": [
+          "sales_B_202501-202606.csv:10806 (52002463-1)",
+          "sales_B_202501-202606.csv:10809 (52002463-4)",
+          "sales_B_202501-202606.csv:10810 (52002463-5)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> leak_old_price [ambiguous:negotiating_status]",
+        "lines": 36,
+        "scored": false,
+        "examples": [
+          "sales_B_202501-202606.csv:11150 (52002541-1)",
+          "sales_B_202501-202606.csv:11151 (52002541-2)",
+          "sales_B_202501-202606.csv:11153 (52002541-4)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> ok [ambiguous:no_agreement_row]",
+        "lines": 32,
+        "scored": false,
+        "examples": [
+          "sales_B_202501-202606.csv:11555 (52002630-1)",
+          "sales_B_202501-202606.csv:11557 (52002630-3)",
+          "sales_B_202501-202606.csv:11627 (52002647-1)"
+        ]
+      },
+      {
+        "cluster": "ok_volume_discount -> leak_rate_out_of_tier [reference_differs]",
+        "lines": 17,
+        "scored": true,
+        "examples": [
+          "sales_B_202501-202606.csv:10974 (52002502-2)",
+          "sales_B_202501-202606.csv:10984 (52002505-3)",
+          "sales_B_202501-202606.csv:11190 (52002549-3)"
+        ]
+      },
+      {
+        "cluster": "leak_below_margin_floor -> leak_old_price [reference_differs]",
+        "lines": 12,
+        "scored": true,
+        "examples": [
+          "sales_B_202501-202606.csv:12178 (52002770-2)",
+          "sales_B_202501-202606.csv:13677 (52003095-2)",
+          "sales_B_202501-202606.csv:15846 (52003578-1)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> excluded [ambiguous:unknown_customer]",
+        "lines": 8,
+        "scored": false,
+        "examples": [
+          "sales_B_202501-202606.csv:2692 (52000618-1)",
+          "sales_B_202501-202606.csv:2693 (52000618-2)",
+          "sales_B_202501-202606.csv:9256 (52002113-1)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> leak_rate_out_of_tier [ambiguous:two_revisions_behind]",
+        "lines": 6,
+        "scored": false,
+        "examples": [
+          "sales_B_202501-202606.csv:12278 (52002791-3)",
+          "sales_B_202501-202606.csv:12629 (52002873-3)",
+          "sales_B_202501-202606.csv:16105 (52003633-1)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> overcharge [ambiguous:list_cut_old_price]",
+        "lines": 3,
+        "scored": false,
+        "examples": [
+          "sales_B_202501-202606.csv:17249 (52003888-1)",
+          "sales_B_202501-202606.csv:17797 (52004011-1)",
+          "sales_B_202501-202606.csv:18721 (52004213-1)"
+        ]
+      },
+      {
+        "cluster": "leak_rate_out_of_tier -> ok_sample",
+        "lines": 3,
+        "scored": true,
+        "examples": [
+          "sales_B_202501-202606.csv:9984 (52002282-1)",
+          "sales_B_202501-202606.csv:15100 (52003412-1)",
+          "sales_B_202501-202606.csv:20477 (52004608-1)"
+        ]
+      },
+      {
+        "cluster": "leak_rate_out_of_tier -> overcharge",
+        "lines": 3,
+        "scored": true,
+        "examples": [
+          "sales_B_202501-202606.csv:14998 (52003389-1)",
+          "sales_B_202501-202606.csv:15343 (52003468-1)",
+          "sales_B_202501-202606.csv:15676 (52003540-1)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> leak_below_margin_floor [ambiguous:volume_discount_below_floor]",
+        "lines": 2,
+        "scored": false,
+        "examples": [
+          "sales_B_202501-202606.csv:17499 (52003943-1)",
+          "sales_B_202501-202606.csv:20351 (52004577-1)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> ok_special [ambiguous:overlapping_specials, engine_ref:special]",
+        "lines": 2,
+        "scored": false,
+        "examples": [
+          "sales_B_202501-202606.csv:16497 (52003720-3)",
+          "sales_B_202501-202606.csv:16601 (52003745-1)"
+        ]
+      }
+    ],
+    "gen-1/revdate": [
+      {
+        "cluster": "ambiguous -> ok_declined [ambiguous:negotiating_status, basis:kept_negotiating]",
+        "lines": 36,
+        "scored": false,
+        "examples": [
+          "sales_B_202501-202606.csv:11150 (52002541-1)",
+          "sales_B_202501-202606.csv:11151 (52002541-2)",
+          "sales_B_202501-202606.csv:11153 (52002541-4)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> ok [ambiguous:no_agreement_row]",
+        "lines": 32,
+        "scored": false,
+        "examples": [
+          "sales_B_202501-202606.csv:11555 (52002630-1)",
+          "sales_B_202501-202606.csv:11557 (52002630-3)",
+          "sales_B_202501-202606.csv:11627 (52002647-1)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> excluded [ambiguous:unknown_customer]",
+        "lines": 8,
+        "scored": false,
+        "examples": [
+          "sales_B_202501-202606.csv:2692 (52000618-1)",
+          "sales_B_202501-202606.csv:2693 (52000618-2)",
+          "sales_B_202501-202606.csv:9256 (52002113-1)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> leak_rate_out_of_tier [ambiguous:two_revisions_behind]",
+        "lines": 6,
+        "scored": false,
+        "examples": [
+          "sales_B_202501-202606.csv:12278 (52002791-3)",
+          "sales_B_202501-202606.csv:12629 (52002873-3)",
+          "sales_B_202501-202606.csv:16105 (52003633-1)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> overcharge [ambiguous:list_cut_old_price]",
+        "lines": 3,
+        "scored": false,
+        "examples": [
+          "sales_B_202501-202606.csv:17249 (52003888-1)",
+          "sales_B_202501-202606.csv:17797 (52004011-1)",
+          "sales_B_202501-202606.csv:18721 (52004213-1)"
+        ]
+      },
+      {
+        "cluster": "leak_rate_out_of_tier -> ok_sample",
+        "lines": 3,
+        "scored": true,
+        "examples": [
+          "sales_B_202501-202606.csv:9984 (52002282-1)",
+          "sales_B_202501-202606.csv:15100 (52003412-1)",
+          "sales_B_202501-202606.csv:20477 (52004608-1)"
+        ]
+      },
+      {
+        "cluster": "leak_rate_out_of_tier -> overcharge",
+        "lines": 3,
+        "scored": true,
+        "examples": [
+          "sales_B_202501-202606.csv:14998 (52003389-1)",
+          "sales_B_202501-202606.csv:15343 (52003468-1)",
+          "sales_B_202501-202606.csv:15676 (52003540-1)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> leak_below_margin_floor [ambiguous:volume_discount_below_floor]",
+        "lines": 2,
+        "scored": false,
+        "examples": [
+          "sales_B_202501-202606.csv:17499 (52003943-1)",
+          "sales_B_202501-202606.csv:20351 (52004577-1)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> ok_special [ambiguous:overlapping_specials, engine_ref:special]",
+        "lines": 2,
+        "scored": false,
+        "examples": [
+          "sales_B_202501-202606.csv:16497 (52003720-3)",
+          "sales_B_202501-202606.csv:16601 (52003745-1)"
+        ]
+      }
+    ],
+    "gen-2/default": [
+      {
+        "cluster": "ok_declined -> leak_old_price [reference_differs]",
+        "lines": 863,
+        "scored": true,
+        "examples": [
+          "sales_A_202407-202512.csv:10484 (5104221-1)",
+          "sales_A_202407-202512.csv:10486 (5104223-1)",
+          "sales_A_202407-202512.csv:10487 (5104224-1)"
+        ]
+      },
+      {
+        "cluster": "ok_deferred -> leak_old_price [reference_differs]",
+        "lines": 82,
+        "scored": true,
+        "examples": [
+          "sales_A_202407-202512.csv:10605 (5104283-2)",
+          "sales_A_202407-202512.csv:10654 (5104300-1)",
+          "sales_A_202407-202512.csv:10655 (5104300-2)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> ok [ambiguous:AMB_NO_AGREEMENT_ROW]",
+        "lines": 43,
+        "scored": false,
+        "examples": [
+          "sales_A_202407-202512.csv:10746 (5104340-1)",
+          "sales_A_202407-202512.csv:11208 (5104564-2)",
+          "sales_A_202407-202512.csv:11209 (5104564-3)"
+        ]
+      },
+      {
+        "cluster": "ok_volume_discount -> leak_rate_out_of_tier [reference_differs]",
+        "lines": 24,
+        "scored": true,
+        "examples": [
+          "sales_A_202407-202512.csv:10633 (5104294-1)",
+          "sales_A_202407-202512.csv:11365 (5104628-1)",
+          "sales_A_202407-202512.csv:11806 (5104803-2)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> excluded [ambiguous:AMB_CUSTOMER_NOT_IN_MASTER]",
+        "lines": 12,
+        "scored": false,
+        "examples": [
+          "sales_A_202407-202512.csv:663 (5100262-1)",
+          "sales_A_202407-202512.csv:2080 (5100811-1)",
+          "sales_A_202407-202512.csv:3588 (5101457-1)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> unexplained [ambiguous:AMB_UNEXPLAINED_PRICE_INSIDE_TIER]",
+        "lines": 10,
+        "scored": false,
+        "examples": [
+          "sales_A_202407-202512.csv:5274 (5102132-2)",
+          "sales_A_202407-202512.csv:11017 (5104474-1)",
+          "sales_A_202407-202512.csv:12776 (5105211-3)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> ok [ambiguous:AMB_HELD_PRICE_AND_LATER_LIST_CHANGE]",
+        "lines": 6,
+        "scored": false,
+        "examples": [
+          "sales_B_202601-202606.csv:2600 (62001095-2)",
+          "sales_B_202601-202606.csv:2952 (62001249-1)",
+          "sales_B_202601-202606.csv:3398 (62001442-1)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> ok [ambiguous:AMB_HELD_PRICE_BUT_NO_LIST_BEFORE_REVISION]",
+        "lines": 6,
+        "scored": false,
+        "examples": [
+          "sales_A_202407-202512.csv:15518 (5106319-1)",
+          "sales_B_202601-202606.csv:1162 (62000497-1)",
+          "sales_B_202601-202606.csv:1325 (62000573-1)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> leak_below_margin_floor [ambiguous:AMB_VOLUME_DISCOUNT_BELOW_FLOOR]",
+        "lines": 3,
+        "scored": false,
+        "examples": [
+          "sales_B_202601-202606.csv:1476 (62000635-4)",
+          "sales_B_202601-202606.csv:3752 (62001587-1)",
+          "sales_B_202601-202606.csv:3880 (62001637-1)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> ok_volume_discount [ambiguous:AMB_DECIMAL_DISCOUNT_RATE]",
+        "lines": 3,
+        "scored": false,
+        "examples": [
+          "sales_A_202407-202512.csv:1964 (5100765-2)",
+          "sales_A_202407-202512.csv:6054 (5102464-2)",
+          "sales_B_202601-202606.csv:138 (62000071-2)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> leak_old_price [ambiguous:AMB_HELD_PRICE_AND_LATER_LIST_CHANGE]",
+        "lines": 2,
+        "scored": false,
+        "examples": [
+          "sales_B_202601-202606.csv:2051 (62000872-2)",
+          "sales_B_202601-202606.csv:4832 (62002019-1)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> leak_rate_out_of_tier [ambiguous:AMB_ZERO_PRICE_WITHOUT_SAMPLE_NOTE]",
+        "lines": 2,
+        "scored": false,
+        "examples": [
+          "sales_A_202407-202512.csv:15091 (5106157-6)",
+          "sales_B_202601-202606.csv:2212 (62000939-5)"
+        ]
+      },
+      {
+        "cluster": "leak_rate_out_of_tier -> overcharge [cause:manual_price_high]",
+        "lines": 2,
+        "scored": true,
+        "examples": [
+          "sales_B_202601-202606.csv:966 (62000418-1)",
+          "sales_B_202601-202606.csv:3426 (62001452-3)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> leak_below_margin_floor [ambiguous:AMB_VOLUME_DISCOUNT_BELOW_FLOOR, engine_ref:special]",
+        "lines": 1,
+        "scored": false,
+        "examples": [
+          "sales_A_202407-202512.csv:3665 (5101491-2)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> ok_sample [ambiguous:AMB_ZERO_PRICE_WITHOUT_SAMPLE_NOTE]",
+        "lines": 1,
+        "scored": false,
+        "examples": [
+          "sales_B_202601-202606.csv:351 (62000162-4)"
+        ]
+      }
+    ],
+    "gen-2/revdate": [
+      {
+        "cluster": "ambiguous -> ok [ambiguous:AMB_NO_AGREEMENT_ROW]",
+        "lines": 43,
+        "scored": false,
+        "examples": [
+          "sales_A_202407-202512.csv:10746 (5104340-1)",
+          "sales_A_202407-202512.csv:11208 (5104564-2)",
+          "sales_A_202407-202512.csv:11209 (5104564-3)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> excluded [ambiguous:AMB_CUSTOMER_NOT_IN_MASTER]",
+        "lines": 12,
+        "scored": false,
+        "examples": [
+          "sales_A_202407-202512.csv:663 (5100262-1)",
+          "sales_A_202407-202512.csv:2080 (5100811-1)",
+          "sales_A_202407-202512.csv:3588 (5101457-1)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> unexplained [ambiguous:AMB_UNEXPLAINED_PRICE_INSIDE_TIER]",
+        "lines": 10,
+        "scored": false,
+        "examples": [
+          "sales_A_202407-202512.csv:5274 (5102132-2)",
+          "sales_A_202407-202512.csv:11017 (5104474-1)",
+          "sales_A_202407-202512.csv:12776 (5105211-3)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> ok [ambiguous:AMB_HELD_PRICE_AND_LATER_LIST_CHANGE]",
+        "lines": 6,
+        "scored": false,
+        "examples": [
+          "sales_B_202601-202606.csv:2600 (62001095-2)",
+          "sales_B_202601-202606.csv:2952 (62001249-1)",
+          "sales_B_202601-202606.csv:3398 (62001442-1)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> ok [ambiguous:AMB_HELD_PRICE_BUT_NO_LIST_BEFORE_REVISION]",
+        "lines": 6,
+        "scored": false,
+        "examples": [
+          "sales_A_202407-202512.csv:15518 (5106319-1)",
+          "sales_B_202601-202606.csv:1162 (62000497-1)",
+          "sales_B_202601-202606.csv:1325 (62000573-1)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> leak_below_margin_floor [ambiguous:AMB_VOLUME_DISCOUNT_BELOW_FLOOR]",
+        "lines": 3,
+        "scored": false,
+        "examples": [
+          "sales_B_202601-202606.csv:1476 (62000635-4)",
+          "sales_B_202601-202606.csv:3752 (62001587-1)",
+          "sales_B_202601-202606.csv:3880 (62001637-1)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> ok_volume_discount [ambiguous:AMB_DECIMAL_DISCOUNT_RATE]",
+        "lines": 3,
+        "scored": false,
+        "examples": [
+          "sales_A_202407-202512.csv:1964 (5100765-2)",
+          "sales_A_202407-202512.csv:6054 (5102464-2)",
+          "sales_B_202601-202606.csv:138 (62000071-2)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> leak_old_price [ambiguous:AMB_HELD_PRICE_AND_LATER_LIST_CHANGE]",
+        "lines": 2,
+        "scored": false,
+        "examples": [
+          "sales_B_202601-202606.csv:2051 (62000872-2)",
+          "sales_B_202601-202606.csv:4832 (62002019-1)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> leak_rate_out_of_tier [ambiguous:AMB_ZERO_PRICE_WITHOUT_SAMPLE_NOTE]",
+        "lines": 2,
+        "scored": false,
+        "examples": [
+          "sales_A_202407-202512.csv:15091 (5106157-6)",
+          "sales_B_202601-202606.csv:2212 (62000939-5)"
+        ]
+      },
+      {
+        "cluster": "leak_rate_out_of_tier -> overcharge [cause:manual_price_high]",
+        "lines": 2,
+        "scored": true,
+        "examples": [
+          "sales_B_202601-202606.csv:966 (62000418-1)",
+          "sales_B_202601-202606.csv:3426 (62001452-3)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> leak_below_margin_floor [ambiguous:AMB_VOLUME_DISCOUNT_BELOW_FLOOR, engine_ref:special]",
+        "lines": 1,
+        "scored": false,
+        "examples": [
+          "sales_A_202407-202512.csv:3665 (5101491-2)"
+        ]
+      },
+      {
+        "cluster": "ambiguous -> ok_sample [ambiguous:AMB_ZERO_PRICE_WITHOUT_SAMPLE_NOTE]",
+        "lines": 1,
+        "scored": false,
+        "examples": [
+          "sales_B_202601-202606.csv:351 (62000162-4)"
+        ]
+      }
+    ]
+  }
+}
