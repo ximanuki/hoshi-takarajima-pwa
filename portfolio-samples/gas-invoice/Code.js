@@ -358,12 +358,25 @@ function savePdf(folder, blob) {
  */
 function wasSentInGmail(number, to) {
   try {
-    return GmailApp.search(`in:sent to:${to} "${number}"`, 0, 1).length > 0;
+    return GmailApp.search(sentSearchQuery(number, to), 0, 1).length > 0;
   } catch (e) {
     throw new Error(
       `Gmail の送信済みを確認できませんでした（${e.message}）。二重送信を避けるため、この請求書は作っていません。時間をおいて再実行してください。`,
     );
   }
+}
+
+/**
+ * 送信済みフォルダの検索条件。宛先がカンマ区切りで複数あるときは「どれかあて」（{to:a to:b}）にする。
+ * Gmail の to: は1人ずつしか指定できず、「a,b」をそのまま渡すと送ったメールが見つからないため
+ */
+function sentSearchQuery(number, to) {
+  const addrs = String(to || '')
+    .split(',')
+    .map((a) => a.trim())
+    .filter(Boolean);
+  const toPart = addrs.length > 1 ? `{${addrs.map((a) => `to:${a}`).join(' ')}}` : `to:${addrs[0] || ''}`;
+  return `in:sent ${toPart} "${number}"`;
 }
 
 function deleteDraftQuietly(draftId) {
@@ -1181,6 +1194,7 @@ if (typeof module !== 'undefined') {
   module.exports = {
     CONFIG,
     wasSentInGmail,
+    sentSearchQuery,
     runInvoices,
     keepConfirmedTargets,
     staleTargetLines,

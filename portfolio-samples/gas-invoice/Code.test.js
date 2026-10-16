@@ -564,6 +564,19 @@ test('wasSentInGmail は請求書番号だけでなく宛先でも絞って、�
   assert.deepStrictEqual(queries, ['in:sent to:a@example.com "INV-202609-001"', 'in:sent to:b@example.com "INV-202609-001"']);
 });
 
+test('宛先が複数あるときは、どれかあての送信を探す（Gmail の to: は1人ずつ）', (t) => {
+  const { sentSearchQuery } = require('./Code.js');
+  assert.strictEqual(sentSearchQuery('INV-202609-001', 'a@example.com'), 'in:sent to:a@example.com "INV-202609-001"');
+  assert.strictEqual(
+    sentSearchQuery('INV-202609-001', 'a@example.com, b@example.com'),
+    'in:sent {to:a@example.com to:b@example.com} "INV-202609-001"',
+  );
+  // 2人あてに送ったメールが送信済みにある → 見つかる（以前は「to:a@example.com, b@example.com」で見つからなかった）
+  globalThis.GmailApp = { search: (q) => (q.includes('{to:a@example.com to:b@example.com}') ? [{}] : []) };
+  t.after(() => delete globalThis.GmailApp);
+  assert.strictEqual(wasSentInGmail('INV-202609-001', 'a@example.com,b@example.com'), true);
+});
+
 test('wasSentInGmail は検索に失敗したら「未送信」とみなさずエラーにする（二重送信を防ぐ）', (t) => {
   globalThis.GmailApp = {
     search: () => {
