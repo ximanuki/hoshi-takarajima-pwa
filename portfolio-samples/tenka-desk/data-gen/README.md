@@ -113,13 +113,13 @@ npm run verify   # 下の「確かめていること」をすべて確認する
 
 各行に「正しい単価」を決めて、それと請求単価を比べます。判定の順番は `lib/rules.ts` のとおりで、上で当てはまったものが優先です。
 
-1. 商品マスタにないコード（運賃）、返品（数量マイナス）、見本品（単価0で備考に「見本」「サンプル」）は対象外。
+1. 商品マスタにないコード（運賃）、返品（数量マイナス）、無償品（単価0円で、備考に「見本」「サンプル」「無償」「試供」のどれかがある行。見本品を含む）は対象外。0円でも備考にこれらの言葉がない行は、下の手順で判定する。
 2. **正しい単価**を決める：期間内の特値があればその特値。なければ 定価 × 掛率（切り捨て）。ここでの定価は、前回改定の合意状況（適用日・据え置きカテゴリ・見送り）で決まる、その得意先に適用すべき定価。
-3. 請求単価が正しい単価と同じ → 正常。ただし粗利率が下限（10%）未満なら **粗利下限割れ**。
+3. 請求単価が正しい単価と同じ → 正常。ただし粗利率が下限（10%）未満なら **粗利下限割れ**。請求単価が正しい単価より高い → 利益漏れに数えない（`overcharge`、基準より高い請求）。ただし粗利率が下限未満なら **粗利下限割れ**。
 4. 備考に数量値引の記載（例：`数量値引3%`、`まとめ買い5%引`）があり、正しい単価 ×（100−値引率）% の切り捨てと同じ → 正常（数量値引）。
 5. 新定価に移っているはずの日に、旧定価 × 掛率 で請求 → **反映漏れ**。
 6. 期間が終わった特値と同じ単価で請求 → **特値の期限切れ**。
-7. 請求単価が 定価 × ランクの下限〜上限（それぞれ切り捨て）の外 → **掛率ランク外**。
+7. 請求単価が 定価 × ランクの下限〜上限（それぞれ切り捨て）の外 → **掛率ランク外**。正しい単価より高い請求（ランクの上限を超える請求や、定価の値下げのあとも前の高い定価で請求した行など）は、手順3で除いてあり、利益漏れに数えない（`overcharge`）。そのため上限より上で当たるのは、正しい単価そのものが上限より上（得意先の掛率や特値がランクより高いとき）で、それより安く請求した行だけ。
 8. それ以外 → 原因不明の価格差（このデータには0件）。
 
 | 種類 | 得意先×商品 | 行（うち直近12か月） | 影響額（直近12か月） | 埋め込み方 |
@@ -173,7 +173,7 @@ npm run verify   # 下の「確かめていること」をすべて確認する
 | `followup_lines.csv` | 12月分の1行ごとの判定（`expected` は新単価または適用日前の旧単価） |
 | `summary.json` | 件数の集計、まとめて起きた4件の得意先、全ファイルの行数と sha256 |
 
-`label` の値：`ok`, `ok_special`, `ok_deferred`, `ok_declined`, `ok_volume_discount`, `ok_return`, `ok_sample`, `ok_non_product`, `leak_old_price`, `leak_expired_special`, `leak_rate_out_of_tier`, `leak_below_margin_floor`（12月分は `ok_new_price`, `ok_before_effective`, `ok_volume_discount`, `still_old_price`, `not_in_master`, `ok_return`, `ok_sample`, `ok_non_product`）。
+`label` の値：`ok`, `ok_special`, `ok_deferred`, `ok_declined`, `ok_volume_discount`, `ok_return`, `ok_sample`, `ok_non_product`, `leak_old_price`, `leak_expired_special`, `leak_rate_out_of_tier`, `leak_below_margin_floor`, `overcharge`（基準より高い請求。このサンプルには0行。12月分は `ok_new_price`, `ok_before_effective`, `ok_volume_discount`, `still_old_price`, `not_in_master`, `ok_return`, `ok_sample`, `ok_non_product`）。
 
 ## ソースの構成
 

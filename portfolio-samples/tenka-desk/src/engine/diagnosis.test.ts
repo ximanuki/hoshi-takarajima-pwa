@@ -246,6 +246,59 @@ describe('diagnose: findings and impact', () => {
   });
 });
 
+describe('free goods (無償品)', () => {
+  const free1 = line({
+    cust: '000001',
+    rawSku: 'DB-1001',
+    date: '2026-01-15',
+    unitPrice: 0,
+    qty: 3,
+    remark: '販促品(無償提供)',
+  });
+  const free2 = line({
+    cust: '000002',
+    rawSku: 'DB-1002',
+    date: '2025-05-10',
+    unitPrice: 0,
+    qty: 2,
+    remark: 'サンプル',
+  });
+  // no 定価 on that day: counted as a line, adds nothing to the amount
+  const free3 = line({
+    cust: '000001',
+    rawSku: 'DB-1001',
+    date: '2020-01-01',
+    unitPrice: 0,
+    qty: 1,
+    remark: '試供品',
+  });
+  const zero = line({ cust: '000001', rawSku: 'DB-1002', date: '2026-02-01', unitPrice: 0, qty: 4 });
+  const ok = line({ cust: '000003', rawSku: 'DB-1001', date: '2026-09-30', unitPrice: 446, qty: 1 });
+  const r = diagnose(ds, [free1, free2, free3, zero, ok]);
+
+  it('counts 0-yen lines marked 見本・サンプル・無償・試供 apart, at 定価, and leaves them out of the leaks', () => {
+    expect(r.freeGoods).toEqual({
+      lines: 3,
+      linesInWindow: 1,
+      pairs: 2,
+      customers: 2,
+      listAmountYen: 770 * 3 + 500 * 2,
+      listAmountInWindowYen: 770 * 3,
+    });
+    expect(r.statusCounts.excluded_sample).toBe(3);
+    const freeIds = new Set([free1.id, free2.id, free3.id]);
+    expect(r.findings.flatMap((f) => f.lineIds).filter((id) => freeIds.has(id))).toEqual([]);
+  });
+
+  it('judges a 0-yen line without those words like any other line', () => {
+    const d = r.lines.find((x) => x.line.id === zero.id);
+    expect(d?.status).toBe('leak');
+    expect(d?.leak).toBe('rate_out_of_tier');
+    expect(d?.shortfallYen).toBe(360 * 4);
+    expect(r.summary.find((s) => s.type === 'rate_out_of_tier')).toMatchObject({ lines: 1 });
+  });
+});
+
 describe('customer-wide problems', () => {
   it('flags a customer when at least 5 items and 80% of them show the problem while it lasts', () => {
     const base = fixtureInput();

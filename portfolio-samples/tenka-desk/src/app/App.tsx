@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ConfirmDialog, Icon, Notice } from './components/ui.tsx';
 import { AppProvider, useApp } from './model/AppState.tsx';
+import { agreementsNotUsed } from './model/load.ts';
 import { href, ROUTES, type RouteId, useRoute } from './router.ts';
 import { DiagnosisScreen } from './screens/DiagnosisScreen.tsx';
 import { ExportScreen } from './screens/ExportScreen.tsx';
@@ -53,6 +54,12 @@ function Shell() {
   }, [route.id]);
 
   const hasData = app.loaded !== null;
+  // the import and diagnosis screens explain this themselves
+  const agreementsUnused =
+    app.loaded !== null &&
+    route.id !== 'import' &&
+    route.id !== 'diagnosis' &&
+    agreementsNotUsed(app.loaded).length > 0;
 
   return (
     <div className="app">
@@ -123,6 +130,16 @@ function Shell() {
               </button>
             </p>
           </Notice>
+        )}
+        {app.ready && agreementsUnused && (
+          <div className="no-print" data-testid="agreements-unused-banner">
+            <Notice tone="warning" title="合意状況のファイルを使っていません">
+              <p>
+                前回の改定を見送った得意先などの現行単価と、「請求ミスの可能性」の印は仮です。
+                <a href={href('import')}>取り込み</a>の画面で前回の改定日を入れてください。
+              </p>
+            </Notice>
+          </div>
         )}
         {app.ready ? <Screen id={route.id} /> : <p role="status">準備しています…</p>}
       </main>

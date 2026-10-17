@@ -24,6 +24,7 @@ import {
   passThroughOf,
   scenarioCauses,
 } from '../model/letter.ts';
+import { agreementsNotUsed } from '../model/load.ts';
 import { statusOf } from '../model/negotiation.ts';
 import { href, navigate, useRoute } from '../router.ts';
 import { loadStats, type StatsLoad } from '../sample.ts';
@@ -98,6 +99,8 @@ export function LetterScreen() {
   );
   const causes = ls.causes ?? fromScenario;
   const allowed = allowedTopics(causes);
+  // the agreements file is not used: the 現行単価 of a declined customer is wrong, so the letter is 仮
+  const provisional = loaded ? agreementsNotUsed(loaded).length > 0 : false;
 
   const letter = useMemo(():
     | { data: LetterData; evidence: EvidenceItem[]; notRising: EvidenceItem[] }
@@ -119,12 +122,13 @@ export function LetterScreen() {
         ...(ls.documentPrefix.trim() ? { documentNo: `${ls.documentPrefix.trim()}-${cust}` } : {}),
         causes,
         paragraphs: ls.paragraphs,
+        provisional,
       });
       return { data, evidence: ev.items, notRising: ev.notRising };
     } catch (e) {
       return { error: e instanceof Error ? e.message : String(e) };
     }
-  }, [ds, proposal, cust, customer, stats, issueDate, ls, app.company, causes]);
+  }, [ds, proposal, cust, customer, stats, issueDate, ls, app.company, causes, provisional]);
 
   if (!loaded?.diagnosis || !proposal) {
     return (
@@ -496,12 +500,25 @@ export function LetterScreen() {
   );
 }
 
+const PROVISIONAL_TAG =
+  '仮：前回改定の合意状況のファイルを使っていないため、現行単価が正しくない可能性があります。取り込みの画面で前回の改定日を入れてから送ってください';
+
+/** Printed on every sheet while the 現行単価 is not final (LetterData.provisional). */
+function ProvisionalTag({ on }: { on: boolean }) {
+  return on ? (
+    <p className="sheet-sample" data-testid="letter-provisional">
+      {PROVISIONAL_TAG}
+    </p>
+  ) : null;
+}
+
 function LetterSheets({ data, sample }: { data: LetterData; sample: boolean }) {
   const fictional = sample ? '（架空）' : '';
   return (
     <div className={`sheets${sample ? ' is-sample' : ''}`} data-testid="letter">
       <article className="sheet letter" aria-label="申入書">
         <SampleTag sample={sample} />
+        <ProvisionalTag on={data.provisional} />
         <div className="letter-meta">
           {data.documentNo && <p>{data.documentNo}</p>}
           <p>{data.issueDateText}</p>
@@ -540,6 +557,7 @@ function LetterSheets({ data, sample }: { data: LetterData; sample: boolean }) {
 
       <article className="sheet items" aria-label="別紙 価格改定対象品目一覧">
         <SampleTag sample={sample} />
+        <ProvisionalTag on={data.provisional} />
         <p className="sheet-tag">別紙</p>
         <h2 className="sheet-title">{data.itemsTitle}</h2>
         <p className="sheet-to">
@@ -597,6 +615,7 @@ function LetterSheets({ data, sample }: { data: LetterData; sample: boolean }) {
       {data.evidence.items.length > 0 && (
         <article className="sheet evidence" aria-label={data.evidence.heading}>
           <SampleTag sample={sample} />
+          <ProvisionalTag on={data.provisional} />
           <p className="sheet-tag">参考資料</p>
           <h2 className="sheet-title">{data.evidence.heading}</h2>
           <p className="sheet-intro">{data.evidence.intro}</p>

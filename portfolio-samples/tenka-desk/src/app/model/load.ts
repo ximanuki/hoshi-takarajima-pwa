@@ -5,6 +5,7 @@
  */
 
 import {
+  type AgreementFileUse,
   type Company,
   collectPairVolumes,
   companyFromJson,
@@ -16,10 +17,12 @@ import {
   type IsoDate,
   importFile,
   LayoutNotRecognisedError,
+  type LeakType,
   type LineDiagnosis,
   layoutById,
   type PairVolume,
   pctToBp,
+  previousRevisionDateFromJson,
   type SalesLine,
   type Settings,
   settingsFromJson,
@@ -289,6 +292,7 @@ export async function buildLoaded(sources: readonly SourceFile[], opts: LoadOpti
   let company: Company | null = null;
   let dataSettings: Partial<Settings> = {};
   let demoNextRevision: IsoDate | null = null;
+  let previousRevision: IsoDate | null = null;
 
   for (const src of sources) {
     progress(`${src.name} を読み込んでいます…`);
@@ -296,8 +300,9 @@ export async function buildLoaded(sources: readonly SourceFile[], opts: LoadOpti
     if (/\.json$/i.test(src.name)) {
       try {
         const json = JSON.parse(new TextDecoder().decode(src.bytes)) as Record<string, unknown>;
-        if ('marginFloorPct' in json || 'listPriceRounding' in json) {
+        if ('marginFloorPct' in json || 'listPriceRounding' in json || 'previousRevisionDate' in json) {
           dataSettings = settingsFromJson(json);
+          previousRevision = previousRevisionDateFromJson(json);
           const next = json['demoNextRevisionDate'];
           if (typeof next === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(next)) demoNextRevision = next;
           files.push(emptyInfo(src.name, 'json', '設定（JSON）', null));
@@ -341,6 +346,7 @@ export async function buildLoaded(sources: readonly SourceFile[], opts: LoadOpti
     settings,
     ...(company ? { company } : {}),
     revisionDates: opts.revisionDates,
+    ...(previousRevision ? { previousRevisionDate: previousRevision } : {}),
   });
   // keep only what the screens use (the decoded text of large files is not needed any more)
   const slim: Workspace = { ...ws, files: [] };
@@ -415,3 +421,29 @@ export async function buildLoaded(sources: readonly SourceFile[], opts: LoadOpti
     isSample: opts.isSample,
   };
 }
+
+/**
+ * Agreements files that are loaded but not used by the diagnosis (no 改定日 decided,
+ * or one on which no 定価 changed). Empty when there is no 定価の履歴: then there is
+ * no 反映漏れ for the file to correct. Every warning and 「仮」 marker uses this.
+ */
+export function agreementsNotUsed(l: Pick<Loaded, 'ws' | 'kinds'>): AgreementFileUse[] {
+  return l.kinds.has('listPriceHistory') ? l.ws.agreementFiles.filter((a) => !a.used) : [];
+}
+
+/**
+ * The leak types that are 「仮」 while an agreements file is not used: they are
+ * measured against the 基準単価, which follows each customer's answer to the
+ * revision (見送り, 適用日 …), so they can be too high (a declined customer's
+ * correct old price is 反映漏れ; its 数量値引 from that price is 掛率ランク外).
+ * 粗利下限割れ compares the bill with the cost only: it is not over-counted (it can
+ * only grow, when a line counted as 反映漏れ turns out correct but below the floor).
+ * The diagnosis screen and its CSV both use this.
+ */
+export const AGREEMENT_DEPENDENT_TYPES: readonly LeakType[] = [
+  'old_price',
+  'expired_special',
+  'rate_out_of_tier',
+];
+
+export const isAgreementDependent = (t: LeakType): boolean => AGREEMENT_DEPENDENT_TYPES.includes(t);

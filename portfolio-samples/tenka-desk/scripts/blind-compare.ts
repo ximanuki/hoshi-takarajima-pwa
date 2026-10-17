@@ -8,8 +8,10 @@
  * For each dataset the truth files are checked against blind/<gen>/SEALED.sha256
  * before they are read; a file that does not match stops the run. Each run of
  * blind-score.ts found in <data-dir> is scored: engine-labels.csv (the app
- * default) and any engine-labels.<tag>.csv. Writes <out>/results.json and
- * <out>/mismatches.csv.
+ * default) and any engine-labels.<tag>.csv. When the sealed truth has
+ * truth/followup_lines.csv (a dataset with a next/ folder), the 反映チェック is
+ * scored too, from engine-followup(.<tag>).csv, per new price master. Writes
+ * <out>/results.json and <out>/mismatches.csv.
  *
  * Lines the truth labels "ambiguous" (the documents allow two readings) are left
  * out of precision and recall and reported per pattern instead.
@@ -20,6 +22,16 @@ import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseCsv, toCsv } from '../src/engine/index.ts';
+import {
+  type FollowupScore,
+  inc,
+  num,
+  type Prf,
+  prf,
+  type Row,
+  scoreFollowup,
+  sorted,
+} from './blind-scoring.ts';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -47,8 +59,6 @@ if (datasets.length === 0) {
 }
 
 /* ---------- helpers ---------- */
-
-type Row = Record<string, string>;
 
 function readCsv(path: string): Row[] {
   const [header = [], ...body] = parseCsv(readFileSync(path, 'utf8'));
@@ -105,32 +115,6 @@ function engineNorm(label: string): string {
       return label;
   }
 }
-
-interface Prf {
-  tp: number;
-  fp: number;
-  fn: number;
-  precision: number | null;
-  recall: number | null;
-}
-function prf(tp: number, fp: number, fn: number): Prf {
-  const r = (x: number) => Math.round(x * 10000) / 10000;
-  return {
-    tp,
-    fp,
-    fn,
-    precision: tp + fp > 0 ? r(tp / (tp + fp)) : null,
-    recall: tp + fn > 0 ? r(tp / (tp + fn)) : null,
-  };
-}
-
-function inc(m: Record<string, number>, k: string, n = 1): void {
-  m[k] = (m[k] ?? 0) + n;
-}
-function sorted(m: Record<string, number>): Record<string, number> {
-  return Object.fromEntries(Object.entries(m).sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1)));
-}
-const num = (s: string | undefined) => (s === undefined || s === '' ? 0 : Number(s));
 
 /* ---------- scoring one run ---------- */
 
@@ -432,9 +416,11 @@ const results: Record<string, unknown> = {
   note: 'Blind evaluation of the tenka-desk engine on two independently generated fictional datasets. Engine labels were written by scripts/blind-score.ts before the truth was read; the truth hashes were checked against blind/<gen>/SEALED.sha256 first. Lines the truth marks ambiguous are excluded from precision/recall and reported per pattern.',
   runs: {
     default:
-      'engine-labels.csv: the app as shipped, default settings (no 改定日 typed for the agreements file).',
+      'engine-labels.csv: the app with default settings: no 改定日 typed for the agreements file (the app may infer it from the data; see workspace.ts chooseRevision). Before the fix on branch tenka-desk-revision-fix the app did not infer it; those figures are in commit 20004cd.',
     revdate:
-      'engine-labels.revdate.csv: the same, after the one action the import screen asks for: typing the 改定日 of the agreements file (from demo_settings.json previousRevisionDate / the README).',
+      'engine-labels.revdate.csv: the same, after typing the 改定日 of the agreements file on the import screen (from demo_settings.json previousRevisionDate / the README).',
+    followup:
+      'engine-followup(.tag).csv: the 反映チェック of each new price master in next/ against the sales export there, scored against truth/followup_lines.csv when the sealed truth has it.',
   },
   labelMapping: {
     truth: { unexplained_price_diff: 'unexplained' },
@@ -463,7 +449,27 @@ for (const { gen, dataDir, sealedDir } of datasets) {
     const issues = existsSync(issuesPath) ? (JSON.parse(readFileSync(issuesPath, 'utf8')) as unknown) : {};
     runs[run] = scoreRun(gen, run, truthRows, readCsv(join(dataDir, name)), issues);
   }
-  (results['datasets'] as Record<string, unknown>)[gen] = { sealedTruth: sealed, runs };
+  // the 反映チェック truth is read only when the sealed list has it (and so its hash was checked above)
+  const followupTruth = sealed.some((x) => x.file === 'truth/followup_lines.csv')
+    ? readCsv(join(sealedDir, 'truth', 'followup_lines.csv'))
+    : null;
+  let followup: Record<string, unknown> = {
+    scored: false,
+    reason: '反映チェックの正解がありません（next/ がありません）',
+  };
+  if (followupTruth) {
+    followup = {};
+    for (const name of readdirSync(dataDir).sort()) {
+      const m = /^engine-followup(?:\.(.+))?\.csv$/.exec(name);
+      if (m) followup[m[1] ?? 'default'] = scoreFollowup(followupTruth, readCsv(join(dataDir, name)));
+    }
+    if (Object.keys(followup).length === 0)
+      followup = {
+        scored: false,
+        reason: 'engine-followup.csv がありません（blind-score.ts を実行してください）',
+      };
+  }
+  (results['datasets'] as Record<string, unknown>)[gen] = { sealedTruth: sealed, runs, followup };
 }
 
 /* ---------- mismatch clusters ---------- */
@@ -542,8 +548,17 @@ const rows = mismatches.map(({ dataset, run, j, cluster }) => [
 writeFileSync(join(outDir, 'mismatches.csv'), toCsv(HEADER, rows, { bom: true, eol: '\n', quoteAll: false }));
 
 for (const [gen, d] of Object.entries(
-  results['datasets'] as Record<string, { runs: Record<string, unknown> }>,
+  results['datasets'] as Record<string, { runs: Record<string, unknown>; followup: Record<string, unknown> }>,
 )) {
+  for (const [run, f] of Object.entries(d.followup)) {
+    const masters = (f as { masters?: Record<string, FollowupScore> }).masters;
+    for (const [master, x] of Object.entries(masters ?? {})) {
+      const o = x.stillOldPrice;
+      console.log(
+        `${gen} followup/${run} ${master}: still_old_price P ${o.precision ?? '-'} R ${o.recall ?? '-'} (${o.tp}/${o.fp}/${o.fn}) yen engine ${x.yen.engineStillOld} truth ${x.yen.truthStillOld}, labels ${x.labelAgreementScored.agree}/${x.labelAgreementScored.of}`,
+      );
+    }
+  }
   for (const [run, r] of Object.entries(d.runs)) {
     const s = r as {
       lineLevel: Record<string, Prf>;

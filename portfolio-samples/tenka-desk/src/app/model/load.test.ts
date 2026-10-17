@@ -7,7 +7,11 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { buildLoaded, type LoadOptions, type SourceFile } from './load.ts';
+import { buildLetter } from '../../engine/index.ts';
+import { twoRevisionFiles } from '../../engine/testing/twoRevisions.ts';
+import { agreementsNotUsed, buildLoaded, type Loaded, type LoadOptions, type SourceFile } from './load.ts';
+import { computeProposal } from './proposal.ts';
+import { DEFAULT_GUARD, DEFAULT_SCENARIO } from './settings.ts';
 
 const OPTS: LoadOptions = { revisionDates: {}, diagnosisFloorPct: null, isSample: false };
 
@@ -120,6 +124,97 @@ describe('buildLoaded: sales lines from several files', () => {
     expect(loaded.lines).toHaveLength(2);
     expect(loaded.duplicateLines).toBe(2);
     expect(loaded.slipCollisions.count).toBe(0);
+  });
+});
+
+/** The fixture with two 定価改定 in the history (see engine/testing/twoRevisions.ts). */
+const twoRevisions = (extra: SourceFile[] = [], without = ''): SourceFile[] => [
+  ...twoRevisionFiles()
+    .filter((f) => f.name !== without)
+    .map((f) => ({ name: f.name, bytes: new TextEncoder().encode(f.text) })),
+  ...extra,
+];
+const json = (name: string, value: unknown): SourceFile => ({
+  name,
+  bytes: new TextEncoder().encode(JSON.stringify(value)),
+});
+
+describe('buildLoaded: which revision the agreements file answers', () => {
+  it('reads previousRevisionDate from demo_settings.json and uses the agreements file', async () => {
+    const loaded = await buildLoaded(
+      twoRevisions([json('demo_settings.json', { marginFloorPct: 10, previousRevisionDate: '2025-10-01' })]),
+      OPTS,
+    );
+    expect(loaded.ws.dataset.revisions.map((r) => r.date)).toEqual(['2025-10-01']);
+    expect(loaded.ws.agreementFiles[0]?.signals).toEqual(['settings']);
+    expect(agreementsNotUsed(loaded)).toEqual([]);
+    expect(loaded.diagnosis?.summary.reduce((s, x) => s + x.annualImpactYen, 0)).toBe(720);
+  });
+
+  it('reads a JSON that holds only previousRevisionDate as settings, not as an error', async () => {
+    const loaded = await buildLoaded(
+      twoRevisions([json('settings.json', { previousRevisionDate: '2025-10-01' })]),
+      OPTS,
+    );
+    expect(loaded.files.find((f) => f.name === 'settings.json')).toMatchObject({
+      status: 'json',
+      label: '設定（JSON）',
+    });
+    expect(loaded.ws.dataset.revisions.map((r) => r.date)).toEqual(['2025-10-01']);
+  });
+
+  it('lists the agreements files that are loaded but not used', async () => {
+    const unused = await buildLoaded(twoRevisions(), OPTS);
+    expect(agreementsNotUsed(unused).map((a) => a.file)).toEqual(['agreements.csv']);
+    expect(unused.diagnosis?.summary.reduce((s, x) => s + x.annualImpactYen, 0)).toBe(1800);
+
+    const entered = await buildLoaded(twoRevisions(), {
+      ...OPTS,
+      revisionDates: { 'agreements.csv': '2025-10-01' },
+    });
+    expect(agreementsNotUsed(entered)).toEqual([]);
+
+    // without a 定価の履歴 there is no 反映漏れ for the file to correct
+    const noHistory = await buildLoaded(twoRevisions([], 'list_price_history.csv'), OPTS);
+    expect(noHistory.ws.agreementFiles[0]?.used).toBe(false);
+    expect(agreementsNotUsed(noHistory)).toEqual([]);
+  });
+
+  it('marks the declined customer letter 仮, with no ※ご請求, while the file is not used', async () => {
+    // as LetterScreen builds it: provisional while agreementsNotUsed is not empty
+    const letterOf = (loaded: Loaded) => {
+      const p = computeProposal(
+        loaded,
+        structuredClone(DEFAULT_SCENARIO),
+        structuredClone(DEFAULT_GUARD),
+        {},
+      );
+      if (!p.ok) throw new Error(p.error);
+      const company = { name: '架空', business: '', address: '', tel: '', representative: '', branches: [] };
+      return buildLetter(loaded.ws.dataset, '000002', p.pairs, [], company, {
+        issueDate: '2026-01-10',
+        effectiveDate: p.effectiveDate,
+        basis: '出荷分',
+        provisional: agreementsNotUsed(loaded).length > 0,
+      });
+    };
+    const unused = letterOf(await buildLoaded(twoRevisions(), OPTS));
+    expect(unused.provisional).toBe(true);
+    // its correct kept price 792 is not a billing error to point out
+    expect(unused.items.map((i) => [i.sku, i.billedPrice])).toEqual([
+      ['DB-2001', null],
+      ['DB-2002', null],
+    ]);
+    expect(unused.itemsNotes.join('')).not.toContain('※印');
+
+    const entered = letterOf(
+      await buildLoaded(twoRevisions(), { ...OPTS, revisionDates: { 'agreements.csv': '2025-10-01' } }),
+    );
+    expect(entered.provisional).toBe(false);
+    expect(entered.items.map((i) => [i.sku, i.currentPrice, i.billedPrice])).toEqual([
+      ['DB-2001', 792, null],
+      ['DB-2002', 792, null],
+    ]);
   });
 });
 

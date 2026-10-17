@@ -52,7 +52,8 @@ export type HistoryLabel =
   | 'leak_expired_special'
   | 'leak_rate_out_of_tier'
   | 'leak_below_margin_floor'
-  | 'unexplained';
+  | 'unexplained'
+  | 'overcharge';
 
 export const LABEL_JA: Record<string, string> = {
   ok: '正常',
@@ -68,6 +69,7 @@ export const LABEL_JA: Record<string, string> = {
   leak_rate_out_of_tier: '掛率ランク外',
   leak_below_margin_floor: '粗利下限割れ',
   unexplained: '原因不明の価格差',
+  overcharge: '基準より高い請求(漏れに含めない)',
   ok_new_price: '新価格で請求',
   ok_before_effective: '適用日前(旧価格で正しい)',
   still_old_price: '旧価格のまま(反映漏れ)',
@@ -116,8 +118,9 @@ export function parseVolumeDiscount(remark: string): number | null {
   return m ? Number(m[1]) : null;
 }
 
+/** 無償品: 単価0 with 「見本」「サンプル」「無償」「試供」 in the remark (the same words as the app). */
 export function isSampleRemark(remark: string): boolean {
-  return /(見本|サンプル)/.test(remark.normalize('NFKC'));
+  return /(見本|サンプル|無償|試供)/.test(remark.normalize('NFKC'));
 }
 
 export type ListInfo = {
@@ -203,6 +206,11 @@ export function classifyHistoryLine(ctx: Ctx, ln: Line): HistoryResult {
   if (disc !== null && ln.billed === floorDiv(reference * (100 - disc), 100)) {
     return { label: 'ok_volume_discount', ...base, shortfall: 0 };
   }
+  // billing above the correct price is not a profit leak (only the margin floor can still count)
+  if (ln.billed > reference)
+    return below
+      ? { label: 'leak_below_margin_floor', ...base, shortfall: floorGap }
+      : { label: 'overcharge', ...base, shortfall: 0 };
   if (li.prevList !== null && ln.billed === priceAtRate(li.prevList, c.ratePm)) {
     return { label: 'leak_old_price', ...base, shortfall: gap };
   }
@@ -211,6 +219,8 @@ export function classifyHistoryLine(ctx: Ctx, ln: Line): HistoryResult {
       return { label: 'leak_expired_special', ...base, shortfall: gap };
     }
   }
+  // bills above the correct price have returned above: the upper limit counts only when
+  // the correct price itself is above the range (a 掛率 or 特値 above the rank)
   if (ln.billed < priceAtRate(li.list, tier.min) || ln.billed > priceAtRate(li.list, tier.max)) {
     return { label: 'leak_rate_out_of_tier', ...base, shortfall: gap };
   }

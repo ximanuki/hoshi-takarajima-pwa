@@ -7,13 +7,14 @@ import {
   type LeakType,
   LINE_STATUS_JA,
   type LineStatus,
-  toCompactDate,
-  toCsv,
+  REVISION_SIGNAL_JA,
 } from '../../engine/index.ts';
 import { BarList } from '../components/Charts.tsx';
 import { Badge, Card, downloadFile, Icon, NeedsData, Notice, PageHeader } from '../components/ui.tsx';
 import { num, ratio, wareki, warekiRange, yen } from '../format.ts';
 import { useApp } from '../model/AppState.tsx';
+import { diagnosisCsv } from '../model/diagnosisCsv.ts';
+import { agreementsNotUsed, isAgreementDependent } from '../model/load.ts';
 import { href } from '../router.ts';
 
 const TYPE_HELP: Record<LeakType, string> = {
@@ -71,45 +72,16 @@ export function DiagnosisScreen() {
   const wholeCustomers = d.customers.filter((c) => c.wholeCustomer);
   const kinds = loaded.kinds;
   const counts = Object.entries(d.statusCounts).filter(([, n]) => n > 0) as [LineStatus, number][];
+  // an agreements file is loaded but not used: the 基準単価 ignores the customers' answers,
+  // so 反映漏れ and 掛率ランク外 (and 特値の期限切れ) can be too high
+  const notUsed = agreementsNotUsed(loaded);
+  const provisional = notUsed.length > 0;
+  const inferred = loaded.ws.agreementFiles.filter((a) => a.used && a.source === 'inferred');
+  const isProvisional = (t: LeakType) => provisional && isAgreementDependent(t);
 
   const exportCsv = () => {
-    const rows = d.findings.map((f) => [
-      f.id,
-      LEAK_LABEL_JA[f.type],
-      f.cust,
-      f.custName,
-      f.sku,
-      f.itemName,
-      f.firstDate,
-      f.lastDate,
-      f.ongoing ? '続いている' : '解消済み',
-      f.lines,
-      f.linesInWindow,
-      f.annualImpactYen,
-      f.shortfallTotalYen,
-      f.explanation.join(' '),
-    ]);
-    const csv = toCsv(
-      [
-        'ID',
-        '種類',
-        '得意先コード',
-        '得意先名',
-        '商品コード',
-        '商品名',
-        '最初の日付',
-        '最後の日付',
-        '状態',
-        '行数',
-        '直近12か月の行数',
-        '直近12か月の影響額(円)',
-        '全期間の不足額(円)',
-        '説明',
-      ],
-      rows,
-      { bom: true, eol: '\r\n', quoteAll: false },
-    );
-    downloadFile(`利益漏れ診断_${toCompactDate(d.window.end)}.csv`, csv, 'text/csv;charset=utf-8');
+    const { name, text } = diagnosisCsv(d, { provisional });
+    downloadFile(name, text, 'text/csv;charset=utf-8');
   };
 
   return (
@@ -138,6 +110,31 @@ export function DiagnosisScreen() {
           </p>
         </Notice>
       )}
+      {provisional && (
+        <Notice tone="warning" title="合意状況のファイルを使っていません。反映漏れが多めに出ています">
+          <p>
+            {notUsed.map((a) => a.file).join('、')}：
+            {notUsed.every((a) => a.date === null)
+              ? 'どの定価改定（改定日）の答えか決まっていないため'
+              : '改定日が決まっていないか、入れた改定日に定価が変わった商品がないため'}
+            、見送り・据え置き・適用日前の正しい旧価格も「反映漏れ」に、その単価から数量値引をした正しい行も「掛率ランク外」に数えています。反映漏れ・特値の期限切れ・掛率ランク外の金額は「仮」です。
+          </p>
+          <p>
+            <a className="btn btn-small" href={href('import')}>
+              取り込みの画面で前回の改定日を入れる
+            </a>
+          </p>
+        </Notice>
+      )}
+      {inferred.map((a) => (
+        <Notice key={a.file} tone="info">
+          <p>
+            {a.file} を {a.date ? wareki(a.date) : ''} の定価改定の合意状況として扱いました（
+            {a.signals.map((x) => REVISION_SIGNAL_JA[x]).join('・')}から判断）。違う場合は
+            <a href={href('import')}>取り込み</a>の画面で改定日を直してください。
+          </p>
+        </Notice>
+      ))}
       {!kinds.has('specials') && (
         <Notice tone="warning" title="特値一覧が読み込まれていません">
           <p>期間内の特値も「掛率ランク外」として表示され、期限切れの特値は見つけられません。</p>
@@ -153,6 +150,14 @@ export function DiagnosisScreen() {
         <div className="hero">
           <h2 id="leak-total" className="hero-label">
             直近12か月の利益漏れ（4種類の合計）
+            {provisional && (
+              <>
+                {' '}
+                <span className="badge badge-warning" data-testid="leak-total-provisional">
+                  仮
+                </span>
+              </>
+            )}
           </h2>
           <p className="hero-value" data-testid="leak-total">
             {yen(total)}
@@ -161,6 +166,9 @@ export function DiagnosisScreen() {
             同じ期間の売上 {yen(d.salesInWindowYen)} の {ratio(total, d.salesInWindowYen, 2)}・得意先×商品{' '}
             {num(d.findings.length)}組
           </p>
+          {provisional && (
+            <p className="hero-sub">反映漏れ・特値の期限切れ・掛率ランク外の金額が仮のため、合計も仮です。</p>
+          )}
         </div>
         <BarList
           caption="種類ごとの年間影響額"
@@ -169,7 +177,7 @@ export function DiagnosisScreen() {
             key: s.type,
             label: s.label,
             value: s.annualImpactYen,
-            display: yen(s.annualImpactYen),
+            display: isProvisional(s.type) ? `${yen(s.annualImpactYen)}（仮）` : yen(s.annualImpactYen),
             sub: `${num(s.pairs)}組・${num(s.customers)}社・続いている ${num(s.ongoingPairs)}組`,
           }))}
         />
@@ -199,6 +207,20 @@ export function DiagnosisScreen() {
         </Notice>
       )}
 
+      {d.freeGoods.lines > 0 && (
+        <div data-testid="free-goods">
+          <Notice tone="info" title="無償で出した行があります（利益漏れには含めていません）">
+            <p>
+              単価0円で、備考に「見本」「サンプル」「無償」「試供」のどれかがある {num(d.freeGoods.lines)}行（
+              {num(d.freeGoods.pairs)}組・{num(d.freeGoods.customers)}
+              社）は、見本品・無償品として対象外にしています。定価で計算すると直近12か月で{' '}
+              {yen(d.freeGoods.listAmountInWindowYen)}（全期間 {yen(d.freeGoods.listAmountYen)}
+              ）です。無償で出すと決めたものか確かめてください。0円でも備考にこれらの言葉がない行は、ほかの行と同じに判定しています。
+            </p>
+          </Notice>
+        </div>
+      )}
+
       {wholeCustomers.length > 0 && (
         <Card title="得意先単位で起きている可能性があるもの">
           <p className="small muted">
@@ -210,6 +232,7 @@ export function DiagnosisScreen() {
                 <strong>{c.custName}</strong>（{c.cust}）：{LEAK_LABEL_JA[c.type]}が {num(c.eligiblePairs)}
                 品目中 {num(c.affectedPairs)}品目（{warekiRange(c.firstDate, c.lastDate)}）・直近12か月{' '}
                 {yen(c.annualImpactYen)}
+                {isProvisional(c.type) ? '（仮）' : ''}
               </li>
             ))}
           </ul>
@@ -318,7 +341,15 @@ export function DiagnosisScreen() {
                     </td>
                     <td>{f.ongoing ? <Badge tone="warning">続いている</Badge> : <Badge>解消済み</Badge>}</td>
                     <td className="num">{num(f.lines)}</td>
-                    <td className="num">{yen(f.annualImpactYen)}</td>
+                    <td className="num">
+                      {yen(f.annualImpactYen)}
+                      {isProvisional(f.type) && (
+                        <>
+                          {' '}
+                          <Badge tone="warning">仮</Badge>
+                        </>
+                      )}
+                    </td>
                   </tr>
                   {open === f.id && (
                     <tr className="detail-row" id={`detail-${f.id}`}>

@@ -17,8 +17,11 @@
  *
  * Independently, every line is checked against the 粗利率の下限 (粗利下限割れ).
  * A line can carry several flags; its primary type follows the order above, with
- * 粗利下限割れ last. Excluded from the check: returns, free samples (単価0 with a
- * 見本/サンプル remark), and codes that are not in the product master (運賃 etc.).
+ * 粗利下限割れ last. Excluded from the check: returns, codes that are not in the
+ * product master (運賃 etc.), and free goods (無償品): lines with 単価0 and one of
+ * 「見本」「サンプル」「無償」「試供」 in the remark (text.ts isSampleRemark). Free
+ * goods are not leaks; they are counted apart, at 定価 (freeGoods). A 0-yen line
+ * without those words is judged like any other line.
  *
  * The yearly impact (年間影響額) is the actual shortfall over the last 12 calendar
  * months of the data, not a forecast.
@@ -202,6 +205,19 @@ export interface DiagnosisResult {
   salesInWindowYen: number;
   /** bills above the expected price (not leaks; shown for checking) */
   overcharges: OverchargeSummary;
+  /** free goods (無償品, excluded_sample): not leaks, counted apart at 定価 */
+  freeGoods: FreeGoodsSummary;
+}
+
+export interface FreeGoodsSummary {
+  lines: number;
+  linesInWindow: number;
+  pairs: number;
+  customers: number;
+  /** Σ 定価 on the day × qty over all lines (a line without a 定価 that day adds 0) */
+  listAmountYen: number;
+  /** the same over the window (直近12か月) */
+  listAmountInWindowYen: number;
 }
 
 export interface OverchargeSummary {
@@ -563,6 +579,17 @@ export function diagnose(
     amountYen: over.reduce((s, d) => s - d.shortfallYen, 0),
     amountInWindowYen: over.filter((d) => inWindow(d.line.date)).reduce((s, d) => s - d.shortfallYen, 0),
   };
+  const free = results.filter((d) => d.status === 'excluded_sample');
+  const atList = (d: LineDiagnosis) =>
+    (d.line.sku !== null ? (ds.listPriceAt(d.line.sku, d.line.date) ?? 0) : 0) * d.line.qty;
+  const freeGoods: FreeGoodsSummary = {
+    lines: free.length,
+    linesInWindow: free.filter((d) => inWindow(d.line.date)).length,
+    pairs: new Set(free.map((d) => pairKey(d.line.cust, d.line.sku ?? ''))).size,
+    customers: new Set(free.map((d) => d.line.cust)).size,
+    listAmountYen: free.reduce((s, d) => s + atList(d), 0),
+    listAmountInWindowYen: free.filter((d) => inWindow(d.line.date)).reduce((s, d) => s + atList(d), 0),
+  };
   return {
     window: period,
     lines: results,
@@ -572,6 +599,7 @@ export function diagnose(
     statusCounts,
     salesInWindowYen,
     overcharges,
+    freeGoods,
   };
 }
 

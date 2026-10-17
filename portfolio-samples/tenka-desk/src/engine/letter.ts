@@ -61,6 +61,13 @@ export interface LetterOptions {
   paragraphs?: Partial<Record<LetterParagraphId, string>>;
   /** label of figures computed from published values (default 「弊社算出」) */
   computedLabel?: string;
+  /**
+   * The 現行単価 is not final: an agreements file is loaded but not used, so a
+   * customer who declined the last revision is shown the new price. The letter is
+   * then marked 仮 (`provisional`) and shows no ※ご請求: the "billing error" may be
+   * the customer's correct kept price.
+   */
+  provisional?: boolean;
 }
 
 export interface LetterItemRow {
@@ -106,6 +113,8 @@ export interface LetterData {
   itemsNotes: string[];
   /** quantity-weighted average increase over the listed items (bp) */
   averageChangeBp: number;
+  /** the 現行単価 may be wrong (LetterOptions.provisional): the UI prints a 仮 mark on every sheet */
+  provisional: boolean;
   evidence: {
     heading: string;
     intro: string;
@@ -157,8 +166,10 @@ export function buildLetter(
     .sort((a, b) => (a.sku < b.sku ? -1 : 1));
   if (mine.length === 0) throw new EmptyLetterError(cust);
 
+  const provisional = options.provisional === true;
   const items: LetterItemRow[] = mine.map((p) => {
     const product = ds.products.get(p.sku);
+    const billed = !provisional && p.ongoingLeak !== null && p.systemPrice < p.currentPrice;
     return {
       sku: p.sku,
       name: product?.name ?? p.sku,
@@ -171,9 +182,8 @@ export function buildLetter(
       newPriceText: withCommas(p.newPrice),
       changeText: `+${withCommas(p.changeYen)}`,
       rateText: `+${formatRatioPct(p.changeYen, p.currentPrice)}`,
-      billedPrice: p.ongoingLeak !== null && p.systemPrice < p.currentPrice ? p.systemPrice : null,
-      billedPriceText:
-        p.ongoingLeak !== null && p.systemPrice < p.currentPrice ? withCommas(p.systemPrice) : null,
+      billedPrice: billed ? p.systemPrice : null,
+      billedPriceText: billed ? withCommas(p.systemPrice) : null,
     };
   });
   let before = 0;
@@ -285,6 +295,7 @@ export function buildLetter(
         : []),
     ],
     averageChangeBp,
+    provisional,
     evidence: {
       heading: '参考資料（公表統計）',
       intro: `${shownTopics.map((t) => EVIDENCE_TOPIC_JA[t]).join('・')}の動向を示す公表統計です。業界や地域全体の動きを示すもので、個々の取引条件をそのまま表すものではありません。`,
