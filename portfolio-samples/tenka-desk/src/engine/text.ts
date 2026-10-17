@@ -189,7 +189,7 @@ export function parseRemarkDiscount(remark: string): number | null {
   return null;
 }
 
-/** Free goods: remark mentions 見本 / サンプル / 無償 / 試供. */
+/** Free goods (無償品, samples included): the remark has 「見本」「サンプル」「無償」「試供」. */
 export function isSampleRemark(remark: string): boolean {
   return /(見本|サンプル|無償|試供)/.test(remark.normalize('NFKC'));
 }

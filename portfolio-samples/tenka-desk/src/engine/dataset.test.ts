@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { Dataset, inferRevisionDates } from './dataset.ts';
+import { Dataset, inferRevisionDates, listChangeDates } from './dataset.ts';
 import { agreement, fixtureDataset, fixtureInput, REVISION } from './testing/fixtures.ts';
 
 describe('applicableList', () => {
@@ -283,6 +283,13 @@ describe('data checks', () => {
       { sku: 'Q', price: 100, start: '2024-04-01', end: '2025-07-31' },
       { sku: 'Q', price: 120, start: '2025-08-01', end: null },
     );
+    expect(inferRevisionDates(rows)).toEqual(['2025-04-01']);
+    // every day on which any 定価 changed, also for a single product; a new row at the same price is no change
+    rows.push(
+      { sku: 'R', price: 300, start: '2024-04-01', end: '2025-05-31' },
+      { sku: 'R', price: 300, start: '2025-06-01', end: null },
+    );
+    expect(listChangeDates(rows)).toEqual(['2025-04-01', '2025-08-01']);
     expect(inferRevisionDates(rows)).toEqual(['2025-04-01']);
   });
 });

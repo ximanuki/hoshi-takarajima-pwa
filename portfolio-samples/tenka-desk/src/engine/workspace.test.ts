@@ -1,8 +1,18 @@
 import { describe, expect, it } from 'vitest';
+import { diagnose } from './diagnosis.ts';
 import { encodeShiftJis } from './encoding.ts';
 import { importFile, LayoutNotRecognisedError } from './importers.ts';
 import { layoutById } from './layouts.ts';
-import { companyFromJson, loadWorkspace, settingsFromJson, workspaceFromImports } from './workspace.ts';
+import { type TwoRevisionOptions, twoRevisionFiles } from './testing/twoRevisions.ts';
+import {
+  companyFromJson,
+  loadWorkspace,
+  previousRevisionDateFromJson,
+  settingsFromJson,
+  type WorkspaceOptions,
+  workspaceFromImports,
+  yearMonthsInName,
+} from './workspace.ts';
 
 const files = {
   customers:
@@ -60,9 +70,16 @@ describe('loadWorkspace', () => {
     ];
     const ws = loadWorkspace(inputs);
     expect(ws.dataset.revisions).toEqual([]);
-    expect(ws.notes.filter((n) => n.includes('改定日を指定'))).toHaveLength(2);
+    // a warning, not an info note
+    expect(ws.notes.filter((n) => n.includes('使っていません'))).toEqual([]);
+    expect(ws.warnings.filter((n) => n.includes('使っていません'))).toHaveLength(2);
+    expect(ws.agreementFiles.map((a) => [a.file, a.used])).toEqual([
+      ['a1.csv', false],
+      ['a2.csv', false],
+    ]);
     const ws2 = loadWorkspace(inputs, { revisionDates: { 'a1.csv': '2025-04-01' } });
     expect(ws2.dataset.revisions.map((r) => r.date)).toEqual(['2025-04-01']);
+    expect(ws2.agreementFiles[0]).toMatchObject({ file: 'a1.csv', date: '2025-04-01', source: 'entered' });
   });
 
   it('collects import problems by file', () => {
@@ -74,6 +91,181 @@ describe('loadWorkspace', () => {
     ]);
     expect(ws.importIssues).toHaveLength(1);
     expect(ws.importIssues[0]?.file).toBe('sales.csv');
+  });
+});
+
+function loadTwo(options: TwoRevisionOptions = {}, wsOptions: WorkspaceOptions = {}) {
+  const ws = loadWorkspace(
+    twoRevisionFiles(options).map((f) => ({ name: f.name, data: f.text })),
+    wsOptions,
+  );
+  const total = diagnose(ws.dataset, ws.sales.get('sales.csv') ?? []).summary.reduce(
+    (s, x) => s + x.annualImpactYen,
+    0,
+  );
+  return { ws, total };
+}
+
+describe('which revision an agreements file answers', () => {
+  it('leaves the file out, with a warning, when the history has two revisions and nothing points to one', () => {
+    const { ws, total } = loadTwo();
+    expect(ws.revisionCandidates).toEqual(['2025-04-01', '2025-10-01']);
+    expect(ws.dataset.revisions).toEqual([]);
+    expect(ws.agreementFiles).toEqual([
+      expect.objectContaining({ file: 'agreements.csv', date: null, source: null, used: false }),
+    ]);
+    expect(ws.warnings).toHaveLength(1);
+    expect(ws.warnings[0]).toContain('使っていません');
+    expect(ws.warnings[0]).toContain('反映漏れと掛率ランク外が多めに出ます');
+    expect(ws.warnings[0]).toContain('令和7年4月1日');
+    expect(ws.warnings[0]).toContain('令和7年10月1日');
+    // the declined customer's correct old prices are counted as 反映漏れ
+    expect(total).toBe(1800);
+  });
+
+  it('uses the year and month in the file name when exactly one revision matches', () => {
+    const { ws, total } = loadTwo({ agreementsName: 'revision_2025-10_agreements.csv' });
+    expect(ws.dataset.revisions.map((r) => r.date)).toEqual(['2025-10-01']);
+    expect(ws.agreementFiles[0]).toMatchObject({
+      date: '2025-10-01',
+      source: 'inferred',
+      signals: ['file_name'],
+      inHistory: true,
+      used: true,
+    });
+    const note = ws.notes.find((n) => n.includes('revision_2025-10_agreements.csv'));
+    expect(note).toContain('令和7年10月1日');
+    expect(note).toContain('ファイル名');
+    expect(ws.warnings).toEqual([]);
+    expect(total).toBe(720);
+  });
+
+  it('uses the most common 適用日 of the file, but not when two dates tie', () => {
+    const one = loadTwo({ agreedEffective: '2025-10-01' });
+    expect(one.ws.dataset.revisions.map((r) => r.date)).toEqual(['2025-10-01']);
+    expect(one.ws.agreementFiles[0]).toMatchObject({ source: 'inferred', signals: ['effective_dates'] });
+    expect(one.total).toBe(720);
+
+    const tie = loadTwo({
+      agreementRows: [
+        '000001,株式会社甲見本商事（架空）,2025-07-01,2025-08-01,合意,2025-10-01,,',
+        '000002,乙見本工業株式会社（架空）,2025-07-01,2025-08-01,合意(適用日変更),2025-11-01,,',
+      ],
+    });
+    expect(tie.ws.dataset.revisions).toEqual([]);
+    expect(tie.ws.agreementFiles[0]).toMatchObject({ used: false, signals: [] });
+  });
+
+  it('uses previousRevisionDate from the settings only when there is one agreements file', () => {
+    const { ws, total } = loadTwo({}, { previousRevisionDate: '2025-10-01' });
+    expect(ws.dataset.revisions.map((r) => r.date)).toEqual(['2025-10-01']);
+    expect(ws.agreementFiles[0]).toMatchObject({ source: 'inferred', signals: ['settings'] });
+    expect(total).toBe(720);
+
+    const files = twoRevisionFiles();
+    const ag = files.find((f) => f.name === 'agreements.csv');
+    const two = loadWorkspace(
+      [...files, { name: 'agreements_branch.csv', text: ag?.text ?? '' }].map((f) => ({
+        name: f.name,
+        data: f.text,
+      })),
+      { previousRevisionDate: '2025-10-01' },
+    );
+    expect(two.dataset.revisions).toEqual([]);
+    expect(two.agreementFiles.map((a) => a.used)).toEqual([false, false]);
+    expect(two.warnings).toHaveLength(2);
+  });
+
+  it('keeps asking when the signals point to different revisions', () => {
+    const { ws } = loadTwo({
+      agreementsName: 'revision_2025-04_agreements.csv',
+      agreedEffective: '2025-10-01',
+    });
+    expect(ws.dataset.revisions).toEqual([]);
+    expect(ws.agreementFiles[0]).toMatchObject({ used: false, source: null });
+    expect(ws.warnings[0]).toContain('使っていません');
+    expect(ws.warnings[0]).toContain('令和7年4月1日');
+    expect(ws.warnings[0]).toContain('令和7年10月1日');
+  });
+
+  it('takes no signal from a file name that holds a period (two year-months)', () => {
+    // like the sample's sales_A_202410-202609.csv: the first month is not the revision
+    const { ws, total } = loadTwo({ agreementsName: 'agreements_202504-202603.csv' });
+    expect(ws.dataset.revisions).toEqual([]);
+    expect(ws.agreementFiles[0]).toMatchObject({ date: null, source: null, signals: [], used: false });
+    expect(ws.warnings).toHaveLength(1);
+    expect(ws.warnings[0]).toContain('使っていません');
+    expect(total).toBe(1800);
+  });
+
+  it('keeps asking when one month holds two revisions', () => {
+    const { ws } = loadTwo({
+      agreementsName: 'revision_2025-10_agreements.csv',
+      listSteps: [
+        [1000, '2024-04-01'],
+        [1100, '2025-10-01'],
+        [1200, '2025-10-16'],
+      ],
+    });
+    expect(ws.revisionCandidates).toEqual(['2025-10-01', '2025-10-16']);
+    expect(ws.dataset.revisions).toEqual([]);
+    expect(ws.agreementFiles[0]?.used).toBe(false);
+  });
+
+  it('a date the person entered wins over the inferred one', () => {
+    const name = 'revision_2025-10_agreements.csv';
+    const { ws } = loadTwo(
+      { agreementsName: name },
+      { revisionDates: { [name]: '2025-04-01' }, previousRevisionDate: '2025-10-01' },
+    );
+    expect(ws.dataset.revisions.map((r) => r.date)).toEqual(['2025-04-01']);
+    expect(ws.agreementFiles[0]).toMatchObject({ source: 'entered', date: '2025-04-01', used: true });
+    expect(ws.notes.filter((n) => n.includes('改定として扱いました'))).toEqual([]);
+  });
+
+  it('reports an entered date on which no 定価 changed as not used', () => {
+    const { ws, total } = loadTwo({}, { revisionDates: { 'agreements.csv': '2025-10-02' } });
+    expect(ws.agreementFiles[0]).toMatchObject({
+      source: 'entered',
+      date: '2025-10-02',
+      inHistory: false,
+      used: false,
+    });
+    expect(ws.warnings).toHaveLength(1);
+    expect(ws.warnings[0]).toContain('定価が変わった商品');
+    expect(ws.warnings[0]).toContain('令和7年10月2日');
+    expect(total).toBe(1800);
+  });
+
+  it('assigns a single file to the single revision of the history, as before', () => {
+    const { ws } = loadTwo({
+      listSteps: [
+        [1000, '2024-04-01'],
+        [1200, '2025-10-01'],
+      ],
+    });
+    expect(ws.dataset.revisions.map((r) => r.date)).toEqual(['2025-10-01']);
+    expect(ws.agreementFiles[0]).toMatchObject({ source: 'only_revision', signals: [], used: true });
+    expect(ws.notes[0]).toContain('定価の履歴から判断');
+  });
+
+  it('reads the year and month from a file name', () => {
+    expect(yearMonthsInName('revision_2025-10_agreements.csv')).toEqual(['2025-10']);
+    expect(yearMonthsInName('合意状況_2025_10.csv')).toEqual(['2025-10']);
+    expect(yearMonthsInName('agreements202510.csv')).toEqual(['2025-10']);
+    expect(yearMonthsInName('agreements_20251001.csv')).toEqual(['2025-10']);
+    expect(yearMonthsInName('2024-04/revision_2025-10_agreements.csv')).toEqual(['2025-10']);
+    expect(yearMonthsInName('C:\\data\\2024-04\\agreements_2025.06.csv')).toEqual(['2025-06']);
+    expect(yearMonthsInName('agreements.csv')).toEqual([]);
+    expect(yearMonthsInName('agreements_2025-13.csv')).toEqual([]);
+    expect(yearMonthsInName('code_120251001.csv')).toEqual([]);
+  });
+
+  it('reads previousRevisionDate from a settings JSON', () => {
+    expect(previousRevisionDateFromJson({ previousRevisionDate: '2025-06-16' })).toBe('2025-06-16');
+    expect(previousRevisionDateFromJson({ previousRevisionDate: '2025-02-30' })).toBeNull();
+    expect(previousRevisionDateFromJson({ previousRevisionDate: 20250616 })).toBeNull();
+    expect(previousRevisionDateFromJson(null)).toBeNull();
   });
 });
 

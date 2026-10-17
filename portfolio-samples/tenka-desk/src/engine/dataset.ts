@@ -454,11 +454,11 @@ function isZeroShare(s: CostShare): boolean {
   return s.material + s.labor + s.energy + s.other === 0;
 }
 
-/**
- * Dates on which many 定価 changed at once (a 定価改定), from the history alone:
- * at least `minShare` (bp) of the products that have history, and at least 10 products.
- */
-export function inferRevisionDates(history: readonly ListPriceRow[], minShareBp = 500): IsoDate[] {
+/** How many products' 定価 changed on each day (a day counts once per product). */
+function countListChanges(history: readonly ListPriceRow[]): {
+  counts: Map<IsoDate, number>;
+  products: number;
+} {
   const bySku = new Map<string, ListPriceRow[]>();
   for (const r of history) {
     const list = bySku.get(r.sku) ?? [];
@@ -474,9 +474,23 @@ export function inferRevisionDates(history: readonly ListPriceRow[], minShareBp 
       if (cur && prev && cur.price !== prev.price) counts.set(cur.start, (counts.get(cur.start) ?? 0) + 1);
     }
   }
-  const min = Math.max(10, Math.ceil((bySku.size * minShareBp) / 10000));
+  return { counts, products: bySku.size };
+}
+
+/**
+ * Dates on which many 定価 changed at once (a 定価改定), from the history alone:
+ * at least `minShare` (bp) of the products that have history, and at least 10 products.
+ */
+export function inferRevisionDates(history: readonly ListPriceRow[], minShareBp = 500): IsoDate[] {
+  const { counts, products } = countListChanges(history);
+  const min = Math.max(10, Math.ceil((products * minShareBp) / 10000));
   return [...counts.entries()]
     .filter(([, n]) => n >= min)
     .map(([d]) => d)
     .sort();
+}
+
+/** Every day on which the 定価 of at least one product changed, in date order. */
+export function listChangeDates(history: readonly ListPriceRow[]): IsoDate[] {
+  return [...countListChanges(history).counts.keys()].sort();
 }

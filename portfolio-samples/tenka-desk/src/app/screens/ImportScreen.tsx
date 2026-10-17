@@ -1,10 +1,24 @@
 import { useId, useMemo, useState } from 'react';
-import { type FileKind, LAYOUTS, mapColumns, pctToBp, toWareki } from '../../engine/index.ts';
+import {
+  type AgreementFileUse,
+  type FileKind,
+  type IsoDate,
+  LAYOUTS,
+  mapColumns,
+  pctToBp,
+  REVISION_SIGNAL_JA,
+} from '../../engine/index.ts';
 import { DropZone } from '../components/DropZone.tsx';
 import { Badge, Card, Icon, Kpi, Notice, PageHeader } from '../components/ui.tsx';
 import { num, wareki, warekiRange, yen } from '../format.ts';
 import { useApp } from '../model/AppState.tsx';
-import { type ColumnChoice, FILE_CHECKS, type FileInfo, type SlipLineRef } from '../model/load.ts';
+import {
+  agreementsNotUsed,
+  type ColumnChoice,
+  FILE_CHECKS,
+  type FileInfo,
+  type SlipLineRef,
+} from '../model/load.ts';
 
 export function ImportScreen() {
   const app = useApp();
@@ -89,6 +103,14 @@ export function ImportScreen() {
                 <Badge tone="info">サンプルデータ（架空）</Badge>{' '}
                 {inputs?.source === 'sample' ? `販売管理${inputs.layout}形式` : ''}
               </p>
+            )}
+            {agreementsNotUsed(loaded).length > 0 && (
+              <Notice tone="warning" title="合意状況のファイルを使っていません。反映漏れが多めに出ています">
+                {agreementsNotUsed(loaded).map((a) => (
+                  <p key={a.file}>{a.warning}</p>
+                ))}
+                <p>下の「読み込みの確認」の「定価改定の合意状況」で、前回の改定日を入れてください。</p>
+              </Notice>
             )}
             {loaded.diagnosis ? (
               <p className="button-row">
@@ -289,7 +311,7 @@ function DataNotes() {
   if (!loaded) return null;
   const ds = loaded.ws.dataset;
   const agreementFiles = loaded.files.filter((f) => f.kind === 'agreements');
-  const assigned = new Map(ds.revisions.map((r) => [r.date, r]));
+  const candidates = loaded.ws.revisionCandidates;
   return (
     <Card title="読み込みの確認">
       {loaded.ws.notes.map((n) => (
@@ -339,13 +361,14 @@ function DataNotes() {
         <div className="form-block">
           <h3 className="h3">定価改定の合意状況</h3>
           <p className="small muted">
-            合意状況のファイルが、どの定価改定（改定日）の答えなのかを決めます。今の割り当て：
+            合意状況のファイルが、どの定価改定（改定日）の答えなのかを決めます。前回の改定日（新しい定価が始まった日）を入れて「この日付で計算し直す」を押してください。定価の履歴にある改定日：
+            {candidates.length > 0 ? candidates.map(wareki).join('、') : '見つかりませんでした'}
+            。今の割り当て：
             {ds.revisions.length > 0 ? ds.revisions.map((r) => r.label).join('、') : 'なし'}
           </p>
           {agreementFiles.map((f) => {
-            const current =
-              app.settings.revisionDates[f.name] ??
-              (agreementFiles.length === 1 && ds.revisions.length === 1 ? (ds.revisions[0]?.date ?? '') : '');
+            const use = loaded.ws.agreementFiles.find((a) => a.file === f.name);
+            const current = app.settings.revisionDates[f.name] ?? use?.date ?? '';
             return (
               <form
                 key={f.name}
@@ -367,9 +390,7 @@ function DataNotes() {
                 <button type="submit" className="btn btn-small">
                   この日付で計算し直す
                 </button>
-                {current && assigned.has(current) && (
-                  <span className="small muted">{toWareki(current)}として使用中</span>
-                )}
+                {use && <RevisionStatus use={use} candidates={candidates} />}
               </form>
             );
           })}
@@ -411,6 +432,34 @@ function DataNotes() {
         )}
       </form>
     </Card>
+  );
+}
+
+/** How the app took an agreements file: the date in use and why, or that it is not used. */
+function RevisionStatus({ use, candidates }: { use: AgreementFileUse; candidates: readonly IsoDate[] }) {
+  const list = candidates.length > 0 ? candidates.map(wareki).join('、') : '見つかりませんでした';
+  if (use.date === null)
+    return (
+      <span className="small text-warning">
+        使っていません。前回の改定日を入れてください（定価の履歴にある改定日：{list}）
+      </span>
+    );
+  const d = wareki(use.date);
+  if (use.source === 'entered')
+    return use.inHistory ? (
+      <span className="small muted">{d}として使用中</span>
+    ) : (
+      <span className="small text-warning">この日に定価が変わった商品がないため、診断に使っていません</span>
+    );
+  if (use.source === 'only_revision')
+    return (
+      <span className="small muted">{d}の改定として扱いました（定価の履歴の改定日が1つだけのため）</span>
+    );
+  return (
+    <span className="small muted">
+      {d}の改定として扱いました（{use.signals.map((x) => REVISION_SIGNAL_JA[x]).join('・')}
+      から判断）。違う場合は日付を直して「この日付で計算し直す」を押してください
+    </span>
   );
 }
 

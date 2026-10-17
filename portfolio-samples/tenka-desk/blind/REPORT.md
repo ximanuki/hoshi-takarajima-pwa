@@ -2,6 +2,8 @@
 
 2026年10月16日。この PR は**測っただけ**です。エンジンもアプリも直していません。直すのは別の PR で、そのあと新しいブラインドのデータで測り直します。
 
+> **追記（2026年10月17日、ブランチ `tenka-desk-revision-fix`）：** 9章の1〜7を直しました。直したあとの再実行は11章です。1〜7章の数字は直す前のもので、そのときの `results.json`・`mismatches.csv` はコミット 20004cd にあります。
+
 > **すべて架空のデータです。** 2組とも、会社・得意先・商品・価格・取引は作り物で、実在のものとは関係ありません。
 
 ---
@@ -109,6 +111,7 @@
 3. アプリと同じ読み込み方（`scripts/blind-score.ts`）で判定を出しました。このとき正解は開けていません。
 4. 正解の指紋が `SEALED.sha256` と同じことを確かめてから開けました（5ファイルとも一致。この報告を書くときにも確かめ直しました）。
 5. `scripts/blind-compare.ts` で採点しました。結果は `results.json` と `mismatches.csv` です。
+   - 追記：この2つは、直したあとにブランチ `tenka-desk-revision-fix` で作り直しました（11章）。この章から7章までの、直す前の数字のファイルはコミット 20004cd にあります。
 6. 2通りで採点しました。「そのまま」は何も入力しない場合。「改定日あり」は取り込み画面で改定日を1つ入れた場合です。
 
 **読み込み**
@@ -281,6 +284,7 @@
 - **「改定日あり」の日付は `demo_settings.json` から取りました。** 実際に使う人は、前回の改定日を自分で知っている必要があります。
 - **正解は「文書をこう読んだ」という1つの答えです。** 実際の取引で正しいかとは別です。文書を書いたのも、このプロジェクトです。
 - **反映チェック（gen-2 の `next/`）は採点していません。** gen-1 は B形式だけです。
+  - 追記：直したブランチで採点を足しました（11章）。`results.json`・`mismatches.csv` もそのときに作り直しました。直す前のものはコミット 20004cd にあります。
 - **実際の販売管理データでの精度は分かりません。**
 
 ---
@@ -288,18 +292,27 @@
 ## 9. 直すこと（優先順。この PR では直しません）
 
 1. **合意状況ファイルが使われないとき、見落とせないようにする。** 取り込み画面のお知らせを「警告」にします。診断画面にも「合意状況のファイルを使っていません。反映漏れが多めに出ています」と出します。改定日が決まるまでは、反映漏れの金額を「仮」と示します。
+   - → このブランチで対応：取り込み画面の一番上のカードに警告を出し、診断画面にも同じ見出しの警告を出します。合意状況ファイルを読み込んだのに使っていないとき（入れた改定日に定価が変わった商品がないときも）に出ます。反映漏れの金額には、合計・種類別・一覧・得意先単位の表示・CSV（注記の列とファイル名の「_仮」）で「仮」を付けます。シナリオから先の画面にも、現行単価と反映漏れの印が仮だという注意を出します。
+   - → レビューのあとで足したこと：「仮」は反映漏れだけでなく、特値の期限切れと掛率ランク外にも付けます。見送りの得意先が旧価格から数量値引をした正しい行は、合意状況を使わないと掛率ランク外に出るためです（5.5。5.2・5.3 で「そのまま」の掛率ランク外が多いのはこのためです）。粗利下限割れは原価と比べるので多めには出ず、付けません（5.2・5.3 のとおり、改定日を入れると少し増えます）。申入書は、印刷にも「仮」と入れ、「※ご請求」の注記を出しません。
 2. **改定日を自動で決められる場面を増やす。** 定価の履歴の改定日の中から、次のどれかと一致するものが**1つだけ**なら使い、「〜の改定として扱いました」と画面に出します。合わなければ、今までどおり人に聞きます。
    - 合意状況ファイルの「適用日」で一番多い日付
    - ファイル名の年月（例：`revision_2025-10_agreements.csv`）
    - `demo_settings.json` の `previousRevisionDate`
 
    2組とも、この方法なら正しい日が1つに決まります（gen-1 は 2025-10-01、gen-2 は 2025-06-16）。ただし、この2組を見て決めた直し方なので、次の新しいブラインドで確かめる必要があります。
+   - → このブランチで対応：この3つの手がかりで決めます（`src/engine/workspace.ts`。`previousRevisionDate` は合意状況ファイルが1つのときだけ）。手がかりが別々の改定日を指すときや、どれとも合わないときは、今までどおり人に聞きます。決めた日と手がかりを取り込み・診断の画面に出し、日付は取り込み画面で直せます。人が入れた日がいつも優先です。ファイル名の年月は、名前に年月が1つだけのときに使います（`agreements_202504-202603.csv` のような期間は手がかりにしません。レビューで直しました）。新しいブラインドでの確認はまだです（項目8）。
 3. **README に「改定日を入れる」手順を書く。** 今の README には書いてありません。
+   - → このブランチで対応：README に「自社のデータで使うとき：前回の改定日」の章を足しました（アプリが自分で決めるときも書いています）。
 4. **無償品の扱いを文書でそろえる。** `data-gen/README.md`・`README.md`・`docs/evaluation.md`・`src/engine/diagnosis.ts` の冒頭の説明（今は「見本/サンプル」だけと書いてある）を同じにします。あわせて、無償で出した行の数と定価で計算した金額を、診断画面に別に出します（gen-1 では 3行・33,296円が見えなくなっています）。
+   - → このブランチで対応：4か所とも「単価0円で、備考に「見本」「サンプル」「無償」「試供」のどれかがある行」にそろえ、`src/app/docs.test.ts` で確かめます。生成器の正解ルール（`data-gen/lib/rules.ts`）も同じ言葉にしました（同梱サンプルの出力はバイト単位で変わりません）。診断画面に、無償品の行数と定価で計算した金額を、利益漏れとは別に出します。
 5. **「基準より高い請求は漏れに数えない」ことを、`data-gen/README.md` の手順7と `README.md` に書く。**
+   - → このブランチで対応：`README.md` の「計算の考え方」と、`data-gen/README.md` の手順3・7に書きました。正解ルールにも `overcharge` を足しました（同梱サンプルには該当行がなく、出力は変わりません）。
 6. **あいまいな場面でアプリがどちらを選ぶかを、README の1か所にまとめる。** 協議中、合意状況に行がない、2回前の定価、値下げ後の高い定価、特値の重なり、数量値引で粗利下限割れ、マスタにない得意先、見送り後の別の改定、改定後に出た商品、小数の値引率、0円の書き方。
+   - → このブランチで対応：README に「判断が分かれる場面での読み方」の表を足しました（コードと7章から書いています）。
 7. **反映チェック（gen-2 の `next/`）の採点を足す。**
+   - → このブランチで対応：`scripts/blind-score.ts` が `engine-followup.csv` を書き、`scripts/blind-compare.ts` が新単価マスタごとに採点します（11章）。採点の部分はレビューのあとで `scripts/blind-scoring.ts` に分け、単体テスト（`src/app/blindScoring.test.ts`）を足しました。
 8. **直したあと、新しい生成器で新しいブラインドのデータを作って測り直す。** gen-1・gen-2 は答えを見てしまったので、直した結果の確認には使えません（壊れていないかの確認にだけ使います）。次は、正解の指紋をアプリの判定より前にリポジトリへ残す、採点する側に注記を見せない、生成器を3つ以上にする、を足します。
+   - → まだです。このブランチでは行っていません。
 
 ---
 
@@ -312,7 +325,8 @@ cd portfolio-samples/tenka-desk
 node blind/gen-1/generate.mjs --data <入力>/gen-1 --sealed <正解>/gen-1
 node blind/gen-2/generate.mjs --out  <入力>/gen-2 --sealed <正解>/gen-2
 
-# アプリの判定（正解は読まない）
+# アプリの判定（正解は読まない）。engine-labels.csv・import-issues.json と、
+# next/ があれば反映チェックの engine-followup.csv も書く（--out で別のフォルダにも書ける）
 node scripts/blind-score.ts <入力>/gen-1
 node scripts/blind-score.ts <入力>/gen-1 --revision-date revision_2025-10_agreements.csv=2025-10-01 --tag revdate
 node scripts/blind-score.ts <入力>/gen-2
@@ -333,6 +347,90 @@ node scripts/blind-compare.ts --out blind \
 | gen-2 `engine-labels.csv` | `51837f5dcf94283d879ec0a461226cbee665352101935cb6222bdb8f924d60f6` |
 | gen-2 `engine-labels.revdate.csv` | `e8cecffb6b45dd0df544a3e684dbfe2c0e9f2db87a8d67ff23fb4c6e06fa8653` |
 
+この表は直す前のものです。直したあとは、「そのまま」の `engine-labels.csv` も「改定日あり」と同じ指紋になります（11章）。
+
+---
+
+## 11. 修正後の再実行（壊れていないかの確認であり、確認の測定ではありません）
+
+2026年10月17日、ブランチ `tenka-desk-revision-fix` で9章の1〜7を直したあと、10章のコマンドで同じ2組をもう一度判定し、採点しました。判定のファイルはリポジトリの外のフォルダに書き（`blind-score.ts --out`）、`blind-compare.ts --out blind` で `results.json`・`mismatches.csv` を作り直しました。正解の5ファイルの指紋は、今回も `SEALED.sha256` と一致しました。
+
+**注意：** この2組は、直し方を決める前に答えを見ています。改定日の決め方（9章の2）も、この2組を見てから決めました。そのため、ここでの結果は「直して壊れたところがないか」の確認です。直した効果を確かめる測定ではありません。それには新しいブラインドのデータが要ります（9章の8、まだです）。
+
+### 11.1 改定日は、何も入れなくても正しい日に決まりました
+
+| | 定価の履歴の改定日 | アプリが決めた日 | 合った手がかり |
+|---|---|---|---|
+| gen-1 | 2025-04-16、2025-10-01、2026-04-01 | **2025-10-01** | 適用日で一番多い日付（76行中59行）、ファイル名の年月（`revision_2025-10_…`）、`previousRevisionDate` |
+| gen-2 | 2024-10-01、2025-06-16、2026-03-01 | **2025-06-16** | 適用日で一番多い日付（114行中87行）、ファイル名の年月（`revision_2025-06_…`）、`previousRevisionDate` |
+
+どちらも、3つの手がかりが同じ1つの日を指しました。警告は0件で、画面には「〜の改定として扱いました（…から判断）」のお知らせが出ます。
+
+### 11.2 「そのまま」の判定は「改定日あり」と同じになりました
+
+| ファイル | 直す前 | 直したあと |
+|---|---|---|
+| gen-1 `engine-labels.csv`（そのまま） | `b8236fd3…` | `d06fc631d9a79a7805affc0b24acd8e04e5f5b8f677419f0024e9f45a33f0c25` |
+| gen-1 `engine-labels.revdate.csv` | `d06fc631…` | `d06fc631d9a79a7805affc0b24acd8e04e5f5b8f677419f0024e9f45a33f0c25`（変わらず） |
+| gen-2 `engine-labels.csv`（そのまま） | `51837f5d…` | `e8cecffb6b45dd0df544a3e684dbfe2c0e9f2db87a8d67ff23fb4c6e06fa8653` |
+| gen-2 `engine-labels.revdate.csv` | `e8cecffb…` | `e8cecffb6b45dd0df544a3e684dbfe2c0e9f2db87a8d67ff23fb4c6e06fa8653`（変わらず） |
+
+- 「そのまま」の判定ファイルが、直す前の「改定日あり」とバイト単位で同じになりました。違う行は1行もありません。
+- 「改定日あり」の判定ファイルは変わっていません。判定のルールは変えていないためです。
+- 採点の数字も、5章の「改定日あり」と同じです。
+
+| | gen-1 そのまま | gen-2 そのまま |
+|---|---:|---:|
+| 適合率（行） | 100% | 100% |
+| 再現率（行） | 99.5%（1,174 / 1,180） | 99.8%（1,077 / 1,079） |
+| アプリの金額 | 1,317,496円 | 8,058,891円 |
+| 正解の金額 | 1,308,014円 | 8,006,460円 |
+| 判定が正解と同じ行 | 22,105 / 22,111 | 21,862 / 21,864 |
+
+残る食い違い（gen-1 6行、gen-2 2行）は、6章の (c)（無償の販促品・基準より高い請求）だけです。`mismatches.csv` は 372行（あいまいな行 89行 × 4回と、採点した食い違い 6・6・2・2行）になりました。
+
+### 11.3 診断画面に出るようになった無償品
+
+| | 行（直近12か月） | 定価で計算した金額（直近12か月） |
+|---|---:|---:|
+| gen-1 | 42行（27行） | 263,470円 |
+| gen-2 | 61行（27行） | 332,020円 |
+
+gen-1 の42行には、6章 #8 の「販促品(無償提供)」3行が入っています。利益漏れには入れず、診断画面に別に出します。
+
+### 11.4 反映チェック（gen-2 の `next/`）
+
+新単価マスタ（A形式・B形式）それぞれで、2026年9月分の売上明細 1,005行を判定し、正解（`truth/followup_lines.csv`）と比べました。あいまいな2行は採点から外しています。
+
+| | A形式の新単価マスタ | B形式の新単価マスタ |
+|---|---:|---:|
+| 旧単価のまま：適合率 / 再現率 | 100% / 100% | 100% / 100% |
+| 旧単価のまま：正しく見つけた / 空振り / 見逃し | 43 / 0 / 0行 | 43 / 0 / 0行 |
+| 不足額：アプリ / 正解 | 343,236円 / 343,236円 | 343,236円 / 343,236円 |
+| 組・得意先：アプリ / 正解 | 34組・20社 / 34組・20社 | 34組・20社 / 34組・20社 |
+| 判定が正解と同じ行 | 1,003 / 1,003 | 1,003 / 1,003 |
+
+- あいまいな2行（適用開始日より前に、新しい単価で請求）は、アプリでは「その他の差異（要確認）」です。
+- A形式とB形式で判定が違う行は0行でした。
+- 反映チェックは改定日の扱いを使わないので、「そのまま」と「改定日あり」で同じ結果です。
+- 反映チェックの判定ファイル（gen-2 `engine-followup.csv`）の SHA-256 は `f18e015b235eced99e018a05bb5141de3d1d343d1140362a98ec45f9aaad8428` です（`engine-followup.revdate.csv` も同じ）。
+
+### 11.5 レビューのあとの再実行
+
+レビューで次の4つを直したあと、同じ日に10章のコマンドで2組をもう一度判定し、採点しました。
+
+- ファイル名に年月が2つ以上あるとき（`agreements_202504-202603.csv` のような期間）は、改定日の手がかりにしない。
+- 合意状況ファイルを使っていないあいだは、反映漏れに加えて特値の期限切れ・掛率ランク外にも「仮」を付け、申入書の印刷にも「仮」と入れて「※ご請求」を出さない。
+- 生成器の正解ルール（`data-gen/lib/rules.ts`）で、ランクの上限を超える掛率ランク外の判定を元に戻す（正しい単価より安い請求だけが当たる。同梱サンプルの出力は変わらない）。
+- 反映チェックの採点を `scripts/blind-scoring.ts` に分けて、単体テストを足す。
+
+判定のファイル（`engine-labels` 4つと `engine-followup` 2つ）は、11.2・11.4 の指紋とすべて同じでした（`import-issues` も前回と同じです）。`results.json` と `mismatches.csv` も、バイト単位で前回と同じです。2組とも合意状況ファイルの名前にある年月は1つだけで（`revision_2025-10_…`・`revision_2025-06_…`）改定日が自動で決まり、「仮」が出る場面にならないためです。判定のルールは変えていません。
+
+### 11.6 まだ分からないこと
+
+- 改定日の決め方が、この2組とは違う形のデータ（ファイル名に年月がない、適用日がばらばら、手がかりが食い違う）で正しく働くかは、確かめていません。食い違うときに人に聞くことは、単体テストで確かめています。
+- 実際の販売管理データでの精度は、今も分かりません（8章）。
+
 ---
 
 ## English summary
@@ -346,5 +444,7 @@ Blind test of the tenka-desk leak engine on two fictional datasets made by two i
 **Mismatch classes (10 clusters, 1,740 lines, default run):** (a) engine bug 0; (b) generator error 0; (c) docs ambiguous / both readings defensible 3 clusters, 8 lines (zero-price "販促品(無償提供)" treated as a free sample; billing above the expected price reported as "overcharge" instead of an out-of-tier leak); (d) import problem 7 clusters, 1,732 lines, all from the unused agreements file. Class (d) is not a rule error, but it is an app defect and must be fixed.
 
 **Limits:** only two generators. The truth was sealed operationally by the workflow, not cryptographically before generation. The scorer could read the generators' notes and did the classification after the reveal. The generators and the engine were written by the same family of AI model. The engine-label hashes were not committed before the reveal, but a rerun reproduces all four label files byte for byte. The follow-up check (gen-2 `next/`) was not scored. Accuracy on real sales data is unknown.
+
+**Follow-up (2026-10-17, branch `tenka-desk-revision-fix`, section 11):** items 1–7 below are fixed. Rerun on the same two sets with no date entered, the app now picks 2025-10-01 (gen-1) and 2025-06-16 (gen-2) itself, because the most common 適用日, the YYYY-MM in the file name and `previousRevisionDate` all point to the same history date; the default label files are now byte-identical to the earlier "revdate" files, so the default run matches the truth as closely as the revdate run did. The newly scored follow-up check (gen-2 `next/`) finds all 43 still-old-price lines with no false positives (¥343,236, equal to the truth) for both master layouts. These sets were already opened and the inference rule was designed after seeing them, so this is a regression check only; item 8 (a fresh blind set) is still open. After review (section 11.5): a file name with two year-months (a data period) no longer gives a revision signal; while the agreements file is unused, 仮 also marks expired-special and out-of-tier amounts and the printed letter (which then shows no "※ご請求" note); the generator's truth rule keeps the rank upper limit; the follow-up scoring has unit tests. The rerun reproduced every label file, `results.json` and `mismatches.csv` byte for byte.
 
 **Recommended fixes (separate PR, then a fresh blind set):** (1) make an unused agreements file a visible warning on both screens, and mark old-price amounts as provisional until a date is set; (2) infer the revision date when exactly one history date matches the file's most common 適用日, the YYYY-MM in its name, or `previousRevisionDate`; (3) document the date step in the README; (4) align the docs on free goods and show their count and amount; (5) document that overcharges are not leaks; (6) list the engine's choice for each ambiguous pattern in one place; (7) score the follow-up check; (8) re-measure on new, unseen generators with the truth hash committed before the engine runs.

@@ -3,8 +3,8 @@
  * layout detected and imported, and the masters are put together.
  */
 
-import { Dataset, inferRevisionDates } from './dataset.ts';
-import { type IsoDate, toWareki } from './dates.ts';
+import { Dataset, inferRevisionDates, listChangeDates } from './dataset.ts';
+import { type IsoDate, isIsoDate, toWareki, yearMonth } from './dates.ts';
 import { type FileImport, type ImportIssue, type ImportOptions, importFile } from './importers.ts';
 import type {
   Category,
@@ -36,10 +36,46 @@ export interface WorkspaceOptions {
   settings?: Partial<Settings>;
   company?: Company;
   /**
-   * 改定日 for each agreements file (by file name). Without it, a single
-   * agreements file is assigned to the single 定価改定 date found in the history.
+   * 改定日 the person entered for each agreements file (by file name). It always
+   * wins. Without it, the file's revision is decided from the data when only one
+   * answer is possible (see `chooseRevision`), else the file is not used.
    */
   revisionDates?: Record<string, IsoDate>;
+  /**
+   * 前回の改定日 from a settings file (demo_settings.json `previousRevisionDate`).
+   * One of the signals for deciding the revision; it counts only when exactly one
+   * agreements file is loaded, because it names a single revision.
+   */
+  previousRevisionDate?: IsoDate;
+}
+
+/** What pointed to the revision an agreements file answers. */
+export type RevisionSignal = 'effective_dates' | 'file_name' | 'settings';
+
+export const REVISION_SIGNAL_JA: Record<RevisionSignal, string> = {
+  effective_dates: '合意状況の適用日（一番多い日付）',
+  file_name: 'ファイル名の年月',
+  settings: '設定ファイルの前回改定日',
+};
+
+/** How the revision of an agreements file was decided. */
+export type RevisionSource = 'entered' | 'only_revision' | 'inferred';
+
+/** Which 定価改定 an agreements file was taken to answer, and whether the diagnosis uses it. */
+export interface AgreementFileUse {
+  file: string;
+  /** the 改定日 the file was assigned to (null: not decided) */
+  date: IsoDate | null;
+  /** entered by the person / the only revision in the history / inferred from the signals */
+  source: RevisionSource | null;
+  /** for an inferred date: the signals that pointed to it */
+  signals: RevisionSignal[];
+  /** some product's 定価 changed on `date` (else the file can do nothing) */
+  inHistory: boolean;
+  /** the diagnosis uses the file: date !== null && inHistory */
+  used: boolean;
+  /** the warning shown when the file is not used */
+  warning: string | null;
 }
 
 export interface Workspace {
@@ -50,7 +86,14 @@ export interface Workspace {
   priceMasters: Map<string, PriceMasterRow[]>;
   newListPrices: NewListPrice[];
   importIssues: { file: string; issue: ImportIssue }[];
+  /** information for the person (e.g. which revision an agreements file was taken to answer) */
   notes: string[];
+  /** problems that change the results (e.g. an agreements file that is not used) */
+  warnings: string[];
+  /** every agreements file, in load order, with the revision it answers */
+  agreementFiles: AgreementFileUse[];
+  /** the 定価改定 dates found in the 定価の履歴 (inferRevisionDates) */
+  revisionCandidates: IsoDate[];
 }
 
 export function loadWorkspace(inputs: readonly InputFile[], options: WorkspaceOptions = {}): Workspace {
@@ -130,26 +173,43 @@ export function workspaceFromImports(
     }
   }
 
-  const inferred = inferRevisionDates(listHist);
+  const candidates = inferRevisionDates(listHist);
+  const changeDates = new Set(listChangeDates(listHist));
+  const prevSetting = agreementFiles.length === 1 ? (options.previousRevisionDate ?? null) : null;
+  const candidateText =
+    candidates.length > 0
+      ? `定価の履歴にある改定日：${candidates.map(toWareki).join('、')}`
+      : '定価の履歴から改定日を見つけられませんでした';
   const revisions: Revision[] = [];
+  const uses: AgreementFileUse[] = [];
+  const warnings: string[] = [];
   for (const af of agreementFiles) {
-    let date = options.revisionDates?.[af.name];
-    if (date === undefined) {
-      if (agreementFiles.length === 1 && inferred.length === 1) {
-        date = inferred[0];
-        if (date !== undefined)
-          notes.push(
-            `${af.name} を ${toWareki(date)} の定価改定の合意状況として扱いました（定価の履歴から判断）。`,
-          );
-      }
-    }
-    if (date === undefined) {
+    const use = chooseRevision(af, {
+      entered: options.revisionDates?.[af.name] ?? null,
+      candidates,
+      changeDates,
+      single: agreementFiles.length === 1,
+      previousRevisionDate: prevSetting,
+    });
+    const d = use.date;
+    if (d !== null && use.source === 'only_revision')
+      notes.push(`${af.name} を ${toWareki(d)} の定価改定の合意状況として扱いました（定価の履歴から判断）。`);
+    if (d !== null && use.source === 'inferred')
       notes.push(
-        `${af.name}: どの定価改定の合意状況か決められないため、使っていません。改定日を指定してください。`,
+        `${af.name} を ${toWareki(d)} の改定として扱いました（${use.signals.map((x) => REVISION_SIGNAL_JA[x]).join('・')}から判断）。違う場合は改定日を入れ直してください。`,
       );
-      continue;
+    if (d === null) {
+      use.warning =
+        listHist.length === 0
+          ? `${af.name}：定価の履歴が読み込まれていないため、この合意状況は診断に使っていません。`
+          : `${af.name}：どの定価改定（改定日）の合意状況か決められないため、診断に使っていません。見送り・据え置き・適用日前の正しい旧価格も「反映漏れ」に、その単価から数量値引をした正しい行も「掛率ランク外」に数えるので、反映漏れと掛率ランク外が多めに出ます。前回の改定日を入れてください（${candidateText}）。`;
+    } else if (!use.inHistory) {
+      use.warning = `${af.name}：入れた改定日（${toWareki(d)}）に定価が変わった商品が、定価の履歴にありません。この合意状況は診断に効いていません。前回の改定日を入れ直してください（${candidateText}）。`;
     }
-    revisions.push({ date, label: `${toWareki(date)} 定価改定`, agreements: af.rows });
+    if (use.warning !== null) warnings.push(use.warning);
+    uses.push(use);
+    if (d === null) continue;
+    revisions.push({ date: d, label: `${toWareki(d)} 定価改定`, agreements: af.rows });
   }
 
   const datasetInput = {
@@ -174,7 +234,114 @@ export function workspaceFromImports(
       rows.map((r) => ({ ...r, sku: dataset.resolveSku(r.skuKey) })),
     );
   }
-  return { dataset, files: [...files], sales, priceMasters, newListPrices, importIssues, notes };
+  return {
+    dataset,
+    files: [...files],
+    sales,
+    priceMasters,
+    newListPrices,
+    importIssues,
+    notes,
+    warnings,
+    agreementFiles: uses,
+    revisionCandidates: candidates,
+  };
+}
+
+/**
+ * Which 定価改定 an agreements file answers. The first rule that applies wins:
+ *  1. a date the person entered;
+ *  2. the only agreements file and the only 改定日 in the history (`candidates`);
+ *  3. among the candidates, exactly one matches a signal (inferAgreementRevision).
+ * Otherwise the file is not used and the person is asked for the date.
+ */
+function chooseRevision(
+  af: { name: string; rows: readonly RevisionAgreement[] },
+  ctx: {
+    entered: IsoDate | null;
+    candidates: readonly IsoDate[];
+    changeDates: ReadonlySet<IsoDate>;
+    single: boolean;
+    previousRevisionDate: IsoDate | null;
+  },
+): AgreementFileUse {
+  const base = { file: af.name, warning: null };
+  const decided = (date: IsoDate, source: RevisionSource, signals: RevisionSignal[]): AgreementFileUse => {
+    const inHistory = ctx.changeDates.has(date);
+    return { ...base, date, source, signals, inHistory, used: inHistory };
+  };
+  if (ctx.entered !== null) return decided(ctx.entered, 'entered', []);
+  const only = ctx.candidates[0];
+  if (ctx.single && ctx.candidates.length === 1 && only !== undefined)
+    return decided(only, 'only_revision', []);
+  const inferred = inferAgreementRevision(af.name, af.rows, ctx.candidates, ctx.previousRevisionDate);
+  if (inferred) return decided(inferred.date, 'inferred', inferred.signals);
+  return { ...base, date: null, source: null, signals: [], inHistory: false, used: false };
+}
+
+const YEAR_MONTH_IN_NAME =
+  /(?<!\d)((?:19|20)\d{2})[-_.]?(0[1-9]|1[0-2])(?:[-_.]?(?:0[1-9]|[12]\d|3[01]))?(?!\d)/g;
+
+/** Year-months ("2025-10") written in a file's base name: 2025-10, 2025_10, 202510, 20251001. */
+export function yearMonthsInName(name: string): string[] {
+  const base = name.split(/[\\/]/).pop() ?? '';
+  const out: string[] = [];
+  for (const m of base.matchAll(YEAR_MONTH_IN_NAME)) {
+    const ym = `${m[1]}-${m[2]}`;
+    if (!out.includes(ym)) out.push(ym);
+  }
+  return out;
+}
+
+/** The 適用日 written most often in the file (blank rows left out); null on a tie or when none. */
+function mostCommonEffective(rows: readonly RevisionAgreement[]): IsoDate | null {
+  const counts = new Map<IsoDate, number>();
+  for (const r of rows) if (r.effective !== null) counts.set(r.effective, (counts.get(r.effective) ?? 0) + 1);
+  let best: IsoDate | null = null;
+  let bestN = 0;
+  let tie = false;
+  for (const [d, n] of counts) {
+    if (n > bestN) {
+      best = d;
+      bestN = n;
+      tie = false;
+    } else if (n === bestN) tie = true;
+  }
+  return tie ? null : best;
+}
+
+/**
+ * The revision an agreements file answers, from the data: among the 改定日 found in
+ * the 定価の履歴 (`candidates`), the one matching any of (a) the most common 適用日
+ * in the file, (b) the year-month in the file name — only when the name holds
+ * exactly one (two or more, like agreements_202504-202603.csv, are a data period,
+ * not a revision), (c) the settings' 前回改定日 — only when exactly one candidate
+ * matches. A signal that points to no candidate is no match; it does not block the others.
+ */
+export function inferAgreementRevision(
+  name: string,
+  rows: readonly RevisionAgreement[],
+  candidates: readonly IsoDate[],
+  previousRevisionDate: IsoDate | null,
+): { date: IsoDate; signals: RevisionSignal[] } | null {
+  const effective = mostCommonEffective(rows);
+  const months = yearMonthsInName(name);
+  const nameMonth = months.length === 1 ? months[0] : undefined;
+  const signalsOf = (d: IsoDate): RevisionSignal[] => [
+    ...(d === effective ? (['effective_dates'] as const) : []),
+    ...(yearMonth(d) === nameMonth ? (['file_name'] as const) : []),
+    ...(d === previousRevisionDate ? (['settings'] as const) : []),
+  ];
+  const matched = candidates.filter((d) => signalsOf(d).length > 0);
+  const date = matched[0];
+  return matched.length === 1 && date !== undefined ? { date, signals: signalsOf(date) } : null;
+}
+
+/** `previousRevisionDate` of a settings JSON like demo_settings.json (null when absent or not a date). */
+export function previousRevisionDateFromJson(json: unknown): IsoDate | null {
+  if (typeof json !== 'object' || json === null) return null;
+  const v = (json as Record<string, unknown>)['previousRevisionDate'];
+  return typeof v === 'string' && isIsoDate(v) ? v : null;
 }
 
 function num(o: Record<string, unknown>, k: string): number | undefined {

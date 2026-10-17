@@ -57,7 +57,7 @@ npm run dev        # development server
 | Command | What it does |
 |---|---|
 | `npm run build` | Type-checks and writes `dist/`. Paths are relative (`base: './'`), so the build works from any folder or subpath. If the sample data exists, it is copied to `dist/sample/`. |
-| `npm test` | Unit tests (Vitest): 328 tests for the engine, the app logic, the hand-written messy sample (`scripts/messy-sample/`) and the wording rules |
+| `npm test` | Unit tests (Vitest): 387 tests for the engine, the app logic, the hand-written messy sample (`scripts/messy-sample/`), the wording rules, the consistency of the documents and the blind follow-up-check scoring |
 | `npm run lint` / `npm run typecheck` | Biome / TypeScript |
 | `npm run e2e` | Builds, then walks the demo story with Playwright and saves screenshots to `docs/screenshots/`. `dist/` is served under the subpath `/tenka-desk/`. Needs the sample data and Playwright's Chromium (`npx playwright install chromium` if missing). |
 | `npm run evaluate` | Scores the leak detection against the sample data's ground truth ([docs/evaluation.md](docs/evaluation.md), Japanese). |

@@ -7,36 +7,45 @@
  *   node scripts/blind-score.ts <dataset-dir> [--out <dir>]
  *        [--revision-date <agreements-file>=<YYYY-MM-DD>]... [--tag <name>]
  *
- * Writes <out>/engine-labels.csv and <out>/import-issues.json (default out: the
- * dataset folder). With --revision-date the run is no longer the app's default
- * (the user typed a 改定日 on the import screen); pass --tag so the files are
- * written as engine-labels.<tag>.csv / import-issues.<tag>.json instead.
+ * Writes <out>/engine-labels.csv, <out>/engine-followup.csv and
+ * <out>/import-issues.json (default out: the dataset folder). With --revision-date
+ * the run is no longer the app's default (the user typed a 改定日 on the import
+ * screen); pass --tag so the files are written as engine-labels.<tag>.csv,
+ * engine-followup.<tag>.csv and import-issues.<tag>.json instead.
  *
  * What "the app's default" means here, as in buildLoaded with fresh settings:
  *  - every top-level file of the folder, in name order; *.json files are read as
- *    settings (marginFloorPct / listPriceRounding) or company (name), others go
- *    through importFile with layout detection, and a file that cannot be read is
- *    recorded and left out;
- *  - no 改定日 typed for agreements files (revisionDates: {}), no 粗利率の下限 override;
+ *    settings (marginFloorPct / listPriceRounding / previousRevisionDate) or
+ *    company (name), others go through importFile with layout detection, and a
+ *    file that cannot be read is recorded and left out;
+ *  - no 改定日 typed for agreements files (revisionDates: {}): the app decides the
+ *    revision itself when the data allows only one answer (workspace.ts
+ *    chooseRevision, including previousRevisionDate from the settings JSON);
+ *    no 粗利率の下限 override;
  *  - sales lines whose 伝票番号-行 repeats are dropped only when the whole sale
  *    matches, otherwise kept under a new id (the app's rule);
  *  - diagnose(dataset, lines) with no options.
- * Files in sub-folders (e.g. next/ for the 反映チェック) are imported to check that
- * they read, but are not part of the diagnosis.
+ * Files in sub-folders (e.g. next/ for the 反映チェック) are not part of the
+ * diagnosis. Each new price master there is checked against each sales export in
+ * the same sub-folder with checkFollowup, as on the 反映チェック screen (a master
+ * with an unreadable row is refused, as readPriceMasterFile does).
  */
 
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import {
   type Company,
+  checkFollowup,
   companyFromJson,
   type DiagnosisResult,
   diagnose,
   type FileImport,
+  type FollowupStatus,
   type IsoDate,
   importFile,
   LayoutNotRecognisedError,
   type LineDiagnosis,
+  previousRevisionDateFromJson,
   type SalesLine,
   type Settings,
   settingsFromJson,
@@ -74,9 +83,12 @@ if (Object.keys(revisionDates).length > 0 && !tag) {
 }
 outDir ||= dir;
 const suffix = tag ? `.${tag}` : '';
-const OUTPUTS = new Set(['engine-labels.csv', 'import-issues.json']);
+const OUTPUTS = new Set(['engine-labels.csv', 'engine-followup.csv', 'import-issues.json']);
 const isOwnOutput = (name: string) =>
-  OUTPUTS.has(name) || /^engine-labels\..+\.csv$/.test(name) || /^import-issues\..+\.json$/.test(name);
+  OUTPUTS.has(name) ||
+  /^engine-labels\..+\.csv$/.test(name) ||
+  /^engine-followup\..+\.csv$/.test(name) ||
+  /^import-issues\..+\.json$/.test(name);
 
 /* ---------- files ---------- */
 
@@ -161,6 +173,7 @@ const records: FileRecord[] = [];
 const imports: FileImport[] = [];
 let company: Company | null = null;
 let dataSettings: Partial<Settings> = {};
+let previousRevisionDate: IsoDate | null = null;
 
 for (const name of topLevel) {
   const bytes = new Uint8Array(readFileSync(join(dir, name)));
@@ -181,8 +194,9 @@ for (const name of topLevel) {
     };
     try {
       const json = JSON.parse(new TextDecoder().decode(bytes)) as Record<string, unknown>;
-      if ('marginFloorPct' in json || 'listPriceRounding' in json) {
+      if ('marginFloorPct' in json || 'listPriceRounding' in json || 'previousRevisionDate' in json) {
         dataSettings = settingsFromJson(json);
+        previousRevisionDate = previousRevisionDateFromJson(json);
         rec.status = 'json_settings';
       } else if ('name' in json) {
         company = companyFromJson(json);
@@ -204,8 +218,10 @@ for (const name of topLevel) {
   else rec.usedInDiagnosis = false;
   records.push(rec);
 }
+const nestedImports: FileImport[] = [];
 for (const name of nested) {
-  const { rec } = importRecord(name, new Uint8Array(readFileSync(join(dir, name))), false);
+  const { rec, imp } = importRecord(name, new Uint8Array(readFileSync(join(dir, name))), false);
+  if (imp) nestedImports.push(imp);
   records.push(rec);
 }
 
@@ -215,6 +231,7 @@ const ws = workspaceFromImports(imports, {
   settings: { ...dataSettings },
   ...(company ? { company } : {}),
   revisionDates,
+  ...(previousRevisionDate ? { previousRevisionDate } : {}),
 });
 
 function sameSale(a: SalesLine, b: SalesLine): boolean {
@@ -390,6 +407,94 @@ if (result) {
 const labelsPath = join(outDir, `engine-labels${suffix}.csv`);
 writeFileSync(labelsPath, toCsv(HEADER, rows, { bom: false, eol: '\n', quoteAll: false }));
 
+/* ---------- 反映チェック (sub-folders: each new price master × each sales export) ---------- */
+
+const folderOf = (name: string) => name.slice(0, name.lastIndexOf('/'));
+/** the follow-up status in the truth's vocabulary (as scripts/evaluate.ts) */
+const FOLLOW_LABEL: Partial<Record<FollowupStatus, string>> = {
+  excluded_return: 'ok_return',
+  excluded_sample: 'ok_sample',
+  excluded_non_product: 'ok_non_product',
+};
+const FOLLOW_HEADER = [
+  'master',
+  'file',
+  'data_row',
+  'source_line',
+  'line_id',
+  'date',
+  'cust',
+  'sku',
+  'qty',
+  'unit_price',
+  'label',
+  'status',
+  'expected',
+  'shortfall_yen',
+  'remark',
+];
+const followRows: (string | number)[][] = [];
+type FollowupReport =
+  | {
+      master: string;
+      sales: string;
+      counts: Record<string, number>;
+      stillOld: { lines: number; pairs: number; customers: number; shortfallYen: number };
+    }
+  | { master: string; sales?: string; error: string };
+const followup: FollowupReport[] = [];
+for (const m of nestedImports) {
+  if (m.data.kind !== 'priceMaster') continue;
+  const salesFiles = nestedImports.filter(
+    (f) => f.data.kind === 'sales' && folderOf(f.name) === folderOf(m.name),
+  );
+  if (m.data.result.issues.length > 0) {
+    followup.push({
+      master: m.name,
+      error: `refused: ${m.data.result.issues.length} unreadable row(s), as readPriceMasterFile`,
+    });
+    continue;
+  }
+  for (const s of salesFiles) {
+    if (s.data.kind !== 'sales') continue;
+    const dataRow = new Map(s.table.rowLines.map((line, i) => [line, i + 1]));
+    const r = checkFollowup(
+      ws.dataset,
+      m.data.result.records,
+      ws.dataset.resolveLines(s.data.result.records),
+    );
+    for (const x of r.lines) {
+      const l = x.line;
+      followRows.push([
+        m.name,
+        s.name,
+        dataRow.get(l.sourceRow) ?? '',
+        l.sourceRow,
+        l.id,
+        l.date,
+        l.cust,
+        l.sku ?? '',
+        l.qty,
+        l.unitPrice,
+        FOLLOW_LABEL[x.status] ?? x.status,
+        x.status,
+        x.expected ?? '',
+        x.shortfallYen,
+        l.remark,
+      ]);
+    }
+    followup.push({
+      master: m.name,
+      sales: s.name,
+      counts: Object.fromEntries(Object.entries(r.counts).filter(([, n]) => n > 0)),
+      stillOld: r.stillOld,
+    });
+  }
+}
+const followupPath = join(outDir, `engine-followup${suffix}.csv`);
+if (followup.length > 0)
+  writeFileSync(followupPath, toCsv(FOLLOW_HEADER, followRows, { bom: false, eol: '\n', quoteAll: false }));
+
 const salesRowsInFiles = records
   .filter((r) => r.usedInDiagnosis && r.kind === 'sales')
   .reduce((s, r) => s + r.rows, 0);
@@ -399,8 +504,12 @@ const report = {
   appDefault: Object.keys(revisionDates).length === 0,
   revisionDatesGiven: revisionDates,
   settingsUsed: ws.dataset.settings,
+  previousRevisionDateInSettings: previousRevisionDate,
+  revisionCandidates: ws.revisionCandidates,
   revisionsAssigned: ws.dataset.revisions.map((r) => ({ date: r.date, customers: r.agreements.length })),
+  agreementFiles: ws.agreementFiles,
   workspaceNotes: ws.notes,
+  workspaceWarnings: ws.warnings,
   window: result?.window ?? null,
   files: records,
   sales: {
@@ -416,6 +525,8 @@ const report = {
   statusCounts: result?.statusCounts ?? null,
   summary: result?.summary ?? null,
   overcharges: result?.overcharges ?? null,
+  freeGoods: result?.freeGoods ?? null,
+  followup,
   datasetIssues: {
     count: ws.dataset.issues.length,
     byKind: ws.dataset.issues.reduce<Record<string, number>>((acc, i) => {
@@ -433,9 +544,14 @@ console.log(
 );
 console.log(`  revisions assigned: ${JSON.stringify(report.revisionsAssigned)}`);
 for (const n of ws.notes) console.log(`  note: ${n}`);
+for (const n of ws.warnings) console.log(`  warning: ${n}`);
 for (const r of records)
   console.log(
     `  ${r.file}: ${r.status}${r.kind ? ` ${r.kind}/${r.layout} ${r.encoding}` : ''} rows ${r.rows} records ${r.records} issues ${r.issueCount}${r.error ? ` (${r.error})` : ''}${r.usedInDiagnosis ? '' : ' [not in diagnosis]'}`,
   );
 console.log(`  labels: ${JSON.stringify(report.engineLabelCounts)}`);
-console.log(`  wrote ${labelsPath} and ${issuesPath}`);
+for (const f of followup)
+  console.log(
+    `  followup ${f.master}${f.sales ? ` × ${f.sales}` : ''}: ${'error' in f ? f.error : JSON.stringify(f.stillOld)}`,
+  );
+console.log(`  wrote ${labelsPath}${followup.length > 0 ? `, ${followupPath}` : ''} and ${issuesPath}`);
