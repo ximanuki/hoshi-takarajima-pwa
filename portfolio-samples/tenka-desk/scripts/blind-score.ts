@@ -31,7 +31,7 @@
  * with an unreadable row is refused, as readPriceMasterFile does).
  */
 
-import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import {
   type Company,
@@ -492,8 +492,10 @@ for (const m of nestedImports) {
   }
 }
 const followupPath = join(outDir, `engine-followup${suffix}.csv`);
+// no follow-up in this run: remove an earlier run's file so blind-compare cannot score stale output
 if (followup.length > 0)
   writeFileSync(followupPath, toCsv(FOLLOW_HEADER, followRows, { bom: false, eol: '\n', quoteAll: false }));
+else rmSync(followupPath, { force: true });
 
 const salesRowsInFiles = records
   .filter((r) => r.usedInDiagnosis && r.kind === 'sales')

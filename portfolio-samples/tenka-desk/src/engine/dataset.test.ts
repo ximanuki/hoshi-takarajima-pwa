@@ -292,4 +292,25 @@ describe('data checks', () => {
     expect(listChangeDates(rows)).toEqual(['2025-04-01', '2025-08-01']);
     expect(inferRevisionDates(rows)).toEqual(['2025-04-01']);
   });
+
+  it('counts a product once even when its code is spelled differently from row to row', () => {
+    // the same products as the Dataset sees them (full-width and half-width codes match)
+    const rows = [];
+    for (let i = 0; i < 12; i++) {
+      const n = String(i).padStart(2, '0');
+      rows.push({
+        sku: `ＤＢ－１０${toFullWidthDigits(n)}`,
+        price: 100,
+        start: '2024-04-01',
+        end: '2025-03-31',
+      });
+      rows.push({ sku: `DB-10${n}`, price: 110, start: '2025-04-01', end: null });
+    }
+    expect(listChangeDates(rows)).toEqual(['2025-04-01']);
+    expect(inferRevisionDates(rows)).toEqual(['2025-04-01']);
+  });
 });
+
+function toFullWidthDigits(s: string): string {
+  return s.replace(/[0-9]/g, (d) => String.fromCharCode(d.charCodeAt(0) + 0xfee0));
+}

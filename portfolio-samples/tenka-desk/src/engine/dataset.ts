@@ -454,16 +454,20 @@ function isZeroShare(s: CostShare): boolean {
   return s.material + s.labor + s.energy + s.other === 0;
 }
 
-/** How many products' 定価 changed on each day (a day counts once per product). */
+/**
+ * How many products' 定価 changed on each day (a day counts once per product). Products are
+ * matched by `codeKey`, as the Dataset does, so "ＤＢ－１００１" and "DB-1001" are one product.
+ */
 function countListChanges(history: readonly ListPriceRow[]): {
   counts: Map<IsoDate, number>;
   products: number;
 } {
   const bySku = new Map<string, ListPriceRow[]>();
   for (const r of history) {
-    const list = bySku.get(r.sku) ?? [];
+    const key = codeKey(r.sku);
+    const list = bySku.get(key) ?? [];
     list.push(r);
-    bySku.set(r.sku, list);
+    bySku.set(key, list);
   }
   const counts = new Map<IsoDate, number>();
   for (const rows of bySku.values()) {

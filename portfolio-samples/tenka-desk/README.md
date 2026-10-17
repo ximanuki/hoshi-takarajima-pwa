@@ -55,7 +55,7 @@ npm run dev        # 開発用サーバー
 | コマンド | 内容 |
 |---|---|
 | `npm run build` | 型チェックのあと `dist/` に書き出します。相対パス（`base: './'`）なので、どのフォルダ・サブパスに置いても静的ファイルとして動きます。サンプルデータを作ってからビルドすると `dist/sample/` に入ります。 |
-| `npm test` | 単体テスト（Vitest）。エンジンと画面側のロジック、手書きの崩れたサンプル（`scripts/messy-sample/`）、言葉づかいと文書のそろい具合の確認、ブラインド検証の反映チェックの採点で 387件 |
+| `npm test` | 単体テスト（Vitest）。エンジンと画面側のロジック、手書きの崩れたサンプル（`scripts/messy-sample/`）、言葉づかいと文書のそろい具合の確認、ブラインド検証の反映チェックの採点で 388件 |
 | `npm run lint` / `npm run typecheck` | Biome / TypeScript |
 | `npm run e2e` | ビルドして、Playwright でデモの流れを通しで確かめ、画面の画像を `docs/screenshots/` に保存します。`dist/` を `/tenka-desk/` というサブパスで配信して確かめます。サンプルデータと、Playwright 用の Chromium が必要です（未導入なら `npx playwright install chromium`）。 |
 | `npm run evaluate` | 漏れ検出をサンプルデータの正解と比べます（[docs/evaluation.md](docs/evaluation.md)）。 |
