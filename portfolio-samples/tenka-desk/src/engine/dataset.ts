@@ -7,11 +7,12 @@
  * every result can be explained.
  */
 
-import type { IsoDate } from './dates.ts';
+import { type IsoDate, toWareki } from './dates.ts';
 import { AGREEMENT_KIND_JA, isPlainAgreementStatus } from './importers.ts';
 import { priceAtRate } from './money.ts';
 import { codeKey } from './text.ts';
 import {
+  type AgreementKind,
   type Category,
   type Company,
   type CostRow,
@@ -56,12 +57,16 @@ export type DatasetIssueKind =
   | 'unknown_agreement_status'
   | 'interpreted_agreement_status'
   | 'conflicting_agreement'
+  | 'effective_undecided'
+  | 'unknown_excluded_category'
   | 'cost_share_missing';
 
 export interface DatasetIssue {
   kind: DatasetIssueKind;
   message: string;
   ref: string;
+  /** the 定価改定 an issue about an agreements answer belongs to */
+  revision?: IsoDate;
 }
 
 export function pairKey(cust: string, sku: string): string {
@@ -109,13 +114,18 @@ function sortByStart<T extends { start: IsoDate }>(rows: T[]): T[] {
   return [...rows].sort((a, b) => (a.start < b.start ? -1 : a.start > b.start ? 1 : 0));
 }
 
-/** Two answers for the same customer and revision mean the same thing (status wording aside). */
-function sameAnswer(a: RevisionAgreement, b: RevisionAgreement): boolean {
-  return (
-    a.kind === b.kind &&
-    a.effective === b.effective &&
-    [...a.excludedCategories].sort().join(',') === [...b.excludedCategories].sort().join(',')
-  );
+/** Answers that move the customer to the new 定価 (from the 適用日, when one is set). */
+const AGREED_KINDS: readonly AgreementKind[] = ['agreed', 'agreed_later_date', 'partial'];
+
+/** Kinds for which the 対象外カテゴリ decide anything (見送り・協議中 keep every category anyway). */
+const EXCLUSION_KINDS: readonly AgreementKind[] = [...AGREED_KINDS, 'unknown'];
+
+/**
+ * Matching key for a カテゴリ code or name: NFKC, without spaces, upper case.
+ * "ｋｇ" / "KG " -> "KG"; "工具･金物" -> "工具・金物".
+ */
+export function categoryKey(raw: string): string {
+  return raw.normalize('NFKC').replace(/\s/g, '').toUpperCase();
 }
 
 function covers(row: { start: IsoDate; end: IsoDate | null }, date: IsoDate): boolean {
@@ -141,6 +151,10 @@ export class Dataset {
     IsoDate,
     { revision: Revision; byCust: Map<string, RevisionAgreement> }
   >();
+  /** category key (code or name) -> the keys a product's カテゴリ may be written with */
+  private readonly categoryLookup = new Map<string, readonly string[]>();
+  /** 対象外カテゴリ of each answer, as category keys */
+  private readonly excludedKeys = new Map<RevisionAgreement, ReadonlySet<string>>();
 
   constructor(input: DatasetInput) {
     this.settings = { ...DEFAULT_SETTINGS, ...input.settings };
@@ -207,6 +221,8 @@ export class Dataset {
       this.specials.set(k, sorted);
     }
 
+    // 対象外カテゴリはコードでも名前でも書かれる（合意状況の突き合わせにも使うので先に作る）
+    this.indexCategories();
     // 同じ改定日の合意状況が複数のファイル（支店別など）に分かれていても、1つの改定としてまとめる。
     // 後のファイルが前のファイルを上書きすると、前のファイルにしかない得意先の「見送り」などが消えてしまう
     const byDate = new Map<IsoDate, { revision: Revision; byCust: Map<string, RevisionAgreement> }>();
@@ -218,7 +234,7 @@ export class Dataset {
       }
       for (const ag of rev.agreements) {
         const prev = entry.byCust.get(ag.cust);
-        if (prev && !sameAnswer(prev, ag)) {
+        if (prev && !this.sameAnswer(prev, ag)) {
           this.issue(
             'conflicting_agreement',
             `同じ改定日（${rev.date}）の合意状況が食い違っています: 得意先 ${ag.cust}（「${prev.status}」と「${ag.status}」）。後から読み込んだ「${ag.status}」を使います`,
@@ -229,8 +245,9 @@ export class Dataset {
         if (ag.kind === 'unknown') {
           this.issue(
             'unknown_agreement_status',
-            `合意状況「${ag.status}」を判別できないため、改定を適用したものとして扱います`,
+            `${this.customerLabel(ag.cust)}の合意状況「${ag.status}」を判別できないため、改定に合意したものとして扱います（${toWareki(rev.date)}の改定。適用日が書いてあれば、その日から新しい定価）。違う場合はファイルの表記を「合意」「一部合意」「協議中」「見送り」などに直してください`,
             ag.cust,
+            rev.date,
           );
         } else if (!isPlainAgreementStatus(ag.status)) {
           this.issue(
@@ -241,6 +258,10 @@ export class Dataset {
         }
       }
     }
+    // どのカテゴリにも合わない対象外カテゴリ、適用日「未定」の合意は黙って読み替えない
+    for (const [date, { byCust }] of byDate) {
+      for (const ag of byCust.values()) this.checkAnswer(date, ag);
+    }
     this.revisions = [...byDate.values()]
       .map(({ revision, byCust }) => ({ ...revision, agreements: [...byCust.values()] }))
       .sort((a, b) => (a.date < b.date ? -1 : 1));
@@ -250,8 +271,131 @@ export class Dataset {
     this.supplierNotices = [...(input.supplierNotices ?? [])];
   }
 
-  private issue(kind: DatasetIssueKind, message: string, ref: string): void {
-    this.issues.push({ kind, message, ref });
+  private issue(kind: DatasetIssueKind, message: string, ref: string, revision?: IsoDate): void {
+    this.issues.push(revision === undefined ? { kind, message, ref } : { kind, message, ref, revision });
+  }
+
+  /**
+   * Two answers for the same customer and revision mean the same thing: the same kind and,
+   * where they decide anything (合意・一部合意・判別できない), the same 適用日 and the same
+   * 対象外カテゴリ — read as categories, so a code and a name of the same one match.
+   */
+  private sameAnswer(a: RevisionAgreement, b: RevisionAgreement): boolean {
+    if (a.kind !== b.kind) return false;
+    if (!EXCLUSION_KINDS.includes(a.kind)) return true;
+    const cats = (x: RevisionAgreement) => {
+      const m = this.matchExcluded(x.excludedCategories);
+      return `${[...m.keys].sort().join(',')}|${m.unmatched.map(categoryKey).sort().join(',')}`;
+    };
+    return (
+      a.effective === b.effective &&
+      (a.effectiveUndecided === undefined) === (b.effectiveUndecided === undefined) &&
+      cats(a) === cats(b)
+    );
+  }
+
+  /** "得意先 001005（株式会社播磨野資材）" for messages. */
+  private customerLabel(cust: string): string {
+    const name = this.customers.get(cust)?.name;
+    return name ? `得意先 ${cust}（${name}）` : `得意先 ${cust}`;
+  }
+
+  /**
+   * Keys of the categories master (code and name) and of the products' own カテゴリ
+   * values. A code wins over a name that happens to be written the same way.
+   */
+  private indexCategories(): void {
+    const cats = [...this.categories.values()];
+    for (const c of cats) {
+      const code = categoryKey(c.code);
+      const name = categoryKey(c.name);
+      if (code !== '') this.categoryLookup.set(code, name !== '' ? [code, name] : [code]);
+    }
+    for (const c of cats) {
+      const name = categoryKey(c.name);
+      const code = categoryKey(c.code);
+      if (name !== '' && !this.categoryLookup.has(name))
+        this.categoryLookup.set(name, code !== '' ? [code, name] : [name]);
+    }
+    for (const p of this.products.values()) {
+      const k = categoryKey(p.category);
+      if (k !== '' && !this.categoryLookup.has(k)) this.categoryLookup.set(k, [k]);
+    }
+  }
+
+  /**
+   * 対象外カテゴリ entries as category keys. An entry is a code or a name of the categories
+   * master (or a product's カテゴリ as written); one that does not match as a whole is read
+   * as names joined by 「・」, longest names first ("段ボール・紙器・工具・金物").
+   */
+  matchExcluded(entries: readonly string[]): { keys: Set<string>; unmatched: string[] } {
+    const keys = new Set<string>();
+    const unmatched: string[] = [];
+    for (const entry of entries) {
+      const whole = this.categoryLookup.get(categoryKey(entry));
+      if (whole) {
+        for (const k of whole) keys.add(k);
+        continue;
+      }
+      const parts = entry
+        .normalize('NFKC')
+        .split('・')
+        .map((x) => x.trim())
+        .filter((x) => x !== '');
+      let miss: string[] = [];
+      let i = 0;
+      while (i < parts.length) {
+        let j = parts.length;
+        let found: readonly string[] | undefined;
+        for (; j > i; j--) {
+          found = this.categoryLookup.get(categoryKey(parts.slice(i, j).join('・')));
+          if (found) break;
+        }
+        if (found) {
+          if (miss.length > 0) unmatched.push(miss.join('・'));
+          miss = [];
+          for (const k of found) keys.add(k);
+          i = j;
+        } else {
+          miss.push(parts[i] ?? '');
+          i++;
+        }
+      }
+      if (miss.length > 0) unmatched.push(miss.join('・'));
+    }
+    return { keys, unmatched };
+  }
+
+  /** Read one answer's 対象外カテゴリ, and report what the diagnosis cannot take as written. */
+  private checkAnswer(date: IsoDate, ag: RevisionAgreement): void {
+    const { keys, unmatched } = this.matchExcluded(ag.excludedCategories);
+    this.excludedKeys.set(ag, keys);
+    const rev = `${toWareki(date)}の改定`;
+    if (EXCLUSION_KINDS.includes(ag.kind)) {
+      const where = this.categories.size > 0 ? 'カテゴリのコードにも名前にも' : '商品マスタのカテゴリにも';
+      for (const x of unmatched) {
+        this.issue(
+          'unknown_excluded_category',
+          `${this.customerLabel(ag.cust)}の対象外カテゴリ「${x}」が、${where}合いません（${rev}）。このカテゴリは据え置きとして扱わず、新しい定価を正しい単価としています。カテゴリのコードか名前に直してください。`,
+          ag.cust,
+          date,
+        );
+      }
+    }
+    if (AGREED_KINDS.includes(ag.kind) && ag.effective === null && ag.effectiveUndecided !== undefined) {
+      this.issue(
+        'effective_undecided',
+        `${this.customerLabel(ag.cust)}は「${ag.status}」ですが、適用日が「${ag.effectiveUndecided}」です（${rev}）。適用日が決まるまで新しい定価はまだ適用していないものとして、旧定価のままの請求を正しいとしています。適用日が決まったら、合意状況ファイルの適用日を直してください。`,
+        ag.cust,
+        date,
+      );
+    }
+  }
+
+  /** The product's カテゴリ is one the customer kept at the old 定価 (一部合意). */
+  private isExcludedCategory(ag: RevisionAgreement, category: string): boolean {
+    const keys = this.excludedKeys.get(ag);
+    return keys ? keys.has(categoryKey(category)) : ag.excludedCategories.includes(category);
   }
 
   private indexHistory<T extends { sku: string; start: IsoDate; end: IsoDate | null }>(
@@ -366,20 +510,24 @@ export class Dataset {
     if (ag) {
       if (ag.kind === 'declined') kept = 'kept_declined';
       else if (ag.kind === 'negotiating') kept = 'kept_negotiating';
-      else if (ag.kind !== 'not_applicable' && ag.excludedCategories.includes(category))
+      else if (ag.kind !== 'not_applicable' && this.isExcludedCategory(ag, category))
         kept = 'kept_excluded_category';
       else if (ag.kind !== 'not_applicable' && ag.effective !== null && date < ag.effective)
+        kept = 'kept_before_agreed_date';
+      // 合意したが適用日が「未定」: 日付が決まるまで新しい定価はまだ適用しない
+      else if (AGREED_KINDS.includes(ag.kind) && ag.effective === null && ag.effectiveUndecided !== undefined)
         kept = 'kept_before_agreed_date';
     }
     const before = this.resolveList(rows, idx - 1, cust, category, date);
     if (kept !== null) {
+      // the customer stays on `before`, and so does the 定価 before it (previousPrice / since):
+      // a bill at that one is the 定価 the customer was on just before, a 反映漏れ
       return {
         ...before,
         row,
         basis: kept,
         revision: rev?.revision ?? null,
         agreement: ag,
-        previousPrice: null,
       };
     }
     const since =

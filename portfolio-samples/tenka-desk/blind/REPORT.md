@@ -4,6 +4,8 @@
 
 > **追記（2026年10月17日、ブランチ `tenka-desk-revision-fix`）：** 9章の1〜7を直しました。直したあとの再実行は11章です。1〜7章の数字は直す前のもので、そのときの `results.json`・`mismatches.csv` はコミット 20004cd にあります。
 
+> **追記（2026年10月19日、ブランチ `tenka-desk-import-robust`）：** 12章で見つけた合意状況ファイルの読み取りの問題（(d)）と、据え置いた定価の前の定価（(a)）を直しました。再実行は13章です。答えを開けたあとのデータでの回帰の確認で、新しい測定ではありません。
+
 > **すべて架空のデータです。** 2組とも、会社・得意先・商品・価格・取引は作り物で、実在のものとは関係ありません。
 
 ---
@@ -721,6 +723,148 @@ node scripts/blind-compare.ts --out blind/round2 \
 
 ---
 
+## 13. 読み取りの直しのあとの再実行（回帰の確認）
+
+2026年10月19日、ブランチ `tenka-desk-import-robust`。12章で見つけた (d) の2つ（合意状況ファイルのセルを書いたとおりに読めない）と (a)（据え置いた定価の、その前の定価を捨てる）を直したあと、1回目の2組（gen-1・gen-2）と2回目の3組（gen-3・gen-4・gen-5）をもう一度判定し、採点しました。
+
+> **この5組は、どれもすでに答えを開けたデータです。** 直し方は、12章で正解と食い違いの原因を見たあとに決めました。この章の数字は「直して壊れたところがないか」と「12章で見つけた原因が消えたか」の確かめで、**新しい測定ではありません。** 直した効果を測るには、まだ誰も見ていない新しいブラインドのデータが要ります。
+
+### 13.1 直したこと
+
+| | 12章で見つけたこと | 直したこと |
+|---|---|---|
+| 1 | gen-4：協議中の2社の適用日が「未定」で、行が丸ごと読み飛ばされ、その2社が黙って「合意」扱いになった（12.6 の #4〜#6） | 適用日の「未定」「未確定」「調整中」「-」「ー」「なし」など（NFKC でそろえてから比べる）を「まだ決まっていない」と読み、行を使います。協議中・見送り・合意に至らずでは、空欄と同じです。合意・一部合意では、日付が決まるまで新しい定価はまだ適用していないものとし、旧定価のままの請求を正しいとして、得意先の名前つきで警告を出します |
+| 2 | gen-5：対象外カテゴリを名前（「切削工具」）で書いた行が、コードとだけ比べられ、お知らせもなく無視された（#7・#8） | カテゴリ一覧のコードと名前の両方と比べます（全角・半角、大文字・小文字、前後の空白は問いません。「;」「、」「,」「/」「・」と空白で区切り、名前に「・」が入っていても名前として読みます）。どれにも合わないものは、得意先と書いてあった値を挙げて警告します |
+| 3 | gen-3：据え置いた定価の、その前の定価を捨てていた（`resolveList` の `previousPrice: null`。#1） | 据え置きのときも、その前の定価と、その定価になった日を残します |
+| 4 | 読めずに読み飛ばした行の得意先は、どこにも出ないまま「合意」扱いになる | まだ読み飛ばす行（例：適用日が「来春」、一部合意なのに対象外カテゴリが空）は、ファイル名・行・得意先の名前と「合意したものとして扱っています」を警告に出します。判別できない合意状況も、同じ警告に出します |
+
+警告は、取り込みと診断の画面の「合意状況のファイルに、書いたとおりに読めなかった行があります」に、得意先ごとに出ます。README の「合意状況ファイルの書き方」と「判断が分かれる場面での読み方」にも書きました（12.9 の1〜3にあたります。4〜6はまだです。7の言葉は、「合意状況ファイルの書き方」の「合意状況」の行に書きました）。
+
+### 13.2 やったこと
+
+- 10章・12.11 と同じコマンドで、5組を「そのまま」と「改定日あり」の2回ずつ判定しました。判定のファイルは、リポジトリの外の新しいフォルダに書きました（`blind-score.ts --out`）。
+- 採点も、リポジトリの外のフォルダに書きました（`blind-compare.ts --out`。1回目と2回目で別々）。`blind/results.json`・`blind/mismatches.csv`・`blind/round2/` は書き換えていません。
+- 正解の指紋は、5組とも `SEALED.sha256` と一致しました。2回目の生成器の注記（`notes.md`）は、今回も開けていません（採点のスクリプトが指紋を計算するためにバイト列を読むだけです）。
+
+### 13.3 1回目（gen-1・gen-2）：判定は1行も変わりませんでした
+
+- 採点の `results.json` と `mismatches.csv` は、`blind/results.json`・`blind/mismatches.csv`（11章のあと）とバイト単位で同じでした。
+- 判定ファイルで変わったのは、据え置きの行の「前の定価」「旧価格」の列だけです（gen-1 105行、gen-2 232行。空欄だったところが埋まりました）。判定と不足額は変わりません。gen-3 の #1 の形（据え置いた定価の、さらに前の定価での請求）は、この2組にはありませんでした。
+- 「そのまま」と「改定日あり」の判定ファイルは、今回も同じです。反映チェック（gen-2 の `next/`）の判定ファイルは、前とバイト単位で同じです。
+- 新しく出た警告：gen-1 0件、gen-2 2件（合意状況「適用日変更」を判別できない2社。前から「マスタの確認事項」には出ていたもので、判定は前と同じです）。
+
+### 13.4 2回目（gen-3・gen-4・gen-5）
+
+**漏れ全体**（左が12章、右が今回。「そのまま」と「改定日あり」は、今回も同じ結果です）
+
+| | gen-3 | gen-4 | gen-5 |
+|---|---:|---:|---:|
+| 適合率（行） | 100% → 100% | 88.6% → **100%**（1,326 / 1,326） | 98.2% → **100%**（1,410 / 1,410） |
+| 再現率（行） | 100% → 100% | 100% → 100% | 100% → 100% |
+| 空振り / 見逃し（行） | 0 / 0 → 0 / 0 | 170 / 0 → **0 / 0** | 26 / 0 → **0 / 0** |
+| 適合率（組） | 100% → 100% | 83.4% → **100%**（231 / 231） | 97.7% → **100%**（378 / 378） |
+| アプリの金額（直近12か月） | 4,298,373円 → 4,298,373円 | 3,874,843円 → 3,388,938円 | 807,621円 → 776,988円 |
+| 正解の金額 | 3,684,544円 | 3,376,311円 | 768,817円 |
+| 差 | +613,829円 → +613,829円（+16.7%） | +498,532円 → **+12,627円（+0.4%）** | +38,804円 → **+8,171円（+1.1%）** |
+| うち、採点した行の分 | 0円 → 0円 | +485,905円 → **0円** | +30,633円 → **0円** |
+| 判定が正解と同じ行 | 18,533 → 18,543 / 18,719 | 19,843 → **20,016 / 20,016** | 22,428 → **22,454 / 22,454** |
+| 採点した食い違い | 186行 → 176行 | 173行 → **0行** | 26行 → **0行** |
+
+- 残る金額の差は、3組とも正解が「あいまい」とした行（採点外）の分だけです。gen-3 の +613,829円は12.4 のとおりで変わりません。gen-4 の +12,627円は「見送りの得意先が、据え置いた定価のさらに1つ前の定価で請求」の11行、gen-5 の +8,171円は「備考にだけ据え置きと書いた一部合意」の19行（全期間では22行）です。
+- gen-3 の残る176行は、12.6 の (b)（正解の側の誤り。どちらも対象外）で、変わりません。
+- 種類別：gen-3 は反映漏れの再現率が 98.0% → 100%、掛率ランク外の適合率が 97.2% → 100% に。gen-4 は反映漏れの適合率 75.4% → 100%、掛率ランク外の適合率 98.2% → 100%、粗利下限割れの再現率 98.6% → 100% に。gen-5 は反映漏れの適合率 96.5% → 100%、掛率ランク外の適合率 99.8% → 100% に。ほかの種類は 100% / 100% のままです。
+- 正しく見つけた漏れの行（直近12か月）の不足額は、3組ともすべて1円まで正解と同じになりました（12.4 で違っていた gen-4 の 001015・WP-3503 の1行も、基準単価が旧価格になり、正解と同じです）。
+- 反映チェック（`next/`）の判定ファイルは、3組ともバイト単位で前と同じです（12.5 のまま）。
+- 合意状況ファイルで使った得意先の数：gen-4 は 99社 → 101社（「未定」の2行を読むようになったため）。gen-3 84社、gen-5 103社は変わりません。
+
+### 13.5 変わった判定（すべて）
+
+判定ファイルを前と1行ずつ比べ、判定か不足額が変わった行をすべて挙げます。金額は直近12か月です。
+
+| 組 | 得意先 | 行 | 前 → 今回 | 金額 | 理由 | 正解と |
+|---|---|---:|---|---|---|---|
+| gen-3 | 010822・010850・020039・020269・030152・030315 | 10 | 掛率ランク外 → 反映漏れ | 31,018円が掛率ランク外から反映漏れへ移るだけ | 直したこと3（12.6 の #1） | 合う |
+| gen-4 | 001005・001015 | 162 | 反映漏れ → 旧価格で正しい（協議中） | −453,770円 | 直したこと1（#4） | 合う |
+| gen-4 | 001005・001015 | 8 | 掛率ランク外 → 数量値引（正常） | −43,687円 | 直したこと1（#5）。旧価格からの数量値引 | 合う |
+| gen-4 | 001015 | 3 | 反映漏れ → 粗利下限割れ | 反映漏れ −18,480円、粗利下限割れ +30,228円 | 直したこと1（#6） | 合う |
+| gen-4 | 001015 | 1 | 掛率ランク外のまま、不足額 475円 → 279円 | −196円 | 直したこと1。基準単価が旧価格に | 合う |
+| gen-4 | 001044・001047 | 11（あいまい・採点外） | 掛率ランク外 → 反映漏れ | 12,627円が掛率ランク外から反映漏れへ移るだけ | 直したこと3。12.7 の読み方 B から A へ | 採点外 |
+| gen-5 | 010500 | 25（うち直近12か月 21） | 反映漏れ → 旧価格で正しい（据え置きカテゴリ） | −28,053円 | 直したこと2（#7） | 合う |
+| gen-5 | 010500 | 1 | 掛率ランク外 → 数量値引（正常） | −2,580円 | 直したこと2（#8） | 合う |
+
+- これ以外に、判定や不足額が変わった行はありません。gen-4 は −485,905円（採点した行の差のすべて）、gen-5 は −30,633円です。
+- 判定は同じで、ほかの列だけが変わった行があります。据え置きの行の「前の定価」「旧価格」の列（直したこと3。5組とも）、gen-4 の 001005・001015 の27行と gen-5 の 010500 の8行の「定価の根拠」の列（どれも期間内の特値がある行で、基準単価は特値のままなので、判定と不足額は同じ）、gen-5 の 010500 の切削工具で、次の改定（2026-04-01）のあとの行の「前の定価」の列（前の改定を据え置いたので、その前の定価になります。README の「前回の改定を見送った得意先が、後の別の改定で…」の行のとおり）です。
+- 12.7 のあいまいな行では、gen-4 の11行だけが読み方 B から A に変わりました（12.9 の1の確かめで予想したとおり）。gen-3 の「一部合意で対象外カテゴリが空」（48行）と gen-5 の「備考にだけ据え置き」（22行）は、判定は前と同じ（行を使わず合意扱い）ですが、今回から画面に得意先の名前つきの警告が出ます（gen-3 2社、gen-5 1社）。
+
+**新しく出た警告（「そのまま」の判定で）**
+
+| | 警告 | 中身 |
+|---|---:|---|
+| gen-3 | 6件 | 一部合意で対象外カテゴリが空の行を使えず、合意扱いにした2社（010630・020063）。合意状況「適用日変更」を判別できない4社 |
+| gen-4 | 0件 | 「未定」の2行は協議中なので、警告は要りません |
+| gen-5 | 1件 | 一部合意で対象外カテゴリが空の行を使えず、合意扱いにした1社（010760） |
+
+### 13.6 わかったこと・まだ分からないこと
+
+- 12章の空振り196行は、すべて消えました。12.6 の (a) の10行は、正解どおりの反映漏れになりました。1回目の2組の判定は1行も変わらず、ほかの判定や不足額が動いた行もありません。
+- ただし、これは**直し方を決めたあとで、同じデータで確かめた結果**です。「未定」と書く・名前で書くという書き方は、このデータを見て知ったものです。ほかの書き方（カテゴリ名の略し方など）は、試していません。「未定（4月予定）」のような書き足しと、協議中・見送りの適用日の「保留」などは、レビューのあとで読むようにしました（13.8。単体テストだけで確かめています）。合意・一部合意の適用日が読めないときは警告が出ますが、判定は合意扱いのままです。
+- 「合意・一部合意で適用日が未定」（旧定価のままとし、警告を出す）は、5組のどれにもありません。単体テストと画面のテストで確かめただけです。
+- 書き出し（新単価マスタ）に使う協議結果ファイルも、レビューのあとで、対象外カテゴリをコードと名前で読むようにしました（13.8）。5組には協議結果ファイルがないので、単体テストと画面のテストで確かめただけです。
+- 実際の販売管理データでの精度は、今も分かりません。
+
+### 13.7 やり直し方
+
+```bash
+cd portfolio-samples/tenka-desk
+
+# 判定（<出力>/gen-N に書く。「改定日あり」は 10章・12.11 と同じ日付）
+node scripts/blind-score.ts <入力>/gen-1 --out <出力>/gen-1
+node scripts/blind-score.ts <入力>/gen-1 --out <出力>/gen-1 --revision-date revision_2025-10_agreements.csv=2025-10-01 --tag revdate
+# gen-2・gen-3・gen-4・gen-5 も同じ（--revision-date は 10章・12.11 のとおり）
+
+# 採点（1回目と2回目を別のフォルダに）
+node scripts/blind-compare.ts --out <出力>/cmp1 \
+  --dataset gen-1 <出力>/gen-1 <正解>/gen-1 --dataset gen-2 <出力>/gen-2 <正解>/gen-2
+node scripts/blind-compare.ts --out <出力>/cmp2 \
+  --dataset gen-3 <出力>/gen-3 <正解>/gen-3 --dataset gen-4 <出力>/gen-4 <正解>/gen-4 \
+  --dataset gen-5 <出力>/gen-5 <正解>/gen-5
+```
+
+判定ファイルの SHA-256（「そのまま」と「改定日あり」で同じ。反映チェックの `engine-followup.csv` は、gen-2〜gen-5 の4組とも 11.4・12.11 と同じです。gen-1 には `next/` がありません）：
+
+| ファイル | SHA-256 |
+|---|---|
+| gen-1 `engine-labels.csv` | `8416eb9e81ae972f122d4eceacb80621c5e182fd879075a5acefe03bab816e8e` |
+| gen-2 `engine-labels.csv` | `a0ed87c0969fe306f3930a020cc963df21000eec4f26b71374b59f4ba8a76663` |
+| gen-3 `engine-labels.csv` | `e80cf6caabc42451ee5480d752a9754c80c939fc048fff01f918a49a376dd8ab` |
+| gen-4 `engine-labels.csv` | `8b99634b7443d6962442a4e77816ef8a76e3c1499cce738b3a6b9f260e33e7a3` |
+| gen-5 `engine-labels.csv` | `39dcb6a1adf37813c5cd9ae60c56c037e04a685ce7f93e5b0fb227c9d52986be` |
+| 1回目の採点 `results.json` | `94c225971ade8c3b8348bdcf2783faf6e6e708595df4b4b47215afad835aced7`（`blind/results.json` と同じ） |
+| 2回目の採点 `results.json` | `3b9390be35de32e91ff5f3572a95a70ff5a4a5024439909bf39aab6b07f51910`（リポジトリには入れていません） |
+| 2回目の採点 `mismatches.csv` | `8ceaff62f170f6bed68cc8d6ff837ca45494c41a03906e1fa8b7c38ca2ad7db1`（674行：採点した食い違い 176行と、あいまいな行 161行を2回分） |
+
+### 13.8 レビューのあとの直しと、もう一度の再実行
+
+13.1 の直しをレビューして見つかった穴を、同じブランチで直しました。どれも「読めない行で、得意先が黙って合意扱いになる」か「警告が実際の扱いと違う」かのどちらかです。
+
+| | レビューで見つかったこと | 直したこと |
+|---|---|---|
+| 1 | 協議中・見送りでも、適用日が決まった言葉（「未定」など）以外（「保留」「未定（4月予定）」）だと、行を読み飛ばして合意扱いになる。申入日・回答日が日付でないときも同じ | 協議中・見送り・対象外では、適用日に何が書いてあっても行を使います（適用日は使わないため）。合意・一部合意でも「未定（4月予定）」のような書き足しは「未定」と読みます。申入日・回答日は診断に使わないので、日付でなければ空欄として行を使い、取り込み画面に注記します |
+| 2 | 得意先コードが空欄・名前だけ・得意先マスタにない行は、警告もなく、書こうとした得意先が合意扱いになる | 空欄や名前だけの行は読み飛ばす行にして、ほかの読み飛ばした行と同じ警告を出します。得意先マスタにないコードの行は、ファイル名・コード・合意状況を挙げて警告します |
+| 3 | 合意状況に「合意（適用日未定）」と書いて適用日が空欄だと、改定日からの合意として読み、何も出ない | 適用日が「未定」と同じに読みます（旧定価のまま、得意先の名前つきの警告） |
+| 4 | 診断に使っていない合意状況ファイルにも、「旧定価のままの請求を正しいとしています」などの警告が出る | 使っているファイルの改定の分だけ出します。同じ警告が2つのファイル（支店別など）から出るときは1つにまとめます |
+| 5 | 同じ答えを違う書き方（対象外カテゴリのコードと名前、協議中の適用日の空欄と「未定」）で書いた2つのファイルが、「食い違い」と出る | 対象外カテゴリはカテゴリとして、適用日は合意・一部合意のときだけ比べます |
+| 6 | 書き出し（新単価マスタ）の協議結果で、合意の適用日が「未定」の得意先が、お知らせなしに新単価マスタから抜ける。対象外カテゴリを名前で書くと、据え置くカテゴリも新単価で書き出す | どちらの行があっても書き出さず、行と理由を出します。対象外カテゴリは診断と同じく、コードと名前で読みます |
+
+**再実行：** 13.7 と同じコマンドで、5組を2回ずつ判定し直し、採点し直しました（`rerun3/` を作り直しました。リポジトリの外です）。
+
+- 判定ファイル10本、反映チェックの判定ファイル8本、採点の `results.json` と `mismatches.csv`（1回目・2回目）は、13.7 の SHA-256 とすべてバイト単位で同じでした。判定・不足額・点数は、1行も変わっていません。
+- 変わったのは警告の文面だけです。合意状況を判別できない得意先の警告に、どの改定の話かを足しました（gen-2 の2件、gen-3 の4件）。警告の数は、13.3・13.5 のとおりです（gen-1 0件、gen-2 2件、gen-3 6件、gen-4 0件、gen-5 1件）。
+- 5組には、この章で直した書き方（得意先コードが空欄・マスタにない行、協議中・見送りの適用日の「保留」など、日付でない申入日・回答日、「合意（適用日未定）」）が1つもありません。そのため、この再実行は「ほかが動いていない」ことの確かめで、直したところが効くかどうかは単体テストと画面のテストでしか確かめていません。
+- **この5組は、どれもすでに答えを開けたデータです。新しい測定ではありません。**
+
+---
+
 ## English summary
 
 Blind test of the tenka-desk leak engine on two fictional datasets made by two independent generators (gen-1: 22,200 sales lines, B layout; gen-2: 21,953 lines, A and B layouts). The engine's labels were produced before the sealed truth was opened. All 5 truth files matched `SEALED.sha256`. Lines the truth marks ambiguous (89 per dataset) are left out of precision and recall. This PR only measures; it changes no engine or app code.
@@ -738,3 +882,5 @@ Blind test of the tenka-desk leak engine on two fictional datasets made by two i
 **Recommended fixes (separate PR, then a fresh blind set):** (1) make an unused agreements file a visible warning on both screens, and mark old-price amounts as provisional until a date is set; (2) infer the revision date when exactly one history date matches the file's most common 適用日, the YYYY-MM in its name, or `previousRevisionDate`; (3) document the date step in the README; (4) align the docs on free goods and show their count and amount; (5) document that overcharges are not leaks; (6) list the engine's choice for each ambiguous pattern in one place; (7) score the follow-up check; (8) re-measure on new, unseen generators with the truth hash committed before the engine runs.
 
 **Second blind round (2026-10-19, branch `tenka-desk-blind-2`, section 12):** three new generators written by different models (gen-3 Sonnet, gen-4 Fable, gen-5 Opus), truth hashes committed in 8da2a53 before the engine ran, no settings file with the revision date, no year-month in the agreements file names, and scorers who did not open the generators' notes. The engine was not changed. With no date entered, the app picked the right revision date in all three from the most common 適用日, so the default labels equal the date-entered labels byte for byte. Any-leak line precision / recall: gen-3 100% / 100%, gen-4 88.6% / 100%, gen-5 98.2% / 100%; no true leak was missed. Last-12-month amount, app vs truth: ¥4,298,373 vs ¥3,684,544, ¥3,874,843 vs ¥3,376,311, ¥807,621 vs ¥768,817 (the whole gen-3 gap is on lines the truth marks ambiguous). The follow-up check is 100% / 100% on scored lines with equal amounts in all three. The 385 scored mismatched lines are: (a) one engine bug, 10 lines — for a customer who kept an older list price, `resolveList` drops that list's predecessor, so billing at the predecessor shows as out-of-tier instead of old price (total amount unchanged; ¥31,018 moves between types; this is the gen-3 scorer's call, and the gen-4 scorer read the same shape, 11 unscored lines there, as ambiguous); (b) 176 lines where gen-3's truth gave the non-product label to customers missing from the master (both sides exclude them); (d) 199 lines from three agreement cells the importer did not read as written (適用日 「未定」 on two 協議中 rows in gen-4, a category name instead of its code in gen-5), each silently turning that customer into "agreed". Blanking the two 「未定」 cells (gen-4) or writing `CT` for the name (gen-5) in a scratch copy removes every false positive, which locates the cause but is not a test of an importer fix. Next: fix (a) and document the ambiguous patterns; how to handle (d) is decided separately. Limits: one AI vendor, generators that read the same docs (which describe the engine's choices), fictional data, one agreements file answering one revision per set, and only the most-common-適用日 signal exercised for the revision date. The engine-label hashes were not committed before scoring (a rerun reproduces all six label and follow-up files byte for byte). The gen-5 scorer saw a notes template in the generator code after deciding its labels. Accuracy on real data is unknown.
+
+**Import fixes after round 2 (2026-10-19, branch `tenka-desk-import-robust`, section 13):** the agreements importer now reads 適用日 placeholders such as 「未定」「調整中」「-」 as "not decided" instead of dropping the row (irrelevant for 協議中/見送り; for 合意/一部合意 the old 定価 is kept until a date is set, with a warning naming the customer); 対象外カテゴリ entries are matched against category codes and names (NFKC, case-insensitive, several separators, names containing 「・」), and an entry that matches nothing is reported by customer; a kept 定価 keeps its own predecessor in `resolveList`; and every row that is still dropped, every unmatched category and every unclassifiable status is listed by customer on the import and diagnosis screens, saying how the customer was treated. Rerun on the five sets, all of which were already opened (a regression check, not a new measurement): gen-1 and gen-2 labels unchanged (their `results.json` and `mismatches.csv` are byte-identical to `blind/results.json` and `blind/mismatches.csv`); gen-3's 10 lines become `leak_old_price` as the truth says (¥31,018 moves between types); gen-4 and gen-5 now have no scored mismatch (line precision 88.6% → 100% and 98.2% → 100%, recall 100%), and the remaining gaps to the truth amount, +¥12,627 and +¥8,171, are all on lines the truth marks ambiguous. The follow-up files are unchanged byte for byte. The "agreed with an undecided date" path does not occur in any of the five sets and is covered only by unit and screen tests. After review (section 13.8): any text in the 適用日 of a 協議中/見送り/対象外 row and any non-date 申入日/回答日 no longer drops the row; rows whose 得意先コード is blank, a name, or not in the customer master are reported; 「合意（適用日未定）」 with a blank 適用日 is read as undecided; warnings are shown only for used files and listed once; the same answer written two ways is no longer a conflict; and the 新単価マスタ export refuses a 協議結果 with an agreed 「未定」 date or an unmatched 対象外カテゴリ, reading category names as the diagnosis does. A second rerun reproduced every label, follow-up and score file byte for byte; only the wording of the unknown-status warning changed. None of the five sets contains the newly handled cases, so they are covered only by unit and screen tests.

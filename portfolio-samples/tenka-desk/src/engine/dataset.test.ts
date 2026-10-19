@@ -209,6 +209,112 @@ describe('expected price, 特値 and cost', () => {
     });
   });
 
+  it('keeps the old 定価 while an agreed 適用日 is 未定, and names the customer', () => {
+    const undecided = (cust: string, status: string, excluded: string[] = []) => ({
+      ...agreement(cust, status, null, excluded),
+      effectiveUndecided: '未定',
+    });
+    const u = fixtureDataset({
+      revisions: [
+        {
+          date: REVISION,
+          label: '令和7年4月1日 定価改定',
+          agreements: [
+            undecided('000001', '合意'),
+            undecided('000002', '協議中'),
+            undecided('000003', '一部合意', ['KG']),
+          ],
+        },
+      ],
+    });
+    // 合意 with no date yet: the new 定価 is not applied yet
+    expect(u.applicableList('000001', 'DB-1001', '2026-05-10')).toMatchObject({
+      price: 710,
+      basis: 'kept_before_agreed_date',
+    });
+    // 協議中: the date does not matter
+    expect(u.applicableList('000002', 'KG-1001', '2025-05-10')).toMatchObject({
+      price: 1000,
+      basis: 'kept_negotiating',
+    });
+    // 一部合意: kept categories stay kept, the others wait for the date
+    expect(u.applicableList('000003', 'KG-1001', '2025-05-10')?.basis).toBe('kept_excluded_category');
+    expect(u.applicableList('000003', 'DB-1001', '2025-05-10')).toMatchObject({
+      price: 710,
+      basis: 'kept_before_agreed_date',
+    });
+    const notes = u.issues.filter((i) => i.kind === 'effective_undecided');
+    expect(notes.map((i) => i.ref)).toEqual(['000001', '000003']);
+    expect(notes[0]?.message).toContain('000001');
+    expect(notes[0]?.message).toContain('株式会社A商事');
+    expect(notes[0]?.message).toContain('「未定」');
+    // a blank 適用日 still means "from the revision date"
+    expect(ds.applicableList('000001', 'DB-1001', '2025-05-10')?.basis).toBe('current');
+  });
+
+  it('matches 対象外カテゴリ by code or by name, and reports entries that match nothing', () => {
+    const partial = (...excluded: string[]) =>
+      fixtureDataset({
+        revisions: [
+          {
+            date: REVISION,
+            label: '令和7年4月1日 定価改定',
+            agreements: [agreement('000003', '一部合意', REVISION, excluded)],
+          },
+        ],
+      });
+    for (const written of [['KG'], ['kg'], ['ＫＧ'], ['工具・金物'], [' 工具・金物 '], ['工具･金物']]) {
+      const d = partial(...written);
+      expect(d.applicableList('000003', 'KG-1001', '2025-05-10')?.basis, written.join()).toBe(
+        'kept_excluded_category',
+      );
+      expect(d.applicableList('000003', 'DB-1001', '2025-05-10')?.basis, written.join()).toBe('current');
+      expect(
+        d.issues.filter((i) => i.kind === 'unknown_excluded_category'),
+        written.join(),
+      ).toEqual([]);
+    }
+    // two names joined by ・, although the names hold ・ themselves
+    const both = partial('段ボール・紙器・工具・金物');
+    expect(both.applicableList('000003', 'KG-1001', '2025-05-10')?.basis).toBe('kept_excluded_category');
+    expect(both.applicableList('000003', 'DB-1001', '2025-05-10')?.basis).toBe('kept_excluded_category');
+    expect(both.issues.filter((i) => i.kind === 'unknown_excluded_category')).toEqual([]);
+
+    // an entry that matches neither a code nor a name is never ignored silently
+    const unknown = partial('KG', '梱包材');
+    expect(unknown.applicableList('000003', 'KG-1001', '2025-05-10')?.basis).toBe('kept_excluded_category');
+    expect(unknown.applicableList('000003', 'DB-1001', '2025-05-10')?.basis).toBe('current');
+    const notes = unknown.issues.filter((i) => i.kind === 'unknown_excluded_category');
+    expect(notes.map((i) => i.ref)).toEqual(['000003']);
+    expect(notes[0]?.message).toContain('000003');
+    expect(notes[0]?.message).toContain('株式会社C物流');
+    expect(notes[0]?.message).toContain('「梱包材」');
+  });
+
+  it('remembers the 定価 before a kept one (a revision with no recorded answer in between)', () => {
+    // KG-1001: 900 → (2024-10-01, no answer recorded) 1,000 → (2025-04-01, 000002 見送り) 1,100
+    const chain = fixtureDataset({
+      listPriceHistory: [
+        { sku: 'KG-1001', price: 900, start: '2024-04-01', end: '2024-09-30' },
+        { sku: 'KG-1001', price: 1000, start: '2024-10-01', end: '2025-03-31' },
+        { sku: 'KG-1001', price: 1100, start: REVISION, end: null },
+      ],
+    });
+    expect(chain.applicableList('000002', 'KG-1001', '2025-05-10')).toMatchObject({
+      price: 1000,
+      basis: 'kept_declined',
+      previousPrice: 900,
+      since: '2024-10-01',
+    });
+    // the same 定価 before the revision: the same previous 定価
+    expect(chain.applicableList('000002', 'KG-1001', '2025-03-10')).toMatchObject({
+      price: 1000,
+      basis: 'current',
+      previousPrice: 900,
+      since: '2024-10-01',
+    });
+  });
+
   it('resolves codes written in any style', () => {
     expect(ds.resolveSku('ＤＢー１００１')).toBe('DB-1001');
     expect(ds.resolveSku('9999')).toBeNull();

@@ -9,6 +9,7 @@ import {
   type LineStatus,
   REVISION_SIGNAL_JA,
 } from '../../engine/index.ts';
+import { AgreementWarnings } from '../components/AgreementWarnings.tsx';
 import { BarList } from '../components/Charts.tsx';
 import { Badge, Card, downloadFile, Icon, NeedsData, Notice, PageHeader } from '../components/ui.tsx';
 import { num, ratio, wareki, warekiRange, yen } from '../format.ts';
@@ -126,6 +127,7 @@ export function DiagnosisScreen() {
           </p>
         </Notice>
       )}
+      <AgreementWarnings warnings={loaded.ws.agreementWarnings} />
       {inferred.map((a) => (
         <Notice key={a.file} tone="info">
           <p>

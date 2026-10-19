@@ -5,7 +5,13 @@
 
 import { Dataset, inferRevisionDates, listChangeDates } from './dataset.ts';
 import { type IsoDate, isIsoDate, toWareki, yearMonth } from './dates.ts';
-import { type FileImport, type ImportIssue, type ImportOptions, importFile } from './importers.ts';
+import {
+  type FileImport,
+  type ImportIssue,
+  type ImportOptions,
+  importFile,
+  type SkippedRow,
+} from './importers.ts';
 import type {
   Category,
   Company,
@@ -88,8 +94,15 @@ export interface Workspace {
   importIssues: { file: string; issue: ImportIssue }[];
   /** information for the person (e.g. which revision an agreements file was taken to answer) */
   notes: string[];
-  /** problems that change the results (e.g. an agreements file that is not used) */
+  /** problems that change the results (e.g. an agreements file that is not used); includes agreementWarnings */
   warnings: string[];
+  /**
+   * Rows of a used agreements file that the diagnosis cannot take as written, by
+   * customer: a row left out (the customer is then treated as 合意), 合意 with a 適用日
+   * of 「未定」 (the old 定価 is kept), a 対象外カテゴリ that matches no category, a
+   * 合意状況 that cannot be classified. Shown as a warning on the import and diagnosis screens.
+   */
+  agreementWarnings: string[];
   /** every agreements file, in load order, with the revision it answers */
   agreementFiles: AgreementFileUse[];
   /** the 定価改定 dates found in the 定価の履歴 (inferRevisionDates) */
@@ -121,7 +134,7 @@ export function workspaceFromImports(
   const specials: SpecialPrice[] = [];
   const notices: SupplierNotice[] = [];
   const newListPrices: NewListPrice[] = [];
-  const agreementFiles: { name: string; rows: RevisionAgreement[] }[] = [];
+  const agreementFiles: { name: string; rows: RevisionAgreement[]; skipped: SkippedRow[] }[] = [];
   const sales = new Map<string, SalesLine[]>();
   const priceMasters = new Map<string, PriceMasterRow[]>();
   const importIssues: { file: string; issue: ImportIssue }[] = [];
@@ -162,7 +175,7 @@ export function workspaceFromImports(
         newListPrices.push(...d.result.records);
         break;
       case 'agreements':
-        agreementFiles.push({ name: f.name, rows: d.result.records });
+        agreementFiles.push({ name: f.name, rows: d.result.records, skipped: d.result.skipped ?? [] });
         break;
       case 'sales':
         sales.set(f.name, d.result.records);
@@ -227,6 +240,8 @@ export function workspaceFromImports(
     ...(options.company ? { company: options.company } : {}),
   };
   const dataset = new Dataset(datasetInput);
+  const agreementWarnings = agreementRowWarnings(dataset, agreementFiles, uses);
+  warnings.push(...agreementWarnings);
   for (const [name, lines] of sales) sales.set(name, dataset.resolveLines(lines));
   for (const [name, rows] of priceMasters) {
     priceMasters.set(
@@ -243,9 +258,62 @@ export function workspaceFromImports(
     importIssues,
     notes,
     warnings,
+    agreementWarnings,
     agreementFiles: uses,
     revisionCandidates: candidates,
   };
+}
+
+/** Dataset issues about answers the diagnosis could not take as written. */
+const AGREEMENT_ROW_ISSUES = new Set([
+  'effective_undecided',
+  'unknown_excluded_category',
+  'unknown_agreement_status',
+]);
+
+/**
+ * Warnings, by customer, for the rows of the used agreements files that the diagnosis
+ * cannot take as written. A row left out of the file, or one whose 得意先コード is not in
+ * the customer master, leaves the customer it was meant for without an answer, which
+ * reads as 合意: that is never silent (unless another file answers for the customer).
+ * Files that are not used have their own warning, so nothing is listed for them.
+ * Each warning is listed once (two files for one revision may say the same thing).
+ */
+function agreementRowWarnings(
+  dataset: Dataset,
+  files: readonly { name: string; rows: readonly RevisionAgreement[]; skipped: readonly SkippedRow[] }[],
+  uses: readonly AgreementFileUse[],
+): string[] {
+  const out: string[] = [];
+  const usedDates = new Set<IsoDate>();
+  files.forEach((af, i) => {
+    const use = uses[i];
+    if (!use?.used || use.date === null) return;
+    usedDates.add(use.date);
+    const answered = new Set(
+      dataset.revisions.find((r) => r.date === use.date)?.agreements.map((a) => a.cust),
+    );
+    for (const s of af.skipped) {
+      if (s.cust !== '' && answered.has(s.cust)) continue;
+      const name = dataset.customers.get(s.cust)?.name;
+      const who =
+        s.cust === '' ? '得意先コード不明' : name ? `得意先 ${s.cust}（${name}）` : `得意先 ${s.cust}`;
+      out.push(
+        `${af.name}：${s.row}行目（${who}）を読めませんでした${s.reason ? `（${s.reason}）` : ''}。この得意先は合意状況に答えがないことになり、改定に合意したものとして扱っています（新しい定価を正しい単価とします）。行を直して読み込み直してください。`,
+      );
+    }
+    if (dataset.customers.size === 0) return;
+    for (const ag of af.rows) {
+      if (dataset.customers.has(ag.cust)) continue;
+      out.push(
+        `${af.name}：得意先コード ${ag.cust}（「${ag.status}」）が得意先マスタにありません。この行はどの得意先の答えにもならないため、書こうとした得意先は合意状況に答えがないことになり、改定に合意したものとして扱っています（新しい定価を正しい単価とします）。得意先コードを直してください。`,
+      );
+    }
+  });
+  for (const issue of dataset.issues)
+    if (AGREEMENT_ROW_ISSUES.has(issue.kind) && issue.revision !== undefined && usedDates.has(issue.revision))
+      out.push(issue.message);
+  return [...new Set(out)];
 }
 
 /**

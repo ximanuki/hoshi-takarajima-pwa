@@ -234,6 +234,128 @@ describe('other files', () => {
     expect(imp.data.result.issues[0]?.message).toContain('対象外カテゴリが空');
   });
 
+  it('reads a 適用日 written as 未定, 調整中, - … as "not decided" instead of dropping the row', () => {
+    const undecided = ['未定', '未確定', '調整中', '-', 'ー', 'なし', '－', 'ｰ', ' 未定 ', '―'];
+    const imp = importFile(
+      'a.csv',
+      [
+        '得意先コード,得意先名,申入日,回答日,合意状況,適用日,対象外カテゴリ,備考',
+        ...undecided.map((v, i) => `00100${i},甲,2026-02-04,,協議中,${v},,`),
+        '001090,乙,2026-02-04,2026-02-26,合意,2026/5/1,,',
+        '001091,丙,2026-02-04,2026-02-26,合意,,,',
+      ].join('\n'),
+    );
+    if (imp.data.kind !== 'agreements') throw new Error(`kind ${imp.data.kind}`);
+    const { records, issues } = imp.data.result;
+    expect(issues).toEqual([]);
+    expect(records).toHaveLength(undecided.length + 2);
+    for (const r of records.slice(0, undecided.length)) {
+      expect(r.effective, r.cust).toBeNull();
+      expect(r.effectiveUndecided, r.cust).toBeTruthy();
+    }
+    expect(records[0]?.effectiveUndecided).toBe('未定');
+    expect(records[3]?.effectiveUndecided).toBe('-');
+    // a date, and a blank 適用日, are not "undecided"
+    expect(records[undecided.length]).toMatchObject({ effective: '2026-05-01' });
+    expect(records[undecided.length]?.effectiveUndecided).toBeUndefined();
+    expect(records[undecided.length + 1]).toMatchObject({ effective: null });
+    expect(records[undecided.length + 1]?.effectiveUndecided).toBeUndefined();
+  });
+
+  it('names the customer of every agreements row it still has to leave out', () => {
+    const imp = importFile(
+      'a.csv',
+      [
+        '得意先コード,得意先名,申入日,回答日,合意状況,適用日,対象外カテゴリ,備考',
+        '001001,甲,2026-02-04,2026-02-26,合意,来年4月ごろ,,',
+        '001002,乙,2026-02-04,2026-02-26,一部合意,2026-04-01,,据え置き品目は別途',
+        '001003,丙,2026-02-04,2026-02-26,合意,2026-04-01,,',
+        '001004,丁,2026-02-04',
+      ].join('\n'),
+    );
+    if (imp.data.kind !== 'agreements') throw new Error(`kind ${imp.data.kind}`);
+    expect(imp.data.result.records.map((r) => r.cust)).toEqual(['001003']);
+    expect(imp.data.result.skipped).toEqual([
+      { row: 2, cust: '001001', reason: expect.stringContaining('日付として読めません') },
+      { row: 3, cust: '001002', reason: expect.stringContaining('対象外カテゴリが空') },
+      { row: 5, cust: '001004', reason: expect.stringContaining('列の数') },
+    ]);
+  });
+
+  it('keeps a 見送り・協議中 row whatever its 適用日 says, and never drops a row for its 申入日・回答日', () => {
+    const imp = importFile(
+      'a.csv',
+      [
+        '得意先コード,得意先名,申入日,回答日,合意状況,適用日,対象外カテゴリ,備考',
+        '001001,甲,2026-02-04,2026-02-26,協議中,保留,,',
+        '001002,乙,2026-02-04,2026-02-26,見送り,未定（4月予定）,,',
+        '001003,丙,2026-02-04,3月中旬,見送り,,,',
+        '001004,丁,先月,2026-02-26,合意,2026-04-01,,',
+        // 合意 with "未定" and a note: not decided yet (the old 定価 is kept), not a dropped row
+        '001005,戊,2026-02-04,2026-02-26,合意,未定（4月予定）,,',
+      ].join('\n'),
+    );
+    if (imp.data.kind !== 'agreements') throw new Error(`kind ${imp.data.kind}`);
+    const { records, skipped, issues } = imp.data.result;
+    expect(skipped).toEqual([]);
+    expect(records.map((r) => [r.cust, r.effective, r.effectiveUndecided])).toEqual([
+      ['001001', null, '保留'],
+      ['001002', null, '未定(4月予定)'],
+      ['001003', null, undefined],
+      ['001004', '2026-04-01', undefined],
+      ['001005', null, '未定(4月予定)'],
+    ]);
+    expect(records[2]?.answeredOn).toBeNull();
+    expect(records[3]?.requestedOn).toBeNull();
+    // the unreadable 申入日・回答日 are noted (they are not used by the diagnosis)
+    expect(issues.map((i) => [i.row, i.field, i.value])).toEqual([
+      [4, 'answeredOn', '3月中旬'],
+      [5, 'requestedOn', '先月'],
+    ]);
+  });
+
+  it('reads 「合意（適用日未定）」 with a blank 適用日 as agreed with no date yet', () => {
+    const imp = importFile(
+      'a.csv',
+      [
+        '得意先コード,得意先名,申入日,回答日,合意状況,適用日,対象外カテゴリ,備考',
+        '001001,甲,2026-02-04,2026-02-26,合意（適用日未定）,,,',
+        '001002,乙,2026-02-04,2026-02-26,一部合意（時期は調整中）,,KG,',
+        '001003,丙,2026-02-04,2026-02-26,合意（3月請求分から）,,,',
+        '001004,丁,2026-02-04,2026-02-26,合意（適用日未定）,2026-04-01,,',
+        '001005,戊,2026-02-04,2026-02-26,見送り（未定）,,,',
+      ].join('\n'),
+    );
+    if (imp.data.kind !== 'agreements') throw new Error(`kind ${imp.data.kind}`);
+    expect(imp.data.result.records.map((r) => [r.cust, r.effective, r.effectiveUndecided])).toEqual([
+      ['001001', null, '未定'],
+      ['001002', null, '調整中'],
+      ['001003', null, undefined],
+      // a date written in 適用日 wins over the note
+      ['001004', '2026-04-01', undefined],
+      // the date of a 見送り decides nothing
+      ['001005', null, undefined],
+    ]);
+  });
+
+  it('leaves out an agreements row whose 得意先コード is blank or not a code', () => {
+    const imp = importFile(
+      'a.csv',
+      [
+        '得意先コード,得意先名,申入日,回答日,合意状況,適用日,対象外カテゴリ,備考',
+        ',甲,2026-02-04,2026-02-26,見送り,,,',
+        '乙見本工業,乙,2026-02-04,2026-02-26,見送り,,,',
+        '001003,丙,2026-02-04,2026-02-26,見送り,,,',
+      ].join('\n'),
+    );
+    if (imp.data.kind !== 'agreements') throw new Error(`kind ${imp.data.kind}`);
+    expect(imp.data.result.records.map((r) => r.cust)).toEqual(['001003']);
+    expect(imp.data.result.skipped).toEqual([
+      { row: 2, cust: '', reason: expect.stringContaining('得意先コード') },
+      { row: 3, cust: '', reason: expect.stringContaining('乙見本工業') },
+    ]);
+  });
+
   it('classifies agreement statuses', () => {
     expect(classifyAgreement('合意')).toBe('agreed');
     expect(classifyAgreement('合意(適用日変更)')).toBe('agreed_later_date');

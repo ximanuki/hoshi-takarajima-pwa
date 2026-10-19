@@ -40,6 +40,26 @@ test('files with unreadable rows are refused or listed, not silently shortened',
   await expect(page.getByText('2行目「適用日」：日付として読めません（2026-13-01）')).toBeVisible();
   await expect(page.getByRole('button', { name: /販売管理A形式で保存/ })).toBeDisabled();
   await expect(page.getByRole('button', { name: /販売管理B形式で保存/ })).toBeDisabled();
+  // an agreed customer whose 適用日 is 未定 has no 適用開始日: refused, not left out
+  await page
+    .locator('input[type=file]')
+    .first()
+    .setInputFiles(withFirstRow(outcomes, (r) => r.replace('2026-12-01', '未定')));
+  await expect(
+    page.getByText('2行目「適用日」：合意ですが適用日が決まっていません', { exact: false }),
+  ).toBeVisible();
+  await expect(page.getByRole('button', { name: /販売管理A形式で保存/ })).toBeDisabled();
+  // a 対象外カテゴリ that is no category: refused, not exported at the new price
+  await page
+    .locator('input[type=file]')
+    .first()
+    .setInputFiles(
+      withFirstRow(outcomes, (r) => r.replace(',合意,2026-12-01,,', ',一部合意,2026-12-01,梱包材,')),
+    );
+  await expect(
+    page.getByText('2行目「対象外カテゴリ」：カテゴリのコードにも名前にも合いません', { exact: false }),
+  ).toBeVisible();
+  await expect(page.getByRole('button', { name: /販売管理A形式で保存/ })).toBeDisabled();
   // the fixed file is used
   await page.locator('input[type=file]').first().setInputFiles(original(outcomes));
   await expect(page.getByText('協議結果を読めません')).toBeHidden();

@@ -362,6 +362,8 @@ function listBasisText(list: ApplicableList): string {
     case 'kept_excluded_category':
       return `一部合意で据え置いたカテゴリのため、旧定価 ${formatYen(list.price)} が基準です`;
     case 'kept_before_agreed_date':
+      if (!ag?.effective && ag?.effectiveUndecided !== undefined)
+        return `合意したものの適用日が「${ag.effectiveUndecided}」で、新しい定価はまだ適用していないため、旧定価 ${formatYen(list.price)} が基準です`;
       return `合意した適用日（${ag?.effective ? toWareki(ag.effective) : '-'}）より前のため、旧定価 ${formatYen(list.price)} が基準です`;
     case 'current':
       // a product without a 定価 history has one open row from the beginning of time: no date to show

@@ -8,7 +8,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { isSampleRemark } from '../engine/index.ts';
+import { isSampleRemark, UNDECIDED_DATE_WORDS } from '../engine/index.ts';
 
 const PROJECT = join(import.meta.dirname, '..', '..');
 const read = (rel: string) => readFileSync(join(PROJECT, rel), 'utf8');
@@ -62,7 +62,20 @@ describe('documents', () => {
       '改定のあとに出た商品',
       '小数',
       '0円',
+      '未定',
+      '対象外カテゴリが空',
+      'カテゴリの名前',
     ])
       expect(s, k).toContain(k);
+  });
+
+  it('describe the 適用日 words for "not decided yet" and 対象外カテゴリ by name as the app reads them', () => {
+    const s = section(read('README.md'), '合意状況ファイルの書き方');
+    for (const w of ['未定', '未確定', '調整中', '-', 'ー', 'なし']) {
+      expect(UNDECIDED_DATE_WORDS, w).toContain(w);
+      expect(s, w).toContain(`「${w}」`);
+    }
+    expect(s).toContain('名前');
+    expect(s).toContain('得意先の名前つきで警告');
   });
 });

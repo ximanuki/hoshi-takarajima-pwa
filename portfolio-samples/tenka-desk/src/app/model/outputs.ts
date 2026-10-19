@@ -8,6 +8,7 @@ import {
   AGREEMENT_KIND_JA,
   buildPriceMaster,
   classifyAgreement,
+  type Dataset,
   type FileImport,
   type ImportIssue,
   importFile,
@@ -50,8 +51,7 @@ export class FileRowsError extends Error {
   readonly fileName: string;
   /** every row that could not be read, with the reason */
   readonly problems: string[];
-  constructor(imp: FileImport) {
-    const issues = imp.data.result.issues;
+  constructor(imp: FileImport, issues: readonly ImportIssue[] = imp.data.result.issues) {
     const rows = new Set(issues.map((i) => i.row)).size;
     super(`${baseName(imp.name)} に読めない行が${rows}行あります。`);
     this.name = 'FileRowsError';
@@ -60,12 +60,42 @@ export class FileRowsError extends Error {
   }
 }
 
-/** The 協議結果 file; refused when any row cannot be read. */
-export function readOutcomesFile(file: SourceFile): RevisionAgreement[] {
+/**
+ * The 協議結果 file; refused when any row cannot be read, and when a row that is read
+ * would still not reach the new price master as agreed: a 合意 whose 適用日 is 「未定」
+ * (it has no 適用開始日, so the customer would drop out), or, given the Dataset, a
+ * 対象外カテゴリ that is neither a code nor a name of a category (the kept category
+ * would be exported at the new price).
+ */
+export function readOutcomesFile(file: SourceFile, ds?: Pick<Dataset, 'matchExcluded'>): RevisionAgreement[] {
   const imp = importFile(file.name, file.bytes, { kinds: ['agreements'] });
   if (imp.data.kind !== 'agreements') throw new Error(`${file.name} は協議結果のファイルではありません`);
   if (imp.data.result.issues.length > 0) throw new FileRowsError(imp);
-  return imp.data.result.records;
+  const records = imp.data.result.records;
+  // no issues: every row was read, so records[i] is the table's row i
+  const problems: ImportIssue[] = [];
+  records.forEach((r, i) => {
+    if (r.kind !== 'agreed' && r.kind !== 'agreed_later_date' && r.kind !== 'partial') return;
+    const row = imp.table.rowLines[i] ?? i + 2;
+    if (r.effective === null && r.effectiveUndecided !== undefined)
+      problems.push({
+        row,
+        field: 'effective',
+        message:
+          '合意ですが適用日が決まっていません。新単価マスタには適用開始日が要るため、日付を入れてください',
+        value: r.effectiveUndecided,
+      });
+    for (const x of ds?.matchExcluded(r.excludedCategories).unmatched ?? [])
+      problems.push({
+        row,
+        field: 'excluded',
+        message:
+          'カテゴリのコードにも名前にも合いません。このままでは据え置くカテゴリも新単価になるため、カテゴリのコードか名前に直してください',
+        value: x,
+      });
+  });
+  if (problems.length > 0) throw new FileRowsError(imp, problems);
+  return records;
 }
 
 export interface MasterBuild {
@@ -81,7 +111,8 @@ export interface MasterBuild {
 
 /** New price master rows from the current proposal and the agreed outcomes. */
 export function usePriceMaster(): MasterBuild {
-  const { proposal, logs, settings, outcomesFile } = useApp();
+  const { proposal, logs, settings, outcomesFile, loaded } = useApp();
+  const ds = loaded?.ws.dataset;
   const source = settings.exportOpts.outcomeSource;
   const currentPrice = settings.exportOpts.currentPrice;
   return useMemo(() => {
@@ -92,8 +123,8 @@ export function usePriceMaster(): MasterBuild {
     if (source === 'logs') outcomes = outcomesFromLogs(logs);
     else if (outcomesFile) {
       try {
-        const records = readOutcomesFile(outcomesFile);
-        outcomes = outcomesFromAgreements(records);
+        const records = readOutcomesFile(outcomesFile, ds);
+        outcomes = outcomesFromAgreements(records, ds);
         for (const r of records)
           if (!isPlainAgreementStatus(r.status))
             interpreted.push(
@@ -107,7 +138,7 @@ export function usePriceMaster(): MasterBuild {
     const rows =
       proposal?.ok && error === null ? buildPriceMaster(proposal.pairs, outcomes, { currentPrice }) : [];
     return { rows, outcomes, source, error, problems, interpreted };
-  }, [proposal, logs, source, outcomesFile, currentPrice]);
+  }, [proposal, logs, source, outcomesFile, currentPrice, ds]);
 }
 
 /** A new price master for the 反映チェック; refused when any row cannot be read. */

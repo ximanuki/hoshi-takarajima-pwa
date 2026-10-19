@@ -73,6 +73,32 @@ describe('diagnoseLine: leaks', () => {
     expect(d.expected?.price).toBe(539);
   });
 
+  it('反映漏れ for a declined customer billed at the 定価 before its kept one', () => {
+    // KG-1001: 900 → (2024-10-01, every customer moved: no answer recorded) 1,000 →
+    // (2025-04-01) 1,100, declined by 000002, who stays on 1,000. A bill at 900 × 72% = 648
+    // is the 定価 this customer was on just before, not one out of the rank range.
+    const chain = new Dataset({
+      ...fixtureInput(),
+      listPriceHistory: [
+        { sku: 'KG-1001', price: 900, start: '2024-04-01', end: '2024-09-30' },
+        { sku: 'KG-1001', price: 1000, start: '2024-10-01', end: '2025-03-31' },
+        { sku: 'KG-1001', price: 1100, start: REVISION, end: null },
+      ],
+    });
+    const judge = (date: string) =>
+      diagnose(chain, [line({ cust: '000002', rawSku: 'KG-1001', date, unitPrice: 648, qty: 10 })]).lines[0];
+    // before and after the declined revision the customer's 定価 is the same, and so is the label
+    for (const date of ['2025-03-10', D]) {
+      const d = judge(date);
+      expect(d?.leak, date).toBe('old_price');
+      expect(d?.oldPrice, date).toBe(648);
+      expect(d?.shortfallYen, date).toBe((720 - 648) * 10);
+    }
+    const text = explainLine(judge(D) as NonNullable<ReturnType<typeof judge>>).join('');
+    expect(text).toContain('令和6年10月1日から定価が 900円 → 1,000円');
+    expect(text).toContain('見送った');
+  });
+
   it('特値の期限切れ: billed at a 特値 whose period ended', () => {
     const d = check({ cust: '000001', rawSku: 'DB-1002', date: D, unitPrice: 330, qty: 5 });
     expect(d.leak).toBe('expired_special');

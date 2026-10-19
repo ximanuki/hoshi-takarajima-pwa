@@ -113,6 +113,11 @@ export interface RevisionAgreement {
   kind: AgreementKind;
   /** 適用日 agreed with the customer; null when nothing applies */
   effective: IsoDate | null;
+  /**
+   * The 適用日 as written when it says the date is not decided yet (「未定」「調整中」「-」…);
+   * `effective` is then null. For 合意・一部合意 the new 定価 is not applied until a date is set.
+   */
+  effectiveUndecided?: string;
   /** カテゴリコード kept at the old 定価 (一部合意) */
   excludedCategories: string[];
   requestedOn: IsoDate | null;

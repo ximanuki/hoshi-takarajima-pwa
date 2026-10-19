@@ -4,7 +4,7 @@
  */
 
 import { BOM, toCsv } from './csv.ts';
-import { type Dataset, pairKey } from './dataset.ts';
+import { categoryKey, type Dataset, pairKey } from './dataset.ts';
 import { type IsoDate, toCompactDate, toWarekiShort } from './dates.ts';
 import { encodeShiftJis, encodeUtf8 } from './encoding.ts';
 import { classifyAgreement } from './importers.ts';
@@ -20,13 +20,22 @@ export interface NegotiationOutcome {
   /** 一部合意 (some categories kept at the old price) */
   partial?: boolean;
   effective: IsoDate | null;
+  /** カテゴリ kept at the old price, as codes (or, from a 協議結果 file read with a Dataset, category keys) */
   excludedCategories: string[];
   /** agreed unit prices that differ from the proposal */
   itemPrices: Map<string, number>;
 }
 
-/** Outcomes from a file of 協議結果 (same columns as 合意状況). */
-export function outcomesFromAgreements(rows: readonly RevisionAgreement[]): Map<string, NegotiationOutcome> {
+/**
+ * Outcomes from a file of 協議結果 (same columns as 合意状況). With the Dataset, the
+ * 対象外カテゴリ are read as the diagnosis reads them: by code or by name of the
+ * categories master ("工具・金物", "kg・DB"); entries that match nothing are left out
+ * here, and readOutcomesFile refuses such a file.
+ */
+export function outcomesFromAgreements(
+  rows: readonly RevisionAgreement[],
+  ds?: Pick<Dataset, 'matchExcluded'>,
+): Map<string, NegotiationOutcome> {
   const out = new Map<string, NegotiationOutcome>();
   for (const r of rows) {
     const kind = classifyAgreement(r.status);
@@ -41,7 +50,7 @@ export function outcomesFromAgreements(rows: readonly RevisionAgreement[]): Map<
       agreed,
       partial: agreed && kind === 'partial',
       effective: r.effective,
-      excludedCategories: [...r.excludedCategories],
+      excludedCategories: ds ? [...ds.matchExcluded(r.excludedCategories).keys] : [...r.excludedCategories],
       itemPrices: new Map(),
     });
   }
@@ -84,7 +93,7 @@ export function buildPriceMaster(
     if (p.status !== 'proposed') continue;
     const o = outcomes.get(p.cust);
     if (!o?.agreed || o.effective === null) continue;
-    if (o.excludedCategories.includes(p.category)) continue;
+    if (o.excludedCategories.some((c) => categoryKey(c) === categoryKey(p.category))) continue;
     const newPrice = o.itemPrices.get(p.sku) ?? p.newPrice;
     const mode = options.currentPrice ?? 'system';
     const currentPrice =

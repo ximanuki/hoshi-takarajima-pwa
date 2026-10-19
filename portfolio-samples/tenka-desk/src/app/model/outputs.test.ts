@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { fixtureDataset } from '../../engine/testing/fixtures.ts';
 import { FileRowsError, readOutcomesFile, readPriceMasterFile, readSalesFile } from './outputs.ts';
 
 const file = (name: string, text: string) => ({ name, bytes: new TextEncoder().encode(text) });
@@ -42,6 +43,33 @@ describe('readOutcomesFile', () => {
     const f = file('outcomes.csv', `${OUTCOMES_HEADER}\n001001,甲商店,一部合意,2026-12-01,,\n`);
     expect(problemsOf(() => readOutcomesFile(f))).toEqual([
       '2行目「対象外カテゴリ」：一部合意ですが対象外カテゴリが空です。据え置くカテゴリを書いてください',
+    ]);
+  });
+
+  it('refuses a 合意 row whose 適用日 is 未定: the customer would drop out of the new price master', () => {
+    const f = file(
+      'outcomes.csv',
+      `${OUTCOMES_HEADER}\n001001,甲商店,合意,未定,,\n001002,乙商店,見送り,未定,,\n001003,丙商店,合意（適用日未定）,,,\n`,
+    );
+    expect(problemsOf(() => readOutcomesFile(f))).toEqual([
+      '2行目「適用日」：合意ですが適用日が決まっていません。新単価マスタには適用開始日が要るため、日付を入れてください（未定）',
+      '4行目「適用日」：合意ですが適用日が決まっていません。新単価マスタには適用開始日が要るため、日付を入れてください（未定）',
+    ]);
+  });
+
+  it('refuses a 対象外カテゴリ that is neither a code nor a name of a category (it would be exported at the new price)', () => {
+    const ds = fixtureDataset();
+    const ok = file(
+      'outcomes.csv',
+      `${OUTCOMES_HEADER}\n001001,甲商店,一部合意,2026-12-01,工具・金物,\n001002,乙商店,一部合意,2026-12-01,kg・DB,\n`,
+    );
+    expect(readOutcomesFile(ok, ds)).toHaveLength(2);
+    const f = file(
+      'outcomes.csv',
+      `${OUTCOMES_HEADER}\n001001,甲商店,一部合意,2026-12-01,工具・金物,\n001002,乙商店,一部合意,2026-12-01,梱包材,\n001003,丙商店,見送り,,梱包材,\n`,
+    );
+    expect(problemsOf(() => readOutcomesFile(f, ds))).toEqual([
+      '3行目「対象外カテゴリ」：カテゴリのコードにも名前にも合いません。このままでは据え置くカテゴリも新単価になるため、カテゴリのコードか名前に直してください（梱包材）',
     ]);
   });
 });

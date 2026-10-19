@@ -3,7 +3,7 @@ import { diagnose } from './diagnosis.ts';
 import { encodeShiftJis } from './encoding.ts';
 import { importFile, LayoutNotRecognisedError } from './importers.ts';
 import { layoutById } from './layouts.ts';
-import { type TwoRevisionOptions, twoRevisionFiles } from './testing/twoRevisions.ts';
+import { AGREEMENTS_HEADER, type TwoRevisionOptions, twoRevisionFiles } from './testing/twoRevisions.ts';
 import {
   companyFromJson,
   loadWorkspace,
@@ -266,6 +266,198 @@ describe('which revision an agreements file answers', () => {
     expect(previousRevisionDateFromJson({ previousRevisionDate: '2025-02-30' })).toBeNull();
     expect(previousRevisionDateFromJson({ previousRevisionDate: 20250616 })).toBeNull();
     expect(previousRevisionDateFromJson(null)).toBeNull();
+  });
+});
+
+describe('agreements rows the app cannot take as written', () => {
+  // the file name names the revision, so the file is used
+  const used = 'revision_2025-10_agreements.csv';
+  const A = '000001,株式会社甲見本商事（架空）,2025-07-01,2025-08-01';
+  const B = '000002,乙見本工業株式会社（架空）,2025-07-01,2025-08-01';
+  const CATEGORIES =
+    'カテゴリコード,カテゴリ名,原材料比率(%),労務費比率(%),エネルギー比率(%),その他比率(%),主な原材料\nDB,段ボール・紙器,55,15,15,15,段ボール原紙\n';
+
+  function load(rows: string[], extra: { name: string; data: string }[] = []) {
+    const ws = loadWorkspace([
+      ...twoRevisionFiles({ agreementsName: used, agreementRows: rows }).map((f) => ({
+        name: f.name,
+        data: f.text,
+      })),
+      ...extra,
+    ]);
+    expect(ws.agreementFiles[0]?.used).toBe(true);
+    const total = diagnose(ws.dataset, ws.sales.get('sales.csv') ?? []).summary.reduce(
+      (s, x) => s + x.annualImpactYen,
+      0,
+    );
+    return { ws, total };
+  }
+
+  it('keeps a 協議中 customer whose 適用日 is 未定 on the old 定価, without a warning', () => {
+    const { ws, total } = load([`${A},合意,2025-10-01,,`, `${B},協議中,未定,,`]);
+    expect(ws.importIssues).toEqual([]);
+    expect(ws.dataset.applicableList('000002', 'DB-2001', '2025-11-11')).toMatchObject({
+      price: 1100,
+      basis: 'kept_negotiating',
+    });
+    // only 000001's line at the old price; 000002's correct old prices are not 反映漏れ
+    expect(total).toBe(720);
+    expect(ws.agreementWarnings).toEqual([]);
+    expect(ws.warnings).toEqual([]);
+  });
+
+  it('treats an agreed customer whose 適用日 is 未定 as still on the old 定価, with a warning naming it', () => {
+    const { ws, total } = load([`${A},合意,未定,,`, `${B},見送り,,,`]);
+    expect(ws.dataset.applicableList('000001', 'DB-2003', '2025-11-10')).toMatchObject({
+      price: 1100,
+      basis: 'kept_before_agreed_date',
+    });
+    expect(total).toBe(0);
+    expect(ws.agreementWarnings).toHaveLength(1);
+    const w = ws.agreementWarnings[0] ?? '';
+    expect(w).toContain('000001');
+    expect(w).toContain('甲見本商事');
+    expect(w).toContain('「未定」');
+    expect(w).toContain('旧定価');
+    expect(ws.warnings).toContain(w);
+  });
+
+  it('says which customer is treated as agreed when its row cannot be read', () => {
+    const { ws, total } = load([`${A},合意,2025-10-01,,`, `${B},合意,来春,,`]);
+    expect(ws.importIssues).toHaveLength(1);
+    // 000002 has no readable answer: the new 定価 applies (as for a customer missing from the file)
+    expect(ws.dataset.applicableList('000002', 'DB-2001', '2025-11-11')?.basis).toBe('current');
+    expect(total).toBe(1800);
+    expect(ws.agreementWarnings).toHaveLength(1);
+    const w = ws.agreementWarnings[0] ?? '';
+    expect(w).toContain(used);
+    expect(w).toContain('000002');
+    expect(w).toContain('乙見本工業');
+    expect(w).toContain('合意したものとして扱っています');
+    expect(w).toContain('来春');
+  });
+
+  it('reads 対象外カテゴリ written as a category name, and warns about one that matches nothing', () => {
+    const named = load(
+      [`${A},一部合意,2025-10-01,段ボール・紙器,`, `${B},見送り,,,`],
+      [{ name: 'categories.csv', data: CATEGORIES }],
+    );
+    expect(named.ws.dataset.applicableList('000001', 'DB-2003', '2025-11-10')?.basis).toBe(
+      'kept_excluded_category',
+    );
+    // 1-1 (864円) is now above the kept price, 1-2 (792円) is correct
+    expect(named.total).toBe(0);
+    expect(named.ws.agreementWarnings).toEqual([]);
+
+    // without the categories file, the products' own category codes still match
+    const code = load([`${A},一部合意,2025-10-01,db,`, `${B},見送り,,,`]);
+    expect(code.ws.dataset.applicableList('000001', 'DB-2003', '2025-11-10')?.basis).toBe(
+      'kept_excluded_category',
+    );
+    expect(code.ws.agreementWarnings).toEqual([]);
+
+    const unknown = load(
+      [`${A},合意,2025-10-01,,`, `${B},一部合意,2025-10-01,梱包材,`],
+      [{ name: 'categories.csv', data: CATEGORIES }],
+    );
+    expect(unknown.ws.dataset.applicableList('000002', 'DB-2001', '2025-11-11')?.basis).toBe('current');
+    expect(unknown.ws.agreementWarnings).toHaveLength(1);
+    const w = unknown.ws.agreementWarnings[0] ?? '';
+    expect(w).toContain('000002');
+    expect(w).toContain('乙見本工業');
+    expect(w).toContain('「梱包材」');
+  });
+
+  it.each([
+    ['協議中 with 適用日「保留」', `${B},協議中,保留,,`],
+    ['見送り with 適用日「未定（4月予定）」', `${B},見送り,未定（4月予定）,,`],
+    ['見送り with 回答日「3月中旬」', '000002,乙見本工業株式会社（架空）,2025-07-01,3月中旬,見送り,,,'],
+  ])('keeps a declined or negotiating customer on the old 定価 whatever its dates say (%s)', (_, row) => {
+    const { ws, total } = load([`${A},合意,2025-10-01,,`, row]);
+    expect(ws.dataset.applicableList('000002', 'DB-2001', '2025-11-11')?.price).toBe(1100);
+    expect(total).toBe(720);
+    expect(ws.agreementWarnings).toEqual([]);
+  });
+
+  it.each([
+    ['', '得意先コード'],
+    ['乙見本工業', '乙見本工業'],
+    ['000009', '000009'],
+  ])(
+    'names a row whose 得意先コード is %j (blank, not a code, or not in the customer master)',
+    (code, shown) => {
+      const { ws, total } = load([
+        `${A},合意,2025-10-01,,`,
+        `${code},乙見本工業株式会社（架空）,2025-07-01,2025-08-01,見送り,,,`,
+      ]);
+      // 000002 has no answer: the new 定価 applies, and the app says so
+      expect(total).toBe(1800);
+      expect(ws.agreementWarnings).toHaveLength(1);
+      const w = ws.agreementWarnings[0] ?? '';
+      expect(w).toContain(used);
+      expect(w).toContain(shown);
+      expect(w).toContain('合意したものとして扱');
+    },
+  );
+
+  it('reads 「合意（適用日未定）」 with a blank 適用日 as not applied yet, with a warning naming the customer', () => {
+    const { ws, total } = load([`${A},合意（適用日未定）,,,`, `${B},見送り,,,`]);
+    expect(ws.dataset.applicableList('000001', 'DB-2003', '2025-11-10')?.basis).toBe(
+      'kept_before_agreed_date',
+    );
+    expect(total).toBe(0);
+    expect(ws.agreementWarnings).toHaveLength(1);
+    expect(ws.agreementWarnings[0]).toContain('得意先 000001');
+    expect(ws.agreementWarnings[0]).toContain('「未定」');
+  });
+
+  it('does not warn about the rows of a file the diagnosis does not use', () => {
+    const ws = loadWorkspace(
+      twoRevisionFiles({
+        agreementsName: used,
+        agreementRows: [`${A},合意,未定,,`, `${B},合意,2025-10-01,梱包材,`],
+      }).map((f) => ({ name: f.name, data: f.text })),
+      { revisionDates: { [used]: '2025-09-01' } },
+    );
+    expect(ws.agreementFiles[0]?.used).toBe(false);
+    // the file does nothing: the new 定価 applies, as the unused-file warning says
+    expect(ws.dataset.applicableList('000001', 'DB-2003', '2025-11-10')?.basis).toBe('current');
+    expect(ws.agreementWarnings).toEqual([]);
+    expect(ws.warnings).toHaveLength(1);
+    expect(ws.warnings[0]).toContain('診断に効いていません');
+  });
+
+  it('does not report the same answer written two ways as a conflict', () => {
+    const osaka = 'revision_2025-10_agreements_osaka.csv';
+    const second = `${AGREEMENTS_HEADER}\n${A},一部合意,2025-10-01,段ボール・紙器,\n${B},協議中,未定,,\n`;
+    const { ws } = load(
+      [`${A},一部合意,2025-10-01,DB,`, `${B},協議中,,,`],
+      [
+        { name: 'categories.csv', data: CATEGORIES },
+        { name: osaka, data: second },
+      ],
+    );
+    expect(ws.agreementFiles.map((f) => f.used)).toEqual([true, true]);
+    expect(ws.dataset.issues.filter((i) => i.kind === 'conflicting_agreement')).toEqual([]);
+
+    // a different answer is still a conflict: 合意 from 2025-10-01 vs 合意 with no date yet
+    const differ = load(
+      [`${A},合意,2025-10-01,,`, `${B},見送り,,,`],
+      [{ name: osaka, data: `${AGREEMENTS_HEADER}\n${A},合意,未定,,\n` }],
+    );
+    expect(differ.ws.dataset.issues.filter((i) => i.kind === 'conflicting_agreement')).toHaveLength(1);
+  });
+
+  it('lists a warning once when two files for the same revision say the same thing', () => {
+    const osaka = 'revision_2025-10_agreements_osaka.csv';
+    const { ws } = load(
+      [`${A},合意,2025-10-01,,`, `${B},適用日変更,2025-10-01,,`],
+      [{ name: osaka, data: `${AGREEMENTS_HEADER}\n${B},適用日変更,2025-10-01,,\n` }],
+    );
+    expect(ws.agreementFiles.map((f) => f.used)).toEqual([true, true]);
+    expect(ws.agreementWarnings).toHaveLength(1);
+    expect(ws.agreementWarnings[0]).toContain('得意先 000002');
+    expect(ws.agreementWarnings[0]).toContain('「適用日変更」');
   });
 });
 

@@ -296,4 +296,21 @@ describe('outcomesFromAgreements', () => {
     expect(o.get('000001')?.agreed).toBe(true);
     expect(o.get('000002')?.agreed).toBe(false);
   });
+
+  it('reads 対象外カテゴリ by code or by name of the categories master, as the diagnosis does', () => {
+    const imp = importFile(
+      'kyogi.csv',
+      new TextEncoder().encode(
+        '得意先コード,得意先名,協議結果,適用日,対象外カテゴリ,備考\n' +
+          '000003,株式会社C物流,一部合意,2026-12-01,工具・金物,\n' +
+          '000001,株式会社A商事,一部合意,2026-12-01,ｋｇ・梱包材,\n',
+      ),
+      { kinds: ['agreements'] },
+    );
+    if (imp.data.kind !== 'agreements') throw new Error(`kind ${imp.data.kind}`);
+    const o = outcomesFromAgreements(imp.data.result.records, ds);
+    const rows = buildPriceMaster(pairs, o);
+    // KG-1001 is kept at the old price for both customers
+    expect(rows.map((r) => `${r.cust} ${r.sku}`)).toEqual(['000001 DB-1001', '000003 DB-1001']);
+  });
 });

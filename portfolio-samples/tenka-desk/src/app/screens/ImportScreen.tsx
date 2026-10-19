@@ -8,6 +8,7 @@ import {
   pctToBp,
   REVISION_SIGNAL_JA,
 } from '../../engine/index.ts';
+import { AgreementWarnings } from '../components/AgreementWarnings.tsx';
 import { DropZone } from '../components/DropZone.tsx';
 import { Badge, Card, Icon, Kpi, Notice, PageHeader } from '../components/ui.tsx';
 import { num, wareki, warekiRange, yen } from '../format.ts';
@@ -112,6 +113,7 @@ export function ImportScreen() {
                 <p>下の「読み込みの確認」の「定価改定の合意状況」で、前回の改定日を入れてください。</p>
               </Notice>
             )}
+            <AgreementWarnings warnings={loaded.ws.agreementWarnings} />
             {loaded.diagnosis ? (
               <p className="button-row">
                 <a className="btn btn-primary" href="#/diagnosis">

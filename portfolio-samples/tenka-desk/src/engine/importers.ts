@@ -5,7 +5,7 @@
  */
 
 import { type CsvTable, readTable } from './csv.ts';
-import { parseDateLoose } from './dates.ts';
+import { type IsoDate, parseDateLoose } from './dates.ts';
 import { type DecodedText, decodeBytes, type TextEncodingName } from './encoding.ts';
 import { type ColumnMapping, detectLayout, type FileKind, type LayoutSpec, mapColumns } from './layouts.ts';
 import { codeKey, customerKey, normalizeText, parseIntLoose, parsePercentPm, parseSen } from './text.ts';
@@ -36,9 +36,61 @@ export interface ImportIssue {
   value?: string;
 }
 
+/** A row left out of `records`, with the customer it was about (agreements files). */
+export interface SkippedRow {
+  /** 1-based physical line in the file */
+  row: number;
+  /** 得意先コード as read from the row ('' when it cannot be read) */
+  cust: string;
+  /** why the row was left out (the first problem found) */
+  reason: string;
+}
+
 export interface ImportResult<T> {
   records: T[];
   issues: ImportIssue[];
+  /**
+   * Agreements files only: the rows left out, by customer. A customer whose row is
+   * left out has no answer, which the diagnosis reads as 合意, so the app must say so.
+   */
+  skipped?: SkippedRow[];
+}
+
+/**
+ * What people write in a date column when the date is not decided yet. Compared after
+ * NFKC, without spaces and in upper case (so "－", "ｰ" and "tbd" count too).
+ */
+export const UNDECIDED_DATE_WORDS: readonly string[] = [
+  '未定',
+  '未確定',
+  '未決定',
+  '調整中',
+  '確認中',
+  '検討中',
+  '協議中',
+  '未回答',
+  'なし',
+  '無し',
+  '-',
+  'ー',
+  '―',
+  '—',
+  '–',
+  '‐',
+  '−',
+  'TBD',
+];
+
+const UNDECIDED_KEYS = new Set(UNDECIDED_DATE_WORDS.map((w) => undecidedKey(w)));
+
+function undecidedKey(raw: string): string {
+  return raw.normalize('NFKC').replace(/\s/g, '').toUpperCase();
+}
+
+/** One of UNDECIDED_DATE_WORDS, possibly with a note in brackets ("未定（4月予定）"). */
+function isUndecidedDate(raw: string): boolean {
+  const k = undecidedKey(raw);
+  return UNDECIDED_KEYS.has(k) || UNDECIDED_KEYS.has(k.replace(/\([^()]*\)$/, ''));
 }
 
 class RowReader {
@@ -46,6 +98,8 @@ class RowReader {
   row = 0;
   private cells: readonly string[] = [];
   private failed = false;
+  /** the first problem that made the current row unreadable */
+  firstFailure: ImportIssue | null = null;
   private readonly mapping: ColumnMapping;
   constructor(mapping: ColumnMapping) {
     this.mapping = mapping;
@@ -55,6 +109,7 @@ class RowReader {
     this.cells = cells;
     this.row = row;
     this.failed = false;
+    this.firstFailure = null;
   }
 
   get ok(): boolean {
@@ -63,9 +118,10 @@ class RowReader {
 
   fail(field: string, message: string, value?: string): void {
     this.failed = true;
-    this.issues.push(
-      value === undefined ? { row: this.row, field, message } : { row: this.row, field, message, value },
-    );
+    const issue: ImportIssue =
+      value === undefined ? { row: this.row, field, message } : { row: this.row, field, message, value };
+    this.firstFailure ??= issue;
+    this.issues.push(issue);
   }
 
   warn(field: string, message: string, value?: string): void {
@@ -145,9 +201,49 @@ class RowReader {
     if (v === null) this.fail(field, '日付として読めません', raw);
     return v;
   }
+
+  /**
+   * A date that may be written as "not decided yet" (未定, 調整中, - …, see
+   * UNDECIDED_DATE_WORDS): then `date` is null and `undecided` holds the word as
+   * written (NFKC, trimmed). A blank cell is null and not undecided.
+   */
+  dateOrUndecided(field: string): { date: IsoDate | null; undecided?: string } {
+    const raw = this.raw(field);
+    if (raw.trim() === '') return { date: null };
+    if (isUndecidedDate(raw)) return { date: null, undecided: normalizeText(raw) };
+    const v = parseDateLoose(raw);
+    if (v === null) this.fail(field, '日付として読めません', raw);
+    return { date: v };
+  }
+
+  /**
+   * A date that decides nothing for this row (the 適用日 of a 見送り・協議中・対象外):
+   * any text that is not a date is kept as written in `undecided`, never a reason to drop the row.
+   */
+  dateOrNote(field: string): { date: IsoDate | null; undecided?: string } {
+    const raw = this.raw(field);
+    if (raw.trim() === '') return { date: null };
+    const v = parseDateLoose(raw);
+    return v !== null ? { date: v } : { date: null, undecided: normalizeText(raw) };
+  }
+
+  /** A date the diagnosis does not use (申入日・回答日): text that is not a date is noted and read as blank. */
+  unusedDate(field: string): IsoDate | null {
+    if (!this.has(field)) return null;
+    const raw = this.raw(field);
+    if (raw.trim() === '' || isUndecidedDate(raw)) return null;
+    const v = parseDateLoose(raw);
+    if (v === null) this.warn(field, '日付として読めないため空欄として扱います（診断には使いません）', raw);
+    return v;
+  }
 }
 
-function run<T>(table: CsvTable, mapping: ColumnMapping, convert: (r: RowReader) => T): ImportResult<T> {
+function run<T>(
+  table: CsvTable,
+  mapping: ColumnMapping,
+  convert: (r: RowReader) => T,
+  onSkip?: (r: RowReader, reason: string) => void,
+): ImportResult<T> {
   const reader = new RowReader(mapping);
   const records: T[] = [];
   const width = table.header.length;
@@ -156,10 +252,15 @@ function run<T>(table: CsvTable, mapping: ColumnMapping, convert: (r: RowReader)
     reader.start(cells, table.rowLines[i] ?? i + 2);
     if (cells.length !== width) {
       reader.fail('*', `列の数が見出しと違います（${cells.length}列／見出し${width}列）`);
-      return;
+    } else {
+      const rec = convert(reader);
+      if (reader.ok) {
+        records.push(rec);
+        return;
+      }
     }
-    const rec = convert(reader);
-    if (reader.ok) records.push(rec);
+    const f = reader.firstFailure;
+    onSkip?.(reader, f ? `${f.message}${f.value?.trim() ? `（${f.value}）` : ''}` : '');
   });
   return { records, issues: reader.issues };
 }
@@ -474,35 +575,71 @@ export const AGREEMENT_KIND_JA: Record<AgreementKind, string> = {
   unknown: '判別できない',
 };
 
+/** Kinds for which the 適用日 decides something (合意・一部合意, and a status read as 合意). */
+const DATED_KINDS: readonly AgreementKind[] = ['agreed', 'agreed_later_date', 'partial', 'unknown'];
+
+/** "合意（適用日未定）": the word in the status's note that says the date is not decided yet. */
+function undecidedInStatus(status: string): string | undefined {
+  const note = /\(([^()]*)\)$/.exec(statusKey(status))?.[1] ?? '';
+  return /(未定|未確定|未決定|調整中)/.exec(note)?.[1];
+}
+
+/**
+ * 合意状況 / 協議結果. A 適用日 written as 未定・調整中・- … (UNDECIDED_DATE_WORDS) is
+ * kept as `effectiveUndecided` instead of dropping the row; the Dataset reads 合意・一部合意
+ * without a date as "not applied yet" (so does 「合意（適用日未定）」 with a blank 適用日).
+ * For 見送り・協議中・対象外 the 適用日 decides nothing, so any text there is kept as
+ * written. 申入日・回答日 are not used for the diagnosis: text that is not a date is noted
+ * and read as blank. A row without a readable 得意先コード answers for no customer and
+ * is left out. Rows left out are listed in `skipped` with their customer.
+ */
 export function importAgreements(
   table: CsvTable,
   _spec: LayoutSpec,
   mapping: ColumnMapping,
 ): ImportResult<RevisionAgreement> {
-  return run(table, mapping, (r) => {
-    const status = r.text('status');
-    const kind = classifyAgreement(status);
-    const excludedCategories = splitList(r.text('excluded'));
-    // 一部合意なのに据え置くカテゴリがないと、どこまで合意したか分からない。全面合意として扱うと
-    // 合意していない品目まで新単価になるので、この行は使わない（協議記録の一部合意と同じ扱い）
-    if (r.ok && kind === 'partial' && excludedCategories.length === 0) {
-      r.fail(
-        'excluded',
-        '一部合意ですが対象外カテゴリが空です。据え置くカテゴリを書いてください',
-        r.raw('excluded'),
-      );
-    }
-    return {
-      cust: customerKey(r.raw('cust')),
-      status,
-      kind,
-      effective: r.dateOrNull('effective'),
-      excludedCategories,
-      requestedOn: r.has('requestedOn') ? r.dateOrNull('requestedOn') : null,
-      answeredOn: r.has('answeredOn') ? r.dateOrNull('answeredOn') : null,
-      note: r.text('note'),
-    };
-  });
+  const skipped: SkippedRow[] = [];
+  const result = run(
+    table,
+    mapping,
+    (r) => {
+      const cust = customerKey(r.raw('cust'));
+      if (cust === '') r.fail('cust', '得意先コードとして読めません', r.raw('cust'));
+      const status = r.text('status');
+      const kind = classifyAgreement(status);
+      const excludedCategories = splitList(r.text('excluded'));
+      // 一部合意なのに据え置くカテゴリがないと、どこまで合意したか分からない。全面合意として扱うと
+      // 合意していない品目まで新単価になるので、この行は使わない（協議記録の一部合意と同じ扱い）
+      if (r.ok && kind === 'partial' && excludedCategories.length === 0) {
+        r.fail(
+          'excluded',
+          '一部合意ですが対象外カテゴリが空です。据え置くカテゴリを書いてください',
+          r.raw('excluded'),
+        );
+      }
+      const effective = DATED_KINDS.includes(kind)
+        ? r.dateOrUndecided('effective')
+        : r.dateOrNote('effective');
+      const undecided =
+        effective.undecided ??
+        (kind !== 'unknown' && DATED_KINDS.includes(kind) && r.raw('effective').trim() === ''
+          ? undecidedInStatus(status)
+          : undefined);
+      return {
+        cust,
+        status,
+        kind,
+        effective: effective.date,
+        ...(undecided !== undefined ? { effectiveUndecided: undecided } : {}),
+        excludedCategories,
+        requestedOn: r.unusedDate('requestedOn'),
+        answeredOn: r.unusedDate('answeredOn'),
+        note: r.text('note'),
+      };
+    },
+    (r, reason) => skipped.push({ row: r.row, cust: customerKey(r.raw('cust')), reason }),
+  );
+  return { ...result, skipped };
 }
 
 export function importSupplierNotices(
